@@ -1,15 +1,17 @@
 <template>
-    <v-row>
-        <v-col cols="12" lg="4">
-            <v-btn @click="_store.changeTheme"
-                :prepend-icon="_store.theme == 'light' ? 'mdi-moon-waning-crescent' : 'mdi-weather-sunny'"
-                :text="_store.theme == 'dark' ? 'light' : 'dark'" variant="tonal" :ripple="false" />
-        </v-col>
-    </v-row>
+  <div class="banner-container">
+  
+  </div>
+
+  <v-responsive height="3000" />
 </template>
 <script lang="ts" setup>
-import store from '~/store/store';
+import store from "~/store/store";
 
-const _store = store()
+const _store = store();
+
+useHead({
+  title: "npmrungame",
+});
 </script>
 <style scoped></style>

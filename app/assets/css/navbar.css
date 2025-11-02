@@ -1,0 +1,30 @@
+.navbar {
+    position: fixed;
+    top: 1%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    transition: all .7s ease;
+}
+
+.scrolled-navbar {
+    /* background-color: rgba(255, 255, 255, 0.15) !important; */
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.navbar-item:hover {
+    background: rgba(255, 255, 255, .15);
+    backdrop-filter: blur(.5rem);
+    -webkit-backdrop-filter: blur(.5rem);
+}
+
+.navbar-item:hover .default-title-letter {
+    color: #fff !important;
+}
+
+.navbar-item:hover .navbar-item-icon {
+    transform: rotate(360deg);
+    color: #fff;
+}
