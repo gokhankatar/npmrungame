@@ -1,9 +1,14 @@
 <template>
   <div
-    class="navbar d-flex justify-space-between align-center mx-auto rounded py-2 px-3 px-sm-6 px-md-9 px-lg-12 px-xl-15 w-100 w-lg-75"
+    class="navbar d-flex justify-space-between align-center mx-auto rounded px-3 px-sm-6 px-md-9 px-lg-12 px-xl-15 w-100 w-lg-75"
     :class="isScrolledToBottom ? 'scrolled-navbar' : ''"
   >
-    <img :src="logoImg" cover width="200" height="50" />
+    <img
+      :src="logoImg"
+      width="90"
+      class="cursor-pointer"
+      @click="router.replace('/')"
+    />
     <div class="d-flex justify-center align-center ga-2 ga-lg-5">
       <div
         v-for="(item, index) of navbarListItems"
@@ -27,7 +32,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import logoImg from "@/assets/img/logoImg.jpg";
+import logoImg from "@/assets/img/logoImg.png";
 
 const router = useRouter();
 const route = useRoute();
