@@ -28,3 +28,11 @@
     transform: rotate(360deg);
     color: #fff;
 }
+
+.active-navbar-item-title {
+    color: #000;
+}
+
+.active-navbar-item-link {
+    background: #69F0AE !important;
+}

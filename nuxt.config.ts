@@ -5,7 +5,13 @@ export default defineNuxtConfig({
     "pinia-plugin-persistedstate/nuxt",
     "nuxt-lodash",
     "vuetify-nuxt-module",
+    "nuxt-swiper"
   ],
+  runtimeConfig: {
+    public: {
+      apiKey: process.env.API_KEY
+    }
+  },
   app: {
     head: {
       link: [
@@ -21,6 +27,19 @@ export default defineNuxtConfig({
       ]
     }
   },
+  lodash: {
+    prefix: "_",
+    prefixSkip: ["string"],
+    upperAfterPrefix: false,
+    exclude: ["map"],
+    alias: [
+      ["camelCase", "stringToCamelCase"],
+      ["kebabCase", "stringToKebab"],
+      ["isDate", "isLodashDate"]
+    ],
+  },
+  css: ['~/assets/css/main.css'],
+
 
   devtools: { enabled: false },
   devServer: {

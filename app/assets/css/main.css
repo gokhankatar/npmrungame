@@ -1,3 +1,10 @@
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #979b9e #121212;
+    scroll-behavior: smooth;
+}
+
+
 .transition {
     transition: all .3s ease;
 }
@@ -5,4 +12,64 @@
 .default-title-letter {
     letter-spacing: 1px !important;
     font-weight: 500;
+}
+
+.banner-container {
+    position: absolute;
+    height: 100vh;
+    width: 100%;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+.banner-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("~/assets/img/banner_img.jpg");
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.5);
+    transform: scale(1.1);
+    z-index: 0;
+}
+
+.banner-container>* {
+    position: relative;
+    z-index: 1;
+}
+
+.game-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.metacritic-point {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 999;
+}
+
+.game-card-img {
+    object-position: center top;
+    filter: brightness(.7);
+    transition: transform 0.4s ease, filter 0.3s ease;
+    transform: scale(1);
+}
+
+.game-card-img:hover {
+    filter: brightness(1);
+    transform: scale(1.1);
+}
+
+.game-card-info {
+    background: rgba(0, 0, 0, .6);
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
 }
