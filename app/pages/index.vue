@@ -13,7 +13,7 @@
     >
       <v-card
         class="game-card bg-transparent rounded-lg cursor-pointer transition"
-        :height="smallScreen ? 250 : 350"
+        :height="smallScreen ? 250 : 450"
         :ripple="false"
       >
         <v-img
@@ -21,14 +21,34 @@
           class="game-card-img h-100 rounded-lg"
           cover
         />
-        <v-chip
-          class="metacritic-point rounded-xl ma-1 ma-lg-2"
-          :ripple="false"
-          size="small"
-          variant="elevated"
-          color="black"
-          :text="item.metacritic ?? 'unknown'"
-        />
+        <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">
+          <template #activator="{ props }">
+            <v-chip
+              v-bind="props"
+              class="playtime-icon rounded-xl ma-1 ma-lg-2"
+              :ripple="false"
+              size="small"
+              variant="elevated"
+              color="black"
+              :text="item.playtime ? `${item.playtime} saat` : 'belirsiz'"
+            />
+          </template>
+        </v-tooltip>
+
+        <v-tooltip text="Metacritic puanı" location="top">
+          <template #activator="{ props }">
+            <v-chip
+              v-bind="props"
+              class="metacritic-point rounded-xl ma-1 ma-lg-2"
+              :ripple="false"
+              size="small"
+              variant="elevated"
+              color="black"
+              :text="item.metacritic ?? 'belirsiz'"
+            />
+          </template>
+        </v-tooltip>
+
         <div class="game-card-info pa-1 pa-lg-2">
           <p class="default-title-letter text-caption text-lg-subtitle-2 text-white">
             {{ item.name }}
@@ -36,6 +56,17 @@
           <p class="text-white text-caption">
             {{ new Date(item.released).getFullYear() }}
           </p>
+          <v-chip-group multiple column class="">
+            <v-chip
+              v-for="(genre, index) in item.genres"
+              :key="index"
+              color="primary"
+              size="small"
+              variant="tonal"
+              :ripple="false"
+              :text="genre.name"
+            />
+          </v-chip-group>
         </div>
       </v-card>
     </v-col>
@@ -44,6 +75,7 @@
 <script lang="ts" setup>
 import axios from "axios";
 import store from "~/store/store";
+import example_results from "~/example_response.json";
 
 const _store = store();
 
@@ -69,7 +101,7 @@ const getGames = async () => {
 };
 
 onMounted(() => {
-  getGames();
+  gamesArr.value = example_results.results;
 });
 </script>
 
