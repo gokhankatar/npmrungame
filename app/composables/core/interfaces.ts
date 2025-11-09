@@ -7,3 +7,8 @@ export interface NavbarList {
   path: string
   icon: string
 }
+
+export interface Game_Category {
+  name: string;
+  icon: string;
+}

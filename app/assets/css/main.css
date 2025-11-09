@@ -80,3 +80,7 @@
     left: 0;
     z-index: 999;
 }
+
+.category-chip:hover{
+    color: #fff !important;
+}

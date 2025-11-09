@@ -22,11 +22,6 @@ export const navbarListItems: NavbarList[] = [
         icon: "mdi-controller-classic-outline",
     },
     {
-        title: "Oyun Öner",
-        path: "/recommend-games",
-        icon: "mdi-lightbulb-outline",
-    },
-    {
         title: "Blog",
         path: "/blogs",
         icon: "mdi-post",
