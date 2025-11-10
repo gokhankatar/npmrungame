@@ -1,5 +1,6 @@
 export interface StoreNpmRunGame {
   theme?: "dark" | "light"
+  active_game_platform: string
 }
 
 export interface NavbarList {
@@ -9,6 +10,7 @@ export interface NavbarList {
 }
 
 export interface Game_Category {
-  name: string;
+  name: "PC" | "PS5" | "Xbox" | "Nintendo Switch" | "En Yüksek Puanlı"
+  slug: "pc" | "ps5" | "xbox" | "nintendo" | "star"
   icon: string;
 }

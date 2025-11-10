@@ -1,9 +1,39 @@
 <template>
-  <div class="banner-container"></div>
+  <div class="banner-container">
+    <div
+      class="banner-content d-flex flex-column align-center align-md-start ga-1 ga-md-3 ga-lg-5"
+    >
+      <p class="banner-content-title text-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3">
+        Sende Günden Güne Büyüyen Ekosistemin Bir Parçası Ol!
+      </p>
+      <div class="d-flex align center ga-2 ga-lg-5">
+        <div class="discover-btn pa-3 d-flex align-center ga-5 cursor-pointer">
+          <v-icon class="discover-icon" icon="mdi-earth" />
+          <p
+            class="text-subtitle-2 text-md-subtitle-2 text-lg-h5"
+            style="letter-spacing: 1px !important; font-weight: 500"
+          >
+            Keşfet
+          </p>
+        </div>
+
+        <div class="subscribe-btn pa-3 d-flex align-center ga-5 cursor-pointer">
+          <v-icon class="bell-icon" icon="mdi-bell" />
+          <p
+            class="text-subtitle-2 text-md-subtitle-2 text-lg-h5"
+            style="letter-spacing: 1px !important; font-weight: 500"
+          >
+            Abone Ol
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <v-responsive height="100vh" />
 
   <v-container class="pa-0 pa-lg-10 pa-xl-15">
+    <!-- Game Platform Chips -->
     <v-row>
       <v-col cols="12">
         <div
@@ -12,7 +42,13 @@
           <v-chip
             v-for="(item, index) of game_category_list"
             :key="item.name"
+            @click="handleGamePlatform(item.slug)"
             class="cursor-pointer transition category-chip"
+            :class="
+              _store.active_game_platform == item.slug
+                ? `active-game-platform-${item.slug}`
+                : ''
+            "
             color="grey"
             variant="outlined"
             :size="getCategoryChipSize"
@@ -98,6 +134,20 @@
                 <p class="text-white text-caption">
                   {{ new Date(item.released).getFullYear() }}
                 </p>
+
+                <div class="d-flex align-center flex-wrap ga-1">
+                  <template
+                    v-for="icon in getUniquePlatformIcons(item.platforms)"
+                    :key="icon"
+                  >
+                    <v-icon
+                      v-if="icon"
+                      size="x-small"
+                      color="grey-lighten-1"
+                      :icon="icon"
+                    />
+                  </template>
+                </div>
               </div>
 
               <!-- Genres -->
@@ -113,7 +163,7 @@
               </div>
 
               <!-- Tags -->
-              <div class="d-flex flex-wrap ga-1">
+              <div class="d-none d-md-flex flex-wrap ga-1">
                 <v-chip
                   v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
                   :key="index"
@@ -146,7 +196,12 @@ import axios from "axios";
 import store from "~/store/store";
 import example_results from "~/example_response.json";
 import { truncateText } from "~/composables/core/basicFunc";
-import { useLimitedTags, useMetacriticStyle } from "~/composables/data/handleData";
+import {
+  getPlatformIcon,
+  getUniquePlatformIcons,
+  useLimitedTags,
+  useMetacriticStyle,
+} from "~/composables/data/handleData";
 import fireAnimation from "~/assets/img/fire_anim.gif";
 
 const _store = store();
@@ -182,6 +237,14 @@ const getCategoryChipSize = computed(() => {
     return "x-small";
   }
 });
+
+const handleGamePlatform = (platform: "pc" | "ps5" | "xbox" | "nintendo" | "star") => {
+  if (platform == _store.active_game_platform) {
+    _store.clearActiveGamePlatform();
+  } else {
+    _store.changeGamePlatform(platform);
+  }
+};
 
 onMounted(() => {
   gamesArr.value = example_results.results;

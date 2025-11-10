@@ -23,6 +23,92 @@
     overflow: hidden;
 }
 
+.banner-content {
+    position: absolute;
+    top: 70%;
+    width: 40%;
+    left: 10%;
+    z-index: 9999;
+}
+
+.discover-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3.5rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.discover-btn:hover{
+    background-color: rgba(0, 0, 0, .75);
+    color: #fff;
+}
+
+.discover-btn:hover .discover-icon {
+  animation: rotate360 0.6s ease-in-out;
+}
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.subscribe-btn {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    display: inline-flex;
+    align-items: center;
+    border-radius: 3.5rem;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.subscribe-btn:hover{
+    background-color: red;
+    border-color: red !important;
+}
+
+.subscribe-btn:hover {
+    border-color: #999;
+}
+
+.subscribe-btn:hover .bell-icon {
+    animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(10deg);
+    }
+
+    50% {
+        transform: rotate(-10deg);
+    }
+
+    75% {
+        transform: rotate(6deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.banner-content-title {
+    letter-spacing: 2px !important;
+    line-height: 4rem;
+}
+
 .banner-container::before {
     content: "";
     position: absolute;
@@ -81,6 +167,36 @@
     z-index: 999;
 }
 
-.category-chip:hover{
+.category-chip:hover {
     color: #fff !important;
+}
+
+.active-game-platform-pc {
+    background-color: #0078D7 !important;
+    border-color: #0078D7;
+    color: #fff !important;
+}
+
+.active-game-platform-ps5 {
+    background-color: #003087 !important;
+    border-color: #003087;
+    color: #fff !important
+}
+
+.active-game-platform-xbox {
+    background-color: #107C10 !important;
+    border-color: #107C10;
+    color: #fff !important;
+}
+
+.active-game-platform-nintendo {
+    background-color: #E60012 !important;
+    border-color: #E60012;
+    color: #fff !important;
+}
+
+.active-game-platform-star {
+    background-color: #FFD700 !important;
+    border-color: #FFD700;
+    color: #000 !important;
 }
