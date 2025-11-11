@@ -32,31 +32,32 @@
 }
 
 .discover-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3.5rem;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3.5rem;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
 }
 
-.discover-btn:hover{
+.discover-btn:hover {
     background-color: rgba(0, 0, 0, .75);
     color: #fff;
 }
 
 .discover-btn:hover .discover-icon {
-  animation: rotate360 0.6s ease-in-out;
+    animation: rotate360 0.6s ease-in-out;
 }
 
 @keyframes rotate360 {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .subscribe-btn {
@@ -69,7 +70,7 @@
     transition: border-color 0.3s ease;
 }
 
-.subscribe-btn:hover{
+.subscribe-btn:hover {
     background-color: red;
     border-color: red !important;
 }
@@ -81,6 +82,7 @@
 .subscribe-btn:hover .bell-icon {
     animation: shake 0.4s ease-in-out;
 }
+
 
 @keyframes shake {
     0% {
@@ -101,6 +103,47 @@
 
     100% {
         transform: rotate(0deg);
+    }
+}
+
+.loading-text {
+    position: relative;
+    display: inline-block;
+    font-weight: 500;
+    background: linear-gradient(90deg,
+            rgba(200, 200, 200, 0.15) 25%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(200, 200, 200, 0.15) 75%);
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation:
+        shimmer 1.6s infinite linear,
+        pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
     }
 }
 

@@ -34,8 +34,8 @@
 
   <v-container class="pa-0 pa-lg-10 pa-xl-15">
     <!-- Game Platform Chips -->
-    <v-row>
-      <v-col cols="12">
+    <v-row class="d-flex align-center">
+      <v-col cols="12" sm="6">
         <div
           class="d-flex flex-wrap align-center justify-center justify-sm-start ga-1 ga-md-2 ga-lg-4"
         >
@@ -58,136 +58,173 @@
           />
         </div>
       </v-col>
+
+      <v-col cols="12" sm="6">
+        <v-text-field
+          v-model="models.searchGameText"
+          variant="outlined"
+          rounded="xl"
+          label="Oyun Ara"
+          color="grey"
+          density="compact"
+          class="text-grey font-weight-bold text-caption text-lg-subtitle-2 text-xl-subtitle-1"
+          style="letter-spacing: 1px !important"
+          prepend-inner-icon="mdi-magnify"
+          placeholder="Elden Ring"
+          @update:model-value="handleSearch"
+        >
+          <template #append-inner>
+            <v-progress-circular
+              v-if="isLoadingSearch"
+              indeterminate
+              size="20"
+              width="2"
+              color="grey"
+            />
+          </template>
+        </v-text-field>
+      </v-col>
     </v-row>
 
     <!-- Games List -->
-    <v-row class="d-flex justify-center align-center mx-auto" density="comfortable">
-      <template v-if="isLoading">
-        <v-col cols="12">
-          <v-progress-circular color="primary" indeterminate />
-        </v-col>
-      </template>
+    <v-row class="d-flex justify-start align-center mx-auto" density="comfortable">
+      <v-col
+        v-for="(item, index) of gamesArr"
+        :key="index"
+        cols="12"
+        sm="6"
+        md="4"
+        lg="3"
+      >
+        <v-skeleton-loader
+          v-if="isLoading || isLoadingSearch"
+          type="card"
+          class="rounded-lg h-100"
+        />
 
-      <template v-else>
-        <v-col
-          v-for="(item, index) of gamesArr"
-          :key="index"
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
+        <v-card
+          v-if="!isLoading && !isLoadingSearch && !isStartSearching"
+          class="game-card bg-transparent rounded-lg cursor-pointer transition"
+          :height="smallScreen ? 250 : 375"
+          :ripple="false"
         >
-          <v-card
-            class="game-card bg-transparent rounded-lg cursor-pointer transition"
-            :height="smallScreen ? 250 : 375"
-            :ripple="false"
+          <v-img
+            :src="item.background_image"
+            class="game-card-img h-100 rounded-lg"
+            cover
+          />
+
+          <!-- Playtime -->
+          <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">
+            <template #activator="{ props }">
+              <v-chip
+                v-bind="props"
+                class="playtime-icon rounded-xl ma-1 ma-lg-2"
+                :ripple="false"
+                size="small"
+                variant="elevated"
+                prepend-icon="mdi-timer-outline"
+                color="black"
+                :text="item.playtime ? `${item.playtime} saat` : 'belirsiz'"
+              />
+            </template>
+          </v-tooltip>
+
+          <!-- Metacritic -->
+          <v-tooltip text="Metacritic puanı" location="top">
+            <template #activator="{ props }">
+              <v-chip
+                v-bind="props"
+                class="metacritic-point rounded-xl ma-1 ma-lg-2"
+                :ripple="false"
+                size="small"
+                :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
+                :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
+                variant="elevated"
+                :color="useMetacriticStyle(item.metacritic).color"
+                :text="item.metacritic ?? 'belirsiz'"
+              />
+            </template>
+          </v-tooltip>
+
+          <div
+            class="game-card-info d-flex flex-column align-start ga-1 ga-lg-2 pa-1 pa-lg-2"
           >
-            <v-img
-              :src="item.background_image"
-              class="game-card-img h-100 rounded-lg"
-              cover
-            />
+            <!-- Name & Date -->
+            <div class="d-flex flex-column align-start">
+              <p class="default-title-letter text-caption text-lg-subtitle-2 text-white">
+                {{ item.name }}
+              </p>
+              <p class="text-white text-caption">
+                {{ new Date(item.released).getFullYear() }}
+              </p>
 
-            <!-- Playtime -->
-            <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">
-              <template #activator="{ props }">
-                <v-chip
-                  v-bind="props"
-                  class="playtime-icon rounded-xl ma-1 ma-lg-2"
-                  :ripple="false"
-                  size="small"
-                  variant="elevated"
-                  prepend-icon="mdi-timer-outline"
-                  color="black"
-                  :text="item.playtime ? `${item.playtime} saat` : 'belirsiz'"
-                />
-              </template>
-            </v-tooltip>
-
-            <!-- Metacritic -->
-            <v-tooltip text="Metacritic puanı" location="top">
-              <template #activator="{ props }">
-                <v-chip
-                  v-bind="props"
-                  class="metacritic-point rounded-xl ma-1 ma-lg-2"
-                  :ripple="false"
-                  size="small"
-                  :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
-                  :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
-                  variant="elevated"
-                  :color="useMetacriticStyle(item.metacritic).color"
-                  :text="item.metacritic ?? 'belirsiz'"
-                />
-              </template>
-            </v-tooltip>
-
-            <div
-              class="game-card-info d-flex flex-column align-start ga-1 ga-lg-2 pa-1 pa-lg-2"
-            >
-              <!-- Name & Date -->
-              <div class="d-flex flex-column align-start">
-                <p
-                  class="default-title-letter text-caption text-lg-subtitle-2 text-white"
+              <div class="d-flex align-center flex-wrap ga-1">
+                <template
+                  v-for="icon in getUniquePlatformIcons(item.platforms)"
+                  :key="icon"
                 >
-                  {{ item.name }}
-                </p>
-                <p class="text-white text-caption">
-                  {{ new Date(item.released).getFullYear() }}
-                </p>
-
-                <div class="d-flex align-center flex-wrap ga-1">
-                  <template
-                    v-for="icon in getUniquePlatformIcons(item.platforms)"
-                    :key="icon"
-                  >
-                    <v-icon
-                      v-if="icon"
-                      size="x-small"
-                      color="grey-lighten-1"
-                      :icon="icon"
-                    />
-                  </template>
-                </div>
-              </div>
-
-              <!-- Genres -->
-              <div class="d-flex flex-wrap ga-1">
-                <v-chip
-                  v-for="(genre, index) in item.genres"
-                  :key="index"
-                  :size="smallScreen ? 'x-small' : 'small'"
-                  variant="outlined"
-                  :ripple="false"
-                  :text="genre.name"
-                />
-              </div>
-
-              <!-- Tags -->
-              <div class="d-none d-md-flex flex-wrap ga-1">
-                <v-chip
-                  v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
-                  :key="index"
-                  color="blue-lighten-1"
-                  size="x-small"
-                  class="rounded text-black"
-                  variant="elevated"
-                  :ripple="false"
-                  :text="truncateText(tag.name, 15)"
-                />
-                <v-chip
-                  v-if="useLimitedTags(item.tags, 3).hiddenCount > 0"
-                  color="blue-lighten-1"
-                  size="x-small"
-                  variant="elevated"
-                  class="rounded text-black"
-                  :ripple="false"
-                  :text="useLimitedTags(item.tags, 3).hiddenText"
-                />
+                  <v-icon
+                    v-if="icon"
+                    size="x-small"
+                    color="grey-lighten-1"
+                    :icon="icon"
+                  />
+                </template>
               </div>
             </div>
-          </v-card>
-        </v-col>
-      </template>
+
+            <!-- Genres -->
+            <div class="d-flex flex-wrap ga-1">
+              <v-chip
+                v-for="(genre, index) in item.genres"
+                :key="index"
+                :size="smallScreen ? 'x-small' : 'small'"
+                variant="outlined"
+                :ripple="false"
+                :text="genre.name"
+              />
+            </div>
+
+            <!-- Tags -->
+            <div class="d-none d-md-flex flex-wrap ga-1">
+              <v-chip
+                v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
+                :key="index"
+                color="grey-darken-1"
+                size="x-small"
+                class="rounded text-black"
+                variant="elevated"
+                :ripple="false"
+                :text="truncateText(tag.name, 15)"
+              />
+              <v-chip
+                v-if="useLimitedTags(item.tags, 3).hiddenCount > 0"
+                color="grey-darken-2"
+                size="x-small"
+                variant="elevated"
+                class="rounded text-white"
+                :ripple="false"
+                :text="useLimitedTags(item.tags, 3).hiddenText"
+              />
+            </div>
+          </div>
+        </v-card>
+      </v-col>
+
+      <!-- Search Start Text -->
+      <v-col
+        cols="12"
+        v-if="isStartSearching && !isLoadingSearch"
+        class="d-flex align-center ga-2"
+      >
+        <p
+          class="loading-text text-grey-lighten-1 text-caption text-md-subtitle-2 text-lg-subtitle-1"
+        >
+          Oyunlar Aranıyor...
+        </p>
+        <v-progress-circular indeterminate color="grey-lighten-1" size="16" width="2" />
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -197,7 +234,6 @@ import store from "~/store/store";
 import example_results from "~/example_response.json";
 import { truncateText } from "~/composables/core/basicFunc";
 import {
-  getPlatformIcon,
   getUniquePlatformIcons,
   useLimitedTags,
   useMetacriticStyle,
@@ -215,6 +251,14 @@ const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
 const gamesArr = ref<any[]>([]);
 const isLoading = ref(false);
+const isLoadingSearch = ref(false);
+const isStartSearching = ref(false);
+
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+const models = ref({
+  searchGameText: "",
+});
 
 const getGames = async () => {
   try {
@@ -243,6 +287,49 @@ const handleGamePlatform = (platform: "pc" | "ps5" | "xbox" | "nintendo" | "star
     _store.clearActiveGamePlatform();
   } else {
     _store.changeGamePlatform(platform);
+  }
+};
+
+const getGamesByName = async (game_name: string) => {
+  try {
+    isLoadingSearch.value = true;
+    const baseUrl = "https://api.rawg.io/api/games";
+
+    const { data } = await axios.get(baseUrl, {
+      params: {
+        key: config.public.apiKey,
+        search: models.value?.searchGameText,
+      },
+    });
+
+    console.log(data.results);
+
+    if (data.results?.length > 0) {
+      isStartSearching.value = false;
+      isStartSearching.value = false;
+    }
+
+    gamesArr.value = data.results || [];
+  } catch (error: any) {
+    console.error("Error while get games :", error.message);
+  } finally {
+    isLoadingSearch.value = false;
+  }
+};
+
+const handleSearch = () => {
+  if (debounceTimer) clearTimeout(debounceTimer);
+
+  isStartSearching.value = true;
+
+  if (models.value?.searchGameText?.length > 2) {
+    debounceTimer = setTimeout(() => {
+      getGamesByName(models.value?.searchGameText);
+    }, 150);
+  } else {
+    getGames();
+    isLoadingSearch.value = false;
+    isStartSearching.value = false;
   }
 };
 
