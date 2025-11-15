@@ -26,6 +26,9 @@ const store = defineStore("npmrungame_store", {
     logOut() {
       this.isAdmin = false;
     },
+    login() {
+      this.isAdmin = true
+    }
   },
   persist: true,
 });

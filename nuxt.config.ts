@@ -9,7 +9,8 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     public: {
-      apiKey: process.env.API_KEY
+      apiKey: process.env.API_KEY,
+      firebaseApiKey: process.env.FIREBASE_API_KEY
     }
   },
   app: {
