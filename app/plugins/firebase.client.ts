@@ -3,8 +3,10 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 
 export default defineNuxtPlugin(() => {
+  const config = useRuntimeConfig();
+
   const firebaseConfig = {
-    apiKey: "AIzaSyCInDODE68eKVnWnCCT0PbiJaS4QAcjuIg",
+    apiKey: config.public.firebaseApiKey,
     authDomain: "npmrungame-cc969.firebaseapp.com",
     projectId: "npmrungame-cc969",
     storageBucket: "npmrungame-cc969.firebasestorage.app",

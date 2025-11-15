@@ -1,9 +1,16 @@
 <template>
   <template v-if="_store.isAdmin">
-    <v-navigation-drawer class="admin-nav-drawer" permanent :rail="false">
+    <v-navigation-drawer class="admin-nav-drawer" :rail="isRail">
+      <v-btn
+        class="rail-btn text-caption text-lg-subtitle-2 default-title-letter pa-1 rounded ma-1"
+        @click="isRail = !isRail"
+        :icon="isRail ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left'"
+        :ripple="false"
+        size="sm"
+      />
       <template v-slot:prepend>
         <v-list
-          class="bg-transparent"
+          class="bg-transparent mt-10"
           :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
         >
           <v-list-item
@@ -27,30 +34,32 @@
       </template>
 
       <template v-slot:append>
-        <v-btn
-          @click="router.replace('/')"
-          text="Anasayfaya Dön"
-          class="mb-1 default-title-letter rounded-xl text-capitalize"
-          variant="tonal"
-          color="primary"
-          :elevation="0"
-          :size="isExtraLargeScreen ? 'large' : 'small'"
-          prepend-icon="mdi-home-outline"
-          :ripple="false"
-          block
-        />
-        <v-btn
-          @click="handleLogout"
-          text="Çıkış Yap"
-          class="mb-1 default-title-letter rounded-xl text-capitalize"
-          variant="tonal"
-          color="red-accent-1"
-          :elevation="0"
-          :size="isExtraLargeScreen ? 'large' : 'small'"
-          prepend-icon="mdi-logout"
-          :ripple="false"
-          block
-        />
+        <v-list
+          bg-color="transparent"
+          class="mb-1"
+          :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
+        >
+          <v-list-item
+            :to="'/'"
+            prepend-icon="mdi-home-outline"
+            rounded="xl"
+            :ripple="false"
+            class="default-title-letter text-caption text-lg-subtitle-2"
+            active-class="main-nav-active"
+          >
+            Anasayfaya Dön
+          </v-list-item>
+
+          <v-list-item
+            @click="handleLogout"
+            prepend-icon="mdi-logout"
+            rounded="xl"
+            :ripple="false"
+            class="default-title-letter text-caption text-lg-subtitle-2"
+          >
+            Çıkış Yap
+          </v-list-item>
+        </v-list>
       </template>
     </v-navigation-drawer>
   </template>
@@ -115,6 +124,18 @@
         </template>
       </v-text-field>
 
+      <transition name="slide-up">
+        <v-alert
+          v-if="isVisibleAlertAfterLogin"
+          variant="tonal"
+          class="default-title-letter mb-1 text-caption text-lg-subtitle-2"
+          :icon="colorAfterLogin == 'success' ? 'mdi-check' : 'mdi-close'"
+          density="compact"
+          :text="msgAfterLogin!"
+          :color="colorAfterLogin!"
+        />
+      </transition>
+
       <v-btn
         text="Giriş"
         :loading="isLoadingLogin"
@@ -147,6 +168,7 @@ const router = useRouter();
 const display = useDisplay();
 const isSmallScreen = computed(() => display.smAndDown.value);
 const isExtraLargeScreen = computed(() => display.lgAndUp.value);
+const isRail = ref(false);
 
 const { $auth } = useNuxtApp();
 
@@ -172,6 +194,10 @@ const rules = ref({
   ],
 });
 
+const isVisibleAlertAfterLogin = ref(false);
+const msgAfterLogin = ref<string | null>(null);
+const colorAfterLogin = ref<"error" | "success" | null>(null);
+
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
@@ -195,13 +221,28 @@ const handleAdminAuth = async () => {
     );
 
     const user = userCredential.user;
+    msgAfterLogin.value = "Giriş Başarılı";
+    colorAfterLogin.value = "success";
+    isVisibleAlertAfterLogin.value = true;
 
-    
+    adminForm.value?.reset();
+
+    setTimeout(() => {
       _store.login();
-      console.log("Giriş Başarılı , User Credential : ", userCredential);
+      isVisibleAlertAfterLogin.value = false;
+    }, 1500);
+
+    console.log("Giriş Başarılı , User Credential : ", userCredential);
   } catch (error: any) {
-    console.error("Error while admin login", error.message);
-    console.log("GİRİŞ BAŞARISIZ");
+    isVisibleAlertAfterLogin.value = false;
+
+    msgAfterLogin.value = "Email ya da parola yanlış!";
+    colorAfterLogin.value = "error";
+    isVisibleAlertAfterLogin.value = true;
+
+    setTimeout(() => {
+      isVisibleAlertAfterLogin.value = false;
+    }, 3500);
   } finally {
     isLoadingLogin.value = false;
   }
