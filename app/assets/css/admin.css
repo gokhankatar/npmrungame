@@ -1,0 +1,34 @@
+.admin-nav-drawer {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(0.5rem);
+  -webkit-backdrop-filter: blur(0.5rem);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.active-admin-list-item {
+  background: #69f0ae;
+  color: black;
+}
+
+.admin-form {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(0.5rem);
+  -webkit-backdrop-filter: blur(0.5rem);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  min-width: 350px;
+  max-width: 450px;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.back-to-home-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999;
+}

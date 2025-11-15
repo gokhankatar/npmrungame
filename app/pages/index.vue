@@ -1,28 +1,22 @@
 <template>
   <div class="banner-container">
-    <div
-      class="banner-content d-flex flex-column align-center align-md-start ga-1 ga-md-3 ga-lg-5"
-    >
+    <div class="banner-content d-flex flex-column align-center align-md-start ga-1 ga-md-3 ga-lg-5">
       <p class="banner-content-title text-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3">
         Sende Günden Güne Büyüyen Ekosistemin Bir Parçası Ol!
       </p>
-      <div class="d-flex align center ga-2 ga-lg-5">
-        <div class="discover-btn pa-3 d-flex align-center ga-5 cursor-pointer">
-          <v-icon class="discover-icon" icon="mdi-earth" />
-          <p
-            class="text-subtitle-2 text-md-subtitle-2 text-lg-h5"
-            style="letter-spacing: 1px !important; font-weight: 500"
-          >
+      <div class="d-flex align center ga-2 ga-xl-5">
+        <div class="discover-btn pa-1 pa-xl-3 d-flex align-center ga-2 ga-xl-5 cursor-pointer">
+          <v-icon class="discover-icon" icon="mdi-earth" :size="extraLgScreen ? 'medium' : 'x-small'" />
+          <p class="text-subtitle-2 text-md-subtitle-1 text-xl-h5"
+            style="letter-spacing: 1px !important; font-weight: 500">
             Keşfet
           </p>
         </div>
 
-        <div class="subscribe-btn pa-3 d-flex align-center ga-5 cursor-pointer">
-          <v-icon class="bell-icon" icon="mdi-bell" />
-          <p
-            class="text-subtitle-2 text-md-subtitle-2 text-lg-h5"
-            style="letter-spacing: 1px !important; font-weight: 500"
-          >
+        <div class="subscribe-btn pa-1 pa-xl-3 d-flex align-center ga-2 ga-xl-5 cursor-pointer">
+          <v-icon class="bell-icon" icon="mdi-bell" :size="extraLgScreen ? 'medium' : 'x-small'" />
+          <p class="text-subtitle-2 text-md-subtitle-1 text-xlz-h5"
+            style="letter-spacing: 1px !important; font-weight: 500">
             Abone Ol
           </p>
         </div>
@@ -36,51 +30,23 @@
     <!-- Game Platform Chips -->
     <v-row class="d-flex align-center">
       <v-col cols="12" sm="6">
-        <div
-          class="d-flex flex-wrap align-center justify-center justify-sm-start ga-1 ga-md-2 ga-lg-4"
-        >
-          <v-chip
-            v-for="(item, index) of game_category_list"
-            :key="item.name"
-            @click="handleGamePlatform(item.slug)"
-            class="cursor-pointer transition category-chip"
-            :class="
-              _store.active_game_platform == item.slug
-                ? `active-game-platform-${item.slug}`
-                : ''
-            "
-            color="grey"
-            variant="outlined"
-            :size="getCategoryChipSize"
-            :text="item.name"
-            :prepend-icon="item.icon"
-            :ripple="false"
-          />
+        <div class="d-flex flex-wrap align-center justify-center justify-sm-start ga-1 ga-md-2 ga-lg-4">
+          <v-chip v-for="(item, index) of game_category_list" :key="item.name" @click="handleGamePlatform(item.slug)"
+            class="cursor-pointer transition category-chip" :class="_store.active_game_platform == item.slug
+              ? `active-game-platform-${item.slug}`
+              : ''
+              " color="grey" variant="outlined" :size="getCategoryChipSize" :text="item.name" :prepend-icon="item.icon"
+            :ripple="false" />
         </div>
       </v-col>
 
       <v-col cols="12" sm="6">
-        <v-text-field
-          v-model="models.searchGameText"
-          variant="outlined"
-          rounded="xl"
-          label="Oyun Ara"
-          color="grey"
-          density="compact"
-          class="text-grey font-weight-bold text-caption text-lg-subtitle-2 text-xl-subtitle-1"
-          style="letter-spacing: 1px !important"
-          prepend-inner-icon="mdi-magnify"
-          placeholder="Elden Ring"
-          @update:model-value="handleSearch"
-        >
+        <v-text-field v-model="models.searchGameText" variant="outlined" rounded="xl" label="Oyun Ara" color="grey"
+          density="compact" class="text-grey font-weight-bold text-caption text-lg-subtitle-2 text-xl-subtitle-1"
+          style="letter-spacing: 1px !important" prepend-inner-icon="mdi-magnify" placeholder="Elden Ring"
+          @update:model-value="handleSearch">
           <template #append-inner>
-            <v-progress-circular
-              v-if="isLoadingSearch"
-              indeterminate
-              size="20"
-              width="2"
-              color="grey"
-            />
+            <v-progress-circular v-if="isLoadingSearch" indeterminate size="20" width="2" color="grey" />
           </template>
         </v-text-field>
       </v-col>
@@ -88,68 +54,34 @@
 
     <!-- Games List -->
     <v-row class="d-flex justify-start align-center mx-auto" density="comfortable">
-      <v-col
-        v-for="(item, index) of gamesArr"
-        :key="index"
-        cols="12"
-        sm="6"
-        md="4"
-        lg="3"
-      >
-        <v-skeleton-loader
-          v-if="isLoading || isLoadingSearch"
-          type="card"
-          class="rounded-lg h-100"
-        />
+      <v-col v-for="(item, index) of gamesArr" :key="index" cols="12" sm="6" md="4" lg="3">
+        <v-skeleton-loader v-if="isLoading || isLoadingSearch" type="card" class="rounded-lg h-100" />
 
-        <v-card
-          v-if="!isLoading && !isLoadingSearch && !isStartSearching"
-          class="game-card bg-transparent rounded-lg cursor-pointer transition"
-          :height="smallScreen ? 250 : 375"
-          :ripple="false"
-        >
-          <v-img
-            :src="item.background_image"
-            class="game-card-img h-100 rounded-lg"
-            cover
-          />
+        <v-card v-if="!isLoading && !isLoadingSearch && !isStartSearching"
+          class="game-card bg-transparent rounded-lg cursor-pointer transition" :height="smallScreen ? 250 : 375"
+          :ripple="false">
+          <v-img :src="item.background_image" class="game-card-img h-100 rounded-lg" cover />
 
           <!-- Playtime -->
           <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">
             <template #activator="{ props }">
-              <v-chip
-                v-bind="props"
-                class="playtime-icon rounded-xl ma-1 ma-lg-2"
-                :ripple="false"
-                size="small"
-                variant="elevated"
-                prepend-icon="mdi-timer-outline"
-                color="black"
-                :text="item.playtime ? `${item.playtime} saat` : 'belirsiz'"
-              />
+              <v-chip v-bind="props" class="playtime-icon rounded-xl ma-1 ma-lg-2" :ripple="false" size="small"
+                variant="elevated" prepend-icon="mdi-timer-outline" color="black"
+                :text="item.playtime ? `${item.playtime} saat` : 'belirsiz'" />
             </template>
           </v-tooltip>
 
           <!-- Metacritic -->
           <v-tooltip text="Metacritic puanı" location="top">
             <template #activator="{ props }">
-              <v-chip
-                v-bind="props"
-                class="metacritic-point rounded-xl ma-1 ma-lg-2"
-                :ripple="false"
-                size="small"
+              <v-chip v-bind="props" class="metacritic-point rounded-xl ma-1 ma-lg-2" :ripple="false" size="small"
                 :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
-                :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
-                variant="elevated"
-                :color="useMetacriticStyle(item.metacritic).color"
-                :text="item.metacritic ?? 'belirsiz'"
-              />
+                :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''" variant="elevated"
+                :color="useMetacriticStyle(item.metacritic).color" :text="item.metacritic ?? 'belirsiz'" />
             </template>
           </v-tooltip>
 
-          <div
-            class="game-card-info d-flex flex-column align-start ga-1 ga-lg-2 pa-1 pa-lg-2"
-          >
+          <div class="game-card-info d-flex flex-column align-start ga-1 ga-lg-2 pa-1 pa-lg-2">
             <!-- Name & Date -->
             <div class="d-flex flex-column align-start">
               <p class="default-title-letter text-caption text-lg-subtitle-2 text-white">
@@ -160,67 +92,34 @@
               </p>
 
               <div class="d-flex align-center flex-wrap ga-1">
-                <template
-                  v-for="icon in getUniquePlatformIcons(item.platforms)"
-                  :key="icon"
-                >
-                  <v-icon
-                    v-if="icon"
-                    size="x-small"
-                    color="grey-lighten-1"
-                    :icon="icon"
-                  />
+                <template v-for="icon in getUniquePlatformIcons(item.platforms)" :key="icon">
+                  <v-icon v-if="icon" size="x-small" color="grey-lighten-1" :icon="icon" />
                 </template>
               </div>
             </div>
 
             <!-- Genres -->
             <div class="d-flex flex-wrap ga-1">
-              <v-chip
-                v-for="(genre, index) in item.genres"
-                :key="index"
-                :size="smallScreen ? 'x-small' : 'small'"
-                variant="outlined"
-                :ripple="false"
-                :text="genre.name"
-              />
+              <v-chip v-for="(genre, index) in item.genres" :key="index" :size="smallScreen ? 'x-small' : 'small'"
+                variant="outlined" :ripple="false" :text="genre.name" />
             </div>
 
             <!-- Tags -->
             <div class="d-none d-md-flex flex-wrap ga-1">
-              <v-chip
-                v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
-                :key="index"
-                color="grey-darken-1"
-                size="x-small"
-                class="rounded text-black"
-                variant="elevated"
-                :ripple="false"
-                :text="truncateText(tag.name, 15)"
-              />
-              <v-chip
-                v-if="useLimitedTags(item.tags, 3).hiddenCount > 0"
-                color="grey-darken-2"
-                size="x-small"
-                variant="elevated"
-                class="rounded text-white"
-                :ripple="false"
-                :text="useLimitedTags(item.tags, 3).hiddenText"
-              />
+              <v-chip v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags" :key="index"
+                color="grey-darken-1" size="x-small" class="rounded text-black" variant="elevated" :ripple="false"
+                :text="truncateText(tag.name, 15)" />
+              <v-chip v-if="useLimitedTags(item.tags, 3).hiddenCount > 0" color="grey-darken-2" size="x-small"
+                variant="elevated" class="rounded text-white" :ripple="false"
+                :text="useLimitedTags(item.tags, 3).hiddenText" />
             </div>
           </div>
         </v-card>
       </v-col>
 
       <!-- Search Start Text -->
-      <v-col
-        cols="12"
-        v-if="isStartSearching && !isLoadingSearch"
-        class="d-flex align-center ga-2"
-      >
-        <p
-          class="loading-text text-grey-lighten-1 text-caption text-md-subtitle-2 text-lg-subtitle-1"
-        >
+      <v-col cols="12" v-if="isStartSearching && !isLoadingSearch" class="d-flex align-center ga-2">
+        <p class="loading-text text-grey-lighten-1 text-caption text-md-subtitle-2 text-lg-subtitle-1">
           Oyunlar Aranıyor...
         </p>
         <v-progress-circular indeterminate color="grey-lighten-1" size="16" width="2" />
@@ -247,8 +146,11 @@ useHead({
 });
 
 const config = useRuntimeConfig();
+
+// screen breakout
 const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
+const extraLgScreen = computed(() => display.xlAndUp.value)
 const gamesArr = ref<any[]>([]);
 const isLoading = ref(false);
 const isLoadingSearch = ref(false);
