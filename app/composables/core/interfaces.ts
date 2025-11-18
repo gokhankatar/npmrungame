@@ -10,10 +10,10 @@ export interface StoreNpmRunGame {
   theme?: "dark" | "light";
   active_game_platform: string;
   active_admin_list_item:
-    | "dashboard"
-    | "completed_games"
-    | "to_play_games"
-    | "blog";
+  | "dashboard"
+  | "completed_games"
+  | "to_play_games"
+  | "blog";
   admin_user: Admin_User | null;
 }
 
@@ -33,4 +33,11 @@ export interface AdminListItem {
   title: string;
   slug: "dashboard" | "completed_games" | "to_play_games" | "blog";
   icon: string;
+}
+
+export interface Youtube_Channel_Stats {
+  hiddenSubscriberCount: boolean | null
+  subscriberCount: string | number | null
+  videoCount: string | number | null
+  viewCount: string | number | null
 }

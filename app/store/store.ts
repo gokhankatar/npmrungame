@@ -35,8 +35,7 @@ const store = defineStore("npmrungame_store", {
       this.isAdmin = true;
     },
     setAdminUserInfo(admin_user_info: Admin_User) {
-      this.admin_user;
-      admin_user_info;
+      this.admin_user = admin_user_info;
     },
   },
   persist: piniaPluginPersistedstate.localStorage(),

@@ -36,3 +36,17 @@
 .active-navbar-item-link {
     background: #69F0AE !important;
 }
+
+.back-to-admin-panel-btn {
+    position: fixed;
+    bottom: 5%;
+    right: 0;
+    z-index: 999;
+
+    border-radius: 1rem 0 0 1rem;
+    background-color: rgba(0, 0, 0, .2);
+    border: 1px solid rgba(255, 255, 255, .3);
+    border-right: none;
+    backdrop-filter: blur(.7rem);
+    -webkit-backdrop-filter: blur(.7rem);
+}

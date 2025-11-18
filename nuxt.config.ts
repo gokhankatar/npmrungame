@@ -10,7 +10,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiKey: process.env.API_KEY,
-      firebaseApiKey: process.env.FIREBASE_API_KEY
+      firebaseApiKey: process.env.FIREBASE_API_KEY,
+      youtubeApiKey: process.env.YOUTUBE_API_KEY,
+      youtubeChannelId: process.env.YOUTUBE_CHANNEL_ID,
     }
   },
   app: {

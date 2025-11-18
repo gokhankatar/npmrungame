@@ -43,6 +43,29 @@
   z-index: 999;
 }
 
+.card-admin-panel-info {
+  background: rgba(0, 0, 0, .3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(0.5rem);
+  -webkit-backdrop-filter: blur(0.5rem);
+  position: relative;
+}
+
+.card-yt-stats{
+  background: rgba(0, 0, 0, .3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(0.5rem);
+  -webkit-backdrop-filter: blur(0.5rem);
+  position: relative;
+}
+
+.yt-stats-card-icon{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 999;
+}
+
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.3s ease;
