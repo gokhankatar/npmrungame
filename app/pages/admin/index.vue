@@ -1,32 +1,16 @@
 <template>
+
   <template v-if="_store.isAdmin">
     <v-navigation-drawer class="admin-nav-drawer" :rail="isRail">
-      <v-btn
-        class="rail-btn text-caption text-lg-subtitle-2 default-title-letter pa-1 rounded ma-1"
-        @click="isRail = !isRail"
-        :icon="isRail ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left'"
-        :ripple="false"
-        size="sm"
-      />
+      <v-btn class="rail-btn text-caption text-lg-subtitle-2 default-title-letter pa-1 rounded ma-1"
+        @click="isRail = !isRail" :icon="isRail ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left'"
+        :ripple="false" size="sm" />
       <template v-slot:prepend>
-        <v-list
-          class="bg-transparent mt-10"
-          :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
-        >
-          <v-list-item
-            v-for="(item, index) of adminListItems"
-            :key="index"
-            :prepend-icon="item.icon"
-            @click="_store.setActiveAdminListItem(item.slug)"
-            :ripple="false"
-            class="rounded-xl"
-            :class="
-              _store.active_admin_list_item == item.slug ? 'active-admin-list-item' : ''
-            "
-          >
-            <v-list-item-title
-              class="default-title-letter text-caption text-lg-subtitle-2"
-            >
+        <v-list class="bg-transparent mt-10" :density="isExtraLargeScreen ? 'comfortable' : 'compact'">
+          <v-list-item v-for="(item, index) of adminListItems" :key="index" :prepend-icon="item.icon"
+            @click="_store.setActiveAdminListItem(item.slug)" :ripple="false" class="rounded-xl" :class="_store.active_admin_list_item == item.slug ? 'active-admin-list-item' : ''
+              ">
+            <v-list-item-title class="default-title-letter text-caption text-lg-subtitle-2">
               {{ item.title }}
             </v-list-item-title>
           </v-list-item>
@@ -34,118 +18,57 @@
       </template>
 
       <template v-slot:append>
-        <v-list
-          bg-color="transparent"
-          class="mb-1"
-          :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
-        >
-          <v-list-item
-            :to="'/'"
-            prepend-icon="mdi-home-outline"
-            rounded="xl"
-            :ripple="false"
-            class="default-title-letter text-caption text-lg-subtitle-2"
-            active-class="main-nav-active"
-          >
+        <v-list bg-color="transparent" class="mb-1" :density="isExtraLargeScreen ? 'comfortable' : 'compact'">
+          <v-list-item :to="'/'" prepend-icon="mdi-home-outline" rounded="xl" :ripple="false"
+            class="default-title-letter text-caption text-lg-subtitle-2" active-class="main-nav-active">
             Anasayfaya Dön
           </v-list-item>
 
-          <v-list-item
-            @click="handleLogout"
-            prepend-icon="mdi-logout"
-            rounded="xl"
-            :ripple="false"
-            class="default-title-letter text-caption text-lg-subtitle-2"
-          >
+          <v-list-item @click="handleLogout" prepend-icon="mdi-logout" rounded="xl" :ripple="false"
+            class="default-title-letter text-caption text-lg-subtitle-2">
             Çıkış Yap
           </v-list-item>
         </v-list>
       </template>
     </v-navigation-drawer>
+
+    <Dashboard v-if="_store.active_admin_list_item == 'dashboard'" />
   </template>
 
   <template v-else>
-    <v-form
-      class="admin-form rounded-lg pa-5 w-100"
-      ref="adminForm"
-      @submit.prevent="handleAdminAuth"
-    >
-      <v-btn
-        class="back-to-home-btn ma-1 ma-lg-2 text-caption text-lg-subtitle-2 pa-1"
-        @click="router.replace('/')"
-        size="xs"
-        icon="mdi-arrow-left"
-        variant="tonal"
-        color="grey-lighten-1"
-        :ripple="false"
-      />
+    <v-form class="admin-form rounded-lg pa-5 w-100" ref="adminForm" @submit.prevent="handleAdminAuth">
+      <v-btn class="back-to-home-btn ma-1 ma-lg-2 text-caption text-lg-subtitle-2 pa-1" @click="router.replace('/')"
+        size="xs" icon="mdi-arrow-left" variant="tonal" color="grey-lighten-1" :ripple="false" />
 
       <div class="d-flex align-center justify-center ga-2 ga-lg-4 mt-5 mb-5 mb-lg-10">
-        <v-icon
-          icon="mdi-security"
-          color="grey-lighten-1"
-          :size="isSmallScreen ? 'small' : 'large'"
-        />
+        <v-icon icon="mdi-security" color="grey-lighten-1" :size="isSmallScreen ? 'small' : 'large'" />
 
-        <p
-          class="default-title-letter text-grey-lighten-1 text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center"
-        >
+        <p class="default-title-letter text-grey-lighten-1 text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center">
           Admin Girişi
         </p>
       </div>
 
-      <v-text-field
-        v-model="adminModels.email"
-        :rules="rules.email"
-        type="email"
-        variant="outlined"
-        rounded="xl"
-        label="Email"
-        prepend-inner-icon="mdi-email"
-        clearable
-        :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
-      />
+      <v-text-field v-model="adminModels.email" :rules="rules.email" type="email" variant="outlined" rounded="xl"
+        label="Email" prepend-inner-icon="mdi-email" clearable
+        :density="isExtraLargeScreen ? 'comfortable' : 'compact'" />
 
-      <v-text-field
-        v-model="adminModels.password"
-        :rules="rules.password"
-        :type="showPassword ? 'text' : 'password'"
-        rounded="xl"
-        prepend-inner-icon="mdi-lock"
-        variant="outlined"
-        :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
-        label="Şifre"
-      >
+      <v-text-field v-model="adminModels.password" :rules="rules.password" :type="showPassword ? 'text' : 'password'"
+        rounded="xl" prepend-inner-icon="mdi-lock" variant="outlined"
+        :density="isExtraLargeScreen ? 'comfortable' : 'compact'" label="Şifre">
         <template v-slot:append-inner>
-          <v-icon
-            :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            @click="togglePasswordVisibility"
-          />
+          <v-icon :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click="togglePasswordVisibility" />
         </template>
       </v-text-field>
 
       <transition name="slide-up">
-        <v-alert
-          v-if="isVisibleAlertAfterLogin"
-          variant="tonal"
+        <v-alert v-if="isVisibleAlertAfterLogin" variant="tonal"
           class="default-title-letter mb-1 text-caption text-lg-subtitle-2"
-          :icon="colorAfterLogin == 'success' ? 'mdi-check' : 'mdi-close'"
-          density="compact"
-          :text="msgAfterLogin!"
-          :color="colorAfterLogin!"
-        />
+          :icon="colorAfterLogin == 'success' ? 'mdi-check' : 'mdi-close'" density="compact" :text="msgAfterLogin!"
+          :color="colorAfterLogin!" />
       </transition>
 
-      <v-btn
-        text="Giriş"
-        :loading="isLoadingLogin"
-        class="text-caption text-lg-subtitle-2 text-capitalize"
-        prepend-icon="mdi-send"
-        block
-        variant="tonal"
-        :ripple="false"
-        type="submit"
-      />
+      <v-btn text="Giriş" :loading="isLoadingLogin" class="text-caption text-lg-subtitle-2 text-capitalize"
+        prepend-icon="mdi-send" block variant="tonal" :ripple="false" type="submit" />
     </v-form>
   </template>
 </template>
@@ -154,6 +77,8 @@
 import store from "~/store/store";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { VForm } from "vuetify/components";
+import type { Admin_User } from "~/composables/core/interfaces";
+import Dashboard from "~/components/admin/Dashboard.vue";
 
 definePageMeta({
   layout: "admin",
@@ -232,7 +157,9 @@ const handleAdminAuth = async () => {
       isVisibleAlertAfterLogin.value = false;
     }, 1500);
 
-    console.log("Giriş Başarılı , User Credential : ", userCredential);
+    console.log("Giriş Başarılı , User Info : ", userCredential.user);
+    _store.setAdminUserInfo(userCredential?.user?.metadata as Admin_User)
+
   } catch (error: any) {
     isVisibleAlertAfterLogin.value = false;
 

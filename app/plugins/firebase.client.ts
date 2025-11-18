@@ -1,5 +1,4 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 
 export default defineNuxtPlugin(() => {
@@ -18,13 +17,10 @@ export default defineNuxtPlugin(() => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  const analytics = process.client ? getAnalytics(app) : null;
-
   return {
     provide: {
       firebase: app,
       auth,
-      analytics,
     },
   };
 });

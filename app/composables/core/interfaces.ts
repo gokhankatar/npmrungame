@@ -1,3 +1,10 @@
+export interface Admin_User {
+  createdAt: string;
+  creationTime: string;
+  lastLoginAt: string;
+  lastSignInTime: string;
+}
+
 export interface StoreNpmRunGame {
   isAdmin: boolean;
   theme?: "dark" | "light";
@@ -7,6 +14,7 @@ export interface StoreNpmRunGame {
     | "completed_games"
     | "to_play_games"
     | "blog";
+  admin_user: Admin_User | null;
 }
 
 export interface NavbarList {

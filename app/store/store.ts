@@ -1,5 +1,8 @@
 import { defineStore } from "pinia";
-import type { StoreNpmRunGame } from "~/composables/core/interfaces";
+import type {
+  Admin_User,
+  StoreNpmRunGame,
+} from "~/composables/core/interfaces";
 
 const store = defineStore("npmrungame_store", {
   state: (): StoreNpmRunGame => ({
@@ -7,7 +10,9 @@ const store = defineStore("npmrungame_store", {
     theme: "dark",
     active_game_platform: "All",
     active_admin_list_item: "dashboard",
+    admin_user: null,
   }),
+
   actions: {
     changeTheme() {
       this.theme == "dark" ? (this.theme = "light") : (this.theme = "dark");
@@ -27,10 +32,14 @@ const store = defineStore("npmrungame_store", {
       this.isAdmin = false;
     },
     login() {
-      this.isAdmin = true
-    }
+      this.isAdmin = true;
+    },
+    setAdminUserInfo(admin_user_info: Admin_User) {
+      this.admin_user;
+      admin_user_info;
+    },
   },
-  persist: true,
+  persist: piniaPluginPersistedstate.localStorage(),
 });
 
 export default store;
