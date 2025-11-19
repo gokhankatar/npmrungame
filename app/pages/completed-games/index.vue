@@ -18,7 +18,7 @@
             Toplam Oyun
           </p>
           <p
-            class="text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
+            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
           >
             {{ completedGames?.length }}
           </p>
@@ -37,7 +37,7 @@
             Toplam Bitirme Süresi
           </p>
           <p
-            class="text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
+            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
           >
             {{ `${totalPlaytime} saat` }}
           </p>
@@ -56,7 +56,7 @@
             En Yaygın Tür
           </p>
           <p
-            class="text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
+            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
           >
             {{ mostCommonGenre }}
           </p>
@@ -75,7 +75,7 @@
             Ortalama Metacritic Puan
           </p>
           <p
-            class="text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
+            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
           >
             {{ avgMetacritic?.toFixed(0) }}
           </p>
@@ -83,7 +83,9 @@
       </v-col>
 
       <v-col cols="12">
-        <div class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5">
+        <div
+          class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5"
+        >
           <v-icon icon="mdi-trophy-outline" :size="smallScreen ? 'small' : 'x-large'" />
           <p
             class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
@@ -249,6 +251,7 @@ const smallScreen = computed(() => display.smAndDown.value);
 const isMediumScreen = computed(() => display.mdAndUp.value);
 
 const completedGames = ref<any[]>([]);
+
 const isGettingCompletedGames = ref(false);
 
 const getCompletedGames = async () => {
@@ -263,10 +266,12 @@ const getCompletedGames = async () => {
 
     completedGames.value = gamesList;
   } catch (error) {
-    console.error("Oyunlar alınamadı:", error);
+    console.error("Error getting games :", error);
     return [];
   } finally {
-    isGettingCompletedGames.value = false;
+    setTimeout(() => {
+      isGettingCompletedGames.value = false;
+    }, 250);
   }
 };
 

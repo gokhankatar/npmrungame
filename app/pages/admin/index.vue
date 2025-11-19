@@ -73,6 +73,7 @@
 
     <v-container>
       <Dashboard v-if="_store.active_admin_list_item == 'dashboard'" />
+      <Completed_Games v-if="_store.active_admin_list_item == 'completed_games'" />
     </v-container>
   </template>
 
@@ -168,6 +169,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { VForm } from "vuetify/components";
 import type { Admin_User } from "~/composables/core/interfaces";
 import Dashboard from "~/components/admin/Dashboard.vue";
+import Completed_Games from "~/components/admin/Completed_Games.vue";
 
 definePageMeta({
   layout: "admin",
