@@ -15,12 +15,13 @@
         <v-divider color="white" class="w-100 mb-5" />
 
         <v-row class="mx-auto w-100">
+          <!-- Account Informations -->
           <v-col cols="12" md="6" lg="7">
             <v-card
               class="card-admin-panel-info d-flex flex-column align-start justify-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100"
               :elevation="0"
               :ripple="false"
-              :height="isMediumScreen ? 300 : 'auto'"
+              :height="isMediumScreen ? 350 : 'auto'"
             >
               <!-- Email -->
               <div class="d-flex flex-wrap align-center ga-2">
@@ -105,7 +106,7 @@
             <v-card
               class="card-admin-panel-info d-flex flex-column align-center justify-center pa-2 pa-lg-5 rounded-xl w-100"
               :elevation="0"
-              :height="isMediumScreen ? 300 : 'auto'"
+              :height="isMediumScreen ? 350 : 'auto'"
             >
               <v-row class="w-100 mx-auto">
                 <v-col cols="6">
@@ -134,6 +135,11 @@
                     class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
                     :elevation="0"
                   >
+                    <v-icon
+                      v-if="!isSmallScreen"
+                      :size="isMediumScreen ? 'small' : 'large'"
+                      icon="mdi-youtube-subscription"
+                    />
                     <p
                       class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
                     >
@@ -144,12 +150,6 @@
                     >
                       {{ youtubeChannelStats?.subscriberCount }}
                     </p>
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      class="yt-stats-card-icon ma-3"
-                      size="x-small"
-                      icon="mdi-youtube-subscription"
-                    />
                   </v-card>
                 </v-col>
 
@@ -158,6 +158,11 @@
                     class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
                     :elevation="0"
                   >
+                    <v-icon
+                      v-if="!isSmallScreen"
+                      :size="isMediumScreen ? 'small' : 'large'"
+                      icon="mdi-eye"
+                    />
                     <p
                       class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
                     >
@@ -168,12 +173,6 @@
                     >
                       {{ youtubeChannelStats?.viewCount }}
                     </p>
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      class="yt-stats-card-icon ma-3"
-                      size="x-small"
-                      icon="mdi-eye"
-                    />
                   </v-card>
                 </v-col>
 
@@ -182,6 +181,11 @@
                     class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
                     :elevation="0"
                   >
+                    <v-icon
+                      v-if="!isSmallScreen"
+                      :size="isMediumScreen ? 'small' : 'large'"
+                      icon="mdi-monitor"
+                    />
                     <p
                       class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
                     >
@@ -192,12 +196,6 @@
                     >
                       {{ youtubeChannelStats?.videoCount }}
                     </p>
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      class="yt-stats-card-icon ma-3"
-                      size="x-small"
-                      icon="mdi-monitor"
-                    />
                   </v-card>
                 </v-col>
               </v-row>
@@ -238,8 +236,6 @@ const youtubeChannelStats = ref<Youtube_Channel_Stats | null>({
 const getYoutubeChannelInfos = async () => {
   const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${config.public.youtubeChannelId}&key=${config.public.youtubeApiKey}`;
   const response = await axios.get(url);
-
-  console.log("Response yt api", response.data);
 
   youtubeChannelStats.value = response.data?.items[0]
     ?.statistics as Youtube_Channel_Stats;
