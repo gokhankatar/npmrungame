@@ -1,73 +1,45 @@
 <template>
   <v-row class="d-flex justify-center align-center mx-auto mt-5 mt-lg-10">
     <v-col cols="12" lg="10">
-      <div
-        class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5"
-      >
+      <div class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5">
         <v-icon icon="mdi-trophy-outline" :size="smallScreen ? 'small' : 'x-large'" />
-        <p
-          class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
-        >
-          Bitirdiğim Oyunlar
+        <p class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter">
+          Bitirdiğim Oyunlar <strong class="font-weight-bold default-title-letter">({{ completedGames?.length
+          }})</strong>
         </p>
       </div>
     </v-col>
 
     <v-col cols="12" lg="10">
-      <v-data-table
-        :items="completedGames"
-        :headers="header_completed_games"
-        :loading="isGettingCompletedGames"
-        class="admin-data-table rounded-lg w-100"
-        items-per-page-text="Sayfa Başı Oyun Sayısı"
-        hover
-      >
+      <v-data-table :items="completedGames" :headers="header_completed_games" :loading="isGettingCompletedGames"
+        class="admin-data-table rounded-lg w-100" items-per-page-text="Sayfa Başı Oyun Sayısı" hover>
         <template #item="{ item, index }">
           <tr class="table-row cursor-pointer" @click="handleRowClick(item)">
             <td>
               <div class="d-flex align-center ga-1 ga-lg-2 py-2">
-                <img
-                  :src="item.background_image"
-                  width="100"
-                  class="rounded-lg h-100"
-                  cover
-                />
-                <p
-                  class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter"
-                >
+                <img :src="item.background_image" width="100" class="rounded-lg h-100" cover />
+                <p class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter">
                   {{ item.name }}
                 </p>
               </div>
             </td>
 
             <td>
-              <p
-                class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter"
-              >
+              <p class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter">
                 {{ new Date(item.released).getFullYear() }}
               </p>
             </td>
 
             <td>
-              <div class="d-flex align-center ga-1 flex-wrap">
-                <v-chip
-                  v-for="(genre, index) in item.genres"
-                  :key="index"
-                  :size="smallScreen ? 'x-small' : 'small'"
-                  color="green-accent-2"
-                  variant="tonal"
-                  :ripple="false"
-                  :text="genre.name"
-                />
+              <div class="d-flex align-center ga-1 flex-wrap py-1">
+                <v-chip v-for="(genre, index) in item.genres" :key="index" :size="smallScreen ? 'x-small' : 'small'"
+                  color="green-accent-2" variant="tonal" :ripple="false" :text="genre.name" />
               </div>
             </td>
 
             <td>
               <div class="d-flex align-center flex-wrap ga-1">
-                <template
-                  v-for="icon in getUniquePlatformIcons(item.platforms)"
-                  :key="icon"
-                >
+                <template v-for="icon in getUniquePlatformIcons(item.platforms)" :key="icon">
                   <v-icon v-if="icon" size="small" color="grey-lighten-1" :icon="icon" />
                 </template>
               </div>
@@ -78,39 +50,23 @@
             </td>
 
             <td>
-              <v-btn
-                variant="tonal"
-                prepend-icon="mdi-delete"
-                text="Delete"
-                color="error"
-                block
-              />
+              <v-btn variant="tonal" prepend-icon="mdi-delete" text="Delete" color="error" block />
             </td>
           </tr>
         </template>
 
         <template #loading>
-          <v-skeleton-loader
-            class="bg-transparent"
-            :type="
-              completedGames.length > 10
-                ? 'table-row@10'
-                : `table-row@${completedGames.length}`
-            "
-          />
+          <v-skeleton-loader class="bg-transparent" :type="completedGames.length > 10
+            ? 'table-row@10'
+            : `table-row@${completedGames.length}`
+            " />
         </template>
       </v-data-table>
     </v-col>
 
     <v-col cols="12" lg="10">
-      <v-btn
-        :ripple="false"
-        color="green-accent-2"
-        text="Oyun Ekle"
-        prepend-icon="mdi-plus"
-        class="float-right"
-        :block="smallScreen ? true : false"
-      />
+      <v-btn :ripple="false" color="green-accent-2" text="Oyun Ekle" prepend-icon="mdi-plus" class="float-right"
+        :block="smallScreen ? true : false" />
     </v-col>
   </v-row>
 </template>
