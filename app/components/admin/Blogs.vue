@@ -1,110 +1,160 @@
 <template>
-  <v-row class="d-flex justify-center align-center">
-    <v-col cols="12" sm="6" lg="3" v-for="(item, index) of blogs" :key="index">
-      <v-card class="blog-card rounded-lg pa-2 pa-lg-5" :ripple="false">
-        <v-img :src="item.imageUrl"></v-img>
-      </v-card>
+  <v-row class="d-flex justify-center align-center w-100">
+    <v-col cols="12" lg="10">
+      <v-data-table :headers="header_blogs" :loading="isGettingBlogs" :items="blogs"
+        class="admin-data-table rounded-lg w-100" items-per-page-text="Sayfa Başı Oyun Sayısı" hover>
+        <template #item="{ item, index }">
+          <tr class="table-row cursor-pointer" @click="handleRowClick(item)">
+            <td>
+              <div class="d-flex align-center ga-1 ga-lg-2 py-2">
+                <img :src="item.imageUrl" width="100" class="rounded-lg h-100" cover />
+                <p class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter">
+                  {{ truncateText(item.title, 30) }}
+                </p>
+              </div>
+            </td>
+
+            <td>
+              <p class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter">
+                {{ formatTR(item.createdAt?.seconds) }}
+              </p>
+            </td>
+
+            <td>
+              <div class="d-flex align-center ga-1 flex-wrap py-1">
+                <v-chip v-for="(keyword, index) in item.keywords" :key="index"
+                  :size="isSmallScreen ? 'x-small' : 'small'" color="green-accent-2" variant="tonal" :ripple="false"
+                  :text="keyword" />
+              </div>
+            </td>
+
+            <td>
+              <v-btn @click.stop="handleRowClick(item)" variant="tonal" prepend-icon="mdi-delete"
+                class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl" text="Sil" color="error"
+                block />
+            </td>
+          </tr>
+        </template>
+
+        <template #loading>
+          <v-skeleton-loader class="bg-transparent" :type="blogs?.length > 10
+            ? 'table-row@10'
+            : `table-row@${blogs?.length}`
+            " />
+        </template>
+      </v-data-table>
+    </v-col>
+
+    <v-col cols="12" lg="10">
+      <v-btn @click="isAddBlog = true" :ripple="false" color="green-accent-2" text="Blog Ekle" prepend-icon="mdi-plus"
+        class="float-right" :block="isSmallScreen ? true : false" />
     </v-col>
   </v-row>
 
   <!-- Add Blog Pop Up -->
-  <v-dialog
-    v-model="isAddBlog"
-    :max-width="600"
-    style="
+  <v-dialog v-model="isAddBlog" :max-width="600" style="
       background-color: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(0.7rem);
       -webkit-backdrop-filter: blur(0.7rem);
-    "
-  >
-    <v-form @submit.prevent="submitBlog" class="add-blog-form pa-2 pa-lg-5 rounded-lg">
-      <p
-        class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-grey-lighten-1 default-title-letter"
-      >
+    ">
+    <v-form ref="addBlogForm" @submit.prevent="submitBlog"
+      class="add-blog-form overflow-y-auto pa-2 pa-lg-5 rounded-lg">
+      <p class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-grey-lighten-1 default-title-letter">
         Blog Ekle
       </p>
 
+      <v-btn class="close-icon-in-add-blog-form ma-1 ma-lg-2" icon="mdi-close" color="grey-lighten-1" size="small"
+        :ripple="false" @click="isAddBlog = false" variant="text" />
+
       <v-divider class="w-100 mb-5 mt-2" color="white" />
 
-      <v-img v-if="previewUrl" :src="previewUrl" max-width="300" class="my-3" />
+      <v-img v-if="formModels.previewUrl" :src="formModels.previewUrl" max-width="300" class="my-3 rounded-lg" />
 
-      <!-- Resim Upload -->
-      <v-file-input
-        label="Blog Resmi"
-        accept="image/*"
-        variant="outlined"
-        v-model="file"
-        required
-        prepend-inner-icon="mdi-image"
-      />
+      <v-file-input label="Blog Resmi" :rules="rules.file" accept="image/*" class="text-grey-lighten-1" prepend-icon=""
+        color="grey-lighten-1" :density="isSmallScreen ? 'compact' : 'comfortable'" variant="outlined"
+        v-model="formModels.file" required prepend-inner-icon="mdi-image" />
 
-      <!-- Başlık -->
-      <v-text-field
-        v-model="title"
-        variant="outlined"
-        label="Başlık"
-        required
-        clearable
-      />
+      <v-text-field v-model="formModels.title" :rules="rules.title" :density="isSmallScreen ? 'compact' : 'comfortable'"
+        variant="outlined" label="Başlık" prepend-inner-icon="mdi-subtitles-outline"
+        class="text-caption text-lg-subtitle-2 default-title-letter text-grey-lighten-1" required clearable />
 
-      <!-- Anahtar Kelimeler -->
-      <v-combobox
-        v-model="keywords"
-        label="Anahtar Kelimeler"
-        multiple
-        chips
-        variant="outlined"
-        clearable
-      ></v-combobox>
+      <v-combobox v-model="formModels.keywords" :density="isSmallScreen ? 'compact' : 'comfortable'"
+        class="text-caption text-lg-subtitle-2 default-title-letter text-grey-lighten-1" label="Anahtar Kelimeler"
+        prepend-inner-icon="mdi-key" multiple chips variant="outlined" clearable></v-combobox>
 
-      <!-- İçerik -->
-      <v-textarea
-        v-model="content"
-        label="İçerik"
-        variant="outlined"
-        rows="6"
-        required
-        clearable
-      />
+      <v-textarea v-model="formModels.content" :rules="rules.content"
+        :density="isSmallScreen ? 'compact' : 'comfortable'" label="İçerik" prepend-inner-icon="mdi-text"
+        class="text-caption text-lg-subtitle-2 default-title-letter text-grey-lighten-1" variant="outlined" rows="3"
+        required clearable />
 
       <!-- Submit -->
-      <v-btn
-        :loading="isSubmitting"
-        type="submit"
-        color="primary"
-        class="mt-4"
-        text="Blog Ekle"
-      />
+      <v-btn :loading="isSubmitting" :ripple="false" variant="tonal" prepend-icon="mdi-send" type="submit"
+        color="green-accent-2" class="mt-4" text="Blog Ekle" />
     </v-form>
   </v-dialog>
+
+  <v-snackbar v-model="blogToastModels.blogToastBar" :text="blogToastModels.msg" :color="blogToastModels.color"
+    variant="tonal" />
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import { addDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
+import type { Add_Blog_Form_Model } from "~/composables/core/interfaces";
+import { VForm } from "vuetify/components";
+import { header_blogs } from "~/composables/data/headerTables";
+import { truncateText } from "~/composables/core/basicFunc";
+import { useTRFormat } from "~/composables/data/handleData";
 
 const { $firestore } = useNuxtApp();
 const config = useRuntimeConfig();
+const display = useDisplay();
+const isSmallScreen = computed(() => display.smAndDown.value)
 
 const isSubmitting = ref(false);
 const isAddBlog = ref(false);
 const isGettingBlogs = ref(false);
 
+const addBlogForm = ref<InstanceType<typeof VForm> | null>(null);
+
+const blogToastModels = ref({
+  blogToastBar: false,
+  color: "",
+  msg: ""
+})
+
+const { formatTR } = useTRFormat()
+
 const blogs = ref<any[]>([]);
-const file = ref<File | null>(null);
-const previewUrl = ref<string | null>(null);
-const title = ref("");
-const content = ref("");
-const keywords = ref<string[]>([]);
+
+const formModels = ref<Add_Blog_Form_Model>({
+  title: "",
+  content: "",
+  file: null,
+  keywords: null,
+  previewUrl: ""
+})
+
+const rules = ref({
+  file: [
+    (v: string) => !!v || "Resim Gerekli!",
+  ],
+  title: [
+    (v: string) => !!v || "Başlık Gerekli!",
+    (v: string) => (v && v.length >= 6) || "Başlık en az 6 karakter olmalı!",
+  ],
+  content: [
+    (v: string) => !!v || "İçerik Gerekli!",
+    (v: string) => (v && v.length >= 50) || "İçerik en az 50 karakter olmalı!",
+  ],
+});
 
 const uploadBlogImage = async (file: File): Promise<string> => {
-  const { $supabase } = useNuxtApp(); // plugin'den Supabase client
+  const { $supabase } = useNuxtApp();
   if (!file) throw new Error("Dosya yok!");
 
-  // Dosya adını benzersiz yap
   const fileName = `${Date.now()}_${file.name}`;
 
-  // Supabase bucket ismi: npmrungame_blogs
   const { data, error } = await $supabase.storage
     .from("npmrungame_blogs")
     .upload(fileName, file, { upsert: true });
@@ -114,7 +164,6 @@ const uploadBlogImage = async (file: File): Promise<string> => {
     throw error;
   }
 
-  // Public URL al
   const { data: urlData } = $supabase.storage
     .from("npmrungame_blogs")
     .getPublicUrl(fileName);
@@ -126,36 +175,42 @@ const uploadBlogImage = async (file: File): Promise<string> => {
 
 // Form submit
 const submitBlog = async () => {
-  if (!file.value) return alert("Resim seçmelisiniz!");
+
+  const result = await addBlogForm.value?.validate();
+  if (!result || !result.valid) return;
 
   isSubmitting.value = true;
 
   try {
-    // 1️⃣ Resmi Supabase'e yükle
-    const imageUrl = await uploadBlogImage(file.value);
+    // 1️⃣ Upload Img To Supabase
+    const imageUrl = await uploadBlogImage(formModels.value?.file!);
     const blogsCollection = collection($firestore, "blogs");
 
-    // 2️⃣ Firestore'a kaydet
+    // 2️⃣ Add To Firebase
     await addDoc(blogsCollection, {
-      title: title.value,
-      content: content.value,
-      keywords: keywords.value,
+      title: formModels.value?.title,
+      content: formModels.value?.content,
+      keywords: formModels.value?.keywords,
       imageUrl,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
 
-    alert("Blog başarıyla eklendi!");
+    blogToastModels.value.msg = "Blog başarı ile eklendi!"
+    blogToastModels.value.color = "success"
+    blogToastModels.value.blogToastBar = true
 
-    // Formu temizle
-    file.value = null;
-    previewUrl.value = null;
-    title.value = "";
-    content.value = "";
-    keywords.value = [];
+    formModels.value.file = null;
+    formModels.value.previewUrl = null;
+    formModels.value.title = "";
+    formModels.value.content = "";
+    formModels.value.keywords = [];
   } catch (err) {
     console.error(err);
-    alert("Blog ekleme sırasında bir hata oluştu.");
+
+    blogToastModels.value.msg = "Blog eklerken hata oluştu!"
+    blogToastModels.value.color = "error"
+    blogToastModels.value.blogToastBar = true
   } finally {
     isSubmitting.value = false;
   }
@@ -182,10 +237,14 @@ const getBlogsFromDb = async () => {
   }
 };
 
-watch(file, async (newFile) => {
+const handleRowClick = (item: any) => {
+  console.log(item)
+}
+
+watch(formModels.value?.file!, async (newFile) => {
   if (!newFile) return;
 
-  previewUrl.value = URL.createObjectURL(newFile);
+  formModels.value.previewUrl = URL.createObjectURL(newFile);
 });
 
 onMounted(() => {
@@ -195,5 +254,6 @@ onMounted(() => {
 
 <style scoped>
 @import url("~/assets/css/main.css");
+@import url("~/assets/css/admin.css");
 @import url("~/assets/css/admin_blogs.css");
 </style>

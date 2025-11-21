@@ -6,6 +6,13 @@
   border-right: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+.admin-data-table {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(0.7rem);
+  -webkit-backdrop-filter: blur(0.7rem);
+}
+
 .rail-btn {
   position: absolute;
   top: 0;
@@ -44,22 +51,22 @@
 }
 
 .card-admin-panel-info {
-  background: rgba(0, 0, 0, .3);
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(0.5rem);
   -webkit-backdrop-filter: blur(0.5rem);
   position: relative;
 }
 
-.card-yt-stats{
-  background: rgba(0, 0, 0, .3);
+.card-yt-stats {
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(0.5rem);
   -webkit-backdrop-filter: blur(0.5rem);
   position: relative;
 }
 
-.yt-stats-card-icon{
+.yt-stats-card-icon {
   position: absolute;
   bottom: 0;
   right: 0;

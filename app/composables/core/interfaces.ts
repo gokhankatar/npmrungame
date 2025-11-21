@@ -10,10 +10,10 @@ export interface StoreNpmRunGame {
   theme?: "dark" | "light";
   active_game_platform: string;
   active_admin_list_item:
-  | "dashboard"
-  | "completed_games"
-  | "to_play_games"
-  | "blog";
+    | "dashboard"
+    | "completed_games"
+    | "to_play_games"
+    | "blog";
   admin_user: Admin_User | null;
 }
 
@@ -36,8 +36,16 @@ export interface AdminListItem {
 }
 
 export interface Youtube_Channel_Stats {
-  hiddenSubscriberCount: boolean | null
-  subscriberCount: string | number | null
-  videoCount: string | number | null
-  viewCount: string | number | null
+  hiddenSubscriberCount: boolean | null;
+  subscriberCount: string | number | null;
+  videoCount: string | number | null;
+  viewCount: string | number | null;
+}
+
+export interface Add_Blog_Form_Model {
+  file: File | null;
+  previewUrl: string | null;
+  title: string;
+  content: string;
+  keywords: string[] | any;
 }
