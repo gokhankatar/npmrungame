@@ -1,12 +1,17 @@
-.add-blog-form {
+.add-blog-form,
+.blog-detail-in-admin {
   position: relative;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255.15);
   backdrop-filter: blur(0.7rem);
   -webkit-backdrop-filter: blur(0.7rem);
+
+  max-height: 40rem;
+  overflow-y: auto;
 }
 
-.close-icon-in-add-blog-form {
+.close-icon-in-add-blog-form,
+.close-icon-in-blog-detail {
   position: absolute;
   top: 0;
   right: 0;

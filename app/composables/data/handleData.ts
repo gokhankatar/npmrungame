@@ -86,7 +86,6 @@ export const getUniquePlatformIcons = (platforms: any[] | null | undefined): str
   return [...new Set(icons)];
 };
 
-
 export const useTRFormat = () => {
   const formatTR = (timestamp: string | number): string => {
     const t = Number(timestamp);
@@ -120,4 +119,42 @@ export const useTRFormat = () => {
   };
 
   return { formatTR };
+};
+
+export const useFirestoreDateFormatted = () => {
+  const formatDateTR = (timestamp: any): string => {
+    if (!timestamp) throw new Error("Timestamp yok");
+
+    let date: Date;
+
+    // Firestore timestamp objesi
+    if (typeof timestamp === "object" && "seconds" in timestamp) {
+      const ms =
+        timestamp.seconds * 1000 +
+        Math.floor(timestamp.nanoseconds / 1_000_000);
+      date = new Date(ms);
+    } else {
+      const t = Number(timestamp);
+      if (Number.isNaN(t)) throw new Error("Geçersiz timestamp");
+      date = new Date(t);
+    }
+
+    // GMT+03:00 kısmını istemediğin için custom format
+    const day = date.getDate().toString().padStart(2, "0");
+    const monthNames = [
+      "Oca", "Şub", "Mar", "Nis", "May", "Haz",
+      "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"
+    ];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+
+    const hh = date.getHours().toString().padStart(2, "0");
+    const mm = date.getMinutes().toString().padStart(2, "0");
+    const ss = date.getSeconds().toString().padStart(2, "0");
+
+    // Sonuç ↓
+    return `${day} ${month} ${year} ${hh}:${mm}:${ss}`;
+  };
+
+  return { formatDateTR };
 };
