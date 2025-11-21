@@ -13,6 +13,8 @@ export default defineNuxtConfig({
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       youtubeApiKey: process.env.YOUTUBE_API_KEY,
       youtubeChannelId: process.env.YOUTUBE_CHANNEL_ID,
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseKey: process.env.SUPABASE_KEY
     }
   },
   app: {

@@ -90,17 +90,22 @@
               <v-chip
                 :ripple="false"
                 size="small"
-                :color="!item.metacritic ? 'warning' : ''"
+                :color="
+                  item.metacritic
+                    ? useMetacriticStyle(item?.metacritic).color
+                    : 'warning'
+                "
                 :text="item.metacritic ?? 'N/A'"
               />
             </td>
 
             <td>
               <v-btn
-                @click="handleDeleteGame(item)"
+                @click.stop="handleDeleteGame(item)"
                 variant="tonal"
                 prepend-icon="mdi-delete"
-                text="Delete"
+                class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl"
+                text="Sil"
                 color="error"
                 block
               />
@@ -335,6 +340,7 @@
       </div>
 
       <v-divider color="white" class="w-100" />
+
       <!-- description -->
       <p
         class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter"
@@ -466,34 +472,52 @@
         </template>
       </div>
 
-      <v-row
-        v-if="selectedGamesAfterResearch?.length > 0"
-        class="w-100 mx-auto d-flex align-center"
-        dense
-      >
-        <v-col cols="12" sm="6">
-          <v-btn
-            :text="`Tamamlanan Oyunlar Ekle (${selectedGamesAfterResearch?.length})`"
-            size="small"
-            :ripple="false"
-            prepend-icon="mdi-plus"
-            class="text-capitalize"
-            block
-          />
-        </v-col>
+      <transition name="slide-up">
+        <v-row
+          v-if="selectedGamesAfterResearch?.length > 0"
+          class="w-100 mx-auto d-flex align-center"
+          dense
+        >
+          <v-col cols="12" sm="6">
+            <v-btn
+              @click="addGameToDb"
+              :loading="isAddingToDb"
+              :text="`Tamamlanan Oyunlar Ekle (${selectedGamesAfterResearch?.length})`"
+              size="small"
+              :ripple="false"
+              prepend-icon="mdi-plus"
+              class="text-capitalize"
+              block
+            />
+          </v-col>
 
-        <v-col cols="12" sm="6">
-          <v-btn
-            @click="selectedGamesAfterResearch = []"
-            text="Tüm Seçimleri Kaldır"
-            size="small"
-            :ripple="false"
-            class="text-capitalize"
-            prepend-icon="mdi-broom"
-            block
-          />
-        </v-col>
-      </v-row>
+          <v-col cols="12" sm="6">
+            <v-btn
+              @click="selectedGamesAfterResearch = []"
+              text="Tüm Seçimleri Kaldır"
+              size="small"
+              :ripple="false"
+              class="text-capitalize"
+              prepend-icon="mdi-broom"
+              block
+            />
+          </v-col>
+        </v-row>
+      </transition>
+
+      <transition name="slide-up">
+        <v-row class="w-100" v-if="isAddedToDb">
+          <v-col cols="12">
+            <v-alert
+              class="w-100 text-caption text-lg-subtitle-2"
+              density="compact"
+              color="success"
+              variant="text"
+              :text="`${addedGameToDbCount} oyun eklendi`"
+            />
+          </v-col>
+        </v-row>
+      </transition>
     </div>
   </v-dialog>
 
@@ -506,7 +530,14 @@
 </template>
 <script lang="ts" setup>
 import axios from "axios";
-import { doc, getDocs, collection, deleteDoc } from "firebase/firestore";
+import {
+  doc,
+  getDocs,
+  collection,
+  deleteDoc,
+  addDoc,
+  writeBatch,
+} from "firebase/firestore";
 import { truncateText } from "~/composables/core/basicFunc";
 import {
   getUniquePlatformIcons,
@@ -527,7 +558,14 @@ const isDeletingGameFromDb = ref(false);
 const isSuccessfullyDeleted = ref(false);
 const showFullDescription = ref(false);
 const isAddGame = ref(false);
+const isAddedToDb = ref(false);
 const isSearchingGameLoading = ref(false);
+const isAddingToDb = ref(false);
+
+const addedGameToDbCount = ref(0);
+const completedGames = ref<any[]>([]);
+const activeGame = ref<any | null>(null);
+const selectedGamesAfterResearch = ref<any[]>([]);
 const searchGameText = ref<string>("");
 const searchResults = ref<any[]>([]);
 
@@ -535,11 +573,6 @@ const displayedDescription = computed(() => {
   if (showFullDescription.value) return activeGame.value?.description;
   return truncateText(activeGame.value?.description, 250);
 });
-
-const completedGames = ref<any[]>([]);
-const activeGame = ref<any | null>(null);
-
-const selectedGamesAfterResearch = ref<any[]>([]);
 
 const selectGameAfterSearch = (item: any) => {
   const exists = selectedGamesAfterResearch.value.some(
@@ -627,6 +660,54 @@ const searchGame = async () => {
     console.log(error.message);
   } finally {
     isSearchingGameLoading.value = false;
+  }
+};
+
+const addGameToDb = async () => {
+  const games = selectedGamesAfterResearch.value;
+
+  if (!games || games.length === 0) return;
+
+  try {
+    isAddingToDb.value = true;
+
+    addedGameToDbCount.value = games.length;
+
+    // 🔥 Single
+    if (games.length === 1) {
+      await addDoc(collection($firestore, "completed_games"), games[0]);
+      console.log("Tek oyun eklendi:", games[0].name);
+      isAddedToDb.value = true;
+
+      setTimeout(() => {
+        isAddedToDb.value = false;
+      }, 2500);
+      return;
+    }
+
+    // 🔥 Multiple
+    const batch = writeBatch($firestore);
+
+    games.forEach((g) => {
+      const ref = doc(collection($firestore, "completed_games"));
+      batch.set(ref, g);
+    });
+
+    await batch.commit();
+
+    console.log(`${games.length} oyun toplu olarak eklendi`);
+    isAddedToDb.value = true;
+
+    setTimeout(() => {
+      isAddedToDb.value = false;
+    }, 2500);
+    return;
+  } catch (error: any) {
+    console.error("Error while add to db : ", error.message);
+  } finally {
+    await getCompletedGames();
+    isAddingToDb.value = false;
+    selectedGamesAfterResearch.value = [];
   }
 };
 

@@ -17,7 +17,7 @@ export const useMetacriticStyle = (score?: number) => {
 
   if (score >= 90) {
     return {
-      color: "deep-orange-accent-1",
+      color: "green-accent-2",
       icon: "mdi-fire",
       text: `${score}`,
     };
@@ -76,13 +76,16 @@ export const getPlatformIcon = (platformName: string): string | null => {
   return null;
 };
 
-export const getUniquePlatformIcons = (platforms: any[]): string[] => {
-  const icons = platforms
-    .map((p) => getPlatformIcon(p.platform.name))
+export const getUniquePlatformIcons = (platforms: any[] | null | undefined): string[] => {
+  const safePlatforms = platforms ?? [];
+
+  const icons = safePlatforms
+    .map((p) => getPlatformIcon(p?.platform?.name))
     .filter((icon): icon is string => Boolean(icon));
 
   return [...new Set(icons)];
 };
+
 
 export const useTRFormat = () => {
   const formatTR = (timestamp: string | number): string => {
