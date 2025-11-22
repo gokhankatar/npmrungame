@@ -1,6 +1,11 @@
 <template>
   <template v-if="_store.isAdmin">
-    <v-navigation-drawer class="admin-nav-drawer" :rail="isRail">
+    <!-- List Bar -->
+    <v-navigation-drawer
+      class="admin-nav-drawer"
+      :rail="isRail"
+      :permanent="!isSmallScreen"
+    >
       <v-btn
         class="rail-btn text-caption text-lg-subtitle-2 default-title-letter pa-1 rounded ma-1"
         @click="isRail = !isRail"
@@ -72,12 +77,84 @@
     </v-navigation-drawer>
 
     <v-container>
+      <!-- Responsive Bar -->
+      <transition name="slide-down">
+      
+      </transition>
+      <div
+        v-if="isSmallScreen"
+        class="d-flex justiy-center justify-sm-end align-center w-100"
+      >
+        <v-btn
+          text="menu"
+          @click="isOpenResponsiveBar = !isOpenResponsiveBar"
+          :ripple="false"
+          prepend-icon="mdi-arrow-down-bold"
+        />
+
+        <div class="responsive-admin-list-bar pa-2" v-if="isOpenResponsiveBar">
+          <v-btn
+            class="close-btn-in-responsive-admin-list-bar ma-2"
+            icon="mdi-close"
+            color="grey-darken-1"
+            size="large"
+            variant="text"
+            :ripple="false"
+            @click="isOpenResponsiveBar = false"
+          />
+          <div class="d-flex flex-column ga-3 mt-10">
+            <div
+              class="responsive-admin-bar-list-item transition d-flex align-center ga-4 pa-2 rounded-lg cursor-pointer"
+              v-for="(item, index) of adminListItems"
+              @click="handleRouteForResponsive(item.slug)"
+              :key="item.title"
+            >
+              <v-icon size="large" :icon="item.icon" />
+              <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
+                {{ item.title }}
+              </p>
+            </div>
+          </div>
+
+          <v-row
+            class="action-buttons-in-responsive-admin-list-bar w-100 mx-auto pa-2"
+            dense
+          >
+            <v-col cols="6">
+              <v-btn
+                size="small"
+                prepend-icon="mdi-home-outline"
+                text="Anasayfaya Dön"
+                :ripple="false"
+                variant="tonal"
+                block
+                @click="router.replace('/')"
+              />
+            </v-col>
+
+            <v-col cols="6">
+              <v-btn
+                size="small"
+                prepend-icon="mdi-logout"
+                text="Çıkış Yap"
+                :ripple="false"
+                variant="tonal"
+                block
+                @click="handleRouteForResponsive('logout')"
+              />
+            </v-col>
+          </v-row>
+        </div>
+      </div>
+
+      <!-- Content -->
       <Dashboard v-if="_store.active_admin_list_item == 'dashboard'" />
       <Completed_Games v-if="_store.active_admin_list_item == 'completed_games'" />
       <Blogs v-if="_store.active_admin_list_item == 'blog'" />
     </v-container>
   </template>
 
+  <!-- Authentication Form -->
   <template v-else>
     <v-form
       class="admin-form rounded-lg pa-5 w-100"
@@ -194,6 +271,7 @@ const adminForm = ref<InstanceType<typeof VForm> | null>(null);
 
 const showPassword = ref(false);
 const isLoadingLogin = ref(false);
+const isOpenResponsiveBar = ref(false);
 
 const adminModels = ref({
   email: "",
@@ -225,6 +303,22 @@ const handleLogout = (): void => {
   setTimeout(() => {
     router.replace("/");
   }, 150);
+};
+
+const handleRouteForResponsive = (
+  slug: "dashboard" | "completed_games" | "to_play_games" | "blog" | "home" | "logout"
+) => {
+  if (slug !== "home" || "logout") {
+    _store.setActiveAdminListItem(
+      slug as "dashboard" | "completed_games" | "to_play_games" | "blog"
+    );
+    isOpenResponsiveBar.value = false;
+  } else {
+    handleLogout();
+    console.log("cıkıs gerek");
+    isOpenResponsiveBar.value = false;
+    _store.setActiveAdminListItem("dashboard");
+  }
 };
 
 const handleAdminAuth = async () => {

@@ -243,3 +243,31 @@
     border-color: #FFD700;
     color: #000 !important;
 }
+
+.slide-down-enter-from {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.slide-down-enter-to {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.slide-down-enter-active {
+    transition: all 0.35s ease;
+}
+
+.slide-down-leave-from {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.slide-down-leave-to {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.slide-down-leave-active {
+    transition: all 0.3s ease;
+}

@@ -1,6 +1,5 @@
 ## To-Do List
 
-- Admin Panel ve normal sayfa icin responsive menuler yapılacak.
 - Blog sayfası (kullanıcı sayfasındaki) çeşitlendirilecek.
 - Single Blog sayfası yapılacak.
 - Bloglar için update ozelligi eklenecke ve ayunı baslıktan varsa kontrol edilecek.

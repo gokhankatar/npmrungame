@@ -6,6 +6,33 @@
   border-right: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+.responsive-admin-list-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
+  z-index: 9999;
+}
+
+.action-buttons-in-responsive-admin-list-bar {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.close-btn-in-responsive-admin-list-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 9999;
+}
+
 .shadowed-text {
   text-shadow: -2px 0 4px rgba(255, 255, 255, 0.5),
     2px 0 4px rgba(255, 255, 255, 0.5), 0 0 8px rgba(255, 255, 255, 0.01);
@@ -30,6 +57,11 @@
 .active-admin-list-item {
   background: #69f0ae;
   color: black;
+}
+
+.responsive-admin-bar-list-item:hover {
+  background: rgba(255, 255, 255, .15);
+  color: #fff !important;
 }
 
 .admin-form {

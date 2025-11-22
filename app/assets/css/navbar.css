@@ -50,3 +50,35 @@
     backdrop-filter: blur(.7rem);
     -webkit-backdrop-filter: blur(.7rem);
 }
+
+.responsive-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999999;
+    background: rgba(0, 0, 0, .85);
+    backdrop-filter: blur(1.2rem);
+    -webkit-backdrop-filter: blur(1.2rem);
+}
+
+.close-icon-in-responsive-bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 999;
+}
+
+.action-buttons-in-responsive-bar {
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    width: 100%;
+}
+
+
+.responsive-text:hover {
+    color: #fff !important;
+    background-color: rgba(0, 0, 0, .3);
+}
