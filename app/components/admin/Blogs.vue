@@ -214,6 +214,7 @@
         class="text-caption text-lg-subtitle-2 default-title-letter text-grey-lighten-1"
         variant="outlined"
         rows="3"
+        counter
         required
         clearable
       />
@@ -508,6 +509,7 @@ const submitBlog = async () => {
     addBlogForm.value?.reset();
     addBlogForm.value?.resetValidation();
     isSubmitting.value = false;
+    isAddBlog.value = false;
   }
 };
 
