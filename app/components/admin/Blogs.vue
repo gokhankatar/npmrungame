@@ -203,7 +203,7 @@
         chips
         variant="outlined"
         clearable
-      ></v-combobox>
+      />
 
       <v-textarea
         v-model="formModels.content"

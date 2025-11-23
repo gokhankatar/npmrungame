@@ -2,12 +2,36 @@
   <v-responsive height="100" />
 
   <v-container class="pa-0 pa-lg-10 pa-xl-15">
+    <Game_Genres />
+
+    <v-divider color="transparent" class="w-100 my-5 my-lg-10" />
+
     <!-- Game Platform Chips -->
-    <v-row class="d-flex align-center">
-      <v-col cols="12" sm="6">
-        <div
-          class="d-flex flex-wrap align-center justify-center justify-sm-start ga-1 ga-md-2 ga-lg-4"
+    <v-row class="d-flex align-center mt-5 mt-lg-10">
+      <v-col cols="12" sm="6" lg="4">
+        <p
+          class="text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-grey-lighten-1 default-title-letter text-center text-sm-start"
         >
+          Tüm Oyunlar
+        </p>
+      </v-col>
+
+      <v-col cols="12" sm="6" lg="8">
+        <div
+          class="d-flex flex-wrap align-center justify-center justify-sm-end ga-1 ga-md-2 ga-lg-4"
+        >
+          <v-btn
+            prepend-icon="mdi-magnify"
+            :ripple="false"
+            :size="getCategoryChipSize"
+            class="rounded-xl text-capitalize my-2 my-sm-0"
+            text="Oyun Ara..."
+            :variant="display.xs.value ? 'outlined' : 'text'"
+            color="green-accent-2"
+            :elevation="0"
+            :block="display.xs.value"
+          />
+          
           <v-chip
             v-for="(item, index) of game_category_list"
             :key="item.name"
@@ -181,6 +205,7 @@ import store from "~/store/store";
 import fireAnimation from "~/assets/img/fire_anim.gif";
 import example_results from "~/example_response.json";
 import axios from "axios";
+import Game_Genres from "~/components/common/Game_Genres.vue";
 
 const config = useRuntimeConfig();
 const _store = store();

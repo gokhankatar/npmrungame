@@ -78,9 +78,7 @@
 
     <v-container>
       <!-- Responsive Bar -->
-      <transition name="slide-down">
-      
-      </transition>
+      <transition name="slide-down"> </transition>
       <div
         v-if="isSmallScreen"
         class="d-flex justiy-center justify-sm-end align-center w-100"

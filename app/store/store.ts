@@ -11,6 +11,11 @@ const store = defineStore("npmrungame_store", {
     active_game_platform: "All",
     active_admin_list_item: "dashboard",
     admin_user: null,
+    active_game_genre: {
+      title: null,
+      slug: null
+    },
+    active_games_endpoint: null
   }),
 
   actions: {
@@ -37,6 +42,19 @@ const store = defineStore("npmrungame_store", {
     setAdminUserInfo(admin_user_info: Admin_User) {
       this.admin_user = admin_user_info;
     },
+    setActiveGameGenre(slug: "action" | "strategy" | "adventure" | "shooter" | "indie" | "rpg" | "horror" | "souls-like", title: "Aksiyon" | "Strateji" | "Nişancı" | "Indie" | "Rol Yapma" | "Macera" | "Korku" | "Souls-Like") {
+      this.active_game_genre = {
+        slug,
+        title
+      };
+    },
+    setActiveGameEndpoint(endpoint: string) {
+      this.active_games_endpoint = endpoint
+    },
+    clearToActiveGameGenre() {
+      this.active_game_genre.slug = null
+      this.active_game_genre.title = null
+    }
   },
   persist: piniaPluginPersistedstate.localStorage(),
 });
