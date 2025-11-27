@@ -123,9 +123,10 @@ export const useTRFormat = () => {
 
 export const useFirestoreDateFormatted = () => {
   const formatDateTR = (timestamp: any): string => {
-    if (!timestamp) throw new Error("Timestamp yok");
+    // ❗ Veri yok → UI crash yerine "-" ver
+    if (!timestamp) return "-";
 
-    let date: Date;
+    let date: Date | null = null;
 
     // Firestore timestamp objesi
     if (typeof timestamp === "object" && "seconds" in timestamp) {
@@ -133,27 +134,40 @@ export const useFirestoreDateFormatted = () => {
         timestamp.seconds * 1000 +
         Math.floor(timestamp.nanoseconds / 1_000_000);
       date = new Date(ms);
-    } else {
-      const t = Number(timestamp);
-      if (Number.isNaN(t)) throw new Error("Geçersiz timestamp");
-      date = new Date(t);
     }
 
-    // GMT+03:00 kısmını istemediğin için custom format
-    const day = date.getDate().toString().padStart(2, "0");
-    const monthNames = [
-      "Oca", "Şub", "Mar", "Nis", "May", "Haz",
-      "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"
-    ];
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
+    // Firestore değil ama sayısal timestamp
+    else if (!Number.isNaN(Number(timestamp))) {
+      date = new Date(Number(timestamp));
+    }
 
-    const hh = date.getHours().toString().padStart(2, "0");
-    const mm = date.getMinutes().toString().padStart(2, "0");
-    const ss = date.getSeconds().toString().padStart(2, "0");
+    // Son çare → direkt Date parse
+    else if (typeof timestamp === "string") {
+      const parsed = new Date(timestamp);
+      if (!Number.isNaN(parsed.getTime())) date = parsed;
+    }
 
-    // Sonuç ↓
-    return `${day} ${month} ${year} ${hh}:${mm}:${ss}`;
+    // Hâlâ çözülemediyse
+    if (!date) return "-";
+
+    try {
+      // Locale bazlı parçalama (çok daha stabil)
+      const df = new Intl.DateTimeFormat("tr-TR", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+        timeZone: "Europe/Istanbul",
+      });
+
+      return df.format(date);
+    } catch (_) {
+      // Formatlama bile çökerse UI kurtulsun
+      return "-";
+    }
   };
 
   return { formatDateTR };
