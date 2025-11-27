@@ -11,6 +11,7 @@ const store = defineStore("npmrungame_store", {
     active_game_platform: "All",
     active_admin_list_item: "dashboard",
     admin_user: null,
+    active_blog_id: null,
     active_game_genre: {
       title: null,
       slug: null
@@ -54,6 +55,9 @@ const store = defineStore("npmrungame_store", {
     clearToActiveGameGenre() {
       this.active_game_genre.slug = null
       this.active_game_genre.title = null
+    },
+    setActiveBlogId(id: string) {
+      this.active_blog_id = id
     }
   },
   persist: piniaPluginPersistedstate.localStorage(),

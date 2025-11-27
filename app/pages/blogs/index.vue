@@ -54,6 +54,7 @@
             v-else
             class="blog-card cursor-pointer d-flex flex-column ga-2 flex-grow-1"
             height="100%"
+            @click="handleBlogClick(randomInitialBlog)"
             :ripple="false"
             :elevation="0"
           >
@@ -130,6 +131,7 @@
             class="blog-card cursor-pointer d-flex flex-column flex-lg-row justify-space-between alig-center h-100"
             v-for="(item, index) of randomTwoBlogs"
             :key="index"
+            @click="handleBlogClick(item)"
           >
             <v-img
               :src="item.imageUrl"
@@ -214,7 +216,12 @@
       <!-- All Blogs -->
       <v-row class="mt-5 mt-lg-10" :density="isSmallScreen ? 'compact' : 'comfortable'">
         <v-col cols="12" sm="6" lg="3" v-for="(item, index) of blogs" :key="index">
-          <v-card class="blog-card cursor-pointer" :ripple="false" :elevation="0">
+          <v-card
+            class="blog-card cursor-pointer"
+            :ripple="false"
+            :elevation="0"
+            @click="handleBlogClick(item)"
+          >
             <v-img
               :src="item.imageUrl"
               class="blog-card-img rounded-lg w-100 h-50"
@@ -287,7 +294,7 @@
 </template>
 <script lang="ts" setup>
 import { collection, getDocs } from "firebase/firestore";
-import { truncateText } from "~/composables/core/basicFunc";
+import { slugify, truncateText } from "~/composables/core/basicFunc";
 import { useFirestoreDateFormatted } from "~/composables/data/handleData";
 import store from "~/store/store";
 import blogAnimImg from "~/assets/img/blog_anim.gif";
@@ -300,8 +307,6 @@ const { $firestore } = useNuxtApp();
 
 const _store = store();
 const router = useRouter();
-const route = useRoute();
-
 const display = useDisplay();
 const isSmallScreen = computed(() => display.smAndDown.value);
 
@@ -335,13 +340,19 @@ const getBlogsFromDb = async () => {
 
     blogs.value = blogsList;
     pickRandomBlogs();
-
-    console.log(randomInitialBlog.value?.createdAt);
   } catch (error: any) {
     console.error("Error while getting blogs : ", error.message);
   } finally {
     isGettingBlogs.value = false;
   }
+};
+
+const handleBlogClick = (blog: any) => {
+  const prefixedTitle = slugify(blog?.title);
+  _store.setActiveBlogId(blog?.firestoreId);
+
+  console.log("clicked blog", blog);
+  router.replace(`/blogs/${prefixedTitle}`);
 };
 
 onMounted(() => {
