@@ -3,22 +3,33 @@
 
   <v-container class="py-2 py-lg-5 px-md-5 px-lg-10 px-xl-15">
     <v-row
-      class="d-flex justify-start align-center mx-auto"
+      class="d-flex align-center mx-auto"
       :density="isSmallScreen ? 'compact' : 'comfortable'"
     >
       <!-- Total Blogs -->
-      <v-col cols="12">
-        <div class="d-flex justify-start align-center ga-2">
+      <v-col cols="12" md="6" xl="8">
+        <div class="d-flex flex-wrap justify-center justify-sm-start align-center ga-2">
           <img :src="blogAnimImg" width="50" />
           <p
-            class="text-start text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter text-grey-lighten-1"
+            class="text-center text-sm-start text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter text-grey-lighten-1"
           >
             Oyun Dünyasından En Son Haberler
           </p>
         </div>
-
-        <v-divider class="w-100 my-3" color="white" />
       </v-col>
+
+      <v-col cols="12" md="6" xl="4">
+        <v-text-field
+          variant="solo"
+          label="Blog Ara"
+          rounded="lg"
+          :elevation="0"
+          prepend-inner-icon="mdi-magnify"
+          class="text-grey-lighten-1"
+        />
+      </v-col>
+
+      <v-divider class="w-100 mt-1 mb-3 mb-lg-5" color="white" />
 
       <v-row
         v-if="!isSmallScreen"
@@ -61,22 +72,23 @@
                 {{ randomInitialBlog?.title }}
               </p>
 
-              <p class="text-caption text-lg-subtitle-2 text-grey-darken-1">
-                {{ truncateText(randomInitialBlog?.content, 200) }}
+              <p
+                class="d-flex d-lg-none text-caption text-lg-subtitle-2 text-grey-darken-1"
+              >
+                {{ truncateText(randomInitialBlog?.content, 250) }}
               </p>
 
-              <div class="d-flex flex-wrap align-center ga-1">
-                <v-chip
-                  class="rounded-xl cursor-default"
-                  variant="outlined"
-                  size="small"
-                  color="grey-lighten-1"
-                  prepend-icon="mdi-tag"
-                  :ripple="false"
-                  v-for="(tag, tagIndex) of randomInitialBlog?.keywords"
-                  :text="tag"
-                />
-              </div>
+              <p
+                class="d-none d-lg-flex d-xl-none text-caption text-lg-subtitle-2 text-grey-darken-1"
+              >
+                {{ truncateText(randomInitialBlog?.content, 125) }}
+              </p>
+
+              <p
+                class="d-none d-xl-flex text-caption text-lg-subtitle-2 text-grey-darken-1"
+              >
+                {{ truncateText(randomInitialBlog?.content, 300) }}
+              </p>
 
               <div
                 class="w-100 d-none d-lg-flex justiy-start justify-lg-end align-center"
