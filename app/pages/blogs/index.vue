@@ -190,7 +190,7 @@
       </v-row>
 
       <!-- All Blogs Skeleton -->
-      <v-row class="mt-5 mt-lg-10" v-if="isGettingBlogs">
+      <v-row class="mt-5 mt-lg-10 w-100 mx-auto" v-if="isGettingBlogs">
         <v-col cols="12" sm="6" lg="3" v-for="i in 8" :key="i">
           <v-card class="rounded-lg d-flex flex-column" :elevation="0">
             <!-- Skeleton Image -->
@@ -350,8 +350,6 @@ const getBlogsFromDb = async () => {
 const handleBlogClick = (blog: any) => {
   const prefixedTitle = slugify(blog?.title);
   _store.setActiveBlogId(blog?.firestoreId);
-
-  console.log("clicked blog", blog);
   router.replace(`/blogs/${prefixedTitle}`);
 };
 
