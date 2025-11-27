@@ -142,7 +142,7 @@
 <script lang="ts" setup>
 import axios from "axios";
 import { doc, getDocs, collection, addDoc } from "firebase/firestore";
-import { sumBy, flatMap, chain } from "lodash";
+ import pkg from 'lodash'; 
 import {
   getUniquePlatformIcons,
   useLimitedTags,
@@ -157,6 +157,8 @@ useHead({
 
 const { $firestore } = useNuxtApp();
 
+
+const { sumBy, flatMap, chain } = pkg;
 const router = useRouter();
 const config = useRuntimeConfig();
 const display = useDisplay();
