@@ -8,9 +8,9 @@
         <p
           class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
         >
-          Bitirdiğim Oyunlar
+          Şuanda Oynanan Oyunlar
           <strong class="font-weight-bold default-title-letter"
-            >({{ completedGames?.length }})</strong
+            >({{ currentGames?.length }})</strong
           >
         </p>
       </div>
@@ -20,17 +20,17 @@
         class="rounded text-caption text-lg-subtitle-2"
         :ripple="false"
         variant="tonal"
-        @click="getCompletedGames"
+        @click="getCurrentGames"
         :size="smallScreen ? 'x-small' : 'small'"
-        :loading="isGettingCompletedGames"
+        :loading="isGettingCurrentGames"
       />
     </v-col>
 
     <v-col cols="12" lg="10">
       <v-data-table
-        :items="completedGames"
+        :items="currentGames"
         :headers="header_completed_games"
-        :loading="isGettingCompletedGames"
+        :loading="isGettingCurrentGames"
         class="admin-data-table rounded-lg w-100"
         items-per-page-text="Sayfa Başı Oyun Sayısı"
         hover
@@ -115,9 +115,9 @@
           <v-skeleton-loader
             class="bg-transparent"
             :type="
-              completedGames.length > 10
+              currentGames.length > 10
                 ? 'table-row@10'
-                : `table-row@${completedGames.length}`
+                : `table-row@${currentGames.length}`
             "
           />
         </template>
@@ -582,7 +582,7 @@ const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
 const isExtraLargeScreen = computed(() => display.xlAndUp.value);
 
-const isGettingCompletedGames = ref(false);
+const isGettingCurrentGames = ref(false);
 const isOpenConfirmationDialog = ref(false);
 const isOpenGameDetail = ref(false);
 const isDeletingGameFromDb = ref(false);
@@ -598,7 +598,7 @@ const isSearchingGameLoading = ref(false);
 const isAddingToDb = ref(false);
 
 const addedGameToDbCount = ref(0);
-const completedGames = ref<any[]>([]);
+const currentGames = ref<any[]>([]);
 const activeGame = ref<any | null>(null);
 const selectedGamesAfterResearch = ref<any[]>([]);
 const searchGameText = ref<string>("");
@@ -623,11 +623,11 @@ const selectGameAfterSearch = (item: any) => {
   }
 };
 
-const getCompletedGames = async () => {
+const getCurrentGames = async () => {
   try {
-    isGettingCompletedGames.value = true;
+    isGettingCurrentGames.value = true;
 
-    const gamesCol = collection($firestore, "completed_games");
+    const gamesCol = collection($firestore, "current_games");
     const gamesSnapshot = await getDocs(gamesCol);
 
     const gamesList = gamesSnapshot.docs.map((doc) => ({
@@ -635,13 +635,13 @@ const getCompletedGames = async () => {
       ...doc.data(),
     }));
 
-    completedGames.value = gamesList;
+    currentGames.value = gamesList;
   } catch (error) {
     console.error("Error getting games :", error);
     return [];
   } finally {
     setTimeout(() => {
-      isGettingCompletedGames.value = false;
+      isGettingCurrentGames.value = false;
     }, 250);
   }
 };
@@ -669,7 +669,7 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
   try {
     isDeletingGameFromDb.value = true;
 
-    await deleteDoc(doc($firestore, "completed_games", firestoreId));
+    await deleteDoc(doc($firestore, "current_games", firestoreId));
 
     console.log("The game deleted from DB :", firestoreId);
     sendNotification(`${activeGame.value?.name} adlı oyun veritabanından silindi!`);
@@ -680,7 +680,7 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
     isDeletingGameFromDb.value = false;
 
     // Update List
-    await getCompletedGames();
+    await getCurrentGames();
   }
 };
 
@@ -719,7 +719,7 @@ const addGameToDb = async () => {
 
     // 🔥 Single
     if (games.length === 1) {
-      await addDoc(collection($firestore, "completed_games"), games[0]);
+      await addDoc(collection($firestore, "current_games"), games[0]);
       console.log("Tek oyun eklendi:", games[0].name);
       isAddedToDb.value = true;
 
@@ -733,7 +733,7 @@ const addGameToDb = async () => {
     const batch = writeBatch($firestore);
 
     games.forEach((g) => {
-      const ref = doc(collection($firestore, "completed_games"));
+      const ref = doc(collection($firestore, "current_games"));
       batch.set(ref, g);
     });
 
@@ -749,7 +749,7 @@ const addGameToDb = async () => {
   } catch (error: any) {
     console.error("Error while add to db : ", error.message);
   } finally {
-    await getCompletedGames();
+    await getCurrentGames();
     isAddingToDb.value = false;
     selectedGamesAfterResearch.value = [];
   }
@@ -768,7 +768,7 @@ watch(
 );
 
 onMounted(() => {
-  getCompletedGames();
+  getCurrentGames();
 });
 </script>
 

@@ -7,6 +7,11 @@ export const adminListItems: AdminListItem[] = [
     icon: "mdi-view-dashboard-outline",
   },
   {
+    title: "Şuan Oynananlar",
+    slug: "current_games",
+    icon: "mdi-progress-clock",
+  },
+  {
     title: "Bitirdiğim Oyunlar",
     slug: "completed_games",
     icon: "mdi-check-circle-outline",

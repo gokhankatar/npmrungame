@@ -30,7 +30,7 @@ const store = defineStore("npmrungame_store", {
       this.active_game_platform = "All";
     },
     setActiveAdminListItem(
-      item: "dashboard" | "completed_games" | "to_play_games" | "blog"
+      item: "dashboard" | "completed_games" | "to_play_games" | "blog" | "current_games"
     ) {
       this.active_admin_list_item = item;
     },

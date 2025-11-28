@@ -17,3 +17,18 @@
   right: 0;
   z-index: 999;
 }
+
+.successfully-done-container {
+  position: relative;
+  background: rgba(0, 0, 0, .15);
+  border: 1px solid rgba(255, 255, 255, .15);
+  backdrop-filter: blur(.5rem);
+  -webkit-backdrop-filter: blur(.5rem);
+}
+
+.close-icon-in-successfully-done-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999;
+}

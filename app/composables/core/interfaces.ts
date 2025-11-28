@@ -55,7 +55,7 @@ export interface Game_Category {
 
 export interface AdminListItem {
   title: string;
-  slug: "dashboard" | "completed_games" | "to_play_games" | "blog";
+  slug: "dashboard" | "completed_games" | "to_play_games" | "blog" | "current_games";
   icon: string;
 }
 

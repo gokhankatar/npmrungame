@@ -1,16 +1,37 @@
 <template>
   <template v-if="_store.isAdmin">
     <!-- List Bar -->
-    <v-navigation-drawer class="admin-nav-drawer" :rail="isRail" :permanent="!isSmallScreen">
-      <v-btn class="rail-btn text-caption text-lg-subtitle-2 default-title-letter pa-1 rounded ma-1"
-        @click="isRail = !isRail" :icon="isRail ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left'"
-        :ripple="false" size="sm" />
+    <v-navigation-drawer
+      class="admin-nav-drawer"
+      :rail="isRail"
+      :permanent="!isSmallScreen"
+    >
+      <v-btn
+        class="rail-btn text-caption text-lg-subtitle-2 default-title-letter pa-1 rounded ma-1"
+        @click="isRail = !isRail"
+        :icon="isRail ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left'"
+        :ripple="false"
+        size="sm"
+      />
       <template v-slot:prepend>
-        <v-list class="bg-transparent mt-10" :density="isExtraLargeScreen ? 'comfortable' : 'compact'">
-          <v-list-item v-for="(item, index) of adminListItems" :key="index" :prepend-icon="item.icon"
-            @click="_store.setActiveAdminListItem(item.slug)" :ripple="false" class="rounded-xl" :class="_store.active_admin_list_item == item.slug ? 'active-admin-list-item' : ''
-              ">
-            <v-list-item-title class="default-title-letter text-caption text-lg-subtitle-2">
+        <v-list
+          class="bg-transparent mt-10"
+          :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
+        >
+          <v-list-item
+            v-for="(item, index) of adminListItems"
+            :key="index"
+            :prepend-icon="item.icon"
+            @click="_store.setActiveAdminListItem(item.slug)"
+            :ripple="false"
+            class="rounded-xl"
+            :class="
+              _store.active_admin_list_item == item.slug ? 'active-admin-list-item' : ''
+            "
+          >
+            <v-list-item-title
+              class="default-title-letter text-caption text-lg-subtitle-2"
+            >
               {{ item.title }}
             </v-list-item-title>
           </v-list-item>
@@ -18,17 +39,36 @@
       </template>
 
       <template v-slot:append>
-        <v-list bg-color="transparent" class="mb-1" :density="isExtraLargeScreen ? 'comfortable' : 'compact'">
-          <v-list-item :to="'/'" prepend-icon="mdi-home-outline" rounded="xl" :ripple="false"
-            class="default-title-letter text-caption text-lg-subtitle-2" active-class="main-nav-active">
-            <v-list-item-title class="default-title-letter text-caption text-lg-subtitle-2">
+        <v-list
+          bg-color="transparent"
+          class="mb-1"
+          :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
+        >
+          <v-list-item
+            :to="'/'"
+            prepend-icon="mdi-home-outline"
+            rounded="xl"
+            :ripple="false"
+            class="default-title-letter text-caption text-lg-subtitle-2"
+            active-class="main-nav-active"
+          >
+            <v-list-item-title
+              class="default-title-letter text-caption text-lg-subtitle-2"
+            >
               Anasayfaya Dön
             </v-list-item-title>
           </v-list-item>
 
-          <v-list-item @click="handleLogout" prepend-icon="mdi-logout" rounded="xl" :ripple="false"
-            class="default-title-letter text-caption text-lg-subtitle-2">
-            <v-list-item-title class="default-title-letter text-caption text-lg-subtitle-2">
+          <v-list-item
+            @click="handleLogout"
+            prepend-icon="mdi-logout"
+            rounded="xl"
+            :ripple="false"
+            class="default-title-letter text-caption text-lg-subtitle-2"
+          >
+            <v-list-item-title
+              class="default-title-letter text-caption text-lg-subtitle-2"
+            >
               Çıkış Yap
             </v-list-item-title>
           </v-list-item>
@@ -38,81 +78,168 @@
 
     <v-container>
       <!-- Responsive Bar -->
-      <transition name="slide-down"> </transition>
-      <div v-if="isSmallScreen" class="d-flex justiy-center justify-sm-end align-center w-100">
-        <v-btn text="menu" @click="isOpenResponsiveBar = !isOpenResponsiveBar" :ripple="false"
-          prepend-icon="mdi-arrow-down-bold" />
+      <transition name="slide-down">
+        <div v-if="isSmallScreen" class="d-flex justiy-end align-center w-100">
+          <v-btn
+            v-if="!isOpenResponsiveBar"
+            @click="isOpenResponsiveBar = !isOpenResponsiveBar"
+            :ripple="false"
+            prepend-icon="mdi-menu"
+            text="Menu"
+            :elevation="0"
+            :block="isSmallScreen"
+            :size="isSmallScreen ? 'small' : 'default'"
+          />
 
-        <div class="responsive-admin-list-bar pa-2" v-if="isOpenResponsiveBar">
-          <v-btn class="close-btn-in-responsive-admin-list-bar ma-2" icon="mdi-close" color="grey-darken-1" size="large"
-            variant="text" :ripple="false" @click="isOpenResponsiveBar = false" />
-          <div class="d-flex flex-column ga-3 mt-10">
-            <div
-              class="responsive-admin-bar-list-item transition d-flex align-center ga-4 pa-2 rounded-lg cursor-pointer"
-              v-for="(item, index) of adminListItems" @click="handleRouteForResponsive(item.slug)" :key="item.title">
-              <v-icon size="large" :icon="item.icon" />
-              <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
-                {{ item.title }}
-              </p>
+          <div class="responsive-admin-list-bar pa-2" v-if="isOpenResponsiveBar">
+            <v-btn
+              class="close-btn-in-responsive-admin-list-bar ma-2"
+              icon="mdi-close"
+              color="grey-darken-1"
+              size="large"
+              variant="text"
+              :ripple="false"
+              @click="isOpenResponsiveBar = false"
+            />
+            <div class="d-flex flex-column ga-3 mt-10">
+              <div
+                class="responsive-admin-bar-list-item transition d-flex align-center ga-4 pa-2 rounded-lg cursor-pointer"
+                v-for="(item, index) of adminListItems"
+                @click="handleRouteForResponsive(item.slug)"
+                :key="item.title"
+              >
+                <v-icon size="large" :icon="item.icon" />
+                <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
+                  {{ item.title }}
+                </p>
+              </div>
             </div>
+
+            <v-row
+              class="action-buttons-in-responsive-admin-list-bar w-100 mx-auto pa-2"
+              dense
+            >
+              <v-col cols="6">
+                <v-btn
+                  size="small"
+                  prepend-icon="mdi-home-outline"
+                  text="Anasayfaya Dön"
+                  :ripple="false"
+                  variant="tonal"
+                  block
+                  @click="router.replace('/')"
+                />
+              </v-col>
+
+              <v-col cols="6">
+                <v-btn
+                  size="small"
+                  prepend-icon="mdi-logout"
+                  text="Çıkış Yap"
+                  :ripple="false"
+                  variant="tonal"
+                  block
+                  @click="handleRouteForResponsive('logout')"
+                />
+              </v-col>
+            </v-row>
           </div>
-
-          <v-row class="action-buttons-in-responsive-admin-list-bar w-100 mx-auto pa-2" dense>
-            <v-col cols="6">
-              <v-btn size="small" prepend-icon="mdi-home-outline" text="Anasayfaya Dön" :ripple="false" variant="tonal"
-                block @click="router.replace('/')" />
-            </v-col>
-
-            <v-col cols="6">
-              <v-btn size="small" prepend-icon="mdi-logout" text="Çıkış Yap" :ripple="false" variant="tonal" block
-                @click="handleRouteForResponsive('logout')" />
-            </v-col>
-          </v-row>
         </div>
-      </div>
+      </transition>
 
       <!-- Content -->
       <Dashboard v-if="_store.active_admin_list_item == 'dashboard'" />
       <Completed_Games v-if="_store.active_admin_list_item == 'completed_games'" />
       <Blogs v-if="_store.active_admin_list_item == 'blog'" />
+      <To_Play_Games v-if="_store.active_admin_list_item == 'to_play_games'" />
+      <Current_Games v-if="_store.active_admin_list_item == 'current_games'" />
     </v-container>
   </template>
 
   <!-- Authentication Form -->
   <template v-else>
-    <v-form class="admin-form rounded-lg pa-5 w-100" ref="adminForm" @submit.prevent="handleAdminAuth">
-      <v-btn class="back-to-home-btn ma-1 ma-lg-2 text-caption text-lg-subtitle-2 pa-1" @click="router.replace('/')"
-        size="xs" icon="mdi-arrow-left" variant="tonal" color="grey-lighten-1" :ripple="false" />
+    <v-form
+      class="admin-form rounded-lg pa-5 w-100"
+      ref="adminForm"
+      @submit.prevent="handleAdminAuth"
+    >
+      <v-btn
+        class="back-to-home-btn ma-1 ma-lg-2 text-caption text-lg-subtitle-2 pa-1"
+        @click="router.replace('/')"
+        size="xs"
+        icon="mdi-arrow-left"
+        variant="tonal"
+        color="grey-lighten-1"
+        :ripple="false"
+      />
 
       <div class="d-flex align-center justify-center ga-2 ga-lg-4 mt-5 mb-5 mb-lg-10">
-        <v-icon icon="mdi-security" color="grey-lighten-1" :size="isSmallScreen ? 'small' : 'large'" />
+        <v-icon
+          icon="mdi-security"
+          color="grey-lighten-1"
+          :size="isSmallScreen ? 'small' : 'large'"
+        />
 
-        <p class="default-title-letter text-grey-lighten-1 text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center">
+        <p
+          class="default-title-letter text-grey-lighten-1 text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center"
+        >
           Admin Girişi
         </p>
       </div>
 
-      <v-text-field ref="adminFormEmailRef" v-model="adminModels.email" :rules="rules.email" type="email"
-        variant="outlined" rounded="xl" label="Email" prepend-inner-icon="mdi-email" clearable
-        :density="isExtraLargeScreen ? 'comfortable' : 'compact'" />
+      <v-text-field
+        ref="adminFormEmailRef"
+        v-model="adminModels.email"
+        :rules="rules.email"
+        type="email"
+        variant="outlined"
+        rounded="xl"
+        label="Email"
+        prepend-inner-icon="mdi-email"
+        clearable
+        :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
+      />
 
-      <v-text-field v-model="adminModels.password" :rules="rules.password" :type="showPassword ? 'text' : 'password'"
-        rounded="xl" prepend-inner-icon="mdi-lock" variant="outlined"
-        :density="isExtraLargeScreen ? 'comfortable' : 'compact'" label="Şifre">
+      <v-text-field
+        v-model="adminModels.password"
+        :rules="rules.password"
+        :type="showPassword ? 'text' : 'password'"
+        rounded="xl"
+        prepend-inner-icon="mdi-lock"
+        variant="outlined"
+        :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
+        label="Şifre"
+      >
         <template v-slot:append-inner>
-          <v-icon :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click="togglePasswordVisibility" />
+          <v-icon
+            :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click="togglePasswordVisibility"
+          />
         </template>
       </v-text-field>
 
       <transition name="slide-up">
-        <v-alert v-if="isVisibleAlertAfterLogin" variant="tonal"
+        <v-alert
+          v-if="isVisibleAlertAfterLogin"
+          variant="tonal"
           class="default-title-letter mb-1 text-caption text-lg-subtitle-2"
-          :icon="colorAfterLogin == 'success' ? 'mdi-check' : 'mdi-close'" density="compact" :text="msgAfterLogin!"
-          :color="colorAfterLogin!" />
+          :icon="colorAfterLogin == 'success' ? 'mdi-check' : 'mdi-close'"
+          density="compact"
+          :text="msgAfterLogin!"
+          :color="colorAfterLogin!"
+        />
       </transition>
 
-      <v-btn text="Giriş" :loading="isLoadingLogin" class="text-caption text-lg-subtitle-2 text-capitalize"
-        prepend-icon="mdi-send" block variant="tonal" :ripple="false" type="submit" />
+      <v-btn
+        text="Giriş"
+        :loading="isLoadingLogin"
+        class="text-caption text-lg-subtitle-2 text-capitalize"
+        prepend-icon="mdi-send"
+        block
+        variant="tonal"
+        :ripple="false"
+        type="submit"
+      />
     </v-form>
   </template>
 </template>
@@ -125,6 +252,8 @@ import type { Admin_User } from "~/composables/core/interfaces";
 import Dashboard from "~/components/admin/Dashboard.vue";
 import Completed_Games from "~/components/admin/Completed_Games.vue";
 import Blogs from "~/components/admin/Blogs.vue";
+import To_Play_Games from "~/components/admin/To_Play_Games.vue";
+import Current_Games from "~/components/admin/Current_Games.vue";
 
 definePageMeta({
   layout: "admin",
@@ -183,17 +312,24 @@ const handleLogout = () => {
 };
 
 const handleRouteForResponsive = (
-  slug: "dashboard" | "completed_games" | "to_play_games" | "blog" | "home" | "logout"
+  slug:
+    | "dashboard"
+    | "completed_games"
+    | "to_play_games"
+    | "blog"
+    | "home"
+    | "logout"
+    | "current_games"
 ) => {
   console.log(slug);
 
   if (slug !== "home" && slug !== "logout") {
     _store.setActiveAdminListItem(
-      slug as "dashboard" | "completed_games" | "to_play_games" | "blog"
+      slug as "dashboard" | "completed_games" | "to_play_games" | "blog" | "current_games"
     );
     isOpenResponsiveBar.value = false;
   } else if (slug == "home") {
-    router.replace('/')
+    router.replace("/");
     isOpenResponsiveBar.value = false;
     _store.setActiveAdminListItem("dashboard");
   } else {
@@ -248,9 +384,9 @@ const handleAdminAuth = async () => {
 
 onMounted(() => {
   if (!_store.isAdmin) {
-    adminFormEmailRef.value?.focus()
+    adminFormEmailRef.value?.focus();
   }
-})
+});
 </script>
 
 <style scoped>

@@ -4,13 +4,16 @@
       <div
         class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5"
       >
-        <v-icon icon="mdi-trophy-outline" :size="smallScreen ? 'small' : 'x-large'" />
+        <v-icon
+          icon="mdi-gamepad-variant-outline"
+          :size="smallScreen ? 'small' : 'x-large'"
+        />
         <p
           class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
         >
-          Bitirdiğim Oyunlar
+          Oynayacağım Oyunlar
           <strong class="font-weight-bold default-title-letter"
-            >({{ completedGames?.length }})</strong
+            >({{ toPlayGames?.length }})</strong
           >
         </p>
       </div>
@@ -20,17 +23,17 @@
         class="rounded text-caption text-lg-subtitle-2"
         :ripple="false"
         variant="tonal"
-        @click="getCompletedGames"
+        @click="getToPlayGames"
         :size="smallScreen ? 'x-small' : 'small'"
-        :loading="isGettingCompletedGames"
+        :loading="isGettingToPlayGames"
       />
     </v-col>
 
     <v-col cols="12" lg="10">
       <v-data-table
-        :items="completedGames"
+        :items="toPlayGames"
         :headers="header_completed_games"
-        :loading="isGettingCompletedGames"
+        :loading="isGettingToPlayGames"
         class="admin-data-table rounded-lg w-100"
         items-per-page-text="Sayfa Başı Oyun Sayısı"
         hover
@@ -115,9 +118,7 @@
           <v-skeleton-loader
             class="bg-transparent"
             :type="
-              completedGames.length > 10
-                ? 'table-row@10'
-                : `table-row@${completedGames.length}`
+              toPlayGames.length > 10 ? 'table-row@10' : `table-row@${toPlayGames.length}`
             "
           />
         </template>
@@ -143,8 +144,8 @@
     :max-width="600"
     style="
       background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(0.7rem);
-      -webkit-backdrop-filter: blur(0.7rem);
+      backdrop-filter: blur(0.1rem);
+      -webkit-backdrop-filter: blur(0.1rem);
     "
   >
     <div
@@ -372,8 +373,8 @@
     :max-width="600"
     style="
       background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(0.7rem);
-      -webkit-backdrop-filter: blur(0.7rem);
+      backdrop-filter: blur(0.1rem);
+      -webkit-backdrop-filter: blur(0.1rem);
     "
   >
     <div
@@ -582,7 +583,7 @@ const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
 const isExtraLargeScreen = computed(() => display.xlAndUp.value);
 
-const isGettingCompletedGames = ref(false);
+const isGettingToPlayGames = ref(false);
 const isOpenConfirmationDialog = ref(false);
 const isOpenGameDetail = ref(false);
 const isDeletingGameFromDb = ref(false);
@@ -598,7 +599,7 @@ const isSearchingGameLoading = ref(false);
 const isAddingToDb = ref(false);
 
 const addedGameToDbCount = ref(0);
-const completedGames = ref<any[]>([]);
+const toPlayGames = ref<any[]>([]);
 const activeGame = ref<any | null>(null);
 const selectedGamesAfterResearch = ref<any[]>([]);
 const searchGameText = ref<string>("");
@@ -623,11 +624,11 @@ const selectGameAfterSearch = (item: any) => {
   }
 };
 
-const getCompletedGames = async () => {
+const getToPlayGames = async () => {
   try {
-    isGettingCompletedGames.value = true;
+    isGettingToPlayGames.value = true;
 
-    const gamesCol = collection($firestore, "completed_games");
+    const gamesCol = collection($firestore, "to_play_games");
     const gamesSnapshot = await getDocs(gamesCol);
 
     const gamesList = gamesSnapshot.docs.map((doc) => ({
@@ -635,13 +636,13 @@ const getCompletedGames = async () => {
       ...doc.data(),
     }));
 
-    completedGames.value = gamesList;
+    toPlayGames.value = gamesList;
   } catch (error) {
     console.error("Error getting games :", error);
     return [];
   } finally {
     setTimeout(() => {
-      isGettingCompletedGames.value = false;
+      isGettingToPlayGames.value = false;
     }, 250);
   }
 };
@@ -669,7 +670,7 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
   try {
     isDeletingGameFromDb.value = true;
 
-    await deleteDoc(doc($firestore, "completed_games", firestoreId));
+    await deleteDoc(doc($firestore, "to_play_games", firestoreId));
 
     console.log("The game deleted from DB :", firestoreId);
     sendNotification(`${activeGame.value?.name} adlı oyun veritabanından silindi!`);
@@ -680,7 +681,7 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
     isDeletingGameFromDb.value = false;
 
     // Update List
-    await getCompletedGames();
+    await getToPlayGames();
   }
 };
 
@@ -719,7 +720,7 @@ const addGameToDb = async () => {
 
     // 🔥 Single
     if (games.length === 1) {
-      await addDoc(collection($firestore, "completed_games"), games[0]);
+      await addDoc(collection($firestore, "to_play_games"), games[0]);
       console.log("Tek oyun eklendi:", games[0].name);
       isAddedToDb.value = true;
 
@@ -733,7 +734,7 @@ const addGameToDb = async () => {
     const batch = writeBatch($firestore);
 
     games.forEach((g) => {
-      const ref = doc(collection($firestore, "completed_games"));
+      const ref = doc(collection($firestore, "to_play_games"));
       batch.set(ref, g);
     });
 
@@ -749,7 +750,7 @@ const addGameToDb = async () => {
   } catch (error: any) {
     console.error("Error while add to db : ", error.message);
   } finally {
-    await getCompletedGames();
+    await getToPlayGames();
     isAddingToDb.value = false;
     selectedGamesAfterResearch.value = [];
   }
@@ -768,12 +769,11 @@ watch(
 );
 
 onMounted(() => {
-  getCompletedGames();
+  getToPlayGames();
 });
 </script>
-
 <style scoped>
 @import "~/assets/css/main.css";
 @import "~/assets/css/admin.css";
-@import "~/assets/css/completed_games.css";
+@import "~/assets/css/to_play_games.css";
 </style>

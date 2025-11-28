@@ -54,6 +54,16 @@
     append-icon="mdi-arrow-right"
   />
 
+  <!-- ! Only Development Mode -->
+  <v-btn
+    v-if="!_store.isAdmin"
+    @click="router.replace('/admin')"
+    class="go-to-admin-panel-btn text-caption text-lg-subtitle-2 default-title-letter"
+    :ripple="false"
+    text="Admin Paneline Git"
+    append-icon="mdi-login"
+  />
+
   <!-- ! Responsive Bar -->
   <transition name="slide-down">
     <div class="responsive-bar" v-if="isOpenResponsiveBar">

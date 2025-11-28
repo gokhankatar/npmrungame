@@ -366,12 +366,35 @@
   </v-dialog>
 
   <!-- Toast Bar -->
-  <v-snackbar
+  <v-dialog
     v-model="blogToastModels.blogToastBar"
-    :text="blogToastModels.msg"
-    :color="blogToastModels.color"
-    variant="tonal"
-  />
+    :max-width="600"
+    style="
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(0.1rem);
+      -webkit-backdrop-filter: blur(0.1rem);
+    "
+  >
+    <div
+      class="successfully-done-container d-flex flex-column align-center justify-center pa-5 rounded-xl"
+    >
+      <v-btn
+        @click="blogToastModels.blogToastBar = false"
+        class="close-icon-in-successfully-done-container ma-1 ma-lg-2"
+        icon="mdi-close"
+        :ripple="false"
+        variant="text"
+        color="grey-darken-1"
+        size="small"
+      />
+      <v-img :src="successfullyDoneImg" :width="isSmallScreen ? 50 : 75" />
+      <p
+        class="text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter"
+      >
+        {{ blogToastModels?.msg }}
+      </p>
+    </div>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -389,6 +412,7 @@ import { VForm } from "vuetify/components";
 import { header_blogs } from "~/composables/data/headerTables";
 import { truncateText } from "~/composables/core/basicFunc";
 import { useFirestoreDateFormatted } from "~/composables/data/handleData";
+import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 
 const { $firestore } = useNuxtApp();
 const config = useRuntimeConfig();
@@ -411,7 +435,6 @@ const activeBlog = ref<any | null>(null);
 
 const blogToastModels = ref({
   blogToastBar: false,
-  color: "",
   msg: "",
 });
 
@@ -489,7 +512,6 @@ const submitBlog = async () => {
     });
 
     blogToastModels.value.msg = "Blog başarı ile eklendi!";
-    blogToastModels.value.color = "success";
     blogToastModels.value.blogToastBar = true;
 
     await getBlogsFromDb();
@@ -503,7 +525,6 @@ const submitBlog = async () => {
     console.error(err);
 
     blogToastModels.value.msg = "Blog eklerken hata oluştu!";
-    blogToastModels.value.color = "error";
     blogToastModels.value.blogToastBar = true;
   } finally {
     addBlogForm.value?.reset();
@@ -552,8 +573,7 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
 
     console.log("The blog deleted from DB :", firestoreId);
 
-    blogToastModels.value.color = "error";
-    blogToastModels.value.msg = `${activeBlog.value?.title} baslıklı blog silindi!`;
+    blogToastModels.value.msg = `${activeBlog.value?.title} başlıklı blog başarıyla silindi!`;
     blogToastModels.value.blogToastBar = true;
   } catch (error) {
     console.error("Silme hatası:", error);
