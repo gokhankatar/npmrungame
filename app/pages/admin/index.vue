@@ -152,6 +152,7 @@
       <Completed_Games v-if="_store.active_admin_list_item == 'completed_games'" />
       <Blogs v-if="_store.active_admin_list_item == 'blog'" />
       <To_Play_Games v-if="_store.active_admin_list_item == 'to_play_games'" />
+      <!-- @vue-ignore -->
       <Current_Games v-if="_store.active_admin_list_item == 'current_games'" />
     </v-container>
   </template>
