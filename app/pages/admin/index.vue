@@ -164,15 +164,20 @@
       ref="adminForm"
       @submit.prevent="handleAdminAuth"
     >
-      <v-btn
-        class="back-to-home-btn ma-1 ma-lg-2 text-caption text-lg-subtitle-2 pa-1"
-        @click="router.replace('/')"
-        size="xs"
-        icon="mdi-arrow-left"
-        variant="tonal"
-        color="grey-lighten-1"
-        :ripple="false"
-      />
+      <v-tooltip text="Ana sayfaya dön" location="top">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            class="back-to-home-btn ma-1 ma-lg-2 text-caption text-lg-subtitle-2 pa-1"
+            @click="router.replace('/')"
+            size="xs"
+            icon="mdi-arrow-left"
+            variant="text"
+            color="grey-lighten-1"
+            :ripple="false"
+          />
+        </template>
+      </v-tooltip>
 
       <div class="d-flex align-center justify-center ga-2 ga-lg-4 mt-5 mb-5 mb-lg-10">
         <v-icon
@@ -231,6 +236,34 @@
         />
       </transition>
 
+      <v-checkbox
+        v-model="adminModels.isSelectedRememberMe"
+        density="compact"
+        :ripple="false"
+        class="text-caption text-lg-subtitle-2"
+        color="green-accent-2"
+      >
+        <template #label>
+          <div class="d-flex align-center ga-1 ga-lg-2">
+            <span class="text-caption text-lg-subtitle-2 default-title-letter"
+              >Beni Hatırla</span
+            >
+
+            <v-tooltip text="Başarılı Girişte Bilgileri Hatırla" location="top">
+              <template #activator="{ props }">
+                <v-icon
+                  v-bind="props"
+                  size="22"
+                  color="grey"
+                  class="cursor-pointer"
+                  icon="mdi-help-circle-outline"
+                />
+              </template>
+            </v-tooltip>
+          </div>
+        </template>
+      </v-checkbox>
+
       <v-btn
         text="Giriş"
         :loading="isLoadingLogin"
@@ -264,6 +297,7 @@ useHead({
   title: "npmrungame | Admin",
 });
 
+const config = useRuntimeConfig();
 const _store = store();
 const router = useRouter();
 const display = useDisplay();
@@ -283,6 +317,7 @@ const isOpenResponsiveBar = ref(false);
 const adminModels = ref({
   email: "",
   password: "",
+  isSelectedRememberMe: false,
 });
 
 const rules = ref({
@@ -348,6 +383,7 @@ const handleAdminAuth = async () => {
 
   try {
     isLoadingLogin.value = true;
+
     const userCredential = await signInWithEmailAndPassword(
       $auth,
       adminModels.value?.email,
@@ -355,6 +391,11 @@ const handleAdminAuth = async () => {
     );
 
     const user = userCredential.user;
+
+    if (user && adminModels.value?.isSelectedRememberMe) {
+      _store.setAnySuccessfullLogin();
+    }
+
     msgAfterLogin.value = "Giriş Başarılı";
     colorAfterLogin.value = "success";
     isVisibleAlertAfterLogin.value = true;
@@ -382,6 +423,20 @@ const handleAdminAuth = async () => {
     isLoadingLogin.value = false;
   }
 };
+
+watch(
+  () => adminModels.value?.isSelectedRememberMe,
+  (val) => {
+    if (val) {
+      if (_store.hasAnySuccessfulLogin) {
+        adminModels.value.email = "npmrungame@gmail.com";
+        adminModels.value.password = config.public.adminPassw;
+      }
+    } else {
+      adminForm.value?.reset();
+    }
+  }
+);
 
 onMounted(() => {
   if (!_store.isAdmin) {

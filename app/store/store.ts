@@ -12,6 +12,7 @@ const store = defineStore("npmrungame_store", {
     active_admin_list_item: "dashboard",
     admin_user: null,
     active_blog_id: null,
+    hasAnySuccessfulLogin: false,
     active_game_genre: {
       title: null,
       slug: null
@@ -32,6 +33,7 @@ const store = defineStore("npmrungame_store", {
     setActiveAdminListItem(
       item: "dashboard" | "completed_games" | "to_play_games" | "blog" | "current_games"
     ) {
+      // @ts-ignore
       this.active_admin_list_item = item;
     },
     logOut() {
@@ -58,6 +60,9 @@ const store = defineStore("npmrungame_store", {
     },
     setActiveBlogId(id: string) {
       this.active_blog_id = id
+    },
+    setAnySuccessfullLogin() {
+      this.hasAnySuccessfulLogin = true;
     }
   },
   persist: piniaPluginPersistedstate.localStorage(),

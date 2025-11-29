@@ -11,6 +11,7 @@ export interface StoreNpmRunGame {
   active_game_platform: string;
   active_games_endpoint: string | null;
   active_blog_id: string | null;
+  hasAnySuccessfulLogin: boolean;
   active_admin_list_item:
   | "dashboard"
   | "completed_games"
