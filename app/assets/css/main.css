@@ -50,16 +50,6 @@
     animation: rotate360 0.6s ease-in-out;
 }
 
-@keyframes rotate360 {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 .subscribe-btn {
     border: 1px solid rgba(255, 255, 255, 0.25);
     display: inline-flex;
@@ -83,29 +73,6 @@
     animation: shake 0.4s ease-in-out;
 }
 
-
-@keyframes shake {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    25% {
-        transform: rotate(10deg);
-    }
-
-    50% {
-        transform: rotate(-10deg);
-    }
-
-    75% {
-        transform: rotate(6deg);
-    }
-
-    100% {
-        transform: rotate(0deg);
-    }
-}
-
 .loading-text {
     position: relative;
     display: inline-block;
@@ -123,30 +90,6 @@
         pulse 1.2s ease-in-out infinite;
 }
 
-@keyframes shimmer {
-    0% {
-        background-position: -200% 0;
-    }
-
-    100% {
-        background-position: 200% 0;
-    }
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-
-    50% {
-        transform: scale(1.05);
-        opacity: 1;
-    }
-}
-
 .banner-content-title {
     letter-spacing: 2px !important;
     line-height: 4rem;
@@ -156,7 +99,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url("~/assets/img/banner_img.jpg");
+    background-image: url("~/assets/img/banner_img_3.jpeg");
     background-size: cover;
     background-position: center;
     filter: brightness(0.5);
@@ -270,4 +213,60 @@
 
 .slide-down-leave-active {
     transition: all 0.3s ease;
+}
+
+@keyframes shake {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(10deg);
+    }
+
+    50% {
+        transform: rotate(-10deg);
+    }
+
+    75% {
+        transform: rotate(6deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+}
+
+@keyframes rotate360 {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }

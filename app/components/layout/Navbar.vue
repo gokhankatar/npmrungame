@@ -1,5 +1,5 @@
 <template>
-  <div class="navbar d-flex justify-space-between align-center mx-auto rounded px-3 px-md-5 px-lg-7 px-xl-12"
+  <div class="navbar d-flex justify-space-between align-center mx-auto rounded py-1 py-lg-3 px-3 px-md-5 px-lg-7 px-xl-12"
     :class="isScrolledToBottom ? 'scrolled-navbar' : ''">
     <img :src="logo" width="90" class="cursor-pointer" @click="router.replace('/')" />
 
