@@ -20,8 +20,9 @@
       <v-col v-for="(item, index) of gamesList" :key="index" cols="12" sm="6" md="4" lg="3">
         <v-skeleton-loader v-if="isGettingGames" type="card" class="my-2 rounded-lg h-100" />
 
-        <v-card v-if="!isGettingGames" class="game-card bg-transparent rounded-lg cursor-pointer transition"
-          :height="isSmallScreen ? 250 : 375" :ripple="false">
+        <v-card v-if="!isGettingGames" @click="handleRowClick(item)"
+          class="game-card bg-transparent rounded-lg cursor-pointer transition" :height="isSmallScreen ? 250 : 375"
+          :ripple="false">
           <v-img :src="item.background_image" class="game-card-img h-100 rounded-lg" cover />
 
           <!-- Playtime -->
@@ -132,6 +133,11 @@ const handleToBack = () => {
   _store.clearActiveGamePlatform();
   router.replace("/discover");
 };
+
+const handleRowClick = (item: any) => {
+  _store.setActiveDetailedGame(item.id, item.name)
+  router.replace(`/game-detail/${item.name}`)
+}
 
 onMounted(() => {
   getGamesByTagOrGenre()

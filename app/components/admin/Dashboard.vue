@@ -5,9 +5,7 @@
         <!-- Title -->
         <div class="d-flex align-center ga-2">
           <v-avatar :image="adminLogoImg" />
-          <p
-            class="default-title-letter text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-xl-h4"
-          >
+          <p class="default-title-letter text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-xl-h4">
             Admin
           </p>
         </div>
@@ -19,21 +17,11 @@
           <v-col cols="12" md="6" lg="7">
             <v-card
               class="card-admin-panel-info d-flex flex-column align-start justify-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100"
-              :elevation="0"
-              :ripple="false"
-              :height="isMediumScreen ? 350 : 'auto'"
-            >
+              :elevation="0" :ripple="false" :height="isMediumScreen ? 350 : 'auto'">
               <!-- Email -->
               <div class="d-flex flex-wrap align-center ga-2">
-                <v-chip
-                  :ripple="false"
-                  text="Email"
-                  color="grey"
-                  variant="tonal"
-                  rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'large'"
-                  prepend-icon="mdi-email"
-                />
+                <v-chip :ripple="false" text="Email" color="grey" variant="tonal" rounded="xl"
+                  :size="isSmallScreen ? 'small' : 'large'" prepend-icon="mdi-email" />
                 <p class="text-grey-lighten-1 text-caption text-lg-subtitle-2">
                   npmrungame@gmail.com
                 </p>
@@ -41,49 +29,28 @@
 
               <!-- Last Login -->
               <div class="d-flex flex-wrap align-center ga-2">
-                <v-chip
-                  :ripple="false"
-                  text="Son Giriş"
-                  color="grey"
-                  variant="tonal"
-                  rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'large'"
-                  prepend-icon="mdi-update"
-                />
+                <v-chip :ripple="false" text="Son Giriş" color="grey" variant="tonal" rounded="xl"
+                  :size="isSmallScreen ? 'small' : 'large'" prepend-icon="mdi-update" />
                 <p class="text-grey-lighten-1 text-caption text-lg-subtitle-2">
                   {{
-                        formatTR(_store.admin_user?.lastLoginAt as string) }}
+                    formatTR(_store.admin_user?.lastLoginAt as string) }}
                 </p>
               </div>
 
               <!-- Created Time -->
               <div class="d-flex flex-wrap align-center ga-2">
-                <v-chip
-                  :ripple="false"
-                  text="Hesabın Oluşturulduğu Tarih"
-                  color="grey"
-                  variant="tonal"
-                  rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'large'"
-                  prepend-icon="mdi-calendar-range"
-                />
+                <v-chip :ripple="false" text="Hesabın Oluşturulduğu Tarih" color="grey" variant="tonal" rounded="xl"
+                  :size="isSmallScreen ? 'small' : 'large'" prepend-icon="mdi-calendar-range" />
                 <p class="text-grey-lighten-1 text-caption text-lg-subtitle-2">
                   {{
-                        formatTR(_store.admin_user?.createdAt as string) }}
+                    formatTR(_store.admin_user?.createdAt as string) }}
                 </p>
               </div>
 
               <!-- Admin Authority -->
               <div class="d-flex flex-wrap align-center ga-2">
-                <v-chip
-                  :ripple="false"
-                  text="Admin Yetkili Kişiler"
-                  color="grey"
-                  variant="tonal"
-                  rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'large'"
-                  prepend-icon="mdi-key"
-                />
+                <v-chip :ripple="false" text="Admin Yetkili Kişiler" color="grey" variant="tonal" rounded="xl"
+                  :size="isSmallScreen ? 'small' : 'large'" prepend-icon="mdi-key" />
                 <div class="d-flex align-center ga-1">
                   <v-tooltip text="Zeynep Cansu Katar" location="top">
                     <template #activator="{ props }">
@@ -105,49 +72,32 @@
           <v-col cols="12" md="6" lg="5">
             <v-card
               class="card-admin-panel-info d-flex flex-column align-center justify-center pa-2 pa-lg-5 rounded-xl w-100"
-              :elevation="0"
-              :height="isMediumScreen ? 350 : 'auto'"
-            >
+              :elevation="0" :height="isMediumScreen ? 350 : 'auto'">
               <v-row class="w-100 mx-auto">
                 <v-col cols="6">
                   <v-card
                     class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <p
-                      class="default-title-letter text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1"
-                    >
+                    :elevation="0">
+                    <p class="default-title-letter text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1">
                       Abone Gizlik
                     </p>
-                    <v-icon
-                      :icon="
-                        youtubeChannelStats?.hiddenSubscriberCount
-                          ? 'mdi-eye'
-                          : 'mdi-eye-off'
-                      "
-                      :size="isSmallScreen ? 'small' : 'large'"
-                    />
+                    <v-icon :icon="youtubeChannelStats?.hiddenSubscriberCount
+                        ? 'mdi-eye'
+                        : 'mdi-eye-off'
+                      " :size="isSmallScreen ? 'small' : 'large'" />
                   </v-card>
                 </v-col>
 
                 <v-col cols="6">
                   <v-card
                     class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-youtube-subscription"
-                    />
-                    <p
-                      class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
-                    >
+                    :elevation="0">
+                    <v-icon v-if="!isSmallScreen" :size="isMediumScreen ? 'small' : 'large'"
+                      icon="mdi-youtube-subscription" />
+                    <p class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center">
                       Abone Sayısı
                     </p>
-                    <p
-                      class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
+                    <p class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter">
                       {{ youtubeChannelStats?.subscriberCount }}
                     </p>
                   </v-card>
@@ -156,21 +106,12 @@
                 <v-col cols="6">
                   <v-card
                     class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-eye"
-                    />
-                    <p
-                      class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
-                    >
+                    :elevation="0">
+                    <v-icon v-if="!isSmallScreen" :size="isMediumScreen ? 'small' : 'large'" icon="mdi-eye" />
+                    <p class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center">
                       Toplam İzlenme
                     </p>
-                    <p
-                      class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
+                    <p class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter">
                       {{ youtubeChannelStats?.viewCount }}
                     </p>
                   </v-card>
@@ -179,21 +120,12 @@
                 <v-col cols="6">
                   <v-card
                     class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-monitor"
-                    />
-                    <p
-                      class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
-                    >
+                    :elevation="0">
+                    <v-icon v-if="!isSmallScreen" :size="isMediumScreen ? 'small' : 'large'" icon="mdi-monitor" />
+                    <p class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center">
                       Toplam Video
                     </p>
-                    <p
-                      class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
+                    <p class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter">
                       {{ youtubeChannelStats?.videoCount }}
                     </p>
                   </v-card>
@@ -204,35 +136,18 @@
 
           <!-- Completed Game Card -->
           <v-col cols="12" sm="6" lg="4">
-            <v-card
-              class="bg-transparent rounded-lg"
-              :ripple="false"
-              :height="display.xs.value ? 'auto' : 315"
-            >
-              <v-img
-                class="card-img-in-card-dashboard-game-stats"
-                :src="randomGameBackgroundForCompletedGames"
-                height="100%"
-                cover
-              />
-              <img
-                :src="successfullyDoneImg"
-                class="img-anim"
-                :width="isSmallScreen ? 40 : 70"
-              />
+            <v-card class="bg-transparent rounded-lg" :ripple="false" :height="display.xs.value ? 'auto' : 315">
+              <v-img class="card-img-in-card-dashboard-game-stats" :src="randomGameBackgroundForCompletedGames"
+                height="100%" cover />
+              <img :src="successfullyDoneImg" class="img-anim" :width="isSmallScreen ? 40 : 70" />
               <div
-                class="card-content-in-card-dashboard-game-stats d-flex align-center flex-wrap justiy-center justify-sm-space-between rounded-lg pa-1 pa-lg-2 ga-2"
-              >
+                class="card-content-in-card-dashboard-game-stats d-flex align-center flex-wrap justiy-center justify-sm-space-between rounded-lg pa-1 pa-lg-2 ga-2">
                 <p
-                  class="text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center default-title-letter text-grey-lighten-1"
-                >
+                  class="text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center default-title-letter text-grey-lighten-1">
                   Tamamlanmış Oyun
                 </p>
 
-                <p
-                  class="text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
-                  style="color: #4df62f"
-                >
+                <p class="text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter" style="color: #4df62f">
                   {{ completedGames?.length }}
                 </p>
               </div>
@@ -241,35 +156,18 @@
 
           <!-- To Play Game Card -->
           <v-col cols="12" sm="6" lg="4">
-            <v-card
-              class="bg-transparent rounded-lg"
-              :ripple="false"
-              :height="display.xs.value ? 'auto' : 315"
-            >
-              <v-img
-                class="card-img-in-card-dashboard-game-stats"
-                :src="randomGameBackgroundForToPlayGames"
-                height="100%"
-                cover
-              />
-              <img
-                :src="toPlayAnimImg"
-                class="img-anim"
-                :width="isSmallScreen ? 40 : 70"
-              />
+            <v-card class="bg-transparent rounded-lg" :ripple="false" :height="display.xs.value ? 'auto' : 315">
+              <v-img class="card-img-in-card-dashboard-game-stats" :src="randomGameBackgroundForToPlayGames"
+                height="100%" cover />
+              <img :src="toPlayAnimImg" class="img-anim" :width="isSmallScreen ? 40 : 70" />
               <div
-                class="card-content-in-card-dashboard-game-stats d-flex align-center flex-wrap justiy-center justify-sm-space-between rounded-lg pa-1 pa-lg-2 ga-2"
-              >
+                class="card-content-in-card-dashboard-game-stats d-flex align-center flex-wrap justiy-center justify-sm-space-between rounded-lg pa-1 pa-lg-2 ga-2">
                 <p
-                  class="text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center default-title-letter text-grey-lighten-1"
-                >
+                  class="text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center default-title-letter text-grey-lighten-1">
                   Oynanacak Oyun
                 </p>
 
-                <p
-                  class="text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
-                  style="color: #86ddfd"
-                >
+                <p class="text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter" style="color: #86ddfd">
                   {{ toPlayGames?.length }}
                 </p>
               </div>
@@ -278,38 +176,22 @@
 
           <!-- Current Game Card -->
           <v-col cols="12" lg="4">
-            <v-card
-              class="bg-transparent rounded-lg"
-              :ripple="false"
-              :height="!isLargeScreen ? 'auto' : 315"
-            >
-              <v-img
-                class="card-img-in-card-dashboard-game-stats"
-                :src="randomGameBackgroundForCurrentGames"
-                height="100%"
-                cover
-              />
-              <div
-                class="scan-dot"
-                :style="{
-                  width: isSmallScreen ? '14px' : '20px',
-                  height: isSmallScreen ? '14px' : '20px',
-                }"
-              ></div>
+            <v-card class="bg-transparent rounded-lg" :ripple="false" :height="!isLargeScreen ? 'auto' : 315">
+              <v-img class="card-img-in-card-dashboard-game-stats" :src="randomGameBackgroundForCurrentGames"
+                height="100%" cover />
+              <div class="scan-dot" :style="{
+                width: isSmallScreen ? '14px' : '20px',
+                height: isSmallScreen ? '14px' : '20px',
+              }"></div>
 
               <div
-                class="card-content-in-card-dashboard-game-stats d-flex align-center flex-wrap justiy-center justify-sm-space-between rounded-lg pa-1 pa-lg-2 ga-2"
-              >
+                class="card-content-in-card-dashboard-game-stats d-flex align-center flex-wrap justiy-center justify-sm-space-between rounded-lg pa-1 pa-lg-2 ga-2">
                 <p
-                  class="text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center default-title-letter text-grey-lighten-1"
-                >
+                  class="text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center default-title-letter text-grey-lighten-1">
                   Şuanda Oynanan
                 </p>
 
-                <p
-                  class="text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
-                  style="color: #FF1D1D"
-                >
+                <p class="text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter" style="color: #FF1D1D">
                   {{ currentGames?.length }}
                 </p>
               </div>
@@ -324,7 +206,7 @@
 <script lang="ts" setup>
 import { useTRFormat } from "~/composables/data/handleData";
 import store from "~/store/store";
-import adminLogoImg from "~/assets/img/logo.jpeg";
+import adminLogoImg from "~/assets/img/logo_fixed.webp";
 import adminZeynepCansuKatarImg from "~/assets/img/admin_zeynep_cansu_katar.jpg";
 import adminGokhanKatarImg from "~/assets/img/admin_gokhan_katar.jpg";
 import axios from "axios";

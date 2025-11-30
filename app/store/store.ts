@@ -15,6 +15,7 @@ const store = defineStore("npmrungame_store", {
     admin_user: null,
     active_blog_id: null,
     hasAnySuccessfulLogin: false,
+    active_detailed_game: { id: null, name: null },
     active_game_genre: {
       title: "Aksiyon",
       slug: "adventure",
@@ -53,6 +54,10 @@ const store = defineStore("npmrungame_store", {
     },
     setAdminUserInfo(admin_user_info: Admin_User) {
       this.admin_user = admin_user_info;
+    },
+    setActiveDetailedGame(id: number | string, name: string) {
+      this.active_detailed_game.id = id;
+      this.active_detailed_game.name = name;
     },
     setActiveGameGenre(
       slug: Game_Genre_Slug,

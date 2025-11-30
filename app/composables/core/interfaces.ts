@@ -9,6 +9,10 @@ export interface StoreNpmRunGame {
   isAdmin: boolean;
   theme?: "dark" | "light";
   active_game_platform: string;
+  active_detailed_game: {
+    id: number | string | null;
+    name: string | null;
+  };
   active_games_endpoint: string | null;
   active_blog_id: string | null;
   hasAnySuccessfulLogin: boolean;

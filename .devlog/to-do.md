@@ -1,11 +1,9 @@
 ## To-Do List
 
-- Blog sayfası (kullanıcı sayfasındaki) çeşitlendirilecek.
 - Single Blog sayfası yapılacak.
-- Kesfet kısmı halledilecek (oyun arama pop up)
 - Oyun Detay Syafası
 - Endpointler store da olsun (prev,page,next)
-- keşfet sayfası icin oyun arama pop up ı gelsin
+- Paginationlar yapılacak ve store tarafında da olmalı (prev,next ve currentPage gibi keyler olabilir)
 - router guard middleware ları yaz
 - Bloglar için update ozelligi eklenecke ve ayunı baslıktan varsa kontrol edilecek.
 - Her card için loading skeletonu unutma ui rezil gournmesın

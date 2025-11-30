@@ -37,8 +37,9 @@
       <v-col v-for="(item, index) of gamesArr" :key="index" cols="12" sm="6" md="4" lg="3">
         <v-skeleton-loader v-if="isLoading" type="card" class="rounded-lg h-100" />
 
-        <v-card v-if="!isLoading" class="game-card bg-transparent rounded-lg cursor-pointer transition"
-          :height="smallScreen ? 250 : 375" :ripple="false">
+        <v-card v-if="!isLoading" @click="handleRowClick(item)"
+          class="game-card bg-transparent rounded-lg cursor-pointer transition" :height="smallScreen ? 250 : 375"
+          :ripple="false">
           <v-img :src="item.background_image" class="game-card-img h-100 rounded-lg" cover />
 
           <!-- Playtime -->
@@ -183,7 +184,9 @@ useHead({
 
 const config = useRuntimeConfig();
 const _store = store();
+const router = useRouter();
 const display = useDisplay();
+
 const smallScreen = computed(() => display.smAndDown.value);
 const extraLgScreen = computed(() => display.xlAndUp.value);
 
@@ -252,6 +255,11 @@ const handleGamePlatform = (platform: "pc" | "ps5" | "xbox" | "nintendo" | "star
     _store.changeGamePlatform(platform);
   }
 };
+
+const handleRowClick = (item: any) => {
+  _store.setActiveDetailedGame(item.id, item.name)
+  router.replace(`/game-detail/${item.name}`)
+}
 
 watch(
   () => searchGameText.value,
