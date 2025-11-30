@@ -135,7 +135,7 @@
           <p v-if="searchResults?.length" class="text-caption text-grey-darken-1 text-start default-title-letter">
             {{ `${searchResults?.length} oyun bulundu` }}
           </p>
-          <v-card v-for="game in searchResults" :key="game.id" :ripple="false"
+          <v-card @click="handleRowClick(game)" v-for="game in searchResults" :key="game.id" :ripple="false"
             class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer">
             <v-avatar :size="smallScreen ? 30 : 48" rounded>
               <v-img :src="game.background_image" :alt="game.name" cover />

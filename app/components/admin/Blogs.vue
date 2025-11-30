@@ -133,8 +133,8 @@
     :max-width="600"
     style="
       background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(0.7rem);
-      -webkit-backdrop-filter: blur(0.7rem);
+      backdrop-filter: blur(0.6rem);
+      -webkit-backdrop-filter: blur(0.6rem);
     "
   >
     <v-form

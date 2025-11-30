@@ -86,6 +86,14 @@ export const getUniquePlatformIcons = (platforms: any[] | null | undefined): str
   return [...new Set(icons)];
 };
 
+export const parseRequirements = (raw?: string) => {
+  if (!raw) return []
+  return raw
+    .split('\n')
+    .map(line => line.replace(/^Minimum:|^Recommended:\s*/g, ''))
+    .filter(Boolean);
+}
+
 export const useTRFormat = () => {
   const formatTR = (timestamp: string | number): string => {
     const t = Number(timestamp);
