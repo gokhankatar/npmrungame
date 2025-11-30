@@ -13,32 +13,32 @@ export interface StoreNpmRunGame {
   active_blog_id: string | null;
   hasAnySuccessfulLogin: boolean;
   active_admin_list_item:
-  | "dashboard"
-  | "completed_games"
-  | "to_play_games"
-  | "blog";
+    | "dashboard"
+    | "completed_games"
+    | "to_play_games"
+    | "blog";
   admin_user: Admin_User | null;
   active_game_genre: {
     title:
-    | "Aksiyon"
-    | "Strateji"
-    | "Nişancı"
-    | "Indie"
-    | "Rol Yapma"
-    | "Macera"
-    | "Korku"
-    | "Souls-Like"
-    | null;
+      | "Aksiyon"
+      | "Strateji"
+      | "Nişancı"
+      | "Indie"
+      | "Rol Yapma"
+      | "Macera"
+      | "Korku"
+      | "Souls-Like"
+      | null;
     slug:
-    | "action"
-    | "strategy"
-    | "adventure"
-    | "shooter"
-    | "indie"
-    | "rpg"
-    | "horror"
-    | "souls-like"
-    | null;
+      | "action"
+      | "strategy"
+      | "adventure"
+      | "shooter"
+      | "indie"
+      | "rpg"
+      | "horror"
+      | "souls-like"
+      | null;
   };
 }
 
@@ -56,7 +56,12 @@ export interface Game_Category {
 
 export interface AdminListItem {
   title: string;
-  slug: "dashboard" | "completed_games" | "to_play_games" | "blog" | "current_games";
+  slug:
+    | "dashboard"
+    | "completed_games"
+    | "to_play_games"
+    | "blog"
+    | "current_games";
   icon: string;
 }
 
@@ -75,8 +80,7 @@ export interface Add_Blog_Form_Model {
   keywords: string[] | any;
 }
 
-export interface Game_Genre {
-  name:
+export type Game_Genre_Name =
   | "Aksiyon"
   | "Strateji"
   | "Nişancı"
@@ -85,14 +89,20 @@ export interface Game_Genre {
   | "Macera"
   | "Korku"
   | "Souls-Like";
-  slug:
+
+export type Game_Genre_Slug =
   | "action"
   | "strategy"
+  | "role-playing-games-rpg"
   | "adventure"
   | "shooter"
   | "indie"
-  | "rpg"
   | "horror"
   | "souls-like";
+
+export interface Game_Genre {
+  name: Game_Genre_Name;
+  slug: Game_Genre_Slug;
   background_img: string;
+  type: "genre" | "tag";
 }

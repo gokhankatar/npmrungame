@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import type {
   Admin_User,
+  Game_Genre_Name,
+  Game_Genre_Slug,
   StoreNpmRunGame,
 } from "~/composables/core/interfaces";
 
@@ -14,10 +16,12 @@ const store = defineStore("npmrungame_store", {
     active_blog_id: null,
     hasAnySuccessfulLogin: false,
     active_game_genre: {
-      title: null,
-      slug: null
+      title: "Aksiyon",
+      slug: "adventure",
+      // @ts-ignore
+      type: "genre",
     },
-    active_games_endpoint: null
+    active_games_endpoint: null,
   }),
 
   actions: {
@@ -31,7 +35,12 @@ const store = defineStore("npmrungame_store", {
       this.active_game_platform = "All";
     },
     setActiveAdminListItem(
-      item: "dashboard" | "completed_games" | "to_play_games" | "blog" | "current_games"
+      item:
+        | "dashboard"
+        | "completed_games"
+        | "to_play_games"
+        | "blog"
+        | "current_games"
     ) {
       // @ts-ignore
       this.active_admin_list_item = item;
@@ -45,25 +54,31 @@ const store = defineStore("npmrungame_store", {
     setAdminUserInfo(admin_user_info: Admin_User) {
       this.admin_user = admin_user_info;
     },
-    setActiveGameGenre(slug: "action" | "strategy" | "adventure" | "shooter" | "indie" | "rpg" | "horror" | "souls-like", title: "Aksiyon" | "Strateji" | "Nişancı" | "Indie" | "Rol Yapma" | "Macera" | "Korku" | "Souls-Like") {
+    setActiveGameGenre(
+      slug: Game_Genre_Slug,
+      title: Game_Genre_Name,
+      type: "genre" | "tag"
+    ) {
       this.active_game_genre = {
+        // @ts-ignore
         slug,
-        title
+        title,
+        type,
       };
     },
     setActiveGameEndpoint(endpoint: string) {
-      this.active_games_endpoint = endpoint
+      this.active_games_endpoint = endpoint;
     },
     clearToActiveGameGenre() {
-      this.active_game_genre.slug = null
-      this.active_game_genre.title = null
+      this.active_game_genre.slug = null;
+      this.active_game_genre.title = null;
     },
     setActiveBlogId(id: string) {
-      this.active_blog_id = id
+      this.active_blog_id = id;
     },
     setAnySuccessfullLogin() {
       this.hasAnySuccessfulLogin = true;
-    }
+    },
   },
   persist: piniaPluginPersistedstate.localStorage(),
 });
