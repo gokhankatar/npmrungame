@@ -45,7 +45,7 @@
   <v-responsive height="100vh" />
 
   <v-container class="pa-0 pa-lg-10 pa-xl-15">
-    <v-row class="w-100 mx-auto" :dense="smallScreen">
+    <v-row class="w-100 mx-auto my-5" :dense="smallScreen">
       <v-col cols="12" md="8" class="d-flex justify-center justify-sm-start">
         <p
           class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-blue-grey-lighten-1 default-title-letter"
@@ -55,12 +55,19 @@
       </v-col>
 
       <v-col cols="12" md="4" class="d-flex justify-center justify-sm-end">
-        <Animated_Text text="npmrungame" :msPerChar="50" :duration="550" :loop="true" />
+        <Animated_Text
+          @click="goToChannel"
+          text="npmrungame"
+          class="cursor-pointer"
+          :msPerChar="50"
+          :duration="550"
+          :loop="true"
+        />
       </v-col>
 
       <v-divider class="mt-2 mb-5 w-100" />
 
-      <v-row :dense="smallScreen" class="mt-4">
+      <v-row :dense="smallScreen" class="mt-2 mt-lg-5">
         <v-col
           v-for="item in videos"
           :key="item.video_src"
@@ -70,7 +77,14 @@
           xl="3"
           class="video-container"
         >
+          <!-- Skeleton Overlay -->
+          <v-skeleton-loader
+            v-if="isLoadedVideos"
+            class="rounded-xl overlay"
+            :height="300"
+          />
           <v-video
+            v-else
             class="align-self-center"
             :image="item.video_img"
             rounded="xl"
@@ -136,30 +150,37 @@ const smallScreen = computed(() => display.smAndDown.value);
 const extraLgScreen = computed(() => display.xlAndUp.value);
 
 const videos = ref<any[]>([]);
+const isLoadedVideos = ref(false);
 
 const getVideosFromDb = async () => {
   try {
-    const col = collection($firestore, "npmrungame_yt_videos");
-    const snapshot = await getDocs(col);
+    isLoadedVideos.value = true;
+
+    const colRef = collection($firestore, "npmrungame_yt_videos");
+    const snapshot = await getDocs(colRef);
 
     if (snapshot.empty) return;
 
-    const videoList = snapshot.docs.map((doc) => ({
+    videos.value = snapshot.docs.map((doc) => ({
       firestoreId: doc.id,
       ...doc.data(),
     }));
-
-    // Preview URL oluştur
-    videos.value = videoList;
-
-    console.log(videos.value);
   } catch (error: any) {
     console.error(error.message);
+  } finally {
+    setTimeout(() => {
+      isLoadedVideos.value = false;
+    }, 1200);
   }
 };
 
-onMounted(async () => {
-  await getVideosFromDb();
+const goToChannel = () => {
+  let url = "https://www.youtube.com/@npmrungame";
+  window.open(url, "_blank");
+};
+
+onMounted(() => {
+  getVideosFromDb();
 });
 </script>
 
