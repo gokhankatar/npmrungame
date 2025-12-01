@@ -1,5 +1,6 @@
 <template>
-  <v-responsive height="100" />
+  <v-responsive height="100" v-if="!isSmallScreen" />
+  <v-responsive height="70" v-else />
 
   <v-row class="w-100 mx-auto align-stretch" :dense="isSmallScreen">
     <v-col cols="12">
@@ -14,8 +15,14 @@
         />
       </div>
     </v-col>
+
+    <!-- Loader (Game Banner) -->
+    <v-col cols="12" lg="6" class="d-flex" v-if="isGettingGame">
+      <v-skeleton-loader class="cursor-pointer transition rounded-lg flex-grow-1" />
+    </v-col>
+
     <!-- Game Banner -->
-    <v-col cols="12" lg="6" class="d-flex">
+    <v-col cols="12" lg="6" class="d-flex" v-else>
       <v-img
         :src="game?.background_image"
         cover
@@ -23,8 +30,20 @@
       />
     </v-col>
 
+    <!-- Loader (Game Screenshots)  -->
+    <v-col cols="12" lg="6" class="d-flex" v-if="isGettingScreenshots">
+      <v-row :dense="isSmallScreen" class="flex-grow-1">
+        <v-col cols="12" md="6" lg="4" v-for="n in 6" :key="n">
+          <v-skeleton-loader
+            class="cursor-pointer transition rounded-lg w-100 h-100"
+            type="image"
+          />
+        </v-col>
+      </v-row>
+    </v-col>
+
     <!-- Game Screenshots -->
-    <v-col cols="12" lg="6" class="d-flex">
+    <v-col cols="12" lg="6" class="d-flex" v-else>
       <v-row :dense="isSmallScreen" class="flex-grow-1">
         <v-col cols="12" md="6" lg="4" v-for="(item, index) in imgArr" :key="index">
           <v-img
@@ -36,7 +55,17 @@
       </v-row>
     </v-col>
 
-    <v-col cols="12" md="6">
+    <!-- Loader (text) -->
+    <v-col cols="12" md="6" v-if="isGettingGame">
+      <div class="d-flex flex-column align-center align-sm-start ga-1 ga-lg-3">
+        <v-skeleton-loader type="text" width="100%" />
+        <v-skeleton-loader type="text" width="100" />
+        <v-skeleton-loader v-for="n of 3" type="paragraph" width="100%" />
+      </div>
+    </v-col>
+
+    <!-- Game Info (text) -->
+    <v-col cols="12" md="6" v-else>
       <div class="d-flex flex-column align-center align-sm-start ga-1 ga-lg-3">
         <p
           class="text-subtitle-2 text-sm-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3 default-title-letter text-blue-grey-lighten-1"
@@ -60,7 +89,54 @@
 
     <v-divider v-else color="white" class="w-100 my-3" />
 
-    <v-col cols="12" md="6">
+    <!-- Loader (Game Info - chips) -->
+    <v-col cols="12" md="6" v-if="isGettingGame">
+      <div class="d-flex flex-column align-start ga-2 ga-lg-4 ga-xl-5">
+        <div class="d-flex flex-wrap align-center ga-1 ga-lg-2 w-100">
+          <v-skeleton-loader type="text" width="100%" class="rounded-lg" />
+          <v-skeleton-loader type="chip" width="100%" class="rounded-xl" />
+        </div>
+
+        <div class="d-flex flex-wrap align-center ga-1 ga-lg-2 w-100">
+          <v-skeleton-loader type="text" width="70%" />
+          <v-skeleton-loader type="chip" width="100%" />
+        </div>
+
+        <div class="d-flex flex-wrap align-center ga-1 ga-lg-2 w-100">
+          <v-skeleton-loader type="text" width="50%" />
+          <v-skeleton-loader type="chip" width="70%" />
+        </div>
+
+        <div class="d-flex flex-wrap align-center ga-1 ga-lg-2 w-100">
+          <v-skeleton-loader type="text" width="80%" />
+          <v-skeleton-loader
+            v-for="i in 3"
+            :key="i"
+            type="chip"
+            width="80"
+            class="rounded-xl"
+          />
+        </div>
+
+        <div class="d-flex flex-wrap align-center ga-1 ga-lg-2 w-100">
+          <v-skeleton-loader type="text" width="50%" />
+          <v-skeleton-loader
+            v-for="i in 2"
+            :key="i"
+            type="chip"
+            width="90"
+            class="rounded-lg"
+          />
+        </div>
+
+        <div class="d-flex flex-wrap align-center ga-1 ga-lg-2 w-100">
+          <v-skeleton-loader type="text" width="75%" />
+        </div>
+      </div>
+    </v-col>
+
+    <!-- Game Info (chips) -->
+    <v-col cols="12" md="6" v-else>
       <div class="d-flex flex-column align-start ga-2 ga-lg-4 ga-xl-5">
         <!-- Metacritic -->
         <div
@@ -74,7 +150,6 @@
           >
             Metacritic
           </p>
-
           <v-chip
             class="rounded-xl"
             :ripple="false"
@@ -86,7 +161,6 @@
             :text="game.metacritic"
           />
         </div>
-
         <!-- Website -->
         <div v-if="game?.website" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
           <p
@@ -94,7 +168,6 @@
           >
             Website
           </p>
-
           <v-chip
             class="rounded-xl"
             target="_blank"
@@ -106,7 +179,6 @@
             :text="game?.website"
           />
         </div>
-
         <!-- Playtime -->
         <div v-if="game?.playtime" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
           <p
@@ -114,7 +186,6 @@
           >
             Tahmini Oyun Süresi
           </p>
-
           <v-chip
             class="rounded-xl"
             :ripple="false"
@@ -124,9 +195,11 @@
             :text="`${game.playtime} saat`"
           />
         </div>
-
         <!-- Developers -->
-        <div v-if="game?.developers" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
+        <div
+          v-if="game?.developers[0]"
+          class="d-flex flex-wrap align-center ga-1 ga-lg-2"
+        >
           <p
             class="default-title-letter text-decoration-underline text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1"
           >
@@ -143,9 +216,11 @@
             :text="developer.name"
           />
         </div>
-
         <!-- Publishers -->
-        <div v-if="game?.publishers" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
+        <div
+          v-if="game?.publishers[0]"
+          class="d-flex flex-wrap align-center ga-1 ga-lg-2"
+        >
           <p
             class="default-title-letter text-decoration-underline text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1"
           >
@@ -162,9 +237,8 @@
             :text="publisher.name"
           />
         </div>
-
         <!-- Platforms -->
-        <div v-if="game?.genres" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
+        <div v-if="game?.platforms[0]" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
           <p
             class="default-title-letter text-decoration-underline text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1"
           >
@@ -174,9 +248,8 @@
             <v-icon v-if="icon" size="x-small" color="grey-lighten-1" :icon="icon" />
           </template>
         </div>
-
         <!-- Stores -->
-        <div v-if="game?.stores" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
+        <div v-if="game?.stores[0]" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
           <p
             class="default-title-letter text-decoration-underline text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1"
           >
@@ -193,9 +266,8 @@
             :text="store.store.name"
           />
         </div>
-
         <!-- Genres -->
-        <div v-if="game?.genres" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
+        <div v-if="game?.genres[0]" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
           <p
             class="default-title-letter text-decoration-underline text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1"
           >
@@ -210,7 +282,6 @@
             :text="genre.name"
           />
         </div>
-
         <!-- Tags -->
         <div v-if="game?.tags[0]" class="d-flex flex-wrap align-center ga-1 ga-lg-2">
           <p
@@ -231,53 +302,64 @@
       </div>
     </v-col>
 
+    <!-- Loader (System Req) -->
+    <template v-if="isGettingGame">
+      <v-row class="w-100 mx-auto my-3 my-lg-5" align="stretch">
+        <v-col cols="12" sm="6" v-for="n of 2">
+          <v-skeleton-loader type="card" class="rounded-lg" />
+        </v-col>
+      </v-row>
+    </template>
+
     <!-- System Requirements -->
-    <v-row
-      v-if="
-        game?.platforms[0]?.requirements?.minimum ||
-        game?.platforms[0]?.requirements?.recommended
-      "
-      class="w-100 mx-auto my-3 my-lg-5"
-      align="stretch"
-    >
-      <!-- Minimum -->
-      <v-col cols="12" sm="6" v-if="game?.platforms[0]?.requirements?.minimum">
-        <v-card class="rounded-lg pa-2 pa-lg-5 h-100" :ripple="false">
-          <v-card-title class="text-subtitle-2 text-lg-subtitle-1 default-title-letter">
-            Minimum Sistem Gereksinimleri
-          </v-card-title>
+    <template v-else>
+      <v-row
+        v-if="
+          game?.platforms[0]?.requirements?.minimum ||
+          game?.platforms[0]?.requirements?.recommended
+        "
+        class="w-100 mx-auto my-3 my-lg-5"
+        align="stretch"
+      >
+        <!-- Minimum -->
+        <v-col cols="12" sm="6" v-if="game?.platforms[0]?.requirements?.minimum">
+          <v-card class="rounded-lg pa-2 pa-lg-5 h-100" :ripple="false">
+            <v-card-title class="text-subtitle-2 text-lg-subtitle-1 default-title-letter">
+              Minimum Sistem Gereksinimleri
+            </v-card-title>
 
-          <p
-            class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1"
-            v-for="(line, i) in parseRequirements(
-              game?.platforms[0]?.requirements?.minimum
-            )"
-            :key="i"
-          >
-            {{ line }}
-          </p>
-        </v-card>
-      </v-col>
+            <p
+              class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1"
+              v-for="(line, i) in parseRequirements(
+                game?.platforms[0]?.requirements?.minimum
+              )"
+              :key="i"
+            >
+              {{ line }}
+            </p>
+          </v-card>
+        </v-col>
 
-      <!-- Recommended -->
-      <v-col cols="12" sm="6" v-if="game?.platforms[0]?.requirements?.recommended">
-        <v-card class="rounded-lg pa-2 pa-lg-5 h-100" :ripple="false">
-          <v-card-title class="text-subtitle-2 text-lg-subtitle-1 default-title-letter">
-            Önerilen Sistem Gereksinimleri
-          </v-card-title>
+        <!-- Recommended -->
+        <v-col cols="12" sm="6" v-if="game?.platforms[0]?.requirements?.recommended">
+          <v-card class="rounded-lg pa-2 pa-lg-5 h-100" :ripple="false">
+            <v-card-title class="text-subtitle-2 text-lg-subtitle-1 default-title-letter">
+              Önerilen Sistem Gereksinimleri
+            </v-card-title>
 
-          <p
-            class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1"
-            v-for="(line, i) in parseRequirements(
-              game?.platforms[0]?.requirements?.recommended
-            )"
-            :key="i"
-          >
-            {{ line }}
-          </p>
-        </v-card>
-      </v-col>
-    </v-row>
+            <p
+              class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1"
+              v-for="(line, i) in parseRequirements(
+                game?.platforms[0]?.requirements?.recommended
+              )"
+              :key="i"
+            >
+              {{ line }}
+            </p>
+          </v-card>
+        </v-col>
+      </v-row>
+    </template>
   </v-row>
 
   <!-- Image Detail Pop Up -->
@@ -311,6 +393,7 @@ const display = useDisplay();
 const isSmallScreen = computed(() => display.smAndDown.value);
 
 const isGettingGame = ref(false);
+const isGettingScreenshots = ref(false);
 const isOpenImgDetail = ref(false);
 
 const game = ref<any | null>(null);
@@ -318,11 +401,19 @@ const imgDetailSrc = ref<string | null>(null);
 const imgArr = ref<any[]>([]);
 
 const getGameScreenshots = async () => {
-  const res = await axios.get(
-    `https://api.rawg.io/api/games/${_store.active_detailed_game?.id}/screenshots?key=${config.public.apiKey}`
-  );
+  try {
+    isGettingScreenshots.value = true;
 
-  imgArr.value = res.data.results;
+    const res = await axios.get(
+      `https://api.rawg.io/api/games/${_store.active_detailed_game?.id}/screenshots?key=${config.public.apiKey}`
+    );
+
+    imgArr.value = res.data.results;
+  } catch (error: any) {
+    console.error("Error while getting screenshots", error.message);
+  } finally {
+    isGettingScreenshots.value = false;
+  }
 };
 
 const getGamesById = async () => {

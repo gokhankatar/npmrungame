@@ -1,5 +1,6 @@
 <template>
-  <v-responsive height="100" />
+  <v-responsive height="100" v-if="!isSmallScreen" />
+  <v-responsive height="70" v-else />
 
   <v-container class="py-2 py-lg-5 px-md-5 px-lg-10 px-xl-15">
     <v-row
@@ -15,24 +16,57 @@
           >
             Oyun Dünyasından En Son Haberler
           </p>
+          <p
+            class="text-center text-sm-start text-caption text-md-subtitle-2 text-lg-subtitle-1 text-grey-darken-1 default-title-letter"
+          >
+            Güncel çıkışlar, stüdyo gelişmeleri ve toplulukta öne çıkan detaylarla oyun
+            dünyasının nabzını burada tutuyoruz. Yeni çıkan oyunlar, oyun
+            değerlendirmeleri, oyun dünyasından haberler ve birçok blog yazısı...
+          </p>
         </div>
       </v-col>
 
       <v-col cols="12" md="6" xl="4">
         <v-text-field
+          v-model="searchText"
+          @input="searchBlog"
           variant="solo"
           label="Blog Ara"
+          clearable
           rounded="lg"
           :elevation="0"
           prepend-inner-icon="mdi-magnify"
           class="text-grey-lighten-1"
         />
+        <v-row no-gutters class="d-flex ga-1">
+          <v-chip
+            v-for="kw in keywords"
+            :key="kw"
+            :size="isSmallScreen ? 'x-small' : 'small'"
+            :variant="selectedKeyword === kw ? 'elevated' : 'tonal'"
+            color="blue-lighten-1"
+            :ripple="false"
+            @click="filterByKeyword(kw)"
+            :prepend-icon="selectedKeyword === kw ? 'mdi-check' : ''"
+            :text="kw"
+          />
+          <v-chip
+            v-if="selectedKeyword"
+            prepend-icon="mdi-broom"
+            variant="outlined"
+            :size="isSmallScreen ? 'x-small' : 'small'"
+            @click="resetKeyword"
+            :ripple="false"
+            text="Filtreyi temizle"
+          />
+        </v-row>
       </v-col>
 
       <v-divider class="w-100 mt-1 mb-3 mb-lg-5" color="white" />
 
+      <!-- Blog Banner -->
       <v-row
-        v-if="!isSmallScreen"
+        v-if="!isSmallScreen && searchText?.length < 3 && !selectedKeyword"
         :align="'stretch'"
         :density="isSmallScreen ? 'compact' : 'comfortable'"
       >
@@ -189,6 +223,23 @@
         </v-col>
       </v-row>
 
+      <v-col cols="12" v-if="isLoadingSearchBlog">
+        <div class="d-flex align-center ga-2 w-100">
+          <v-progress-circular
+            indeterminate
+            color="blue-grey-lighten-1"
+            size="16"
+            width="2"
+          />
+          <Animated_Text
+            text="Blog Aranıyor..."
+            :msPerChar="50"
+            :duration="550"
+            :loop="true"
+          />
+        </div>
+      </v-col>
+
       <!-- All Blogs Skeleton -->
       <v-row class="mt-5 mt-lg-10 w-100 mx-auto" v-if="isGettingBlogs">
         <v-col cols="12" sm="6" lg="3" v-for="i in 8" :key="i">
@@ -298,6 +349,7 @@ import { slugify, truncateText } from "~/composables/core/basicFunc";
 import { useFirestoreDateFormatted } from "~/composables/data/handleData";
 import store from "~/store/store";
 import blogAnimImg from "~/assets/img/blog_anim.gif";
+import Animated_Text from "~/components/common/Animated_Text.vue";
 
 useHead({
   title: "npmrungame | Blogs",
@@ -313,18 +365,38 @@ const isSmallScreen = computed(() => display.smAndDown.value);
 const { formatDateTR } = useFirestoreDateFormatted();
 
 const isGettingBlogs = ref(false);
+const isLoadingSearchBlog = ref(false);
 
+const allBlogs = ref<any[]>([]);
 const blogs = ref<any[]>([]);
 const randomInitialBlog = ref<any | null>(null);
 const randomTwoBlogs = ref<any[]>([]);
+const keywords = ref<string[]>([]);
+const selectedKeyword = ref<string | null>(null);
+const searchText = ref<string>("");
 
 const pickRandomBlogs = () => {
-  if (!blogs.value?.length) return;
+  if (!allBlogs.value?.length) return;
 
-  const shuffled = [...blogs.value].sort(() => Math.random() - 0.5);
+  const shuffled = [...allBlogs.value].sort(() => Math.random() - 0.5);
 
   randomInitialBlog.value = shuffled[0];
   randomTwoBlogs.value = shuffled.slice(1, 3);
+};
+
+const extractKeywords = () => {
+  const set = new Set<string>();
+
+  allBlogs.value.forEach((blog) => {
+    blog.keywords?.forEach((kw: string) => set.add(kw.trim()));
+  });
+
+  keywords.value = [...set];
+};
+
+const resetKeyword = () => {
+  selectedKeyword.value = null;
+  blogs.value = allBlogs.value;
 };
 
 const getBlogsFromDb = async () => {
@@ -338,12 +410,24 @@ const getBlogsFromDb = async () => {
       ...doc.data(),
     }));
 
-    blogs.value = blogsList;
+    allBlogs.value = blogsList;
+    blogs.value = blogsList; // UI reset
+
     pickRandomBlogs();
+    extractKeywords();
   } catch (error: any) {
     console.error("Error while getting blogs : ", error.message);
   } finally {
     isGettingBlogs.value = false;
+  }
+};
+
+const filterByKeyword = (kw: string) => {
+  if (selectedKeyword.value !== kw) {
+    selectedKeyword.value = kw;
+    blogs.value = allBlogs.value.filter((blog) => blog.keywords?.includes(kw));
+  } else {
+    resetKeyword();
   }
 };
 
@@ -352,6 +436,40 @@ const handleBlogClick = (blog: any) => {
   _store.setActiveBlogId(blog?.firestoreId);
   router.replace(`/blogs/${prefixedTitle}`);
 };
+
+const searchBlog = () => {
+  try {
+    isLoadingSearchBlog.value = true;
+
+    const q = searchText.value?.trim().toLowerCase();
+
+    if (q.length > 2) {
+      blogs.value = allBlogs.value.filter((blog: any) =>
+        blog.title.toLowerCase().includes(q)
+      );
+    } else {
+      blogs.value = allBlogs.value; // reset
+    }
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    setTimeout(() => {
+      isLoadingSearchBlog.value = false;
+    }, 1000);
+  }
+};
+
+watch(
+  () => searchText.value,
+  (val) => {
+    if (!val || val.length < 2) {
+      isLoadingSearchBlog.value = false;
+      blogs.value = allBlogs.value;
+      return;
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   getBlogsFromDb();

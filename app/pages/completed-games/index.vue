@@ -1,5 +1,6 @@
 <template>
-  <v-responsive height="100" />
+  <v-responsive height="100" v-if="!smallScreen" />
+  <v-responsive height="70" v-else />
 
   <v-container class="pa-2 pa-md-5 pa-lg-10 pa-xl-15">
     <v-row
