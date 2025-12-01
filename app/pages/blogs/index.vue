@@ -3,10 +3,7 @@
   <v-responsive height="70" v-else />
 
   <v-container class="py-2 py-lg-5 px-md-5 px-lg-10 px-xl-15">
-    <v-row
-      class="d-flex align-center mx-auto"
-      :density="isSmallScreen ? 'compact' : 'comfortable'"
-    >
+    <v-row class="d-flex align-center mx-auto" :dense="isSmallScreen">
       <!-- Total Blogs -->
       <v-col cols="12" md="6" xl="8">
         <div class="d-flex flex-wrap justify-center justify-sm-start align-center ga-2">
@@ -32,6 +29,7 @@
           @input="searchBlog"
           variant="solo"
           label="Blog Ara"
+          :density="isSmallScreen ? 'compact' : 'comfortable'"
           clearable
           rounded="lg"
           :elevation="0"
@@ -223,6 +221,7 @@
         </v-col>
       </v-row>
 
+      <!-- Searching Blogs -->
       <v-col cols="12" v-if="isLoadingSearchBlog">
         <div class="d-flex align-center ga-2 w-100">
           <v-progress-circular
@@ -233,6 +232,18 @@
           />
           <Animated_Text
             text="Blog Aranıyor..."
+            :msPerChar="50"
+            :duration="550"
+            :loop="true"
+          />
+        </div>
+      </v-col>
+
+      <!-- No Result -->
+      <v-col cols="12" v-if="searchText?.length > 2 && blogs?.length == 0">
+        <div class="d-flex align-center ga-2 w-100">
+          <Animated_Text
+            text="Eşleşen Blog Yok 🔍"
             :msPerChar="50"
             :duration="550"
             :loop="true"
@@ -437,25 +448,25 @@ const handleBlogClick = (blog: any) => {
   router.replace(`/blogs/${prefixedTitle}`);
 };
 
-const searchBlog = () => {
+const searchBlog = async () => {
   try {
     isLoadingSearchBlog.value = true;
 
     const q = searchText.value?.trim().toLowerCase();
+
+    await new Promise((r) => setTimeout(r, 800));
 
     if (q.length > 2) {
       blogs.value = allBlogs.value.filter((blog: any) =>
         blog.title.toLowerCase().includes(q)
       );
     } else {
-      blogs.value = allBlogs.value; // reset
+      blogs.value = allBlogs.value;
     }
   } catch (error: any) {
     console.log(error.message);
   } finally {
-    setTimeout(() => {
-      isLoadingSearchBlog.value = false;
-    }, 1000);
+    isLoadingSearchBlog.value = false;
   }
 };
 
