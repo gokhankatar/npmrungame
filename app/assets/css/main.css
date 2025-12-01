@@ -215,6 +215,12 @@
     transition: all 0.3s ease;
 }
 
+.video-header-element {
+  background: #0008;
+  color: #fff;
+}
+
+
 @keyframes shake {
     0% {
         transform: rotate(0deg);
