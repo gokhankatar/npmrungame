@@ -46,21 +46,21 @@ export const footer_social_links: Footer_Social_Links[] = [
     {
         title: "Twitter",
         icon: "mdi-twitter",
-        link: ""
+        link: "https://x.com/gokhan_vue"
     },
     {
         title: "Youtube",
         icon: "mdi-youtube",
-        link: ""
+        link: "https://www.youtube.com/@npmrungame"
     },
     {
         title: "Linkedin",
         icon: "mdi-linkedin",
-        link: ""
+        link: "https://www.linkedin.com/in/gokhankatar/"
     },
     {
         title: "Github",
         icon: "mdi-github",
-        link: ""
+        link: "https://github.com/gokhankatar"
     },
 ]
