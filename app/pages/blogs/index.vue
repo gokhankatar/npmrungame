@@ -108,19 +108,19 @@
               <p
                 class="d-flex d-lg-none text-caption text-lg-subtitle-2 text-grey-darken-1"
               >
-                {{ truncateText(randomInitialBlog?.content, 250) }}
+                {{ truncateText(randomInitialBlog?.content_raw, 250) }}
               </p>
 
               <p
                 class="d-none d-lg-flex d-xl-none text-caption text-lg-subtitle-2 text-grey-darken-1"
               >
-                {{ truncateText(randomInitialBlog?.content, 125) }}
+                {{ truncateText(randomInitialBlog?.content_raw, 125) }}
               </p>
 
               <p
                 class="d-none d-xl-flex text-caption text-lg-subtitle-2 text-grey-darken-1"
               >
-                {{ truncateText(randomInitialBlog?.content, 300) }}
+                {{ truncateText(randomInitialBlog?.content_raw, 300) }}
               </p>
 
               <div
@@ -183,19 +183,19 @@
               <p
                 class="d-flex d-lg-none text-caption text-lg-subtitle-2 text-grey-darken-1"
               >
-                {{ truncateText(item.content, 200) }}
+                {{ truncateText(item.content_raw, 200) }}
               </p>
 
               <p
                 class="d-none d-lg-flex d-xl-none text-caption text-lg-subtitle-2 text-grey-darken-1"
               >
-                {{ truncateText(item.content, 125) }}
+                {{ truncateText(item.content_raw, 125) }}
               </p>
 
               <p
                 class="d-none d-xl-flex text-caption text-lg-subtitle-2 text-grey-darken-1"
               >
-                {{ truncateText(item.content, 300) }}
+                {{ truncateText(item.content_raw, 300) }}
               </p>
 
               <div class="d-flex flex-wrap align-center ga-1">
@@ -300,13 +300,13 @@
               <p
                 class="d-flex d-md-none text-caption text-lg-subtitle-2 text-grey-darken-1"
               >
-                {{ truncateText(item.content, 200) }}
+                {{ truncateText(item.content_raw, 200) }}
               </p>
 
               <p
                 class="d-none d-md-flex text-caption text-lg-subtitle-2 text-grey-darken-1"
               >
-                {{ truncateText(item.content, 125) }}
+                {{ truncateText(item.content_raw, 125) }}
               </p>
 
               <div class="d-flex d-sm-none d-flex flex-wrap align-center ga-1">

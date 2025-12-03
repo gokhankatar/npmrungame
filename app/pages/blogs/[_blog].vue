@@ -3,10 +3,10 @@
 
   <v-container class="py-2 py-lg-5 px-md-5 px-lg-10 px-xl-15">
     <v-row
-      class="d-flex align-center mx-auto"
+      class="d-flex justify-center align-center mx-auto"
       :density="isSmallScreen ? 'compact' : 'comfortable'"
     >
-      <v-col cols="12">
+      <v-col cols="12" lg="10" xl="8">
         <div class="d-flex justify-center justify-sm-end w-100">
           <v-btn
             @click="router.replace('/blogs')"
@@ -18,7 +18,7 @@
         </div>
       </v-col>
 
-      <v-col cols="12">
+      <v-col cols="12" lg="10" xl="8">
         <img class="rounded-lg w-100" :src="blog?.imageUrl" cover />
         <div class="d-flex flex-column align-start ga-2 ga-lg-5 mt-2 mt-lg-5">
           <p
