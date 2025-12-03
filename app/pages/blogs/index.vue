@@ -403,9 +403,7 @@ const extractKeywords = () => {
   });
 
   keywords.value = [...set];
-  console.log(keywords.value);
 };
-
 
 const resetKeyword = () => {
   selectedKeyword.value = null;
@@ -439,7 +437,6 @@ const getBlogsFromDb = async () => {
     isGettingBlogs.value = false;
   }
 };
-
 
 const filterByKeyword = (kw: string) => {
   if (selectedKeyword.value !== kw) {

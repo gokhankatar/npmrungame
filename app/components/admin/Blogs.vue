@@ -662,8 +662,6 @@ const getBlogsFromDb = async () => {
       ...doc.data(),
     }));
 
-    console.log("blogs list", blogsList);
-
     blogs.value = blogsList;
   } catch (error: any) {
     console.error("Error while getting blogs : ", error.message);
