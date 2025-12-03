@@ -403,6 +403,7 @@ const extractKeywords = () => {
   });
 
   keywords.value = [...set];
+  console.log(keywords.value);
 };
 
 const resetKeyword = () => {
@@ -476,6 +477,7 @@ watch(
     if (!val || val.length < 2) {
       isLoadingSearchBlog.value = false;
       blogs.value = allBlogs.value;
+      selectedKeyword.value = null;
       return;
     }
   },
