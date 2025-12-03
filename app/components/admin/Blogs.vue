@@ -125,6 +125,115 @@
         :block="isSmallScreen ? true : false"
       />
     </v-col>
+
+    <v-col cols="12" lg="10" class="mt-5 mt-lg-10">
+      <p class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-grey-lighten-1">
+        Blog İçeriğini Nasıl Yazmalıyım ?
+      </p>
+
+      <v-divider class="w-100 mt-2 mb-4" color="white" />
+
+      <v-stepper-vertical
+        v-model="step"
+        :mandatory="false"
+        color="green-accent-2"
+        next-text="Sonraki"
+        prev-text="Önceki"
+        class="d-flex flex-column ga-2"
+        multiple
+        icon="mdi-eye"
+        non-linear
+      >
+        <!-- Ana Başlık -->
+        <v-stepper-vertical-item
+          title="Ana Başlık (#)"
+          class="text-caption text-sm-subtitle-2 text-md-subtitle-1 text-lg-h5"
+          value="1"
+          editable
+        >
+          <p
+            class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter"
+          >
+            Blogunuzda ana başlık eklemek için satır başına <v-code>#</v-code> kullanın.
+          </p>
+          <p
+            class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter"
+          >
+            Örnek:
+          </p>
+          <v-divider class="w-100 w-lg-25 mt-1 mb-2" />
+          <v-code style="background: rgba(0, 0, 0, 0.7)"># OYUN TUTKUSU</v-code>
+        </v-stepper-vertical-item>
+
+        <!-- Alt Başlık -->
+        <v-stepper-vertical-item
+          title="Alt Başlık (##)"
+          class="text-caption text-sm-subtitle-2 text-md-subtitle-1 text-lg-h5"
+          value="2"
+          editable
+        >
+          <p
+            class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter"
+          >
+            Alt başlıklar için satır başına <v-code>##</v-code> ekleyin.
+          </p>
+          <p
+            class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter"
+          >
+            Örnek:
+          </p>
+          <v-divider class="w-100 w-lg-25 mt-1 mb-2" />
+          <v-code style="background: rgba(0, 0, 0, 0.7)">## OYNADIĞIM OYUNLAR</v-code>
+        </v-stepper-vertical-item>
+
+        <!-- Divider -->
+        <v-stepper-vertical-item
+          title="Divider (--)"
+          class="text-caption text-sm-subtitle-2 text-md-subtitle-1 text-lg-h5"
+          value="3"
+          editable
+        >
+          <p
+            class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter"
+          >
+            Metinleri bölmek veya yeni bir bölüm başlatmak için
+            <v-code>--</v-code> kullanın.
+          </p>
+          <p
+            class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter"
+          >
+            Örnek:
+          </p>
+          <v-divider class="w-100 w-lg-25 mt-1 mb-2" />
+          <v-code style="background: rgba(0, 0, 0, 0.7)">--</v-code>
+        </v-stepper-vertical-item>
+
+        <!-- Normal Paragraf -->
+        <v-stepper-vertical-item
+          title="Paragraf"
+          class="text-caption text-sm-subtitle-2 text-md-subtitle-1 text-lg-h5"
+          value="4"
+          editable
+        >
+          <p
+            class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter"
+          >
+            Normal satırlar paragraf olarak kabul edilir. Sadece yazınızı yazın, ekstra
+            işaret gerekmez.
+          </p>
+          <p
+            class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter"
+          >
+            Örnek:
+          </p>
+          <v-divider class="w-100 w-lg-25 mt-1 mb-2" />
+          <v-code style="background: rgba(0, 0, 0, 0.7)">
+            Oyun oynamak sadece eğlence değil, aynı zamanda yaratıcılığı geliştiren bir
+            aktivitedir.
+          </v-code>
+        </v-stepper-vertical-item>
+      </v-stepper-vertical>
+    </v-col>
   </v-row>
 
   <!-- Add Blog Pop Up -->
@@ -411,7 +520,10 @@ import type { Add_Blog_Form_Model } from "~/composables/core/interfaces";
 import { VForm } from "vuetify/components";
 import { header_blogs } from "~/composables/data/headerTables";
 import { truncateText } from "~/composables/core/basicFunc";
-import { useFirestoreDateFormatted } from "~/composables/data/handleData";
+import {
+  useBlogHtmlFormatter,
+  useFirestoreDateFormatted,
+} from "~/composables/data/handleData";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 
 const { $firestore } = useNuxtApp();
@@ -432,6 +544,7 @@ const isDeletingBlogFromDb = ref(false);
 const addBlogForm = ref<InstanceType<typeof VForm> | null>(null);
 const blogs = ref<any[]>([]);
 const activeBlog = ref<any | null>(null);
+const step = shallowRef([1]);
 
 const blogToastModels = ref({
   blogToastBar: false,
@@ -501,10 +614,13 @@ const submitBlog = async () => {
     const imageUrl = await uploadBlogImage(formModels.value?.file!);
     const blogsCollection = collection($firestore, "blogs");
 
+    const formattedContent = useBlogHtmlFormatter(formModels.value?.content);
+
     // 2️⃣ Add To Firebase
     await addDoc(blogsCollection, {
       title: formModels.value?.title,
-      content: formModels.value?.content,
+      content_raw: formModels.value?.content,
+      content: formattedContent,
       keywords: formModels.value?.keywords,
       imageUrl,
       createdAt: serverTimestamp(),

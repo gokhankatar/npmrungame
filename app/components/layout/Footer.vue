@@ -1,5 +1,5 @@
 <template>
-  <v-responsive :height="display.xs.value ? 450 : 280" />
+  <v-responsive :height="display.xs.value ? 450 : 300" />
 
   <div class="footer-container py-3">
     <v-row class="footer-content w-100 w-md-75 mx-auto align-center">

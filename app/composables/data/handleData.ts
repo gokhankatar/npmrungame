@@ -173,10 +173,47 @@ export const useFirestoreDateFormatted = () => {
 
       return df.format(date);
     } catch (_) {
-      // Formatlama bile çökerse UI kurtulsun
       return "-";
     }
   };
 
   return { formatDateTR };
 };
+
+export const useBlogHtmlFormatter = (rawText: string): string => {
+  if (!rawText) return "";
+
+  const lines = rawText.split("\n");
+  const result: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]?.trim();
+    if (!line) continue;
+
+    // Main title (#)
+    if (line.startsWith("# ")) {
+      const content = line.replace(/^#\s*/, "");
+      result.push(`<p class="text-grey-lighten-1 text-subtitle-2 text-sm-subtitle-1 text-lg-h5 default-title-letter font-weight-bold mb-3">${content}</p>`);
+      continue;
+    }
+
+    // Subtitle (##)
+    if (line.startsWith("## ")) {
+      const content = line.replace(/^##\s*/, "");
+      result.push(`<p class="text-grey-lighten-1 text-subtitle-2 text-lg-h6 default-title-letter font-medium mb-2">${content}</p>`);
+      continue;
+    }
+
+    // Divider
+    if (line.startsWith("--") || line.startsWith("—-")) {
+      result.push(`<hr class="my-4 border-t border-white" />`);
+      continue;
+    }
+
+    // Normal text
+    result.push(`<p class="text-grey-darken-1 text-caption text-lg-subtitle-2 text-xl-subtitle-1 mb-2">${line}</p>`);
+  }
+
+  return result.join("\n");
+};
+

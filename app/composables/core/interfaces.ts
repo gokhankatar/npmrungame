@@ -128,6 +128,12 @@ export interface Footer_Social_Links {
   link: string
 }
 
+export interface BlogBlock {
+  type: "title" | "divider" | "paragraph";
+  content?: string;
+  key: string;
+}
+
 export interface Footer_Link {
   title: string,
   items: Footer_SubItem[]

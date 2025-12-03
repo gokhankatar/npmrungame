@@ -19,19 +19,18 @@
       </v-col>
 
       <v-col cols="12">
-        <img class="rounded-lg w-100 w-lg-75 w-xl-50" :src="blog?.imageUrl" cover />
+        <img class="rounded-lg w-100" :src="blog?.imageUrl" cover />
         <div class="d-flex flex-column align-start ga-2 ga-lg-5 mt-2 mt-lg-5">
           <p
-            class="text-center text-md-start text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-xl-h4 text-grey-lighten-1 default-title-letter"
+            class="text-center text-md-start text-subtitle-2 text-sm-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3 shadowed-text default-title-letter"
+            style="text-transform: capitalize !important"
           >
             {{ blog?.title }}
           </p>
 
-          <p
-            class="text-center text-md-start text-caption text-md-subtitle-2 text-lg-subtitle-1 text-grey-darken-1 default-title-letter"
-          >
-            {{ blog?.content }}
-          </p>
+          <v-divider class="w-100 w-lg-50" />
+
+          <div class="d-flex flex-column ga-1 ga-lg-2" v-html="blog?.content"></div>
 
           <div class="d-flex flex-wrap align-center ga-2 ga-lg-3">
             <span

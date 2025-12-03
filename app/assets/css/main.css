@@ -291,6 +291,11 @@
 }
 
 
+.shadowed-text {
+  text-shadow: -2px 0 4px rgba(255, 255, 255, 0.5),
+    2px 0 4px rgba(255, 255, 255, 0.5), 0 0 8px rgba(255, 255, 255, 0.01);
+}
+
 @keyframes bounce {
     0% {
         transform: translateY(0);
