@@ -575,8 +575,8 @@ const rules = ref({
 });
 
 const displayedContent = computed(() => {
-  if (showFullContent.value) return activeBlog.value?.content;
-  return truncateText(activeBlog.value?.content, 250);
+  if (showFullContent.value) return activeBlog.value?.content_raw;
+  return truncateText(activeBlog.value?.content_raw, 250);
 });
 
 const uploadBlogImage = async (file: File): Promise<string> => {
