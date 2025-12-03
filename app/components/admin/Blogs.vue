@@ -143,6 +143,7 @@
         multiple
         icon="mdi-eye"
         non-linear
+        :hide-actions="isSmallScreen"
       >
         <!-- Ana Başlık -->
         <v-stepper-vertical-item
