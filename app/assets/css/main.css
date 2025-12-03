@@ -216,10 +216,98 @@
 }
 
 .video-header-element {
-  background: #0008;
-  color: #fff;
+    background: #0008;
+    color: #fff;
 }
 
+
+/* --- CARD --- */
+.feature-card {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 300ms ease;
+}
+
+.feature-card:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* --- ICON BOUNCE --- */
+.feature-card-icon {
+    transition: transform 350ms ease;
+}
+
+.feature-card:hover .feature-card-icon {
+    animation: icon-bounce 450ms ease forwards;
+}
+
+@keyframes icon-bounce {
+    0% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(-6px);
+    }
+
+    70% {
+        transform: translateY(4px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* --- TITLE BASE --- */
+.feature-card-title {
+    letter-spacing: 1px;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+    background: linear-gradient(90deg, rgba(255, 255, 255, .4), rgba(255, 255, 255, 1));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: 0.4s ease;
+}
+
+/* Hover sırasında glow + yukarı animasyon */
+.feature-card:hover .feature-card-title {
+    animation: glow-text 1.2s ease forwards;
+}
+
+.feature-card-title span {
+    opacity: 0;
+    display: inline-block;
+    transform: translateY(8px);
+    transition: 0.35s ease;
+}
+
+
+.feature-card:hover .feature-card-icon {
+    animation: bounce 1.2s ease forwards;
+}
+
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(-8px);
+    }
+
+    60% {
+        transform: translateY(4px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
 
 @keyframes shake {
     0% {

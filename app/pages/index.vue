@@ -67,6 +67,7 @@
 
       <v-divider class="mt-2 mb-5 w-100" />
 
+      <!-- Channel Scenes -->
       <v-row :dense="smallScreen" class="mt-2 mt-lg-5">
         <v-col
           v-for="item in videos"
@@ -126,6 +127,56 @@
           </v-video>
         </v-col>
       </v-row>
+
+      <!-- why npmrungame -->
+      <v-col cols="12">
+        <div
+          class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
+        >
+          <p
+            class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-blue-grey-lighten-1 default-title-letter"
+          >
+            Neden npmrungame ?
+          </p>
+
+          <v-divider class="w-100 w-lg-50" color="white" />
+        </div>
+      </v-col>
+
+      <v-col
+        cols="6"
+        lg="4"
+        xl="3"
+        v-for="(item, index) of feature_cards"
+        :key="item.title"
+      >
+        <v-card
+          class="feature-card transition rounded-xl pa-2 pa-lg-5 d-flex flex-column align-center align-md-start justify-center justify-md-start ga-2 ga-lg-5 cursor-default"
+          :ripple="false"
+          :hover="false"
+          :elevation="0"
+          :height="display.mdAndDown.value ? 100 : 230"
+        >
+          <v-icon
+            :icon="item.icon"
+            color="grey-lighten-1"
+            class="feature-card-icon"
+            :size="smallScreen ? 'small' : 'large'"
+          />
+          <p
+            class="feature-card-title text-center text-md-start text-grey-lighten-1 text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter"
+          >
+            {{ item.title }}
+          </p>
+
+          <p
+            v-if="!display.mdAndDown.value"
+            class="feature-description text-caption text-lg-subtitle-2 text-grey-darken-1 default-title-letter"
+          >
+            {{ item.description }}
+          </p>
+        </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>
