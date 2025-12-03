@@ -357,7 +357,7 @@
 <script lang="ts" setup>
 import { collection, getDocs } from "firebase/firestore";
 import { slugify, truncateText } from "~/composables/core/basicFunc";
-import { useFirestoreDateFormatted } from "~/composables/data/handleData";
+import { normalizeText, useFirestoreDateFormatted } from "~/composables/data/handleData";
 import store from "~/store/store";
 import blogAnimImg from "~/assets/img/blog_anim.gif";
 import Animated_Text from "~/components/common/Animated_Text.vue";
@@ -399,12 +399,13 @@ const extractKeywords = () => {
   const set = new Set<string>();
 
   allBlogs.value.forEach((blog) => {
-    blog.keywords?.forEach((kw: string) => set.add(kw.trim()));
+    blog.keywords?.forEach((kw: string) => set.add(kw));
   });
 
   keywords.value = [...set];
   console.log(keywords.value);
 };
+
 
 const resetKeyword = () => {
   selectedKeyword.value = null;
@@ -417,13 +418,18 @@ const getBlogsFromDb = async () => {
     const blogsCol = collection($firestore, "blogs");
     const blogsSnapshot = await getDocs(blogsCol);
 
-    const blogsList = blogsSnapshot.docs.map((doc) => ({
-      firestoreId: doc.id,
-      ...doc.data(),
-    }));
+    const blogsList = blogsSnapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      return {
+        firestoreId: doc.id,
+        ...data,
+        keywords: (data.keywords ?? []).map((k: string) => normalizeText(k)),
+      };
+    });
 
     allBlogs.value = blogsList;
-    blogs.value = blogsList; // UI reset
+    blogs.value = blogsList;
 
     pickRandomBlogs();
     extractKeywords();
@@ -433,6 +439,7 @@ const getBlogsFromDb = async () => {
     isGettingBlogs.value = false;
   }
 };
+
 
 const filterByKeyword = (kw: string) => {
   if (selectedKeyword.value !== kw) {

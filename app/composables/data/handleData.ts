@@ -180,6 +180,14 @@ export const useFirestoreDateFormatted = () => {
   return { formatDateTR };
 };
 
+export const normalizeText = (s: any): string =>
+  String(s ?? "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+
 export const useBlogHtmlFormatter = (rawText: string): string => {
   if (!rawText) return "";
 
