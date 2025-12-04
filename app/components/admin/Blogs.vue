@@ -528,6 +528,8 @@ import {
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 
 const { $firestore } = useNuxtApp();
+const { formatDateTR } = useFirestoreDateFormatted();
+
 const config = useRuntimeConfig();
 const display = useDisplay();
 
@@ -551,8 +553,6 @@ const blogToastModels = ref({
   blogToastBar: false,
   msg: "",
 });
-
-const { formatDateTR } = useFirestoreDateFormatted();
 
 const formModels = ref<Add_Blog_Form_Model>({
   title: "",

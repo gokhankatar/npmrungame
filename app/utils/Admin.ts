@@ -26,4 +26,9 @@ export const adminListItems: AdminListItem[] = [
     slug: "blog",
     icon: "mdi-post-outline",
   },
+  {
+    title: "Mesajlar",
+    slug: "messages",
+    icon: "mdi-email-outline",
+  },
 ];

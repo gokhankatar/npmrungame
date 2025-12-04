@@ -4,6 +4,10 @@
   <div class="bg-grey">/about</div>
 </template>
 <script lang="ts" setup>
+useHead({
+  title: "npmrungame | Hakkımda",
+});
+
 const display = useDisplay();
 const isSmallScreen = computed(() => display.smAndDown.value);
 </script>

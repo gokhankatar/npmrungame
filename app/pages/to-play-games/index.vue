@@ -275,7 +275,7 @@ import { truncateText } from "~/composables/core/basicFunc";
 import store from "~/store/store";
 
 useHead({
-  title: "npmrungame | Bitirdiğim Oyunlar",
+  title: "npmrungame | Oynayacaklarım",
 });
 
 const { $firestore } = useNuxtApp();

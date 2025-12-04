@@ -180,7 +180,7 @@ import axios from "axios";
 import Game_Genres from "~/components/common/Game_Genres.vue";
 
 useHead({
-  title: "npmrungame | Discover"
+  title: "npmrungame | Keşfet"
 })
 
 const config = useRuntimeConfig();

@@ -103,7 +103,7 @@ export const useTRFormat = () => {
 
     const df = new Intl.DateTimeFormat("en-GB", {
       day: "2-digit",
-      month: "short", // Nov
+      month: "short", 
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
@@ -131,12 +131,10 @@ export const useTRFormat = () => {
 
 export const useFirestoreDateFormatted = () => {
   const formatDateTR = (timestamp: any): string => {
-    // ❗ Veri yok → UI crash yerine "-" ver
     if (!timestamp) return "-";
 
     let date: Date | null = null;
 
-    // Firestore timestamp objesi
     if (typeof timestamp === "object" && "seconds" in timestamp) {
       const ms =
         timestamp.seconds * 1000 +
@@ -144,22 +142,18 @@ export const useFirestoreDateFormatted = () => {
       date = new Date(ms);
     }
 
-    // Firestore değil ama sayısal timestamp
     else if (!Number.isNaN(Number(timestamp))) {
       date = new Date(Number(timestamp));
     }
 
-    // Son çare → direkt Date parse
     else if (typeof timestamp === "string") {
       const parsed = new Date(timestamp);
       if (!Number.isNaN(parsed.getTime())) date = parsed;
     }
 
-    // Hâlâ çözülemediyse
     if (!date) return "-";
 
     try {
-      // Locale bazlı parçalama (çok daha stabil)
       const df = new Intl.DateTimeFormat("tr-TR", {
         year: "numeric",
         month: "short",
@@ -186,7 +180,6 @@ export const normalizeText = (s: any): string =>
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
-
 
 export const useBlogHtmlFormatter = (rawText: string): string => {
   if (!rawText) return "";

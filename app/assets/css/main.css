@@ -221,7 +221,6 @@
 }
 
 
-/* --- CARD --- */
 .feature-card {
     position: relative;
     overflow: hidden;
@@ -233,7 +232,6 @@
     background: rgba(255, 255, 255, 0.03);
 }
 
-/* --- ICON BOUNCE --- */
 .feature-card-icon {
     transition: transform 350ms ease;
 }
@@ -242,25 +240,6 @@
     animation: icon-bounce 450ms ease forwards;
 }
 
-@keyframes icon-bounce {
-    0% {
-        transform: translateY(0);
-    }
-
-    30% {
-        transform: translateY(-6px);
-    }
-
-    70% {
-        transform: translateY(4px);
-    }
-
-    100% {
-        transform: translateY(0);
-    }
-}
-
-/* --- TITLE BASE --- */
 .feature-card-title {
     letter-spacing: 1px;
     font-weight: 600;
@@ -273,7 +252,6 @@
     transition: 0.4s ease;
 }
 
-/* Hover sırasında glow + yukarı animasyon */
 .feature-card:hover .feature-card-title {
     animation: glow-text 1.2s ease forwards;
 }
@@ -292,9 +270,131 @@
 
 
 .shadowed-text {
-  text-shadow: -2px 0 4px rgba(255, 255, 255, 0.5),
-    2px 0 4px rgba(255, 255, 255, 0.5), 0 0 8px rgba(255, 255, 255, 0.01);
+    text-shadow: -2px 0 4px rgba(255, 255, 255, 0.5),
+        2px 0 4px rgba(255, 255, 255, 0.5), 0 0 8px rgba(255, 255, 255, 0.01);
 }
+
+.scan-dot {
+    position: absolute;
+    background-color: #ff1e1e;
+    top: 1rem;
+    left: 1rem;
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
+    z-index: 999;
+}
+
+.scan-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    animation: pulseScanDot 1.2s infinite ease-out;
+    background-color: rgba(255, 0, 0, 0.6);
+}
+
+.scan-dot-home-page {
+    position: relative;
+    background-color: #ff1e1e;
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
+    z-index: 999;
+}
+
+.scan-dot-home-page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: rgba(255, 0, 0, 0.6);
+    animation: pulseScanDot 1.2s infinite ease-out;
+    z-index: -1;
+}
+
+.bell-shake {
+    animation: bellShake 1.2s infinite ease-in-out;
+    transform-origin: top center;
+}
+
+.input-container {
+    background-image: linear-gradient(to top, #09203f 0%, #537895 100%);
+    border-radius: 2rem;
+    padding: 2rem;
+}
+
+.subs-email-input {
+    position: relative;
+}
+
+.subs-email-btn {
+    position: absolute;
+    right: .2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 100%;
+    z-index: 999;
+}
+
+@keyframes bellShake {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    10% {
+        transform: rotate(-15deg);
+    }
+
+    20% {
+        transform: rotate(15deg);
+    }
+
+    30% {
+        transform: rotate(-12deg);
+    }
+
+    40% {
+        transform: rotate(12deg);
+    }
+
+    50% {
+        transform: rotate(-8deg);
+    }
+
+    60% {
+        transform: rotate(8deg);
+    }
+
+    70% {
+        transform: rotate(-4deg);
+    }
+
+    80% {
+        transform: rotate(4deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+
+@keyframes pulseScanDot {
+    0% {
+        transform: scale(0.7);
+        opacity: 0.9;
+    }
+
+    70% {
+        transform: scale(1.7);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+}
+
 
 @keyframes bounce {
     0% {
@@ -367,5 +467,23 @@
 
     to {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes icon-bounce {
+    0% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(-6px);
+    }
+
+    70% {
+        transform: translateY(4px);
+    }
+
+    100% {
+        transform: translateY(0);
     }
 }

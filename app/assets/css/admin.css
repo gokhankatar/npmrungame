@@ -137,42 +137,6 @@
   z-index: 999;
 }
 
-.scan-dot {
-  position: absolute;
-  background-color: #ff1e1e;
-  top: 1rem;
-  left: 1rem;
-  border-radius: 50%;
-  box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
-  z-index: 999;
-}
-
-.scan-dot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  animation: pulse 1.2s infinite ease-out;
-  background-color: rgba(255, 0, 0, 0.6);
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0.7);
-    opacity: 0.9;
-  }
-
-  70% {
-    transform: scale(1.7);
-    opacity: 0;
-  }
-
-  100% {
-    transform: scale(0.7);
-    opacity: 0;
-  }
-}
-
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.3s ease;

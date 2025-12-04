@@ -363,7 +363,7 @@ import blogAnimImg from "~/assets/img/blog_anim.gif";
 import Animated_Text from "~/components/common/Animated_Text.vue";
 
 useHead({
-  title: "npmrungame | Blogs",
+  title: "npmrungame | Bloglar",
 });
 
 const { $firestore } = useNuxtApp();

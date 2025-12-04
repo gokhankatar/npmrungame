@@ -71,6 +71,7 @@ export interface AdminListItem {
   | "completed_games"
   | "to_play_games"
   | "blog"
+  | "messages"
   | "current_games";
   icon: string;
 }

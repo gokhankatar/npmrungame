@@ -356,6 +356,7 @@ const handleRouteForResponsive = (
     | "home"
     | "logout"
     | "current_games"
+    | "messages"
 ) => {
   console.log(slug);
 
