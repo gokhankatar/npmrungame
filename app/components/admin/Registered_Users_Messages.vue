@@ -35,7 +35,7 @@
         :loading="isGettingRegisteredUsers"
         :items="registeredUsers"
         class="admin-data-table rounded-lg w-100"
-        items-per-page-text="Sayfa Başı Blog Sayısı"
+        items-per-page-text="Sayfa Başı Kullanıcı Sayısı"
         hover
       >
         <template #item="{ item, index }">
