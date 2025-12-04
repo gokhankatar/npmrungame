@@ -76,7 +76,7 @@
       </template>
     </v-navigation-drawer>
 
-    <v-container>
+    <v-container class="pt-15">
       <!-- Responsive Bar -->
       <transition name="slide-down">
         <div v-if="isSmallScreen" class="d-flex justiy-end align-center w-100">
@@ -84,11 +84,12 @@
             v-if="!isOpenResponsiveBar"
             @click="isOpenResponsiveBar = !isOpenResponsiveBar"
             :ripple="false"
-            prepend-icon="mdi-menu"
+            prepend-icon="mdi-arrow-down-thick"
             text="Menu"
+            class="admin-responsive-menu-btn"
             :elevation="0"
             :block="isSmallScreen"
-            :size="isSmallScreen ? 'small' : 'default'"
+            :size="isSmallScreen ? 'large' : 'x-large'"
           />
 
           <div class="responsive-admin-list-bar pa-2" v-if="isOpenResponsiveBar">

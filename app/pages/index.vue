@@ -746,7 +746,7 @@ const addUserToDb = async () => {
 
     setTimeout(() => {
       isSendMail.value = false;
-    }, 2500);
+    }, 4500);
   } catch (error: any) {
     console.error("Error while adding user:", error.message);
   } finally {

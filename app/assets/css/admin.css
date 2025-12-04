@@ -64,6 +64,18 @@
   color: #fff !important;
 }
 
+.admin-responsive-menu-btn {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  width: 100%;
+  background: rgba(0, 0, 0, .15);
+  border: 1px solid rgba(255, 255, 255, .15);
+  backdrop-filter: blur(.5rem);
+  -webkit-backdrop-filter: blur(.5rem);
+}
+
 .admin-form {
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(0.5rem);
@@ -130,7 +142,7 @@
   -webkit-backdrop-filter: blur(.2rem);
 }
 
-.img-anim{
+.img-anim {
   position: absolute;
   top: 0;
   left: 0;
