@@ -151,7 +151,7 @@
         :key="item.title"
       >
         <v-card
-          class="feature-card transition rounded-xl pa-2 pa-lg-5 d-flex flex-column align-center align-md-start justify-center justify-md-start ga-2 ga-lg-5 cursor-default"
+          class="feature-card transition rounded-xl pa-2 pa-lg-5 d-flex flex-column align-center align-lg-start justify-center justify-lg-start ga-2 ga-lg-5 cursor-default"
           :ripple="false"
           :hover="false"
           :elevation="0"
@@ -164,7 +164,7 @@
             :size="smallScreen ? 'small' : 'large'"
           />
           <p
-            class="feature-card-title text-center text-md-start text-grey-lighten-1 text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter"
+            class="feature-card-title text-center text-lg-start text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter"
           >
             {{ item.title }}
           </p>
