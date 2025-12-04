@@ -546,7 +546,7 @@
         <p
           class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1 font-weight-bold default-title-letter"
         >
-          {{ `Sevgili ${extractNameFromEmail(email)},` }}
+          {{ `Sevgili ${displayName},` }}
         </p>
 
         <p
@@ -600,6 +600,7 @@ const isAddingToDb = ref(false);
 const alreadyRegistered = ref(false);
 const isSendMail = ref(false);
 
+const displayName = ref("");
 const email = ref<string>("");
 const currentGames = ref<any[]>([]);
 const videos = ref<any[]>([]);
@@ -735,12 +736,13 @@ const addUserToDb = async () => {
       email: email.value,
     };
 
+    displayName.value = extractNameFromEmail(email.value);
+
     await addDoc(collection($firestore, "registered_users"), user);
 
     console.log("User registered:", user);
 
     isSendMail.value = true;
-    email.value = "";
 
     setTimeout(() => {
       isSendMail.value = false;
@@ -749,6 +751,7 @@ const addUserToDb = async () => {
     console.error("Error while adding user:", error.message);
   } finally {
     isAddingToDb.value = false;
+    email.value = "";
   }
 };
 
