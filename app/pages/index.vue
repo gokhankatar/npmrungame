@@ -179,156 +179,163 @@
       </v-col>
 
       <!-- npmrungame current play -->
-      <v-col cols="12">
-        <div
-          class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
-        >
-          <div class="d-flex align-center ga-2 ga-lg-3">
-            <div
-              class="scan-dot-home-page"
-              :style="{
-                width: smallScreen ? '14px' : '20px',
-                height: smallScreen ? '14px' : '20px',
-              }"
-            ></div>
-            <p
-              class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-blue-grey-lighten-1 default-title-letter"
-            >
-              Şu Sıralar Ne Oynuyor ?
-            </p>
-          </div>
-
-          <v-divider class="w-100 w-lg-50" color="white" />
-        </div>
-      </v-col>
-
-      <v-col
-        v-for="(item, index) of currentGames"
-        :key="index"
-        cols="12"
-        sm="6"
-        md="4"
-        lg="3"
+      <v-row
+        class="w-100 mx-auto d-flex justify-center align-center"
+        v-if="currentGames?.length"
       >
-        <v-skeleton-loader
-          v-if="isGettingCurrentGame"
-          type="card"
-          class="rounded-lg h-100"
-        />
+        <v-col cols="12">
+          <div
+            class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
+          >
+            <div class="d-flex align-center ga-2 ga-lg-3">
+              <div
+                class="scan-dot-home-page"
+                :style="{
+                  width: smallScreen ? '14px' : '20px',
+                  height: smallScreen ? '14px' : '20px',
+                }"
+              ></div>
+              <p
+                class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-blue-grey-lighten-1 default-title-letter"
+              >
+                Şu Sıralar Ne Oynuyor ?
+              </p>
+            </div>
 
-        <v-card
-          v-if="!isGettingCurrentGame"
-          class="game-card bg-transparent rounded-lg cursor-pointer transition"
-          :height="smallScreen ? 250 : 375"
-          :ripple="false"
-          @click="handleRowClick(item)"
+            <v-divider class="w-100 w-lg-50" color="white" />
+          </div>
+        </v-col>
+
+        <v-col
+          v-for="(item, index) of currentGames"
+          :key="index"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
         >
-          <v-img
-            :src="item.background_image"
-            class="game-card-img h-100 rounded-lg"
-            cover
+          <v-skeleton-loader
+            v-if="isGettingCurrentGame"
+            type="card"
+            class="rounded-lg h-100"
           />
 
-          <!-- Playtime -->
-          <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">
-            <template #activator="{ props }">
-              <v-chip
-                v-if="item.playtime"
-                v-bind="props"
-                class="playtime-icon rounded-xl ma-1 ma-lg-2"
-                :ripple="false"
-                size="small"
-                variant="elevated"
-                prepend-icon="mdi-timer-outline"
-                color="black"
-                :text="`${item.playtime} saat`"
-              />
-            </template>
-          </v-tooltip>
-
-          <!-- Metacritic -->
-          <v-tooltip text="Metacritic puanı" location="top">
-            <template #activator="{ props }">
-              <v-chip
-                v-if="item.metacritic"
-                v-bind="props"
-                class="metacritic-point rounded-xl ma-1 ma-lg-2"
-                :ripple="false"
-                size="small"
-                :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
-                :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
-                variant="elevated"
-                :color="useMetacriticStyle(item.metacritic).color"
-                :text="item.metacritic"
-              />
-            </template>
-          </v-tooltip>
-
-          <div
-            class="game-card-info d-flex flex-column align-start ga-1 ga-lg-2 pa-1 pa-lg-2"
+          <v-card
+            v-if="!isGettingCurrentGame"
+            class="game-card bg-transparent rounded-lg cursor-pointer transition"
+            :height="smallScreen ? 250 : 375"
+            :ripple="false"
+            @click="handleRowClick(item)"
           >
-            <!-- Name & Date -->
-            <div class="d-flex flex-column align-start">
-              <p class="default-title-letter text-caption text-lg-subtitle-2 text-white">
-                {{ item.name }}
-              </p>
-              <p class="text-white text-caption">
-                {{ new Date(item.released).getFullYear() }}
-              </p>
+            <v-img
+              :src="item.background_image"
+              class="game-card-img h-100 rounded-lg"
+              cover
+            />
 
-              <!-- Platforms -->
-              <div class="d-flex align-center flex-wrap ga-1">
-                <template
-                  v-for="icon in getUniquePlatformIcons(item.platforms)"
-                  :key="icon"
+            <!-- Playtime -->
+            <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">
+              <template #activator="{ props }">
+                <v-chip
+                  v-if="item.playtime"
+                  v-bind="props"
+                  class="playtime-icon rounded-xl ma-1 ma-lg-2"
+                  :ripple="false"
+                  size="small"
+                  variant="elevated"
+                  prepend-icon="mdi-timer-outline"
+                  color="black"
+                  :text="`${item.playtime} saat`"
+                />
+              </template>
+            </v-tooltip>
+
+            <!-- Metacritic -->
+            <v-tooltip text="Metacritic puanı" location="top">
+              <template #activator="{ props }">
+                <v-chip
+                  v-if="item.metacritic"
+                  v-bind="props"
+                  class="metacritic-point rounded-xl ma-1 ma-lg-2"
+                  :ripple="false"
+                  size="small"
+                  :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
+                  :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
+                  variant="elevated"
+                  :color="useMetacriticStyle(item.metacritic).color"
+                  :text="item.metacritic"
+                />
+              </template>
+            </v-tooltip>
+
+            <div
+              class="game-card-info d-flex flex-column align-start ga-1 ga-lg-2 pa-1 pa-lg-2"
+            >
+              <!-- Name & Date -->
+              <div class="d-flex flex-column align-start">
+                <p
+                  class="default-title-letter text-caption text-lg-subtitle-2 text-white"
                 >
-                  <v-icon
-                    v-if="icon"
-                    size="x-small"
-                    color="grey-lighten-1"
-                    :icon="icon"
-                  />
-                </template>
+                  {{ item.name }}
+                </p>
+                <p class="text-white text-caption">
+                  {{ new Date(item.released).getFullYear() }}
+                </p>
+
+                <!-- Platforms -->
+                <div class="d-flex align-center flex-wrap ga-1">
+                  <template
+                    v-for="icon in getUniquePlatformIcons(item.platforms)"
+                    :key="icon"
+                  >
+                    <v-icon
+                      v-if="icon"
+                      size="x-small"
+                      color="grey-lighten-1"
+                      :icon="icon"
+                    />
+                  </template>
+                </div>
+              </div>
+
+              <!-- Genres -->
+              <div class="d-flex flex-wrap ga-1">
+                <v-chip
+                  v-for="(genre, index) in item.genres"
+                  :key="index"
+                  :size="smallScreen ? 'x-small' : 'small'"
+                  variant="outlined"
+                  :ripple="false"
+                  :text="genre.name"
+                />
+              </div>
+
+              <!-- Tags -->
+              <div class="d-none d-md-flex flex-wrap ga-1">
+                <v-chip
+                  v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
+                  :key="index"
+                  color="grey-darken-1"
+                  size="x-small"
+                  class="rounded text-black"
+                  variant="elevated"
+                  :ripple="false"
+                  :text="truncateText(tag.name, 15)"
+                />
+                <v-chip
+                  v-if="useLimitedTags(item.tags, 3).hiddenCount > 0"
+                  color="grey-darken-2"
+                  size="x-small"
+                  variant="elevated"
+                  class="rounded text-white"
+                  :ripple="false"
+                  :text="useLimitedTags(item.tags, 3).hiddenText"
+                />
               </div>
             </div>
-
-            <!-- Genres -->
-            <div class="d-flex flex-wrap ga-1">
-              <v-chip
-                v-for="(genre, index) in item.genres"
-                :key="index"
-                :size="smallScreen ? 'x-small' : 'small'"
-                variant="outlined"
-                :ripple="false"
-                :text="genre.name"
-              />
-            </div>
-
-            <!-- Tags -->
-            <div class="d-none d-md-flex flex-wrap ga-1">
-              <v-chip
-                v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
-                :key="index"
-                color="grey-darken-1"
-                size="x-small"
-                class="rounded text-black"
-                variant="elevated"
-                :ripple="false"
-                :text="truncateText(tag.name, 15)"
-              />
-              <v-chip
-                v-if="useLimitedTags(item.tags, 3).hiddenCount > 0"
-                color="grey-darken-2"
-                size="x-small"
-                variant="elevated"
-                class="rounded text-white"
-                :ripple="false"
-                :text="useLimitedTags(item.tags, 3).hiddenText"
-              />
-            </div>
-          </div>
-        </v-card>
-      </v-col>
+          </v-card>
+        </v-col>
+      </v-row>
 
       <!-- Subscription Input -->
       <v-col cols="12">
@@ -460,7 +467,6 @@ const getCurrentGames = async () => {
     }));
 
     currentGames.value = gamesList;
-    console.log(currentGames.value);
   } catch (error) {
     console.error("Error getting games :", error);
     return [];
