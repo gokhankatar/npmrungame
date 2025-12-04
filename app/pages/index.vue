@@ -561,7 +561,7 @@
   </v-dialog>
 </template>
 <script lang="ts" setup>
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, serverTimestamp, where } from "firebase/firestore";
 import Animated_Text from "~/components/common/Animated_Text.vue";
 import { slugify, truncateText } from "~/composables/core/basicFunc";
 import {
@@ -734,6 +734,8 @@ const addUserToDb = async () => {
     const user = {
       username: extractNameFromEmail(email.value),
       email: email.value,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     };
 
     displayName.value = extractNameFromEmail(email.value);

@@ -6,6 +6,11 @@ export const adminListItems: AdminListItem[] = [
     slug: "dashboard",
     icon: "mdi-view-dashboard-outline",
   },
+   {
+    title: "Kayıtlar ve Mesajlar",
+    slug: "messages",
+    icon: "mdi-email-outline",
+  },
   {
     title: "Şuan Oynananlar",
     slug: "current_games",
@@ -25,10 +30,5 @@ export const adminListItems: AdminListItem[] = [
     title: "Blog",
     slug: "blog",
     icon: "mdi-post-outline",
-  },
-  {
-    title: "Mesajlar",
-    slug: "messages",
-    icon: "mdi-email-outline",
   },
 ];

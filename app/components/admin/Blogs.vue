@@ -508,7 +508,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import {
   addDoc,
   collection,
@@ -530,7 +529,6 @@ import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 const { $firestore } = useNuxtApp();
 const { formatDateTR } = useFirestoreDateFormatted();
 
-const config = useRuntimeConfig();
 const display = useDisplay();
 
 const isSmallScreen = computed(() => display.smAndDown.value);

@@ -155,6 +155,8 @@
       <To_Play_Games v-if="_store.active_admin_list_item == 'to_play_games'" />
       <!-- @vue-ignore -->
       <Current_Games v-if="_store.active_admin_list_item == 'current_games'" />
+      <!-- @vue-ignore -->
+      <Registered_Users_Messages v-if="_store.active_admin_list_item == 'messages'" />
     </v-container>
   </template>
 
@@ -289,6 +291,7 @@ import Completed_Games from "~/components/admin/Completed_Games.vue";
 import Blogs from "~/components/admin/Blogs.vue";
 import To_Play_Games from "~/components/admin/To_Play_Games.vue";
 import Current_Games from "~/components/admin/Current_Games.vue";
+import Registered_Users_Messages from "~/components/admin/Registered_Users_Messages.vue";
 
 definePageMeta({
   layout: "admin",
