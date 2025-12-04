@@ -337,6 +337,94 @@
         </v-col>
       </v-row>
 
+      <!-- Blogs -->
+      <v-col cols="12">
+        <div
+          class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
+        >
+          <div
+            @click="router.replace('/blogs')"
+            class="cursor-pointer d-flex justify-center align-center ga-2 ga-lg-3"
+          >
+            <v-icon
+              icon="mdi-post-outline"
+              class="blog-bounce"
+              :size="smallScreen ? 20 : 32"
+              color="blue-grey-darken-1"
+            />
+            <p
+              class="text-center text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-blue-grey-lighten-1 default-title-letter"
+            >
+              Blog Yazılarımıza Göz At
+            </p>
+          </div>
+
+          <v-divider class="w-100 w-lg-50" color="white" />
+        </div>
+      </v-col>
+
+      <v-col cols="12" sm="6" lg="3" v-for="(item, index) of randomBlogs" :key="index">
+        <v-card
+          class="blog-card cursor-pointer"
+          :ripple="false"
+          :elevation="0"
+          @click="handleBlogClick(item)"
+          :height="getBlogCardHeight()"
+        >
+          <v-img :src="item.imageUrl" class="blog-card-img rounded-lg w-100 h-50" cover />
+
+          <v-card-actions class="d-flex flex-column align-start ga-1 ga-lg-2">
+            <p
+              class="text-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
+            >
+              {{ item.title }}
+            </p>
+
+            <p class="text-caption text-lg-subtitle-2 text-grey-darken-1">
+              {{ truncateText(item.content_raw, 100) }}
+            </p>
+
+            <div class="d-flex d-sm-none d-flex flex-wrap align-center ga-1">
+              <p class="text-caption text-grey-darken-1">Tarih :</p>
+              <span class="text-caption text-grey-lighten-1">{{
+                formatDateTR(item.createdAt)
+              }}</span>
+            </div>
+
+            <div class="d-none d-sm-flex flex-wrap align-center ga-1">
+              <v-chip
+                class="rounded"
+                variant="tonal"
+                color="white"
+                prepend-icon="mdi-tag"
+                size="x-small"
+                :ripple="false"
+                v-for="(tag, tagIndex) of item.keywords"
+                :text="tag"
+              />
+            </div>
+
+            <div class="d-flex d-sm-none flex-wrap align-center ga-1">
+              <p class="text-caption text-grey-darken-1">Etiketler :</p>
+              <v-chip
+                class="rounded"
+                variant="tonal"
+                color="green-accent-2"
+                prepend-icon="mdi-tag"
+                size="x-small"
+                :ripple="false"
+                v-for="(tag, tagIndex) of item.keywords"
+                :text="tag"
+              />
+            </div>
+          </v-card-actions>
+
+          <span class="d-none d-sm-flex text-caption text-grey-lighten-1 ma-1 ma-lg-2">{{
+            formatDateTR(item.createdAt)
+          }}</span>
+        </v-card>
+      </v-col>
+
       <!-- Subscription Input -->
       <v-col cols="12">
         <div
@@ -400,9 +488,11 @@
 <script lang="ts" setup>
 import { collection, getDocs } from "firebase/firestore";
 import Animated_Text from "~/components/common/Animated_Text.vue";
-import { truncateText } from "~/composables/core/basicFunc";
+import { slugify, truncateText } from "~/composables/core/basicFunc";
 import {
   getUniquePlatformIcons,
+  normalizeText,
+  useFirestoreDateFormatted,
   useLimitedTags,
   useMetacriticStyle,
 } from "~/composables/data/handleData";
@@ -414,6 +504,7 @@ useHead({
 });
 
 const { $firestore } = useNuxtApp();
+const { formatDateTR } = useFirestoreDateFormatted();
 
 const _store = store();
 const router = useRouter();
@@ -426,11 +517,27 @@ const extraLgScreen = computed(() => display.xlAndUp.value);
 
 const isLoadedVideos = ref(false);
 const isGettingCurrentGame = ref(false);
+const isGettingBlogs = ref(false);
 const isSuccessfulSendMail = ref(false);
 
 const email = ref<string>("");
 const currentGames = ref<any[]>([]);
 const videos = ref<any[]>([]);
+const randomBlogs = ref<any[]>([]);
+
+const emailIsValid = computed(() => /.+@.+\..+/.test(email.value));
+
+const getBlogCardHeight = () => {
+  if (display.xl.value) {
+    return 400;
+  } else if (display.lgAndUp.value && !display.xl.value) {
+    return 575;
+  } else if (display.mdAndDown.value && !display.xs.value) {
+    return 425;
+  } else {
+    return "auto";
+  }
+};
 
 const getVideosFromDb = async () => {
   try {
@@ -477,6 +584,36 @@ const getCurrentGames = async () => {
   }
 };
 
+const getBlogsFromDb = async () => {
+  try {
+    isGettingBlogs.value = true;
+    const blogsCol = collection($firestore, "blogs");
+    const blogsSnapshot = await getDocs(blogsCol);
+
+    const blogsList = blogsSnapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      return {
+        firestoreId: doc.id,
+        ...data,
+        keywords: (data.keywords ?? []).map((k: string) => normalizeText(k)),
+      };
+    });
+
+    randomBlogs.value = blogsList.sort(() => Math.random() - 0.5).slice(0, 4);
+  } catch (error: any) {
+    console.error("Error while getting blogs : ", error.message);
+  } finally {
+    isGettingBlogs.value = false;
+  }
+};
+
+const handleBlogClick = (blog: any) => {
+  const prefixedTitle = slugify(blog?.title);
+  _store.setActiveBlogId(blog?.firestoreId);
+  router.replace(`/blogs/${prefixedTitle}`);
+};
+
 const goToChannel = () => {
   let url = "https://www.youtube.com/@npmrungame";
   window.open(url, "_blank");
@@ -491,8 +628,6 @@ const emailRule = (v: string) => {
   return /.+@.+\..+/.test(v) || "Geçerli bir e-posta adresi gir.";
 };
 
-const emailIsValid = computed(() => /.+@.+\..+/.test(email.value));
-
 const handleSubmit = () => {
   console.log("Gönderilen mail:", email.value);
   // burada API çağırırsın
@@ -501,6 +636,7 @@ const handleSubmit = () => {
 onMounted(() => {
   getVideosFromDb();
   getCurrentGames();
+  getBlogsFromDb();
 });
 </script>
 
