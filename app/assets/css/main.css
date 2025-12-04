@@ -331,21 +331,53 @@
     right: .2rem;
     top: 50%;
     transform: translateY(-50%);
-    height: 100%;
+    height: 95%;
     z-index: 999;
 }
 
 .blog-bounce {
-  animation: blogBounce 1.6s infinite ease-in-out;
+    animation: blogBounce 1.6s infinite ease-in-out;
+}
+
+.successful-registered-container {
+    position: relative;
+    background: rgba(0, 0, 0, .3);
+    border: 1px solid rgba(255, 255, 255, .15);
+    backdrop-filter: blur(1rem);
+    -webkit-backdrop-filter: blur(1rem);
+}
+
+.close-btn-in-successful-registered-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 999;
 }
 
 @keyframes blogBounce {
-  0%   { transform: translateY(0); }
-  20%  { transform: translateY(-4px); }
-  40%  { transform: translateY(0); }
-  60%  { transform: translateY(-2px); }
-  80%  { transform: translateY(0); }
-  100% { transform: translateY(0); }
+    0% {
+        transform: translateY(0);
+    }
+
+    20% {
+        transform: translateY(-4px);
+    }
+
+    40% {
+        transform: translateY(0);
+    }
+
+    60% {
+        transform: translateY(-2px);
+    }
+
+    80% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
 }
 
 @keyframes bellShake {

@@ -471,10 +471,11 @@
                   icon="mdi-send"
                   size="small"
                   color="blue-lighten-1"
+                  :loading="isAddingToDb"
                   :disabled="!emailIsValid"
                   :ripple="false"
                   :variant="emailIsValid ? 'elevated' : 'text'"
-                  @click="handleSubmit"
+                  @click="addUserToDb"
                   class="subs-email-btn"
                 />
               </template>
@@ -484,12 +485,87 @@
       </v-col>
     </v-row>
   </v-container>
+
+  <!-- successfull registered email popup -->
+  <v-dialog
+    v-model="isSendMail"
+    :max-width="600"
+    style="
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(0.2rem);
+      -webkit-backdrop-filter: blur(0.2rem);
+    "
+  >
+    <div
+      class="successful-registered-container pa-3 pa-lg-5 rounded-lg d-flex flex-column align-center justify-center ga-2 ga-lg-5"
+    >
+      <v-btn
+        @click="handleCloseSendMailPopUp"
+        class="close-btn-in-successful-registered-container ma-1 ma-lg-2"
+        size="small"
+        icon="mdi-close"
+        variant="text"
+        color="grey-lighten-1"
+        :ripple="false"
+      />
+      <!-- Is already have email -->
+      <template v-if="alreadyRegistered">
+        <div class="d-flex flex-column align-center justify-center">
+          <img
+            :src="warningImg"
+            class="bg-warning"
+            style="border-radius: 50%"
+            :width="smallScreen ? 50 : 75"
+          />
+          <p
+            class="mt-2 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 default-title-letter text-warning"
+          >
+            Zaten Kayıtlısın
+          </p>
+        </div>
+
+        <p
+          class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1 default-title-letter"
+        >
+          Bu e-posta adresi ile zaten topluluğa katılmışsın. Güzel haber: Gelişmeleri
+          almaya devam edeceksin!
+        </p>
+      </template>
+
+      <!-- New Register -->
+      <template v-else>
+        <div class="d-flex flex-column align-center justify-center">
+          <img :src="successFullyDoneImg" :width="smallScreen ? 75 : 120" />
+          <p
+            class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 default-title-letter text-blue-grey-darken-1"
+          >
+            Kayıt Başarılı
+          </p>
+        </div>
+
+        <p
+          class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1 font-weight-bold default-title-letter"
+        >
+          {{ `Sevgili ${extractNameFromEmail(email)},` }}
+        </p>
+
+        <p
+          class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-grey-lighten-1 default-title-letter"
+        >
+          topluluğumuza katıldığınız için minnet duyduk. Artık tüm gelişmelerden haberdar
+          olacaksınız. Ekosistemimizin bir parçası olduğunuz için teşekkür ederiz. İyi
+          oyunlar dileriz...
+        </p>
+      </template>
+    </div>
+  </v-dialog>
 </template>
 <script lang="ts" setup>
-import { collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import Animated_Text from "~/components/common/Animated_Text.vue";
 import { slugify, truncateText } from "~/composables/core/basicFunc";
 import {
+  extractNameFromEmail,
   getUniquePlatformIcons,
   normalizeText,
   useFirestoreDateFormatted,
@@ -498,6 +574,8 @@ import {
 } from "~/composables/data/handleData";
 import store from "~/store/store";
 import fireAnimation from "~/assets/img/fire_anim.gif";
+import successFullyDoneImg from "~/assets/img/successfully_done_anim.gif";
+import warningImg from "~/assets/img/warning_anim.gif";
 
 useHead({
   title: "npmrungame",
@@ -518,7 +596,9 @@ const extraLgScreen = computed(() => display.xlAndUp.value);
 const isLoadedVideos = ref(false);
 const isGettingCurrentGame = ref(false);
 const isGettingBlogs = ref(false);
-const isSuccessfulSendMail = ref(false);
+const isAddingToDb = ref(false);
+const alreadyRegistered = ref(false);
+const isSendMail = ref(false);
 
 const email = ref<string>("");
 const currentGames = ref<any[]>([]);
@@ -625,13 +705,67 @@ const handleRowClick = (item: any) => {
 };
 
 const emailRule = (v: string) => {
-  return /.+@.+\..+/.test(v) || "Geçerli bir e-posta adresi gir.";
+  if (v === "" || v === undefined || v === null) return true;
+  return /.+@.+\..+/.test(v) || "Geçersiz email";
 };
 
-const handleSubmit = () => {
-  console.log("Gönderilen mail:", email.value);
-  // burada API çağırırsın
+const addUserToDb = async () => {
+  try {
+    isAddingToDb.value = true;
+
+    // Email control
+    const q = query(
+      collection($firestore, "registered_users"),
+      where("email", "==", email.value)
+    );
+
+    const snapshot = await getDocs(q);
+
+    // already registered
+    if (!snapshot.empty) {
+      alreadyRegistered.value = true;
+      isSendMail.value = true;
+
+      return;
+    }
+
+    // Is haven't already email ?
+    const user = {
+      username: extractNameFromEmail(email.value),
+      email: email.value,
+    };
+
+    await addDoc(collection($firestore, "registered_users"), user);
+
+    console.log("User registered:", user);
+
+    isSendMail.value = true;
+    email.value = "";
+
+    setTimeout(() => {
+      isSendMail.value = false;
+    }, 2500);
+  } catch (error: any) {
+    console.error("Error while adding user:", error.message);
+  } finally {
+    isAddingToDb.value = false;
+  }
 };
+
+const handleCloseSendMailPopUp = () => {
+  isSendMail.value = false;
+  alreadyRegistered.value = false;
+};
+
+watch(
+  isSendMail,
+  (newVal) => {
+    if (newVal === false) {
+      handleCloseSendMailPopUp();
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   getVideosFromDb();

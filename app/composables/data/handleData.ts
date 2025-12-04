@@ -103,7 +103,7 @@ export const useTRFormat = () => {
 
     const df = new Intl.DateTimeFormat("en-GB", {
       day: "2-digit",
-      month: "short", 
+      month: "short",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
@@ -218,3 +218,8 @@ export const useBlogHtmlFormatter = (rawText: string): string => {
   return result.join("\n");
 };
 
+export const extractNameFromEmail = (email: string): string => {
+  if (!email || !email.includes("@")) return "";
+
+  return email.split("@")[0] as string;
+};
