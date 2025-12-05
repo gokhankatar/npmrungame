@@ -41,7 +41,7 @@
               <div class="d-flex align-center ga-1 ga-lg-2 py-2">
                 <img
                   :src="item.imageUrl"
-                  :width="isLargeScreen ? 75 : 40"
+                  :width="isSmallScreen ? 30 : 60"
                   class="rounded-lg h-100"
                   cover
                 />

@@ -41,7 +41,7 @@
               <div class="d-flex align-center ga-1 ga-lg-2 py-2">
                 <img
                   :src="item.background_image"
-                  width="100"
+                  :width="smallScreen ? 30 : 60"
                   class="rounded-lg h-100"
                   cover
                 />

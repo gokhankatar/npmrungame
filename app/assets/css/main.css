@@ -279,6 +279,13 @@
     z-index: 999;
 }
 
+.blog-img-gif {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 999;
+}
+
 .scan-dot::after {
     content: "";
     position: absolute;

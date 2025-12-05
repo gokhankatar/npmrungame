@@ -14,7 +14,9 @@
           </p>
           <p
             class="text-center text-sm-start text-grey-darken-1 text-subtitle-2 text-sm-subtitle-1 text-md-h5"
-            style="line-height: 2.1rem"
+            :style="
+              display.mdAndUp.value ? { lineHeight: '2.1rem' } : { lineHeight: '1.2rem' }
+            "
           >
             4K oyun dünyasının nabzını tutan, yeni çıkan AAA yapımları, bağımsız projeleri
             ve hızla gelişen oyun teknolojilerini yakından inceleyen bir kanal. Donanım
@@ -24,8 +26,11 @@
         </div>
       </v-col>
 
-      <v-row class="w-100 mx-auto mt-lg-5 mt-xl-10" :dense="display.smAndDown.value">
-        <v-col cols="12" sm="6" lg="4">
+      <v-row
+        class="w-100 mx-auto mt-lg-5 mt-xl-10 justify-center justify-sm-start align-center"
+        :dense="display.smAndDown.value"
+      >
+        <v-col cols="8" sm="5" lg="4">
           <v-btn
             class="default-title-letter"
             text="Keşfet"
@@ -39,7 +44,7 @@
           />
         </v-col>
 
-        <v-col cols="12" sm="6" lg="4">
+        <v-col cols="8" sm="5" lg="4">
           <v-btn
             class="subscription-btn default-title-letter"
             text="Abone Ol"
@@ -47,6 +52,18 @@
             href="https://www.youtube.com/@npmrungame"
             target="_blank"
             append-icon="mdi-youtube-subscription"
+            :ripple="false"
+            block
+          />
+        </v-col>
+
+        <v-col v-if="display.xs.value" cols="8">
+          <v-btn
+            class="action-btn default-title-letter"
+            text="Oyun Öner"
+            size="default"
+            @click="router.replace('/recommend-games')"
+            append-icon="mdi-gamepad-up"
             :ripple="false"
             block
           />
