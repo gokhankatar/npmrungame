@@ -61,16 +61,17 @@
             text="Gönder"
             :elevation="0"
             variant="tonal"
+            rounded="xl"
             color="blue-lighten-1"
             :size="display.smAndDown.value ? 'small' : 'large'"
             append-icon="mdi-send"
             :ripple="false"
+            :block="display.smAndDown.value"
           />
         </div>
       </v-form>
     </v-col>
   </v-row>
-
 </template>
 
 <script setup lang="ts">
