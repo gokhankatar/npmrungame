@@ -11,7 +11,7 @@
         class="form-container rounded-xl pa-2 pa-lg-5 pa-xl-10"
       >
         <p
-          class="my-3 text-center text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
+          class="text-grey-lighten-1 my-3 text-center text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
         >
           Görüşleriniz Bizim İçin Çok Değerli
         </p>
