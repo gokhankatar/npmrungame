@@ -61,6 +61,7 @@
             text="Gönder"
             :elevation="0"
             variant="tonal"
+            class="mt-1"
             rounded="xl"
             color="blue-lighten-1"
             :size="display.smAndDown.value ? 'small' : 'large'"
