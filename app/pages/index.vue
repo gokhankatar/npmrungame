@@ -1,48 +1,5 @@
 <template>
-  <div class="banner-container">
-    <div
-      class="banner-content d-flex flex-column align-center align-md-start ga-1 ga-md-3 ga-lg-5"
-    >
-      <p class="banner-content-title text-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3">
-        Sende Günden Güne Büyüyen Ekosistemin Bir Parçası Ol!
-      </p>
-      <div class="d-flex align center ga-2 ga-xl-5">
-        <div
-          class="discover-btn pa-1 pa-xl-3 d-flex align-center ga-2 ga-xl-5 cursor-pointer"
-        >
-          <v-icon
-            class="discover-icon"
-            icon="mdi-earth"
-            :size="extraLgScreen ? 'medium' : 'x-small'"
-          />
-          <p
-            class="text-subtitle-2 text-md-subtitle-1 text-xl-h5"
-            style="letter-spacing: 1px !important; font-weight: 500"
-          >
-            Keşfet
-          </p>
-        </div>
-
-        <div
-          class="subscribe-btn pa-1 pa-xl-3 d-flex align-center ga-2 ga-xl-5 cursor-pointer"
-        >
-          <v-icon
-            class="bell-icon"
-            icon="mdi-bell"
-            :size="extraLgScreen ? 'medium' : 'x-small'"
-          />
-          <p
-            class="text-subtitle-2 text-md-subtitle-1 text-xlz-h5"
-            style="letter-spacing: 1px !important; font-weight: 500"
-          >
-            Abone Ol
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <v-responsive height="100vh" />
+  <Bg_Anim />
 
   <v-container class="pa-0 pa-lg-10 pa-xl-15">
     <v-row class="w-100 mx-auto my-5" :dense="smallScreen">
@@ -561,7 +518,14 @@
   </v-dialog>
 </template>
 <script lang="ts" setup>
-import { addDoc, collection, getDocs, query, serverTimestamp, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
 import Animated_Text from "~/components/common/Animated_Text.vue";
 import { slugify, truncateText } from "~/composables/core/basicFunc";
 import {
@@ -576,6 +540,7 @@ import store from "~/store/store";
 import fireAnimation from "~/assets/img/fire_anim.gif";
 import successFullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import warningImg from "~/assets/img/warning_anim.gif";
+import Bg_Anim from "~/components/layout/Bg_Anim.vue";
 
 useHead({
   title: "npmrungame",
