@@ -86,7 +86,7 @@
       </v-row>
 
       <!-- why npmrungame -->
-      <v-col cols="12">
+      <v-col cols="12" class="mt-5">
         <div
           class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
         >
@@ -137,7 +137,7 @@
 
       <!-- npmrungame current play -->
       <v-row
-        class="w-100 mx-auto d-flex justify-center align-center"
+        class="w-100 mx-auto d-flex justify-center align-center mt-5"
         v-if="currentGames?.length"
       >
         <v-col cols="12">
@@ -295,7 +295,7 @@
       </v-row>
 
       <!-- Blogs -->
-      <v-col cols="12">
+      <v-col cols="12" class="mt-5">
         <div
           class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
         >
@@ -383,7 +383,7 @@
       </v-col>
 
       <!-- Subscription Input -->
-      <v-col cols="12">
+      <v-col cols="12" class="mt-5">
         <div
           class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
         >
