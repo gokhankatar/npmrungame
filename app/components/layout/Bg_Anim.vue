@@ -34,7 +34,13 @@
           <v-btn
             class="default-title-letter"
             text="Keşfet"
-            :size="display.lgAndUp.value ? 'x-large' : 'default'"
+            :size="
+              display.lgAndUp.value
+                ? 'x-large'
+                : display.smAndDown.value
+                ? 'small'
+                : 'default'
+            "
             variant="elevated"
             color="green-accent-2"
             @click="router.replace('/discover')"
@@ -48,7 +54,13 @@
           <v-btn
             class="subscription-btn default-title-letter"
             text="Abone Ol"
-            :size="display.lgAndUp.value ? 'x-large' : 'default'"
+            :size="
+              display.lgAndUp.value
+                ? 'x-large'
+                : display.smAndDown.value
+                ? 'small'
+                : 'default'
+            "
             href="https://www.youtube.com/@npmrungame"
             target="_blank"
             append-icon="mdi-youtube-subscription"
@@ -59,11 +71,19 @@
 
         <v-col v-if="display.xs.value" cols="8">
           <v-btn
-            class="action-btn default-title-letter"
+            class="default-title-letter"
             text="Oyun Öner"
-            size="default"
+            :size="
+              display.lgAndUp.value
+                ? 'x-large'
+                : display.smAndDown.value
+                ? 'small'
+                : 'default'
+            "
+            color="indigo-lighten-1"
             @click="router.replace('/recommend-games')"
             append-icon="mdi-gamepad-up"
+            variant="outlined"
             :ripple="false"
             block
           />
