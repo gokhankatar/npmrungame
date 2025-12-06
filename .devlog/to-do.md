@@ -7,6 +7,13 @@
 - Admin panel icindeki tabloların mobile gorunumleri yapılacak.
 - bitirdigimm oyunlar ve oynanacaklar sayfasında bazı aksıyıonlar eklenecek (sıralama filtreleme gibi)
 - loading componenti daha guzel yapılabilir
+- Routingler için loading barı başlat (ui opt.)
 - ben kimim sayfası ve recoommend games sayfası yapılacak
 - mail servisleri eklenecek
 - anasayfaya sıkca sorulan sorular gibi bir component ekle
+
+<!-- Final İşlemleri -->
+
+- Code Optimizasyonu Yap !!!!!!!
+ + Gereksiz Tekrarları Azalt //////
+ + Back End İşlemlerini Server Side a taşı //////
