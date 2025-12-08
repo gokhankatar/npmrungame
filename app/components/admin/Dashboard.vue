@@ -612,10 +612,10 @@ const randomGameBackgroundForToPlayGames = computed(() => {
 });
 
 const randomGameBackgroundForCurrentGames = computed(() => {
-  if (!toPlayGames.value.length) return null;
+  if (!currentGames.value || !currentGames.value.length) return null;
 
   const randomIndex = Math.floor(Math.random() * currentGames.value.length);
-  return currentGames.value[randomIndex].background_image;
+  return currentGames.value[randomIndex]?.background_image || null;
 });
 
 const getCompletedGames = async () => {
