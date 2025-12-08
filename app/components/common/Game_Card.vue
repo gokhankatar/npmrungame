@@ -105,7 +105,7 @@
   </v-col>
 </template>
 <script lang="ts" setup>
-import fireAnimation from "~/assets/img/fire_anim.gif";
+import fireAnimationSrc from "~/assets/img/fire_anim.gif";
 import { truncateText } from "~/composables/core/basicFunc";
 import {
   getUniquePlatformIcons,
@@ -121,6 +121,8 @@ defineProps<{
 
 const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
+
+const fireAnimation = fireAnimationSrc;
 </script>
 
 <style scoped>

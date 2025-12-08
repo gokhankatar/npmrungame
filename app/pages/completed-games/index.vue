@@ -118,6 +118,7 @@
         </v-card>
       </v-col>
 
+      <!-- Completed Games  -->
       <v-col cols="12">
         <div
           class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5"

@@ -1,0 +1,20 @@
+.recommend-game-form-container {
+    backdrop-filter: blur(.5rem);
+    -webkit-backdrop-filter: blur(.5rem);
+    border: 1px solid rgba(255, 255, 255, .15);
+}
+
+.selected-research-game {
+    background: #5E35B1 !important;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+    transition: all 0.3s ease;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+    opacity: 0;
+    transform: translateY(20px);
+}

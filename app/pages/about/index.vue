@@ -3,7 +3,7 @@
   <v-responsive height="70" v-else />
 
   <v-container class="pa-2 pa-md-5 pa-lg-10 pa-xl-15">
-    <v-row class="w-100 mx-auto">
+    <v-row class="w-100 mx-auto d-flex justify-center align-center">
       <v-col cols="12" class="d-flex flex-column align-center align-sm-start ga-6">
         <!-- Avatar -->
         <v-avatar :image="profileImgSrc" :size="display.smAndDown.value ? 120 : 200" />
