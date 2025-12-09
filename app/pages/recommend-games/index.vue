@@ -294,12 +294,15 @@
         @click="isAddedToDb = false"
       />
 
-      <v-img :src="successfullyDoneImg" :width="display.smAndDown.value ? 50 : 75" />
+      <v-img
+        v-if="msgGenre == 'successfull'"
+        :src="successfullyDoneImg"
+        :width="display.smAndDown.value ? 50 : 75"
+      />
       <p
         class="text-center text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter"
       >
-        Oyun Öneriniz Bize Ulaştı. Öneriniz için çok teşekkür eder keyifli oyunlar
-        dileriz...
+        {{ dialogMsg }}
       </p>
     </div>
   </v-dialog>
@@ -311,6 +314,7 @@ import { getDocs, collection, addDoc, writeBatch, doc } from "firebase/firestore
 import Game_Card from "~/components/common/Game_Card.vue";
 import { useMetacriticStyle } from "~/composables/data/handleData";
 import store from "~/store/store";
+import _ from "lodash";
 import Anim_Recommend_Game from "~/components/layout/Anim_Recommend_Game.vue";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 
@@ -335,10 +339,18 @@ const isAddedToDb = ref(false);
 const showMaxLimitWarning = ref(false);
 const showNoGameSelectedWarning = ref(false);
 const isOpenRecommendGame = ref(false);
+const isGettingCompletedGames = ref(false);
+const isGettingToPlayGames = ref(false);
+const isAlreadyExistOnToPlayGames = ref(false);
+const isAlreadyExistOnCompleted = ref(false);
 
 const addedGameToDbCount = ref(0);
+const msgGenre = ref<"successfull" | "warning">("successfull");
+const dialogMsg = ref<string>("");
 const searchGameText = ref<string>("");
 const recommendedGames = ref<any[]>([]);
+const completedGames = ref<any[]>([]);
+const toPlayGames = ref<any[]>([]);
 const selectedGamesAfterResearch = ref<any[]>([]);
 const searchResults = ref<any[]>([]);
 
@@ -400,6 +412,37 @@ const searchGame = async () => {
   }
 };
 
+const checkIfGameAlreadyExists = (game: any) => {
+  const id = game.id;
+
+  const existsInCompleted = completedGames.value.some((g) => g.id === id);
+  const existsInToPlay = toPlayGames.value.some((g) => g.id === id);
+  const existsInRecommended = recommendedGames.value.some((g) => g.id === id);
+
+  if (existsInCompleted) {
+    msgGenre.value = "warning";
+    dialogMsg.value = "Bu oyunu zaten tamamlamışsınız 🎮";
+    isAddedToDb.value = true;
+    return true;
+  }
+
+  if (existsInToPlay) {
+    msgGenre.value = "warning";
+    dialogMsg.value = "Bu oyun zaten oynayacaklarım listesinde 📌";
+    isAddedToDb.value = true;
+    return true;
+  }
+
+  if (existsInRecommended) {
+    msgGenre.value = "warning";
+    dialogMsg.value = "Bu oyun zaten başka biri tarafından önerilmiş 📮";
+    isAddedToDb.value = true;
+    return true;
+  }
+
+  return false;
+};
+
 const addGameToRecommendedGames = async () => {
   const games = selectedGamesAfterResearch.value;
 
@@ -416,16 +459,22 @@ const addGameToRecommendedGames = async () => {
       recommended_at: new Date().toISOString(),
     };
 
-    // 🔥 Single
+    // ---------------------------
+    // 🔥 SINGLE GAME
+    // ---------------------------
     if (games.length === 1) {
-      const finalGameData = {
-        ...games[0],
-        ...metadata,
-      };
+      const game = games[0];
 
+      if (checkIfGameAlreadyExists(game)) {
+        setTimeout(() => (isAddedToDb.value = false), 2500);
+        return;
+      }
+
+      const finalGameData = { ...game, ...metadata };
       await addDoc(collection($firestore, "recommended_games"), finalGameData);
 
-      console.log("Tek oyun eklendi:", finalGameData.name);
+      msgGenre.value = "successfull";
+      dialogMsg.value = "Oyun öneriniz başarıyla iletildi! 🎉";
 
       isAddedToDb.value = true;
       setTimeout(() => (isAddedToDb.value = false), 2500);
@@ -433,36 +482,105 @@ const addGameToRecommendedGames = async () => {
       return;
     }
 
-    // 🔥 Multiple (batch)
+    // ---------------------------
+    // 🔥 MULTIPLE GAME (WITH CONTROL)
+    // ---------------------------
+    const validGames: any[] = [];
+    let hasBlocked = false;
+
+    games.forEach((game) => {
+      if (!checkIfGameAlreadyExists(game)) {
+        validGames.push(game);
+      } else {
+        hasBlocked = true;
+      }
+    });
+
+    // ❌ Eğer hiçbir oyun geçerli değilse batch yapma
+    if (validGames.length === 0) {
+      msgGenre.value = "warning";
+      dialogMsg.value =
+        "Önerdiğiniz oyunların tamamı zaten listelerde bulunduğu için eklenmedi.";
+      isAddedToDb.value = true;
+      setTimeout(() => (isAddedToDb.value = false), 3500);
+      return;
+    }
+
+    // 🔥 Batch ile sadece geçerli oyunları ekle
     const batch = writeBatch($firestore);
 
-    games.forEach((g) => {
+    validGames.forEach((g) => {
       const ref = doc(collection($firestore, "recommended_games"));
-
-      const finalGameData = {
-        ...g,
-        ...metadata,
-      };
-
+      const finalGameData = { ...g, ...metadata };
       batch.set(ref, finalGameData);
     });
 
     await batch.commit();
 
-    console.log(`${games.length} oyun toplu olarak eklendi`);
+    // Mesaj durumu
+    if (hasBlocked) {
+      msgGenre.value = "warning";
+      dialogMsg.value =
+        "Bazı oyunlar eklenemedi (zaten listelerde vardı), geçerli olanlar başarıyla eklendi 🎉";
+    } else {
+      msgGenre.value = "successfull";
+      dialogMsg.value = "Tüm oyun önerileriniz başarıyla iletildi! 🎉";
+    }
+
     isAddedToDb.value = true;
-
-    setTimeout(() => {
-      isAddedToDb.value = false;
-    }, 3500);
-
-    return;
+    setTimeout(() => (isAddedToDb.value = false), 3500);
   } catch (error: any) {
-    console.error("Error while add to db:", error.message);
+    console.error("DB Add Error:", error.message);
   } finally {
     await getRecommendedGames();
     isAddingToDb.value = false;
     selectedGamesAfterResearch.value = [];
+  }
+};
+
+const getCompletedGames = async () => {
+  try {
+    isGettingCompletedGames.value = true;
+
+    const gamesCol = collection($firestore, "completed_games");
+    const gamesSnapshot = await getDocs(gamesCol);
+
+    const gamesList = gamesSnapshot.docs.map((doc) => ({
+      firestoreId: doc.id,
+      ...doc.data(),
+    }));
+
+    completedGames.value = gamesList;
+  } catch (error) {
+    console.error("Error getting games :", error);
+    return [];
+  } finally {
+    setTimeout(() => {
+      isGettingCompletedGames.value = false;
+    }, 250);
+  }
+};
+
+const getToPlayGames = async () => {
+  try {
+    isGettingToPlayGames.value = true;
+
+    const gamesCol = collection($firestore, "to_play_games");
+    const gamesSnapshot = await getDocs(gamesCol);
+
+    const gamesList = gamesSnapshot.docs.map((doc) => ({
+      firestoreId: doc.id,
+      ...doc.data(),
+    }));
+
+    toPlayGames.value = gamesList;
+  } catch (error) {
+    console.error("Error getting games :", error);
+    return [];
+  } finally {
+    setTimeout(() => {
+      isGettingToPlayGames.value = false;
+    }, 250);
   }
 };
 
@@ -476,7 +594,7 @@ const getRecommendedGames = async () => {
       ...doc.data(),
     }));
 
-    recommendedGames.value = gamesList;
+    recommendedGames.value = _.uniqBy(gamesList, "id");
   } catch (error) {
     console.error("Error getting games :", error);
     return [];
@@ -555,6 +673,8 @@ watch(
 );
 
 onMounted(() => {
+  getToPlayGames();
+  getCompletedGames();
   getRecommendedGames();
 });
 </script>
