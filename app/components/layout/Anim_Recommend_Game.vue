@@ -30,7 +30,7 @@
     </v-row>
   </div>
 
-  <v-responsive :height="display.smAndDown.value ? '75vh' : '50vh'" />
+  <v-responsive :height="getResponsiveHeight()" />
 </template>
 
 <script setup lang="ts">
@@ -41,6 +41,16 @@ const vantaRefForRecommendedGames = ref<HTMLElement | null>(null);
 
 const router = useRouter();
 const display = useDisplay();
+
+const getResponsiveHeight = () => {
+  const { smAndDown, mdAndUp, xl } = display;
+
+  if (xl.value) return "50vh"; // XL için özel yükseklik
+  if (smAndDown.value) return "75vh"; // SM ve altı
+  if (mdAndUp.value) return "85vh"; // MD–LG
+
+  return "85vh"; // fallback
+};
 
 onMounted(async () => {
   if (!vantaRefForRecommendedGames.value) return;
