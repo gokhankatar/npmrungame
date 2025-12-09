@@ -31,7 +31,7 @@
   width: 0.4rem;
   height: 0.6rem;
   background: #cfcfcf;
-  border-radius: 0.8rem;
+  border-radius: 0.5rem;
   animation: upDown 1.2s infinite ease-in-out;
 }
 
