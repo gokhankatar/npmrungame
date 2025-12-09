@@ -56,7 +56,7 @@
               class="recommende-icon rounded-xl"
               :ripple="false"
               size="small"
-              color="yellow-accent-2"
+              color="deep-purple"
               icon="mdi-thumb-up"
             />
           </template>

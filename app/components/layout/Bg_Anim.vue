@@ -80,10 +80,11 @@
                 ? 'small'
                 : 'default'
             "
-            color="indigo-lighten-1"
+            color="deep-purple"
+            rounded="xl"
             @click="router.replace('/recommend-games')"
             append-icon="mdi-gamepad-up"
-            variant="outlined"
+            variant="elevated"
             :ripple="false"
             block
           />

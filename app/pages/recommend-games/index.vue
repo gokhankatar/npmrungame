@@ -5,7 +5,7 @@
     <v-row class="w-100 mx-auto">
       <v-col cols="12">
         <p
-          class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-blue-grey-darken-1"
+          class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-deep-purple"
         >
           Daha Önce Önerilen Oyunlar
         </p>
@@ -20,231 +20,289 @@
       />
     </v-row>
 
-    <v-row class="w-100 mx-auto d-flex align-center">
-      <v-col cols="12">
-        <p
-          class="text-center text-sm-start text-subtitle-1 text-sm-h5 text-xl-h4 default-title-letter text-blue-grey-darken-1"
-        >
-          npmrungame için oyun öner
-        </p>
-
-        <v-divider class="mt-2 mb-5 mb-lg-8" />
+    <!-- Recommend Game Section -->
+    <v-row
+      class="my-5 my-lg-8 w-100 mx-auto d-flex flex-column justify-center align-center"
+    >
+      <v-col cols="12" sm="8" lg="6" xl="4">
+        <v-btn
+          v-if="!isOpenRecommendGame"
+          @click="isOpenRecommendGame = true"
+          class="default-title-letter"
+          text="Oyun Öner"
+          variant="elevated"
+          :size="display.smAndDown.value ? 'default' : 'x-large'"
+          rounded="xl"
+          :ripple="false"
+          :elevation="0"
+          block
+          prepend-icon="mdi-microsoft-xbox-controller"
+          color="deep-purple"
+        />
+        <v-btn
+          v-else
+          @click="isOpenRecommendGame = false"
+          class="default-title-letter"
+          text="Iptal"
+          variant="elevated"
+          :size="display.smAndDown.value ? 'default' : 'x-large'"
+          rounded="xl"
+          :ripple="false"
+          :elevation="0"
+          block
+          prepend-icon="mdi-close"
+        />
       </v-col>
 
-      <v-col cols="12" lg="6">
-        <v-form
-          class="recommend-game-form-container pa-5 pa-lg-10 rounded-lg"
-          ref="recommendGameForm"
-          @submit.prevent="handleRecommendGame"
-        >
-          <v-text-field
-            ref="recommendedGameFormNameInput"
-            v-model="models.name"
-            :rules="rules.name"
-            rounded="xl"
-            label="Ad"
-            type="text"
-            variant="outlined"
-            class="default-title-letter text-grey-lighten-2"
-            prepend-inner-icon="mdi-account"
-            :density="display.smAndDown.value ? 'compact' : 'comfortable'"
-            clearable
-          />
-          <v-text-field
-            v-model="models.email"
-            :rules="rules.email"
-            rounded="xl"
-            label="Email"
-            type="email"
-            variant="outlined"
-            class="default-title-letter text-grey-lighten-2"
-            prepend-inner-icon="mdi-email"
-            :density="display.smAndDown.value ? 'compact' : 'comfortable'"
-            clearable
-          />
-          <v-textarea
-            rounded="xl"
-            label="Neden Bu Oyun/Oyunlar"
-            variant="outlined"
-            counter
-            class="default-title-letter text-grey-lighten-2"
-            prepend-inner-icon="mdi-email"
-            :density="display.smAndDown.value ? 'compact' : 'comfortable'"
-            clearable
-          />
-
-          <div
-            class="add-game-container d-flex flex-column align-center ga-2 ga-lg-4 rounded"
+      <transition name="slide-down">
+        <v-col cols="12" lg="8" xl="6" v-if="isOpenRecommendGame">
+          <v-form
+            class="recommend-game-form-container pa-5 pa-lg-10 rounded-lg"
+            ref="recommendGameForm"
+            @submit.prevent="handleRecommendGame"
           >
             <v-text-field
-              v-model="searchGameText"
-              @input="searchGame"
-              prepend-inner-icon="mdi-magnify"
-              variant="outlined"
-              class="w-100 text-grey-lighten-1"
-              color="grey-lighten-1"
+              ref="recommendedGameFormNameInput"
+              v-model="models.name"
+              :rules="rules.name"
               rounded="xl"
-              label="Oyun Ara"
-              placeholder="Black Myth Wukong..."
-              :density="display.xl.value ? 'comfortable' : 'compact'"
+              label="Ad"
+              type="text"
+              variant="outlined"
+              class="default-title-letter text-grey-lighten-2"
+              prepend-inner-icon="mdi-account"
+              :density="display.smAndDown.value ? 'compact' : 'comfortable'"
+              clearable
+            />
+            <v-text-field
+              v-model="models.email"
+              :rules="rules.email"
+              rounded="xl"
+              label="Email"
+              type="email"
+              variant="outlined"
+              class="default-title-letter text-grey-lighten-2"
+              prepend-inner-icon="mdi-email"
+              :density="display.smAndDown.value ? 'compact' : 'comfortable'"
+              clearable
+            />
+            <v-textarea
+              rounded="xl"
+              label="Neden Bu Oyun/Oyunlar"
+              variant="outlined"
+              counter
+              class="default-title-letter text-grey-lighten-2"
+              prepend-inner-icon="mdi-email"
+              :density="display.smAndDown.value ? 'compact' : 'comfortable'"
               clearable
             />
 
-            <transition name="slide-up">
-              <v-alert
-                v-if="showNoGameSelectedWarning"
-                type="warning"
-                variant="tonal"
-                density="compact"
-                class="text-caption w-100"
-                text="Lütfen en az 1 oyun seç."
-              />
-            </transition>
-
-            <transition name="slide-up">
-              <v-alert
-                v-if="showMaxLimitWarning"
-                type="warning"
-                variant="tonal"
-                density="compact"
-                class="text-caption w-100"
-                text="En fazla 3 oyun önerebilirsin."
-              />
-            </transition>
-
-            <!-- 🔥 Arama sonuç alanı -->
             <div
-              v-if="searchGameText?.length"
-              class="w-100"
-              style="max-height: 350px; overflow-y: auto"
+              class="add-game-container d-flex flex-column align-center ga-2 ga-lg-4 rounded"
             >
-              <!-- Loading -->
+              <v-text-field
+                v-model="searchGameText"
+                @input="searchGame"
+                prepend-inner-icon="mdi-magnify"
+                variant="outlined"
+                class="w-100 text-grey-lighten-1"
+                color="grey-lighten-1"
+                rounded="xl"
+                label="Oyun Ara"
+                placeholder="Black Myth Wukong..."
+                :density="display.xl.value ? 'comfortable' : 'compact'"
+                clearable
+              />
+
+              <transition name="slide-up">
+                <v-alert
+                  v-if="showNoGameSelectedWarning"
+                  type="warning"
+                  variant="tonal"
+                  density="compact"
+                  class="text-caption w-100"
+                  text="Lütfen en az 1 oyun seç."
+                />
+              </transition>
+
+              <transition name="slide-up">
+                <v-alert
+                  v-if="showMaxLimitWarning"
+                  type="warning"
+                  variant="tonal"
+                  density="compact"
+                  class="text-caption w-100"
+                  text="En fazla 3 oyun önerebilirsin."
+                />
+              </transition>
+
+              <!-- 🔥 Arama sonuç alanı -->
               <div
-                v-if="isSearchingGameLoading"
-                class="d-flex justify-start py-2 py-lg-4"
+                v-if="searchGameText?.length"
+                class="w-100"
+                style="max-height: 350px; overflow-y: auto"
               >
-                <v-progress-circular indeterminate size="24" color="grey-lighten-1" />
+                <!-- Loading -->
+                <div
+                  v-if="isSearchingGameLoading"
+                  class="d-flex justify-start py-2 py-lg-4"
+                >
+                  <v-progress-circular indeterminate size="24" color="grey-lighten-1" />
+                </div>
+
+                <!-- Search Results -->
+                <template v-else>
+                  <p
+                    v-if="searchResults?.length"
+                    class="text-caption text-grey-darken-1 text-start default-title-letter"
+                  >
+                    {{ `${searchResults?.length} oyun bulundu` }}
+                  </p>
+                  <v-card
+                    v-for="game in searchResults"
+                    :key="game.id"
+                    :ripple="false"
+                    class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer"
+                    @click="selectGameAfterSearch(game)"
+                    :class="{
+                      'selected-research-game': selectedGamesAfterResearch.some(
+                        (i) => i.id === game.id
+                      ),
+                    }"
+                  >
+                    <v-avatar :size="display.smAndDown.value ? 30 : 48" rounded>
+                      <v-img :src="game.background_image" :alt="game.name" cover />
+                    </v-avatar>
+
+                    <div class="d-flex flex-column">
+                      <p
+                        class="text-caption text-lg-subtitle-2 default-title-letter"
+                        :class="
+                          selectedGamesAfterResearch.some((i) => i.id === game.id)
+                            ? 'text-grey-lighten-3'
+                            : 'text-grey-lighten-1'
+                        "
+                      >
+                        {{ `${game.name}` }}
+                        <span v-if="game.released"
+                          >({{ new Date(game.released).getFullYear() }})</span
+                        >
+                      </p>
+
+                      <p
+                        class="text-caption"
+                        :class="`text-${useMetacriticStyle(game?.metacritic).color}`"
+                      >
+                        Metacritic: {{ game.metacritic ?? "N/A" }}
+                      </p>
+                    </div>
+                  </v-card>
+
+                  <!-- No Result -->
+                  <p
+                    v-if="searchResults?.length === 0 && searchGameText?.length > 2"
+                    class="text-center text-grey-darken-1 mt-3"
+                  >
+                    Sonuç bulunamadı
+                  </p>
+                </template>
               </div>
 
-              <!-- Search Results -->
-              <template v-else>
-                <p
-                  v-if="searchResults?.length"
-                  class="text-caption text-grey-darken-1 text-start default-title-letter"
-                >
-                  {{ `${searchResults?.length} oyun bulundu` }}
-                </p>
-                <v-card
-                  v-for="game in searchResults"
-                  :key="game.id"
-                  :ripple="false"
-                  class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer"
-                  @click="selectGameAfterSearch(game)"
-                  :class="{
-                    'selected-research-game': selectedGamesAfterResearch.some(
-                      (i) => i.id === game.id
-                    ),
-                  }"
-                >
-                  <v-avatar :size="display.smAndDown.value ? 30 : 48" rounded>
-                    <v-img :src="game.background_image" :alt="game.name" cover />
-                  </v-avatar>
+              <v-row
+                class="w-100 mx-auto d-flex align-center"
+                :class="
+                  selectedGamesAfterResearch.length == 0
+                    ? 'justify-end'
+                    : 'justify-center'
+                "
+                dense
+              >
+                <v-col cols="12" sm="6">
+                  <v-btn
+                    @click="handleRecommendGame"
+                    :loading="isAddingToDb"
+                    :text="
+                      selectedGamesAfterResearch.length > 0
+                        ? `Öner (${selectedGamesAfterResearch?.length})`
+                        : 'Öner'
+                    "
+                    :size="display.smAndDown.value ? 'small' : 'large'"
+                    :ripple="false"
+                    prepend-icon="mdi-plus"
+                    variant="elevated"
+                    color="deep-purple"
+                    rounded="xl"
+                    class="text-capitalize"
+                    block
+                  />
+                </v-col>
 
-                  <div class="d-flex flex-column">
-                    <p
-                      class="text-caption text-lg-subtitle-2 default-title-letter"
-                      :class="
-                        selectedGamesAfterResearch.some((i) => i.id === game.id)
-                          ? 'text-grey-lighten-3'
-                          : 'text-grey-lighten-1'
-                      "
-                    >
-                      {{ `${game.name}` }}
-                      <span v-if="game.released"
-                        >({{ new Date(game.released).getFullYear() }})</span
-                      >
-                    </p>
-
-                    <p
-                      class="text-caption"
-                      :class="`text-${useMetacriticStyle(game?.metacritic).color}`"
-                    >
-                      Metacritic: {{ game.metacritic ?? "N/A" }}
-                    </p>
-                  </div>
-                </v-card>
-
-                <!-- No Result -->
-                <p
-                  v-if="searchResults?.length === 0 && searchGameText?.length > 2"
-                  class="text-center text-grey-darken-1 mt-3"
-                >
-                  Sonuç bulunamadı
-                </p>
-              </template>
-            </div>
-
-            <v-row
-              class="w-100 mx-auto d-flex align-center"
-              :class="
-                selectedGamesAfterResearch.length == 0 ? 'justify-end' : 'justify-center'
-              "
-              dense
-            >
-              <v-col cols="12" sm="6">
-                <v-btn
-                  @click="handleRecommendGame"
-                  :loading="isAddingToDb"
-                  :text="
-                    selectedGamesAfterResearch.length > 0
-                      ? `Öner (${selectedGamesAfterResearch?.length})`
-                      : 'Öner'
-                  "
-                  :size="display.smAndDown.value ? 'small' : 'large'"
-                  :ripple="false"
-                  prepend-icon="mdi-plus"
-                  variant="tonal"
-                  color="success"
-                  rounded="xl"
-                  class="text-capitalize"
-                  block
-                />
-              </v-col>
-
-              <v-col cols="12" sm="6" v-if="selectedGamesAfterResearch?.length > 0">
-                <v-btn
-                  @click="selectedGamesAfterResearch = []"
-                  text="Tüm Seçimleri Kaldır"
-                  variant="tonal"
-                  color="warning"
-                  :size="display.smAndDown.value ? 'small' : 'large'"
-                  rounded="xl"
-                  :ripple="false"
-                  class="text-capitalize"
-                  prepend-icon="mdi-broom"
-                  block
-                />
-              </v-col>
-            </v-row>
-
-            <transition name="slide-up">
-              <v-row class="w-100" v-if="isAddedToDb">
-                <v-col cols="12">
-                  <v-alert
-                    class="w-100 text-caption text-lg-subtitle-2"
-                    density="compact"
-                    color="success"
-                    variant="text"
-                    :text="`${addedGameToDbCount} oyun eklendi`"
+                <v-col cols="12" sm="6" v-if="selectedGamesAfterResearch?.length > 0">
+                  <v-btn
+                    @click="selectedGamesAfterResearch = []"
+                    text="Tüm Seçimleri Kaldır"
+                    variant="tonal"
+                    color="warning"
+                    :size="display.smAndDown.value ? 'small' : 'large'"
+                    rounded="xl"
+                    :ripple="false"
+                    class="text-capitalize"
+                    prepend-icon="mdi-broom"
+                    block
                   />
                 </v-col>
               </v-row>
-            </transition>
-          </div>
-        </v-form>
-      </v-col>
+
+              <transition name="slide-up">
+                <v-row class="w-100" v-if="isAddedToDb">
+                  <v-col cols="12">
+                    <v-alert
+                      class="w-100 text-caption text-lg-subtitle-2"
+                      density="compact"
+                      color="success"
+                      variant="text"
+                      :text="`${addedGameToDbCount} oyun eklendi`"
+                    />
+                  </v-col>
+                </v-row>
+              </transition>
+            </div>
+          </v-form>
+        </v-col>
+      </transition>
     </v-row>
   </v-container>
+  <v-dialog
+    v-model="isAddedToDb"
+    :max-width="600"
+    style="
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(0.2rem);
+      -webkit-backdrop-filter: blur(0.2rem);
+    "
+  >
+    <div
+      class="successfull-recommended-pop-up-container d-flex flex-column align-center ga-1 ga-lg-3 pa-2 pa-md-5 pa-lg-10 rounded-lg w-100"
+    >
+      <v-btn
+        class="successfull-recommended-pop-up-container-close-btn ma-1 ma-lg-2"
+        variant="text"
+        size="small"
+        icon="mdi-close"
+        color="grey"
+        :ripple="false"
+        @click="isAddedToDb = false"
+      />
+
+      <v-img :src="successfullyDoneImg" :width="display.smAndDown.value ? 50 : 75" />
+      <p
+        class="text-center text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter"
+      >
+        Oyun Öneriniz Bize Ulaştı. Öneriniz için çok teşekkür eder keyifli oyunlar
+        dileriz...
+      </p>
+    </div>
+  </v-dialog>
 </template>
 <script lang="ts" setup>
 import axios from "axios";
@@ -254,6 +312,7 @@ import Game_Card from "~/components/common/Game_Card.vue";
 import { useMetacriticStyle } from "~/composables/data/handleData";
 import store from "~/store/store";
 import Anim_Recommend_Game from "~/components/layout/Anim_Recommend_Game.vue";
+import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 
 useHead({
   title: "npmrungame | Oyun Öner",
@@ -275,6 +334,7 @@ const isAddingToDb = ref(false);
 const isAddedToDb = ref(false);
 const showMaxLimitWarning = ref(false);
 const showNoGameSelectedWarning = ref(false);
+const isOpenRecommendGame = ref(false);
 
 const addedGameToDbCount = ref(0);
 const searchGameText = ref<string>("");
@@ -394,7 +454,7 @@ const addGameToRecommendedGames = async () => {
 
     setTimeout(() => {
       isAddedToDb.value = false;
-    }, 2500);
+    }, 3500);
 
     return;
   } catch (error: any) {
@@ -431,7 +491,6 @@ const handleRowClick = (item: any) => {
 };
 
 const handleRecommendGame = async () => {
-  // ❗ Oyun seçilmemişse uyarı göster ve çık
   if (
     !selectedGamesAfterResearch.value ||
     selectedGamesAfterResearch.value.length === 0
@@ -468,6 +527,31 @@ watch(
     }
   },
   { immediate: true }
+);
+
+watch(
+  () => isOpenRecommendGame.value,
+  async (val) => {
+    if (!val) {
+      searchResults.value = [];
+      isSearchingGameLoading.value = false;
+
+      await nextTick();
+
+      setTimeout(() => {
+        recommendGameForm.value?.resetValidation();
+        recommendGameForm.value?.reset();
+        models.value.email = "";
+        models.value.name = "";
+        models.value.suggestionText = "";
+      }, 50);
+
+      return;
+    }
+
+    await nextTick();
+    recommendedGameFormNameInput.value?.focus();
+  }
 );
 
 onMounted(() => {
