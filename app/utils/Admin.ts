@@ -27,6 +27,11 @@ export const adminListItems: AdminListItem[] = [
     icon: "mdi-gamepad-variant-outline",
   },
   {
+    title: "Önerilen Oyunlar",
+    slug: "recommended_games",
+    icon: "mdi-thumb-up",
+  },
+  {
     title: "Blog",
     slug: "blog",
     icon: "mdi-post-outline",

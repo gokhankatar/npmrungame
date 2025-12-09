@@ -3,16 +3,18 @@
   <v-responsive height="70" v-else />
 
   <v-container class="pa-2 pa-md-5 pa-lg-10 pa-xl-15">
-    <v-row class="w-100 mx-auto d-flex flex-column align-center justify-center">
-      <v-col cols="12" lg="9" xl="7">
+    <v-row class="w-100 mx-auto d-flex align-center">
+      <v-col cols="12">
         <p
-          class="text-center text-subtitle-1 text-sm-h5 text-xl-h4 default-title-letter text-blue-grey-darken-1"
+          class="text-center text-sm-start text-subtitle-1 text-sm-h5 text-xl-h4 default-title-letter text-blue-grey-darken-1"
         >
           npmrungame için oyun öner
         </p>
+
+        <v-divider class="mt-2 mb-5 mb-lg-8" />
       </v-col>
 
-      <v-col cols="12" lg="9" xl="7">
+      <v-col cols="12" lg="6">
         <v-form
           class="recommend-game-form-container pa-5 pa-lg-10 rounded-lg"
           ref="recommendGameForm"
@@ -224,8 +226,10 @@
           </div>
         </v-form>
       </v-col>
+    </v-row>
 
-      <v-col cols="12" class="mt-3 mt-lg-5 mt-xl-8">
+    <v-row class="w-100 mx-auto my-5 my-lg-10">
+      <v-col cols="12">
         <p
           class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-blue-grey-darken-1"
         >
@@ -234,9 +238,7 @@
 
         <v-divider class="mt-2 mb-5 mb-lg-8" />
       </v-col>
-    </v-row>
 
-    <v-row class="w-100 mx-auto">
       <Game_Card
         :arr="recommendedGames"
         :loading="isGettingRecommendedGames"

@@ -72,9 +72,11 @@ export interface AdminListItem {
   | "to_play_games"
   | "blog"
   | "messages"
-  | "current_games";
+  | "current_games"
+  | "recommended_games";
   icon: string;
 }
+
 
 export interface Youtube_Channel_Stats {
   hiddenSubscriberCount: boolean | null;

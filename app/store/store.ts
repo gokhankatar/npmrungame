@@ -43,6 +43,7 @@ const store = defineStore("npmrungame_store", {
         | "blog"
         | "messages"
         | "current_games"
+        | "recommended_games"
     ) {
       // @ts-ignore
       this.active_admin_list_item = item;

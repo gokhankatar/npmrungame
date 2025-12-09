@@ -28,23 +28,40 @@
         </template>
       </v-tooltip>
 
-      <!-- Metacritic -->
-      <v-tooltip text="Metacritic puanı" location="top">
-        <template #activator="{ props }">
-          <v-chip
-            v-if="item.metacritic"
-            v-bind="props"
-            class="metacritic-point rounded-xl ma-1 ma-lg-2"
-            :ripple="false"
-            size="small"
-            :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
-            :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
-            variant="elevated"
-            :color="useMetacriticStyle(item.metacritic).color"
-            :text="item.metacritic"
-          />
-        </template>
-      </v-tooltip>
+      <div class="metacritic-point d-flex align-center ga-1 ga-lg-2 ma-1 ma-lg-2">
+        <!-- Metacritic -->
+        <v-tooltip text="Metacritic puanı" location="top">
+          <template #activator="{ props }">
+            <v-chip
+              v-if="item.metacritic"
+              v-bind="props"
+              class="rounded-xl"
+              :ripple="false"
+              size="small"
+              :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
+              :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
+              variant="elevated"
+              :color="useMetacriticStyle(item.metacritic).color"
+              :text="item.metacritic"
+            />
+          </template>
+        </v-tooltip>
+
+        <!-- Recommender -->
+        <v-tooltip :text="`${item.recommender_name} önerdi`" location="top">
+          <template #activator="{ props }">
+            <v-icon
+              v-if="item.recommender_name"
+              v-bind="props"
+              class="recommende-icon rounded-xl"
+              :ripple="false"
+              size="small"
+              color="yellow-accent-2"
+              icon="mdi-thumb-up"
+            />
+          </template>
+        </v-tooltip>
+      </div>
 
       <div
         class="game-card-info d-flex flex-column align-start ga-1 ga-lg-2 pa-1 pa-lg-2"
