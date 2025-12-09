@@ -1,8 +1,25 @@
 <template>
-  <v-responsive height="100" v-if="!display.smAndDown.value" />
-  <v-responsive height="70" v-else />
+  <Anim_Recommend_Game />
 
   <v-container class="pa-2 pa-md-5 pa-lg-10 pa-xl-15">
+    <v-row class="w-100 mx-auto">
+      <v-col cols="12">
+        <p
+          class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-blue-grey-darken-1"
+        >
+          Daha Önce Önerilen Oyunlar
+        </p>
+
+        <v-divider class="mt-2 mb-3 mb-lg-6" />
+      </v-col>
+
+      <Game_Card
+        :arr="recommendedGames"
+        :loading="isGettingRecommendedGames"
+        :onRowClick="handleRowClick"
+      />
+    </v-row>
+
     <v-row class="w-100 mx-auto d-flex align-center">
       <v-col cols="12">
         <p
@@ -227,24 +244,6 @@
         </v-form>
       </v-col>
     </v-row>
-
-    <v-row class="w-100 mx-auto my-5 my-lg-10">
-      <v-col cols="12">
-        <p
-          class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-blue-grey-darken-1"
-        >
-          Daha Önce Önerilen Oyunlar
-        </p>
-
-        <v-divider class="mt-2 mb-5 mb-lg-8" />
-      </v-col>
-
-      <Game_Card
-        :arr="recommendedGames"
-        :loading="isGettingRecommendedGames"
-        :onRowClick="handleRowClick"
-      />
-    </v-row>
   </v-container>
 </template>
 <script lang="ts" setup>
@@ -254,6 +253,7 @@ import { getDocs, collection, addDoc, writeBatch, doc } from "firebase/firestore
 import Game_Card from "~/components/common/Game_Card.vue";
 import { useMetacriticStyle } from "~/composables/data/handleData";
 import store from "~/store/store";
+import Anim_Recommend_Game from "~/components/layout/Anim_Recommend_Game.vue";
 
 useHead({
   title: "npmrungame | Oyun Öner",
