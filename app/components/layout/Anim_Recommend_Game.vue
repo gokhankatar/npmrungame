@@ -1,16 +1,12 @@
 <template>
-  <div
-    ref="vantaRefForRecommendedGames"
-    class="bg-anim"
-    :class="display.smAndDown.value ? 'bg-anim-sm' : 'bg-anim-lg'"
-  >
+  <div ref="vantaRefForRecommendedGames" class="bg-anim" :class="getBgAnimClass()">
     <!-- Banner Content -->
-    <v-row class="banner-content mx-auto w-100 w-md-75 w-lg-50 pa-2 pa-lg-5 rounded-lg">
+    <v-row class="banner-content mx-auto w-100 w-lg-75 w-xl-50 pa-2 pa-lg-5 rounded-lg">
       <v-col cols="12">
-        <div class="d-flex flex-column align-center ga-3 ga-sm-5 ga-lg-8">
+        <div class="d-flex flex-column align-center ga-3 ga-sm-5 ga-xl-8">
           <Animated_Title />
           <p
-            class="text-center text-grey-darken-1 text-subtitle-2 text-sm-subtitle-1 text-lg-h5"
+            class="text-center text-grey-darken-1 text-subtitle-2 text-sm-subtitle-1 text-xl-h5"
             :style="
               display.mdAndUp.value ? { lineHeight: '2.1rem' } : { lineHeight: '1.2rem' }
             "
@@ -43,13 +39,24 @@ const router = useRouter();
 const display = useDisplay();
 
 const getResponsiveHeight = () => {
-  const { smAndDown, mdAndUp, xl } = display;
+  const { smAndDown, lgAndDown, xl } = display;
 
-  if (xl.value) return "50vh"; // XL için özel yükseklik
-  if (smAndDown.value) return "75vh"; // SM ve altı
-  if (mdAndUp.value) return "85vh"; // MD–LG
+  if (xl.value) return "50vh";
+  if (smAndDown.value) return "75vh";
+  if (lgAndDown.value) return "75vh";
+  else {
+    return "50vh";
+  }
+};
 
-  return "85vh"; // fallback
+const getBgAnimClass = () => {
+  const { smAndDown, lgAndDown, xl } = display;
+
+  if (xl.value) return "bg-anim-xl";
+  if (smAndDown.value) return "bg-anim-sm";
+  if (lgAndDown.value) return "bg-anim-md-lg";
+
+  return "bg-anim-md-lg";
 };
 
 onMounted(async () => {
@@ -93,7 +100,11 @@ onBeforeUnmount(() => {
   height: 75vh;
 }
 
-.bg-anim-lg {
+.bg-anim-md-lg {
+  height: 75vh;
+}
+
+.bg-anim-xl {
   height: 50vh;
 }
 
