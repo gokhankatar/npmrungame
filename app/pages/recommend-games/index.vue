@@ -418,37 +418,6 @@ const searchGame = async () => {
   }
 };
 
-const checkIfGameAlreadyExists = (game: any) => {
-  const id = game.id;
-
-  const existsInCompleted = completedGames.value.some((g) => g.id === id);
-  const existsInToPlay = toPlayGames.value.some((g) => g.id === id);
-  const existsInRecommended = recommendedGames.value.some((g) => g.id === id);
-
-  if (existsInCompleted) {
-    msgGenre.value = "warning";
-    dialogMsg.value = "Bu oyunu zaten tamamlamışsınız 🎮";
-    isAddedToDb.value = true;
-    return true;
-  }
-
-  if (existsInToPlay) {
-    msgGenre.value = "warning";
-    dialogMsg.value = "Bu oyun zaten oynayacaklarım listesinde 📌";
-    isAddedToDb.value = true;
-    return true;
-  }
-
-  if (existsInRecommended) {
-    msgGenre.value = "warning";
-    dialogMsg.value = "Bu oyun zaten başka biri tarafından önerilmiş 📮";
-    isAddedToDb.value = true;
-    return true;
-  }
-
-  return false;
-};
-
 const addGameToRecommendedGames = async () => {
   const games = selectedGamesAfterResearch.value;
 
@@ -509,7 +478,6 @@ const addGameToRecommendedGames = async () => {
     selectedGamesAfterResearch.value = [];
   }
 };
-
 
 const getCompletedGames = async () => {
   try {
