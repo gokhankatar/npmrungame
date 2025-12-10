@@ -45,7 +45,7 @@ const getResponsiveHeight = () => {
   if (smAndDown.value) return "75vh";
   if (lgAndDown.value) return "75vh";
   else {
-    return "50vh";
+    return "75vh";
   }
 };
 

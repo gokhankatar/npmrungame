@@ -341,8 +341,6 @@ const showNoGameSelectedWarning = ref(false);
 const isOpenRecommendGame = ref(false);
 const isGettingCompletedGames = ref(false);
 const isGettingToPlayGames = ref(false);
-const isAlreadyExistOnToPlayGames = ref(false);
-const isAlreadyExistOnCompleted = ref(false);
 
 const addedGameToDbCount = ref(0);
 const msgGenre = ref<"successfull" | "warning">("successfull");
@@ -401,7 +399,15 @@ const searchGame = async () => {
         },
       });
 
-      searchResults.value = data?.results ?? [];
+      const results = data?.results ?? [];
+
+      const excludedIds = new Set([
+        ...recommendedGames.value.map((g) => g.id),
+        ...completedGames.value.map((g) => g.id),
+        ...toPlayGames.value.map((g) => g.id),
+      ]);
+
+      searchResults.value = results.filter((game: any) => !excludedIds.has(game.id));
     } else {
       searchResults.value = [];
     }
@@ -465,11 +471,6 @@ const addGameToRecommendedGames = async () => {
     if (games.length === 1) {
       const game = games[0];
 
-      if (checkIfGameAlreadyExists(game)) {
-        setTimeout(() => (isAddedToDb.value = false), 2500);
-        return;
-      }
-
       const finalGameData = { ...game, ...metadata };
       await addDoc(collection($firestore, "recommended_games"), finalGameData);
 
@@ -483,33 +484,11 @@ const addGameToRecommendedGames = async () => {
     }
 
     // ---------------------------
-    // 🔥 MULTIPLE GAME (WITH CONTROL)
+    // 🔥 MULTIPLE GAME — Batch ekleme
     // ---------------------------
-    const validGames: any[] = [];
-    let hasBlocked = false;
-
-    games.forEach((game) => {
-      if (!checkIfGameAlreadyExists(game)) {
-        validGames.push(game);
-      } else {
-        hasBlocked = true;
-      }
-    });
-
-    // ❌ Eğer hiçbir oyun geçerli değilse batch yapma
-    if (validGames.length === 0) {
-      msgGenre.value = "warning";
-      dialogMsg.value =
-        "Önerdiğiniz oyunların tamamı zaten listelerde bulunduğu için eklenmedi.";
-      isAddedToDb.value = true;
-      setTimeout(() => (isAddedToDb.value = false), 3500);
-      return;
-    }
-
-    // 🔥 Batch ile sadece geçerli oyunları ekle
     const batch = writeBatch($firestore);
 
-    validGames.forEach((g) => {
+    games.forEach((g) => {
       const ref = doc(collection($firestore, "recommended_games"));
       const finalGameData = { ...g, ...metadata };
       batch.set(ref, finalGameData);
@@ -517,15 +496,8 @@ const addGameToRecommendedGames = async () => {
 
     await batch.commit();
 
-    // Mesaj durumu
-    if (hasBlocked) {
-      msgGenre.value = "warning";
-      dialogMsg.value =
-        "Bazı oyunlar eklenemedi (zaten listelerde vardı), geçerli olanlar başarıyla eklendi 🎉";
-    } else {
-      msgGenre.value = "successfull";
-      dialogMsg.value = "Tüm oyun önerileriniz başarıyla iletildi! 🎉";
-    }
+    msgGenre.value = "successfull";
+    dialogMsg.value = "Tüm oyun önerileriniz başarıyla iletildi! 🎉";
 
     isAddedToDb.value = true;
     setTimeout(() => (isAddedToDb.value = false), 3500);
@@ -537,6 +509,7 @@ const addGameToRecommendedGames = async () => {
     selectedGamesAfterResearch.value = [];
   }
 };
+
 
 const getCompletedGames = async () => {
   try {
