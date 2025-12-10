@@ -27,7 +27,7 @@
     v-if="_store.isAdmin"
     :ripple="false"
     class="back-btn d-flex align-center"
-    variant="outlined"
+    :variant="display.smAndDown.value ? 'elevated' : 'outlined'"
     rounded="xl"
     @mouseover="hover = true"
     @mouseleave="hover = false"
@@ -49,10 +49,10 @@ import store from "~/store/store";
 
 const _store = store();
 const router = useRouter();
+const display = useDisplay();
 
 const hover = ref(false);
-const hoverDev = ref(false)
-;
+const hoverDev = ref(false);
 </script>
 <style scoped>
 @import "~/assets/css/main.css";

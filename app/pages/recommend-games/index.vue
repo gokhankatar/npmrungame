@@ -2,13 +2,24 @@
   <Anim_Recommend_Game />
 
   <v-container class="pa-2 pa-md-5 pa-lg-10 pa-xl-15">
-    <v-row class="w-100 mx-auto">
+    <v-row class="w-100 mx-auto" v-if="recommendedGames?.length > 0">
       <v-col cols="12">
-        <p
-          class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-deep-purple"
-        >
-          Daha Önce Önerilen Oyunlar
-        </p>
+        <div class="d-flex justify-space-between align-center w-100">
+          <p
+            class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-deep-purple"
+          >
+            Daha Önce Önerilen Oyunlar
+          </p>
+          <v-btn
+            @click="getRecommendedGames"
+            :loading="isGettingRecommendedGames"
+            variant="text"
+            :ripple="false"
+            :color="isGettingRecommendedGames ? 'deep-purple' : 'grey-lighten-1'"
+            icon="mdi-refresh"
+            :size="display.smAndDown.value ? 'small' : 'default'"
+          />
+        </div>
 
         <v-divider class="mt-2 mb-3 mb-lg-6" />
       </v-col>
@@ -402,9 +413,9 @@ const searchGame = async () => {
       const results = data?.results ?? [];
 
       const excludedIds = new Set([
-        ...recommendedGames.value.map((g) => g.id),
-        ...completedGames.value.map((g) => g.id),
-        ...toPlayGames.value.map((g) => g.id),
+        ...recommendedGames.value?.map((g: any) => g.id),
+        ...completedGames.value?.map((g: any) => g.id),
+        ...toPlayGames.value?.map((g: any) => g.id),
       ]);
 
       searchResults.value = results.filter((game: any) => !excludedIds.has(game.id));
@@ -445,7 +456,7 @@ const addGameToRecommendedGames = async () => {
 
       msgGenre.value = "successfull";
       dialogMsg.value = "Oyun öneriniz başarıyla iletildi! 🎉";
-
+      recommendGameForm.value?.reset();
       isAddedToDb.value = true;
       setTimeout(() => (isAddedToDb.value = false), 2500);
 
@@ -453,7 +464,7 @@ const addGameToRecommendedGames = async () => {
     }
 
     // ---------------------------
-    // 🔥 MULTIPLE GAME — Batch ekleme
+    // 🔥 MULTIPLE GAME — (Batch)
     // ---------------------------
     const batch = writeBatch($firestore);
 
@@ -468,6 +479,7 @@ const addGameToRecommendedGames = async () => {
     msgGenre.value = "successfull";
     dialogMsg.value = "Tüm oyun önerileriniz başarıyla iletildi! 🎉";
 
+    recommendGameForm.value?.reset();
     isAddedToDb.value = true;
     setTimeout(() => (isAddedToDb.value = false), 3500);
   } catch (error: any) {

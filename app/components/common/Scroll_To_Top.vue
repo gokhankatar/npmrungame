@@ -4,7 +4,7 @@
       v-if="showScrollBtn"
       :ripple="false"
       class="scroll-top-btn d-flex align-center"
-      variant="outlined"
+      :variant="display.smAndDown.value ? 'elevated' : 'outlined'"
       rounded="xl"
       @click="scrollToTop"
       @mouseover="hover = true"
@@ -26,6 +26,8 @@
 
 <script setup lang="ts">
 import { scrollToTop } from "~/composables/core/basicFunc";
+
+const display = useDisplay();
 
 const hover = ref(false);
 const showScrollBtn = ref(false);
