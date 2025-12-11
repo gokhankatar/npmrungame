@@ -5,12 +5,13 @@ export default defineNuxtConfig({
     "pinia-plugin-persistedstate/nuxt",
     "nuxt-lodash",
     "vuetify-nuxt-module",
-    "nuxt-swiper"
+    "nuxt-swiper",
   ],
   runtimeConfig: {
     rawg_api_key: process.env.API_KEY,
     youtube_api_key: process.env.YOUTUBE_API_KEY,
     youtube_channel_id: process.env.YOUTUBE_CHANNEL_ID,
+    adminPassw: process.env.ADMIN_PASSWORD_KEY,
     public: {
       // apiKey: process.env.API_KEY,
       firebaseApiKey: process.env.FIREBASE_API_KEY,
@@ -18,23 +19,23 @@ export default defineNuxtConfig({
       // youtubeChannelId: process.env.YOUTUBE_CHANNEL_ID,
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_KEY,
-      adminPassw: process.env.ADMIN_PASSWORD_KEY
-    }
+      adminPassw: process.env.ADMIN_PASSWORD_KEY,
+    },
   },
   app: {
     head: {
       link: [
         {
           rel: "icon",
-          type: 'image/x-icon',
-          href: "/favicon.ico"
+          type: "image/x-icon",
+          href: "/favicon.ico",
         },
         {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap'
-        }
-      ]
-    }
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap",
+        },
+      ],
+    },
   },
   lodash: {
     prefix: "_",
@@ -44,11 +45,10 @@ export default defineNuxtConfig({
     alias: [
       ["camelCase", "stringToCamelCase"],
       ["kebabCase", "stringToKebab"],
-      ["isDate", "isLodashDate"]
+      ["isDate", "isLodashDate"],
     ],
   },
-  css: ['~/assets/css/main.css'],
-
+  css: ["~/assets/css/main.css"],
 
   devtools: { enabled: false },
   devServer: {
