@@ -5,28 +5,52 @@ export default defineEventHandler(async (event) => {
   const page = Number(query.page) || 1;
   const page_size = Number(query.page_size) || 40;
 
-  // RAWG API’ye backend üzerinden istek
-  const data: any = await $fetch("https://api.rawg.io/api/games", {
-    params: {
-      key: config.rawg_api_key, // gizli kalıyor
-      page,
-      page_size,
-    },
-  });
+  const platform = query.platform && query.platform !== ""
+    ? String(query.platform)
+    : undefined;
 
-  // frontend için "clean" URL üretici
+  const params: any = {
+    key: config.rawg_api_key,
+    page,
+    page_size,
+  };
+
+  // ⭐ STAR: Metacritic ordering
+  if (platform === "star") {
+    params.ordering = "-metacritic";
+  }
+
+  // 🎮 Platform filter
+  if (platform && platform !== "star") {
+    const platformMap: Record<string, number> = {
+      pc: 1,
+      ps5: 2,
+      xbox: 3,
+      nintendo: 7,
+    };
+
+    if (platformMap[platform]) {
+      params.parent_platforms = platformMap[platform];
+    }
+  }
+
+  // RAWG API 
+  const data: any = await $fetch("https://api.rawg.io/api/games", { params });
+
+  // Pagination URL for proxying through our API
   const makeProxyUrl = (rawUrl: string | null) => {
     if (!rawUrl) return null;
 
     const url = new URL(rawUrl);
 
-    return `/api/games?page=${url.searchParams.get(
-      "page"
-    )}&page_size=${url.searchParams.get("page_size")}`;
+    const nextPage = url.searchParams.get("page");
+
+    return `/api/games?page=${nextPage}&page_size=${page_size}${platform ? `&platform=${platform}` : ""
+      }`;
   };
 
   return {
-    current: page, // <---- önemli (store’a gidecek)
+    current: page,
     next: makeProxyUrl(data?.next),
     previous: makeProxyUrl(data?.previous),
     results: data?.results,

@@ -9,7 +9,11 @@
       :ripple="false"
       @click="onRowClick(item)"
     >
-      <v-img :src="item.background_image" class="game-card-img h-100 rounded-lg" cover />
+      <v-img
+        :src="item.background_image ?? 'https://f4.bcbits.com/img/0016409163_71.jpg'"
+        class="game-card-img h-100 rounded-lg"
+        cover
+      />
 
       <!-- Playtime -->
       <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">

@@ -4,25 +4,33 @@
 
   <v-container class="pa-0 pa-lg-10 pa-xl-15">
     <v-row>
-      <v-col cols="12" sm="8" xl="10">
-        <p
-          class="text-center text-sm-start text-subtitle-2 text-sm-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3 default-title-letter font-weight-bold text-grey-lighten-1"
-        >
-          {{ `${_store.active_game_genre?.title} Oyunları` }}
-        </p>
-      </v-col>
+      <v-row
+        class="d-flex justify-space-between align-center w-100 mx-auto"
+        :dense="display.smAndDown.value"
+      >
+        <v-col cols="12" sm="8" xl="10">
+          <p
+            class="text-center text-sm-start text-subtitle-2 text-sm-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3 default-title-letter font-weight-bold text-grey-lighten-1"
+          >
+            {{ `${_store.active_game_genre?.title} Oyunları` }}
+          </p>
+        </v-col>
 
-      <v-col cols="12" sm="4" xl="2">
-        <v-btn
-          @click="handleToBack"
-          text="Oyunlara Dön"
-          prepend-icon="mdi-arrow-left"
-          :size="isSmallScreen ? 'small' : 'large'"
-          block
-          :ripple="false"
-          variant="text"
-        />
-      </v-col>
+        <v-col cols="12" sm="4" xl="2">
+          <div
+            @click="handleToBack"
+            class="w-100 w-sm-auto back-to-games-btn transition d-flex justify-center float-none float-sm-right justify-sm-end align-center cursor-pointer text-caption text-sm-subtitle-2 ga-1 ga-lg-3 pa-1 pa-sm-2 pa-xl-3"
+            style="width: fit-content"
+          >
+            <v-icon size="20" icon="mdi-arrow-left" />
+            <p
+              class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
+            >
+              Oyunlara Dön
+            </p>
+          </div>
+        </v-col>
+      </v-row>
 
       <v-divider class="w-100 mt-2 mb-5" color="white" />
 

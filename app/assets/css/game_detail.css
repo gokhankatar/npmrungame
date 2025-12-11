@@ -1,0 +1,12 @@
+.img-detail-container {
+    position: relative;
+}
+
+.close-icon-in-img-detail-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    z-index: 9999;
+}

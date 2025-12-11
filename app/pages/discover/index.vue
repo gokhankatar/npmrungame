@@ -11,66 +11,151 @@
     <v-row class="d-flex align-center mt-5 mt-lg-10">
       <v-col cols="12" sm="6" lg="4">
         <p
-          class="text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-grey-lighten-1 default-title-letter text-center text-sm-start">
+          class="text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-grey-lighten-1 default-title-letter text-center text-sm-start"
+        >
           Tüm Oyunlar
         </p>
       </v-col>
 
       <v-col cols="12" sm="6" lg="8">
-        <div class="d-flex flex-wrap align-center justify-center justify-sm-end ga-1 ga-md-2 ga-lg-4">
-          <v-btn @click="isOpenSearchGame = true" prepend-icon="mdi-magnify" :ripple="false" :size="getCategoryChipSize"
-            class="rounded-xl text-capitalize my-2 my-sm-0" text="Oyun Ara..."
-            :variant="display.xs.value ? 'outlined' : 'text'" color="green-accent-2" :elevation="0"
-            :block="display.xs.value" />
+        <div
+          class="d-flex flex-wrap align-center justify-center justify-sm-end ga-1 ga-md-2 ga-lg-4"
+        >
+          <v-btn
+            @click="isOpenSearchGame = true"
+            prepend-icon="mdi-magnify"
+            :ripple="false"
+            :size="getCategoryChipSize"
+            class="rounded-xl text-capitalize my-2 my-sm-0"
+            text="Oyun Ara..."
+            :variant="display.xs.value ? 'outlined' : 'text'"
+            color="green-accent-2"
+            :elevation="0"
+            :block="display.xs.value"
+          />
 
-          <v-chip v-for="(item, index) of game_category_list" :key="item.name" @click="handleGamePlatform(item.slug)"
-            class="cursor-pointer transition category-chip" :class="_store.active_game_platform == item.slug
-              ? `active-game-platform-${item.slug}`
-              : ''
-              " color="grey" variant="outlined" :size="getCategoryChipSize" :text="item.name" :prepend-icon="item.icon"
-            :ripple="false" />
+          <v-chip
+            v-for="(item, index) of game_category_list"
+            :key="item.name"
+            @click="handleGamePlatform(item.slug)"
+            class="cursor-pointer transition category-chip"
+            :class="
+              _store.active_game_platform == item.slug
+                ? `active-game-platform-${item.slug}`
+                : ''
+            "
+            color="grey"
+            variant="outlined"
+            :size="getCategoryChipSize"
+            :text="item.name"
+            :prepend-icon="item.icon"
+            :ripple="false"
+          />
         </div>
       </v-col>
     </v-row>
 
     <!-- Games List -->
-    <v-row class="d-flex justify-start align-center mx-auto" :dense="display.smAndDown.value">
+    <v-row
+      class="d-flex justify-start align-center mx-auto"
+      :dense="display.smAndDown.value"
+    >
       <Game_Card :loading="isLoading" :arr="gamesArr" :onRowClick="handleRowClick" />
 
-      <v-row class="d-flex justify-center align-center w-100 mx-auto my-3 my-lg-6" :dense="display.smAndDown.value">
+      <v-row
+        class="d-flex justify-center align-center w-100 mx-auto my-3 my-lg-6"
+        :dense="display.smAndDown.value"
+      >
         <v-col cols="6" lg="3" xl="2">
-          <v-btn :disabled="!_store.prevPage" @click="goPrev" variant="tonal" rounded="xl"
-            prepend-icon="mdi-chevron-left" text="Geri" :size="display.smAndDown.value ? 'small' : 'large'"
-            :ripple="false" block />
+          <v-skeleton-loader
+            v-if="isLoading"
+            type="text"
+            width="100%"
+            :height="display.smAndDown.value ? 36 : 56"
+            style="border-radius: 5rem"
+          />
+
+          <v-btn
+            v-else
+            :disabled="!_store.prevPage"
+            @click="goPrev"
+            variant="tonal"
+            rounded="xl"
+            prepend-icon="mdi-chevron-left"
+            text="Geri"
+            :size="display.smAndDown.value ? 'small' : 'large'"
+            :ripple="false"
+            block
+          />
         </v-col>
         <v-col cols="6" lg="3" xl="2">
-          <v-btn :disabled="!_store.nextPage" @click="goNext" variant="tonal" rounded="xl"
-            append-icon="mdi-chevron-right" text="İleri" :size="display.smAndDown.value ? 'small' : 'large'"
-            :ripple="false" block />
+          <v-skeleton-loader
+            v-if="isLoading"
+            type="text"
+            width="100%"
+            :height="display.smAndDown.value ? 36 : 56"
+            style="border-radius: 5rem"
+          />
+
+          <v-btn
+            v-else
+            :disabled="!_store.nextPage"
+            @click="goNext"
+            variant="tonal"
+            rounded="xl"
+            append-icon="mdi-chevron-right"
+            text="İleri"
+            :size="display.smAndDown.value ? 'small' : 'large'"
+            :ripple="false"
+            block
+          />
         </v-col>
       </v-row>
     </v-row>
   </v-container>
 
   <!-- Search Game Pop Up -->
-  <v-dialog v-model="isOpenSearchGame" :max-width="600" style="
+  <v-dialog
+    v-model="isOpenSearchGame"
+    :max-width="600"
+    style="
       background-color: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(0.1rem);
       -webkit-backdrop-filter: blur(0.1rem);
-    ">
+    "
+  >
     <div class="search-game-pop-up pa-2 pa-lg-5 rounded-lg">
-      <v-btn class="close-icon-in-search-game-pop-up ma-1 ma-lg-2" @click="isOpenSearchGame = false" icon="mdi-close"
-        variant="text" color="grey-darken-1" :ripple="false" :size="smallScreen ? 'small' : 'default'" />
+      <v-btn
+        class="close-icon-in-search-game-pop-up ma-1 ma-lg-2"
+        @click="isOpenSearchGame = false"
+        icon="mdi-close"
+        variant="text"
+        color="grey-darken-1"
+        :ripple="false"
+        :size="smallScreen ? 'small' : 'default'"
+      />
 
       <div class="mt-5 mt-lg-10 mb-3 mb-lg-5 d-flex justify-center align-center ga-2">
-        <p class="text-subtitle-2 text-lg-h5 default-title-letter text-blue-grey-lighten-1">
+        <p
+          class="text-subtitle-2 text-lg-h5 default-title-letter text-blue-grey-lighten-1"
+        >
           Hangi Oyunu Arıyorsun ?
         </p>
       </div>
 
-      <v-text-field v-model="searchGameText" @input="searchGame" prepend-inner-icon="mdi-magnify" variant="outlined"
-        class="w-100 text-grey-lighten-1" color="grey-lighten-1" rounded="xl" label="Oyun Ara"
-        placeholder="Black Myth Wukong..." :density="extraLgScreen ? 'comfortable' : 'compact'" clearable />
+      <v-text-field
+        v-model="searchGameText"
+        @input="searchGame"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        class="w-100 text-grey-lighten-1"
+        color="grey-lighten-1"
+        rounded="xl"
+        label="Oyun Ara"
+        placeholder="Black Myth Wukong..."
+        :density="extraLgScreen ? 'comfortable' : 'compact'"
+        clearable
+      />
 
       <!-- 🔥 Arama sonuç alanı -->
       <div class="w-100" style="max-height: 350px; overflow-y: auto">
@@ -81,11 +166,19 @@
 
         <!-- Search Results -->
         <template v-else>
-          <p v-if="searchResults?.length" class="text-caption text-grey-darken-1 text-start default-title-letter">
+          <p
+            v-if="searchResults?.length"
+            class="text-caption text-grey-darken-1 text-start default-title-letter"
+          >
             {{ `${searchResults?.length} oyun bulundu` }}
           </p>
-          <v-card @click="handleRowClick(game)" v-for="game in searchResults" :key="game.id" :ripple="false"
-            class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer">
+          <v-card
+            @click="handleRowClick(game)"
+            v-for="game in searchResults"
+            :key="game.id"
+            :ripple="false"
+            class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer"
+          >
             <v-avatar :size="smallScreen ? 30 : 48" rounded>
               <v-img :src="game.background_image" :alt="game.name" cover />
             </v-avatar>
@@ -93,18 +186,25 @@
             <div class="d-flex flex-column">
               <p class="text-caption text-lg-subtitle-2 default-title-letter">
                 {{ `${game.name}` }}
-                <span v-if="game.released">({{ new Date(game.released).getFullYear() }})</span>
+                <span v-if="game.released"
+                  >({{ new Date(game.released).getFullYear() }})</span
+                >
               </p>
 
-              <p class="text-caption" :class="`text-${useMetacriticStyle(game?.metacritic).color}`">
+              <p
+                class="text-caption"
+                :class="`text-${useMetacriticStyle(game?.metacritic).color}`"
+              >
                 Metacritic: {{ game.metacritic ?? "N/A" }}
               </p>
             </div>
           </v-card>
 
           <!-- No Result -->
-          <p v-if="searchResults?.length === 0 && searchGameText?.length > 2"
-            class="text-center text-grey-darken-1 mt-3">
+          <p
+            v-if="searchResults?.length === 0 && searchGameText?.length > 2"
+            class="text-center text-grey-darken-1 mt-3"
+          >
             Sonuç bulunamadı
           </p>
         </template>
@@ -114,22 +214,24 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  useMetacriticStyle,
-} from "~/composables/data/handleData";
+import { useMetacriticStyle } from "~/composables/data/handleData";
 import store from "~/store/store";
 import axios from "axios";
 import Game_Genres from "~/components/common/Game_Genres.vue";
 import Game_Card from "~/components/common/Game_Card.vue";
+import { useDiscoverStore } from "~/store/queryStore";
 
 useHead({
   title: "npmrungame | Keşfet",
 });
 
 const _store = store();
+const discover_store = useDiscoverStore();
 const router = useRouter();
+const route = useRoute();
 const display = useDisplay();
 
+const page = computed(() => Number(route.query.page) || 1);
 const smallScreen = computed(() => display.smAndDown.value);
 const extraLgScreen = computed(() => display.xlAndUp.value);
 
@@ -163,26 +265,7 @@ const searchGame = async () => {
   }
 };
 
-// const getGames = async () => {
-//   try {
-//     isLoading.value = true;
-
-//     const { data } = await axios.get("/api/games", {
-//       params: {
-//         page_size: 40,
-//       },
-//     });
-
-//     gamesArr.value = data?.results ?? [];
-//   } catch (error: any) {
-//     console.error("Error while getting games", error.message);
-//   } finally {
-//     isLoading.value = false;
-//   }
-// };
-
 const getGames = async (url?: string) => {
-
   try {
     isLoading.value = true;
 
@@ -192,13 +275,10 @@ const getGames = async (url?: string) => {
 
     gamesArr.value = data?.results ?? [];
 
-    // URL içindeki current page'i çekelim
     const parsedUrl = new URL(requestUrl, window.location.origin);
     const current = Number(parsedUrl.searchParams.get("page")) || 1;
 
-    // Store update
     _store.setPagination(current, data?.next, data?.previous);
-
   } finally {
     isLoading.value = false;
   }
@@ -214,17 +294,67 @@ const getCategoryChipSize = computed(() => {
   }
 });
 
-const handleGamePlatform = (platform: "pc" | "ps5" | "xbox" | "nintendo" | "star") => {
-  if (platform == _store.active_game_platform) {
+const handleGamePlatform = (platform: any) => {
+  const current = route.query.platform;
+
+  if (current === platform) {
     _store.clearActiveGamePlatform();
+
+    router.push({
+      query: {
+        ...route.query,
+        platform: undefined,
+        page: 1,
+      },
+    });
   } else {
     _store.changeGamePlatform(platform);
+
+    router.push({
+      query: {
+        ...route.query,
+        platform,
+        page: 1,
+      },
+    });
   }
 };
 
 const handleRowClick = (item: any) => {
+  discover_store.setQuery(route.query);
+
   _store.setActiveDetailedGame(item.id, item.name);
   router.replace(`/game-detail/${item.name}`);
+};
+
+const goNext = () => {
+  if (_store.nextPage) {
+    const nextPage = new URL(_store.nextPage, window.location.origin).searchParams.get(
+      "page"
+    );
+
+    router.push({
+      query: {
+        ...route.query,
+        page: nextPage,
+      },
+    });
+  }
+};
+
+const goPrev = () => {
+  if (_store.prevPage) {
+    const prevPage = new URL(_store.prevPage, window.location.origin).searchParams.get(
+      "page"
+    );
+
+    router.push({
+      query: {
+        ...route.query,
+        page: prevPage,
+      },
+    });
+  }
 };
 
 watch(
@@ -239,22 +369,29 @@ watch(
   { immediate: true }
 );
 
-const goNext = () => {
-  if (_store.nextPage) {
-    getGames(_store.nextPage);
-  }
-};
+watch(
+  () => [route.query.page, route.query.platform],
+  () => {
+    const qPlatform = route.query.platform ? route.query.platform : undefined;
 
-const goPrev = () => {
-  if (_store.prevPage) {
-    getGames(_store.prevPage);
-  }
-};
+    getGames(
+      `/api/games?page=${page.value}&page_size=40${
+        qPlatform ? `&platform=${qPlatform}` : ""
+      }`
+    );
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
-  getGames(`/api/games?page=${_store.currentPage}&page_size=40`);
-});
+  const qPlatform = route.query.platform ? route.query.platform : undefined;
 
+  getGames(
+    `/api/games?page=${page.value}&page_size=40${
+      qPlatform ? `&platform=${qPlatform}` : ""
+    }`
+  );
+});
 </script>
 
 <style scoped>

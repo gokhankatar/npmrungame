@@ -6,7 +6,7 @@
     <v-col cols="12">
       <div class="d-flex align-center justify-center justify-sm-end">
         <v-btn
-          @click="router.replace('/discover')"
+          @click="goBackToDiscover"
           text="Keşfetmeye Devam Et"
           prepend-icon="mdi-step-backward"
           :size="isSmallScreen ? 'small' : 'default'"
@@ -24,7 +24,8 @@
     <!-- Game Banner -->
     <v-col cols="12" lg="6" class="d-flex" v-else>
       <v-img
-        :src="game?.background_image"
+        @click="openImgDetail(game?.background_image)"
+        :src="game?.background_image ?? 'https://f4.bcbits.com/img/0016409163_71.jpg'"
         cover
         class="cursor-pointer transition rounded-lg flex-grow-1"
       />
@@ -47,6 +48,7 @@
       <v-row :dense="isSmallScreen" class="flex-grow-1">
         <v-col cols="12" md="6" lg="4" v-for="(item, index) in imgArr" :key="index">
           <v-img
+            @click="openImgDetail(item.image)"
             :src="item.image"
             cover
             class="cursor-pointer transition rounded-lg w-100 h-100"
@@ -372,7 +374,26 @@
       -webkit-backdrop-filter: blur(0.1rem);
     "
   >
-    <v-img v-if="imgDetailSrc" :src="imgDetailSrc" cover />
+    <div class="img-detail-container">
+      <v-btn
+        @click="isOpenImgDetail = false"
+        class="close-icon-in-img-detail-container ma-1 ma-lg-2"
+        variant="text"
+        size="small"
+        color="grey-lighten-2"
+        icon="mdi-close"
+        :ripple="false"
+      />
+
+      <v-img
+        v-if="imgDetailSrc"
+        rounded="xl"
+        height="100%"
+        width="100%"
+        :src="imgDetailSrc"
+        cover
+      />
+    </div>
   </v-dialog>
 </template>
 <script lang="ts" setup>
@@ -384,8 +405,10 @@ import {
   parseRequirements,
   useMetacriticStyle,
 } from "~/composables/data/handleData";
+import { useDiscoverStore } from "~/store/queryStore";
 
 const _store = store();
+const discover_store = useDiscoverStore();
 const router = useRouter();
 const display = useDisplay();
 
@@ -398,6 +421,18 @@ const isOpenImgDetail = ref(false);
 const game = ref<any | null>(null);
 const imgDetailSrc = ref<string | null>(null);
 const imgArr = ref<any[]>([]);
+
+const goBackToDiscover = () => {
+  router.replace({
+    path: "/discover",
+    query: discover_store.lastQuery || {},
+  });
+};
+
+const openImgDetail = (src: string | null) => {
+  imgDetailSrc.value = src;
+  isOpenImgDetail.value = true;
+};
 
 const getGameScreenshots = async () => {
   try {
