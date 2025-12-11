@@ -10,20 +10,43 @@
     <!-- Game Platform Chips -->
     <v-row class="d-flex align-center mt-5 mt-lg-10">
       <v-col cols="12" sm="6" lg="4">
-        <Animated_Text
-          @click="resetAllFilter"
-          text="Tüm Oyunlar"
-          class="cursor-pointer"
-          :msPerChar="50"
-          :duration="550"
-          :loop="true"
-        />
-        <p
-          class="text-center text-sm-start text-caption text-lg-subtitle-2 text-blue-grey-darken-2 default-title-letter"
-        >
-          {{ formatNumber(total_count) }} oyun bulundu, yaklaşık
-          {{ formatNumber(totalPagesDisplay) }} sayfa.
-        </p>
+        <template v-if="isLoading">
+          <v-skeleton-loader
+            type="text"
+            width="190"
+            height="12px"
+            style="
+              background-color: transparent;
+              --v-skeleton-loader-bg-color: transparent;
+            "
+          />
+          <v-skeleton-loader
+            type="text"
+            width="300"
+            height="12px"
+            class="my-2"
+            style="
+              background-color: transparent;
+              --v-skeleton-loader-bg-color: transparent;
+            "
+          />
+        </template>
+        <template v-else>
+          <Animated_Text
+            @click="resetAllFilter"
+            text="Tüm Oyunlar"
+            class="cursor-pointer"
+            :msPerChar="50"
+            :duration="550"
+            :loop="true"
+          />
+          <p
+            class="text-center text-sm-start text-caption text-lg-subtitle-2 text-blue-grey-darken-2 default-title-letter"
+          >
+            {{ formatNumber(total_count) }} oyun bulundu, yaklaşık
+            {{ formatNumber(totalPagesDisplay) }} sayfa.
+          </p>
+        </template>
       </v-col>
 
       <v-col cols="12" sm="6" lg="8">
@@ -76,59 +99,48 @@
         :dense="display.smAndDown.value"
       >
         <!-- prev -->
-        <v-col cols="4" lg="4" xl="3">
-          <v-btn
-            :disabled="!_store.prevPage"
-            @click="goPrev"
-            variant="tonal"
-            rounded="xl"
-            prepend-icon="mdi-chevron-left"
-            text="Geri"
-            :size="display.smAndDown.value ? 'small' : 'large'"
-            :ripple="false"
-            block
-          />
-        </v-col>
-
-        <!-- pagination -->
-        <v-col cols="4" lg="3" xl="2" class="d-flex justify-center">
-          <v-chip
-            class="d-flex align-center justify-center"
-            color="primary"
-            style="padding: 0 8px; height: 36px; min-width: 80px"
-          >
-            <input
-              type="number"
-              v-model.number="currentPageInput"
-              @input="onPageChange"
-              :min="1"
-              :max="totalPagesDisplay"
-              style="
-                width: 50px;
-                border: none;
-                background: transparent;
-                text-align: center;
-                color: white;
-                font-weight: bold;
-              "
+        <v-col cols="12">
+          <div class="d-flex justify-center align-center ga-2 ga-lg-4 w-100">
+            <v-btn
+              :disabled="!_store.prevPage"
+              @click="goPrev"
+              variant="tonal"
+              rounded="xl"
+              prepend-icon="mdi-chevron-left"
+              class="text-capitalize"
+              text="Geri"
+              :size="display.smAndDown.value ? 'small' : 'default'"
+              :ripple="false"
             />
-            <span style="margin-left: 4px; color: white">/ {{ totalPagesDisplay }}</span>
-          </v-chip>
-        </v-col>
 
-        <!-- Next -->
-        <v-col cols="4" lg="4" xl="3">
-          <v-btn
-            :disabled="!_store.nextPage"
-            @click="goNext"
-            variant="tonal"
-            rounded="xl"
-            append-icon="mdi-chevron-right"
-            text="İleri"
-            :size="display.smAndDown.value ? 'small' : 'large'"
-            :ripple="false"
-            block
-          />
+            <div class="d-flex align-center ga-1 ga-lg-2">
+              <v-progress-circular
+                v-if="isLoading"
+                color="grey-darken-1"
+                size="12"
+                width="2"
+                indeterminate
+              />
+              <p
+                v-else
+                class="text-caption text-xl-subtitle-2 defaul-title-letter text-grey-darken-1"
+              >
+                {{ _store.currentPage }} / {{ totalPagesDisplay }}
+              </p>
+            </div>
+
+            <v-btn
+              :disabled="!_store.nextPage"
+              @click="goNext"
+              variant="tonal"
+              rounded="xl"
+              append-icon="mdi-chevron-right"
+              class="text-capitalize"
+              text="İleri"
+              :size="display.smAndDown.value ? 'small' : 'default'"
+              :ripple="false"
+            />
+          </div>
         </v-col>
       </v-row>
     </v-row>
@@ -268,24 +280,6 @@ const total_count = ref<number>(0);
 const total_pages = ref<number>(0);
 const currentPageInput = ref(Number(route.query.page) || 1);
 
-const onPageChange = () => {
-  let page = currentPageInput.value;
-
-  if (page < 1) page = 1;
-  if (page > totalPagesDisplay.value) page = totalPagesDisplay.value;
-
-  currentPageInput.value = page;
-
-  router.push({
-    query: {
-      ...route.query,
-      page: page.toString(),
-    },
-  });
-
-  getGames();
-};
-
 const searchGame = async () => {
   try {
     if (searchGameText.value.length > 2) {
@@ -305,27 +299,6 @@ const searchGame = async () => {
     console.log(error.message);
   } finally {
     isSearchingGameLoading.value = false;
-  }
-};
-
-const getGames = async (url?: string) => {
-  try {
-    isLoading.value = true;
-
-    const requestUrl = url || "/api/games?page=1&page_size=40";
-
-    const { data } = await axios.get(requestUrl);
-
-    gamesArr.value = data?.results ?? [];
-    total_count.value = data?.totalCount || 0;
-    total_pages.value = data?.totalPages || 0;
-
-    const parsedUrl = new URL(requestUrl, window.location.origin);
-    const current = Number(parsedUrl.searchParams.get("page")) || 1;
-
-    _store.setPagination(current, data?.next, data?.previous);
-  } finally {
-    isLoading.value = false;
   }
 };
 
@@ -382,6 +355,45 @@ const handleRowClick = (item: any) => {
   router.replace(`/game-detail/${item.name}`);
 };
 
+const getGames = async (url?: string) => {
+  try {
+    isLoading.value = true;
+
+    const requestUrl = url || "/api/games?page=1&page_size=40";
+
+    const { data } = await axios.get(requestUrl);
+
+    gamesArr.value = data?.results ?? [];
+    total_count.value = data?.totalCount || 0;
+    total_pages.value = data?.totalPages || 0;
+
+    const parsedUrl = new URL(requestUrl, window.location.origin);
+    const current = Number(parsedUrl.searchParams.get("page")) || 1;
+
+    _store.setPagination(current, data?.next, data?.previous);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const onPageChange = () => {
+  let page = currentPageInput.value;
+
+  if (page < 1) page = 1;
+  if (page > totalPagesDisplay.value) page = totalPagesDisplay.value;
+
+  currentPageInput.value = page;
+
+  router.push({
+    query: {
+      ...route.query,
+      page: page.toString(),
+    },
+  });
+
+  getGames();
+};
+
 const goNext = () => {
   if (_store.nextPage) {
     const nextPage = new URL(_store.nextPage, window.location.origin).searchParams.get(
@@ -413,18 +425,6 @@ const goPrev = () => {
 };
 
 watch(
-  () => searchGameText.value,
-  (val) => {
-    if (!val || val.length < 2) {
-      searchResults.value = [];
-      isSearchingGameLoading.value = false;
-      return;
-    }
-  },
-  { immediate: true }
-);
-
-watch(
   () => [route.query.page, route.query.platform],
   () => {
     const qPlatform = route.query.platform ? route.query.platform : undefined;
@@ -434,6 +434,18 @@ watch(
         qPlatform ? `&platform=${qPlatform}` : ""
       }`
     );
+  },
+  { immediate: true }
+);
+
+watch(
+  () => searchGameText.value,
+  (val) => {
+    if (!val || val.length < 2) {
+      searchResults.value = [];
+      isSearchingGameLoading.value = false;
+      return;
+    }
   },
   { immediate: true }
 );
