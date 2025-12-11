@@ -387,7 +387,6 @@ import {
 
 const _store = store();
 const router = useRouter();
-const config = useRuntimeConfig();
 const display = useDisplay();
 
 const isSmallScreen = computed(() => display.smAndDown.value);
@@ -404,9 +403,11 @@ const getGameScreenshots = async () => {
   try {
     isGettingScreenshots.value = true;
 
-    const res = await axios.get(
-      `https://api.rawg.io/api/games/${_store.active_detailed_game?.id}/screenshots?key=${config.public.apiKey}`
-    );
+    const res = await axios.get("/api/game-screenshots", {
+      params: {
+        id: _store.active_detailed_game?.id,
+      },
+    });
 
     imgArr.value = res.data.results;
   } catch (error: any) {
@@ -422,17 +423,13 @@ const getGamesById = async () => {
 
     await getGameScreenshots();
 
-    const res = await axios.get(
-      `https://api.rawg.io/api/games/${_store.active_detailed_game?.id}`,
-      {
-        params: {
-          key: config.public.apiKey,
-        },
-      }
-    );
+    const res = await axios.get("/api/game-details", {
+      params: {
+        id: _store.active_detailed_game?.id,
+      },
+    });
 
     game.value = res.data;
-    console.log(res.data);
   } catch (err: any) {
     console.error("Error fetching game:", err.message);
   } finally {

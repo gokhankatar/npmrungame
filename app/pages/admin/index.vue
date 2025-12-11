@@ -106,7 +106,7 @@
               <div
                 class="responsive-admin-bar-list-item transition d-flex align-center ga-4 pa-2 rounded-lg cursor-pointer"
                 v-for="(item, index) of adminListItems"
-                @click="handleRouteForResponsive(item.slug)"
+                @click="handleRouteForResponsive(item.slug as any)"
                 :key="item.title"
               >
                 <v-icon size="large" :icon="item.icon" />

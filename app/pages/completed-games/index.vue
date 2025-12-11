@@ -159,7 +159,6 @@ const { sumBy, flatMap, chain } = pkg;
 
 const _store = store();
 const router = useRouter();
-const config = useRuntimeConfig();
 const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
 const isMediumScreen = computed(() => display.mdAndUp.value);
@@ -211,22 +210,6 @@ const mostCommonGenre = computed(() => {
   const [genre] = pairs.reduce((prev, curr) => (curr[1] > prev[1] ? curr : prev));
   return genre;
 });
-
-const addToCompletedGamesToDb = async (slug: string) => {
-  try {
-    isAddingToDb.value = true;
-    const game = await axios.get(
-      `https://api.rawg.io/api/games/${slug}?key=${config.public.apiKey}`
-    );
-    const docRef = await addDoc(collection($firestore, "completed_games"), game.data);
-
-    console.log("RAWG oyunu Firestore'a eklendi:", docRef.id);
-  } catch (error: any) {
-    console.error("Error while adding game to db : ", error.message);
-  } finally {
-    isAddingToDb.value = false;
-  }
-};
 
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);

@@ -579,7 +579,7 @@ import { header_completed_games } from "~/composables/data/headerTables";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 
 const { $firestore } = useNuxtApp();
-const config = useRuntimeConfig();
+
 const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
 const isExtraLargeScreen = computed(() => display.xlAndUp.value);
@@ -691,9 +691,8 @@ const searchGame = async () => {
     if (searchGameText.value.length > 2) {
       isSearchingGameLoading.value = true;
 
-      const { data } = await axios.get("https://api.rawg.io/api/games", {
+      const { data } = await axios.get("/api/search-games", {
         params: {
-          key: config.public.apiKey,
           search: searchGameText.value,
         },
       });

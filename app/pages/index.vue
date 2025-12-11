@@ -551,7 +551,6 @@ const { formatDateTR } = useFirestoreDateFormatted();
 
 const _store = store();
 const router = useRouter();
-const config = useRuntimeConfig();
 
 // screen breakout
 const display = useDisplay();

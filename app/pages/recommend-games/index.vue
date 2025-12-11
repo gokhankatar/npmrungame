@@ -6,7 +6,7 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center w-100">
           <p
-            class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-deep-purple"
+            class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-deep-purple-lighten-1"
           >
             Daha Önce Önerilen Oyunlar
           </p>
@@ -65,6 +65,7 @@
         />
       </v-col>
 
+      <!-- Recommend Game Form -->
       <transition name="slide-down">
         <v-col cols="12" lg="8" xl="6" v-if="isOpenRecommendGame">
           <v-form
@@ -73,7 +74,6 @@
             @submit.prevent="handleRecommendGame"
           >
             <v-text-field
-              ref="recommendedGameFormNameInput"
               v-model="models.name"
               :rules="rules.name"
               rounded="xl"
@@ -335,13 +335,11 @@ useHead({
 
 const { $firestore } = useNuxtApp();
 
-const config = useRuntimeConfig();
 const _store = store();
 const router = useRouter();
 const display = useDisplay();
 
 const recommendGameForm = ref<InstanceType<typeof VForm> | null>(null);
-const recommendedGameFormNameInput = ref<InstanceType<typeof VForm> | null>(null);
 
 const isGettingRecommendedGames = ref(false);
 const isSearchingGameLoading = ref(false);
@@ -403,9 +401,8 @@ const searchGame = async () => {
     if (searchGameText.value.length > 2) {
       isSearchingGameLoading.value = true;
 
-      const { data } = await axios.get("https://api.rawg.io/api/games", {
+      const { data } = await axios.get("/api/search-games", {
         params: {
-          key: config.public.apiKey,
           search: searchGameText.value,
         },
       });
@@ -427,6 +424,19 @@ const searchGame = async () => {
   } finally {
     isSearchingGameLoading.value = false;
   }
+};
+
+const resetForm = async () => {
+  searchGameText.value = "";
+
+  models.value.name = "";
+  models.value.email = "";
+  models.value.suggestionText = "";
+  selectedGamesAfterResearch.value = [];
+
+  await nextTick();
+  recommendGameForm.value?.reset();
+  recommendGameForm.value?.resetValidation();
 };
 
 const addGameToRecommendedGames = async () => {
@@ -454,9 +464,9 @@ const addGameToRecommendedGames = async () => {
       const finalGameData = { ...game, ...metadata };
       await addDoc(collection($firestore, "recommended_games"), finalGameData);
 
+      resetForm();
       msgGenre.value = "successfull";
       dialogMsg.value = "Oyun öneriniz başarıyla iletildi! 🎉";
-      recommendGameForm.value?.reset();
       isAddedToDb.value = true;
       setTimeout(() => (isAddedToDb.value = false), 2500);
 
@@ -476,10 +486,9 @@ const addGameToRecommendedGames = async () => {
 
     await batch.commit();
 
+    resetForm();
     msgGenre.value = "successfull";
     dialogMsg.value = "Tüm oyun önerileriniz başarıyla iletildi! 🎉";
-
-    recommendGameForm.value?.reset();
     isAddedToDb.value = true;
     setTimeout(() => (isAddedToDb.value = false), 3500);
   } catch (error: any) {
@@ -607,21 +616,8 @@ watch(
       searchResults.value = [];
       isSearchingGameLoading.value = false;
 
-      await nextTick();
-
-      setTimeout(() => {
-        recommendGameForm.value?.resetValidation();
-        recommendGameForm.value?.reset();
-        models.value.email = "";
-        models.value.name = "";
-        models.value.suggestionText = "";
-      }, 50);
-
-      return;
+      resetForm();
     }
-
-    await nextTick();
-    recommendedGameFormNameInput.value?.focus();
   }
 );
 

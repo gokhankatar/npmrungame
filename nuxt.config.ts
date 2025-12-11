@@ -8,14 +8,17 @@ export default defineNuxtConfig({
     "nuxt-swiper"
   ],
   runtimeConfig: {
+    rawg_api_key: process.env.API_KEY,
+    youtube_api_key: process.env.YOUTUBE_API_KEY,
+    youtube_channel_id: process.env.YOUTUBE_CHANNEL_ID,
     public: {
-      apiKey: process.env.API_KEY,
+      // apiKey: process.env.API_KEY,
       firebaseApiKey: process.env.FIREBASE_API_KEY,
-      youtubeApiKey: process.env.YOUTUBE_API_KEY,
-      youtubeChannelId: process.env.YOUTUBE_CHANNEL_ID,
+      // youtubeApiKey: process.env.YOUTUBE_API_KEY,
+      // youtubeChannelId: process.env.YOUTUBE_CHANNEL_ID,
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_KEY,
-      adminPassw:process.env.ADMIN_PASSWORD_KEY
+      adminPassw: process.env.ADMIN_PASSWORD_KEY
     }
   },
   app: {

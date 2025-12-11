@@ -558,7 +558,7 @@ const { formatDateTR } = useFirestoreDateFormatted();
 
 const router = useRouter();
 const _store = store();
-const config = useRuntimeConfig();
+
 
 const display = useDisplay();
 const isSmallScreen = computed(() => display.smAndDown.value);
@@ -590,11 +590,13 @@ const youtubeChannelStats = ref<Youtube_Channel_Stats | null>({
 });
 
 const getYoutubeChannelInfos = async () => {
-  const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${config.public.youtubeChannelId}&key=${config.public.youtubeApiKey}`;
-  const response = await axios.get(url);
+  try {
+    const res = await axios.get("/api/youtube-channel-infos");
 
-  youtubeChannelStats.value = response.data?.items[0]
-    ?.statistics as Youtube_Channel_Stats;
+    youtubeChannelStats.value = res.data.statistics;
+  } catch (err: any) {
+    console.error("Error getting YouTube stats:", err.message);
+  }
 };
 
 const randomGameBackgroundForCompletedGames = computed(() => {
