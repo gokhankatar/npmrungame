@@ -19,10 +19,13 @@
         <v-col cols="12" sm="4" xl="2">
           <div
             @click="handleToBack"
-            class="w-100 w-sm-auto back-to-games-btn transition d-flex justify-center float-none float-sm-right justify-sm-end align-center cursor-pointer text-caption text-sm-subtitle-2 ga-1 ga-lg-3 pa-1 pa-sm-2 pa-xl-3"
+            class="w-100 w-sm-auto back-to-games-btn transition d-flex justify-center float-none float-sm-right justify-sm-end align-center cursor-pointer text-caption text-sm-subtitle-2 ga-1 ga-lg-3 pa-1 pa-lg-2 rounded-xl"
             style="width: fit-content"
           >
-            <v-icon size="20" icon="mdi-arrow-left" />
+            <v-icon
+              :size="display.smAndDown.value ? 'small' : 'default'"
+              icon="mdi-arrow-left"
+            />
             <p
               class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
             >
@@ -173,9 +176,10 @@ import {
 } from "~/composables/data/handleData";
 import store from "~/store/store";
 import fireAnimation from "~/assets/img/fire_anim.gif";
+import { useDiscoverStore } from "~/store/queryStore";
 
-const route = useRoute();
 const router = useRouter();
+const discover_store = useDiscoverStore();
 const _store = store();
 const display = useDisplay();
 
@@ -183,7 +187,6 @@ const isSmallScreen = computed(() => display.smAndDown.value);
 
 const isGettingGames = ref(false);
 
-const title = ref<string>("");
 const gamesList = ref<any[]>([]);
 
 const getGamesByTagOrGenre = async () => {
@@ -210,8 +213,10 @@ const getGamesByTagOrGenre = async () => {
 };
 
 const handleToBack = () => {
-  _store.clearActiveGamePlatform();
-  router.replace("/discover");
+  router.replace({
+    path: "/discover",
+    query: discover_store.lastQuery || {},
+  });
 };
 
 const handleRowClick = (item: any) => {

@@ -33,7 +33,6 @@
 .back-to-games-btn {
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(0, 0, 0, .2);
-  border-radius: 2.5rem;
 }
 
 .back-to-games-btn:hover {

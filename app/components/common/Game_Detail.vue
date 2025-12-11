@@ -4,15 +4,21 @@
 
   <v-row class="w-100 mx-auto align-stretch" :dense="isSmallScreen">
     <v-col cols="12">
-      <div class="d-flex align-center justify-center justify-sm-end">
-        <v-btn
-          @click="goBackToDiscover"
-          text="Keşfetmeye Devam Et"
-          prepend-icon="mdi-step-backward"
-          :size="isSmallScreen ? 'small' : 'default'"
-          :ripple="false"
-          :block="isSmallScreen"
+      <div
+        @click="goBackToDiscover"
+        class="back-to-discover-btn cursor-pointer transition d-flex align-center justify-center justify-sm-end ga-2 ga-lg-3 float-sm-right pa-1 pa-lg-2 rounded-xl"
+        style="width: fit-content"
+      >
+        <v-icon
+          :size="display.smAndDown.value ? 'small' : 'default'"
+          color="grey-lighten-1"
+          icon="mdi-step-backward"
         />
+        <p
+          class="text-caption text-sm-subtitle-2 text-lg-1 default-title-letter text-grey-lighten-1"
+        >
+          Keşfetmeye Devam Et
+        </p>
       </div>
     </v-col>
 
