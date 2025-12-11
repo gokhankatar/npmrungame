@@ -15,6 +15,9 @@ const store = defineStore("npmrungame_store", {
     admin_user: null,
     active_blog_id: null,
     hasAnySuccessfulLogin: false,
+    prevPage: null,
+    currentPage: 1,
+    nextPage: null,
     active_detailed_game: { id: null, name: null },
     active_game_genre: {
       title: "Aksiyon",
@@ -34,6 +37,11 @@ const store = defineStore("npmrungame_store", {
     },
     clearActiveGamePlatform() {
       this.active_game_platform = "All";
+    },
+    setPagination(current: number, next: string | null, prev: string | null) {
+      this.currentPage = current;
+      this.nextPage = next;
+      this.prevPage = prev;
     },
     setActiveAdminListItem(
       item:

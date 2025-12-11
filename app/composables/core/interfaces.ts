@@ -13,36 +13,39 @@ export interface StoreNpmRunGame {
     id: number | string | null;
     name: string | null;
   };
+  prevPage: string | null;
+  currentPage: string | number | null;
+  nextPage: string | null;
   active_games_endpoint: string | null;
   active_blog_id: string | null;
   hasAnySuccessfulLogin: boolean;
   active_admin_list_item:
-  | "dashboard"
-  | "completed_games"
-  | "to_play_games"
-  | "blog";
+    | "dashboard"
+    | "completed_games"
+    | "to_play_games"
+    | "blog";
   admin_user: Admin_User | null;
   active_game_genre: {
     title:
-    | "Aksiyon"
-    | "Strateji"
-    | "Nişancı"
-    | "Indie"
-    | "Rol Yapma"
-    | "Macera"
-    | "Korku"
-    | "Souls-Like"
-    | null;
+      | "Aksiyon"
+      | "Strateji"
+      | "Nişancı"
+      | "Indie"
+      | "Rol Yapma"
+      | "Macera"
+      | "Korku"
+      | "Souls-Like"
+      | null;
     slug:
-    | "action"
-    | "strategy"
-    | "adventure"
-    | "shooter"
-    | "indie"
-    | "rpg"
-    | "horror"
-    | "souls-like"
-    | null;
+      | "action"
+      | "strategy"
+      | "adventure"
+      | "shooter"
+      | "indie"
+      | "rpg"
+      | "horror"
+      | "souls-like"
+      | null;
   };
 }
 
@@ -59,24 +62,23 @@ export interface Game_Category {
 }
 
 export interface Feature_Card {
-  title: string
-  icon: string
-  description: string
+  title: string;
+  icon: string;
+  description: string;
 }
 
 export interface AdminListItem {
   title: string;
   slug:
-  | "dashboard"
-  | "completed_games"
-  | "to_play_games"
-  | "blog"
-  | "messages"
-  | "current_games"
-  | "recommended_games";
+    | "dashboard"
+    | "completed_games"
+    | "to_play_games"
+    | "blog"
+    | "messages"
+    | "current_games"
+    | "recommended_games";
   icon: string;
 }
-
 
 export interface Youtube_Channel_Stats {
   hiddenSubscriberCount: boolean | null;
@@ -121,14 +123,14 @@ export interface Game_Genre {
 }
 
 interface Footer_SubItem {
-  subtitle: string,
-  path: string
+  subtitle: string;
+  path: string;
 }
 
 export interface Footer_Social_Links {
-  title: string
-  icon: string
-  link: string
+  title: string;
+  icon: string;
+  link: string;
 }
 
 export interface BlogBlock {
@@ -138,6 +140,6 @@ export interface BlogBlock {
 }
 
 export interface Footer_Link {
-  title: string,
-  items: Footer_SubItem[]
+  title: string;
+  items: Footer_SubItem[];
 }

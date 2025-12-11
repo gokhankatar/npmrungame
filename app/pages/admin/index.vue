@@ -124,7 +124,8 @@
           :color="colorAfterLogin!" />
       </transition>
 
-      <v-checkbox v-model="adminModels.isSelectedRememberMe" density="compact" :ripple="false"
+      <v-checkbox @click="adminModels.isSelectedRememberMe = !adminModels.isSelectedRememberMe"
+        v-model="adminModels.isSelectedRememberMe" density="compact" :ripple="false"
         class="text-caption text-lg-subtitle-2" color="green-accent-2">
         <template #label>
           <div class="d-flex align-center ga-1 ga-lg-2">
@@ -165,9 +166,6 @@ useHead({
   title: "npmrungame | Admin",
 });
 
-const { data: rememberData } = await useFetch('/api/me');
-
-const config = useRuntimeConfig();
 const _store = store();
 const router = useRouter();
 const display = useDisplay();
@@ -298,12 +296,14 @@ const handleAdminAuth = async () => {
 watch(
   () => adminModels.value.isSelectedRememberMe,
   async (val) => {
-    if (val && _store.hasAnySuccessfulLogin) {
-      const data = await $fetch('/api/admin/admin-credential');
-      adminModels.value.email = data.email;
-      adminModels.value.password = data.password;
-    } else {
-      adminForm.value?.reset();
+    if (_store.hasAnySuccessfulLogin) {
+      if (val) {
+        const data = await $fetch('/api/admin/admin-credential');
+        adminModels.value.email = data.email;
+        adminModels.value.password = data.password;
+      } else {
+        adminForm.value?.reset();
+      }
     }
   }
 );
