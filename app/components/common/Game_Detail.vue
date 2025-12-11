@@ -377,10 +377,10 @@
     <div class="img-detail-container">
       <v-btn
         @click="isOpenImgDetail = false"
-        class="close-icon-in-img-detail-container ma-1 ma-lg-2"
-        variant="text"
-        size="small"
-        color="grey-lighten-2"
+        class="close-icon-in-img-detail-container ma-1 ma-lg-2 text-caption text-text-lg-subtitle-2 pa-1 pa-lg-2"
+        variant="tonal"
+        size="sm"
+        color="warning"
         icon="mdi-close"
         :ripple="false"
       />

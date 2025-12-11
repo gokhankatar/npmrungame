@@ -6,7 +6,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    backdrop-filter: blur(1px);
-    -webkit-backdrop-filter: blur(1px);
+    backdrop-filter: blur(.5rem);
+    -webkit-backdrop-filter: blur(.5rem);
     z-index: 9999;
 }
