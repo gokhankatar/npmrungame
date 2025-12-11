@@ -1,6 +1,7 @@
-export const useLimitedTags = (tags: any[] = [], limit = 3) => {
-  const visibleTags = tags.slice(0, limit);
-  const hiddenCount = Math.max(0, tags.length - limit);
+export const useLimitedTags = (tags: any[] | null | undefined, limit = 3) => {
+  const safeTags = tags ?? [];
+  const visibleTags = safeTags.slice(0, limit);
+  const hiddenCount = Math.max(0, safeTags.length - limit);
   const hiddenText = hiddenCount > 0 ? `+${hiddenCount} more` : "";
 
   return { visibleTags, hiddenCount, hiddenText };
@@ -74,6 +75,10 @@ export const getPlatformIcon = (platformName: string): string | null => {
   if (name.includes("nintendo")) return "mdi-nintendo-switch";
 
   return null;
+};
+
+export const formatNumber = (value: number) => {
+  return value.toLocaleString("tr-TR");
 };
 
 export const getUniquePlatformIcons = (platforms: any[] | null | undefined): string[] => {

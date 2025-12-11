@@ -4,6 +4,7 @@ export default defineEventHandler(async (event) => {
 
   const page = Number(query.page) || 1;
   const page_size = Number(query.page_size) || 40;
+  const MAX_RAWG_PAGE = 1000;
 
   const platform = query.platform && query.platform !== ""
     ? String(query.platform)
@@ -49,10 +50,17 @@ export default defineEventHandler(async (event) => {
       }`;
   };
 
+
+  const totalCount = data?.count || 0;
+  const limitedTotalCount = Math.min(totalCount, MAX_RAWG_PAGE * page_size);
+  const totalPages = Math.min(Math.ceil(totalCount / page_size), MAX_RAWG_PAGE);
+
   return {
     current: page,
     next: makeProxyUrl(data?.next),
     previous: makeProxyUrl(data?.previous),
+    totalCount: limitedTotalCount,
+    totalPages,
     results: data?.results,
   };
 });

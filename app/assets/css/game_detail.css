@@ -14,6 +14,7 @@
 .back-to-discover-btn{
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
 .back-to-discover-btn:hover{
     background-color: rgba(255, 255, 255, 0.1);
 }

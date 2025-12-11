@@ -24,10 +24,11 @@
           >
             <v-icon
               :size="display.smAndDown.value ? 'small' : 'default'"
+              color="grey-lighten-1"
               icon="mdi-arrow-left"
             />
             <p
-              class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
+              class="text-caption text-sm-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
             >
               Oyunlara Dön
             </p>

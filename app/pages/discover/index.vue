@@ -15,6 +15,12 @@
         >
           Tüm Oyunlar
         </p>
+        <p
+          class="text-center text-sm-start text-caption text-lg-subtitle-2 text-grey-darken-1 default-title-letter"
+        >
+          {{ formatNumber(total_count) }} oyun bulundu, yaklaşık
+          {{ formatNumber(totalPagesDisplay) }} sayfa.
+        </p>
       </v-col>
 
       <v-col cols="12" sm="6" lg="8">
@@ -88,6 +94,7 @@
             block
           />
         </v-col>
+
         <v-col cols="6" lg="3" xl="2">
           <v-skeleton-loader
             v-if="isLoading"
@@ -214,7 +221,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useMetacriticStyle } from "~/composables/data/handleData";
+import { formatNumber, useMetacriticStyle } from "~/composables/data/handleData";
 import store from "~/store/store";
 import axios from "axios";
 import Game_Genres from "~/components/common/Game_Genres.vue";
@@ -234,6 +241,7 @@ const display = useDisplay();
 const page = computed(() => Number(route.query.page) || 1);
 const smallScreen = computed(() => display.smAndDown.value);
 const extraLgScreen = computed(() => display.xlAndUp.value);
+const totalPagesDisplay = computed(() => Math.max(total_pages.value, 1));
 
 const isLoading = ref(false);
 const isOpenSearchGame = ref(false);
@@ -242,6 +250,8 @@ const isSearchingGameLoading = ref(false);
 const gamesArr = ref<any[]>([]);
 const searchResults = ref<any[]>([]);
 const searchGameText = ref<string>("");
+const total_count = ref<number>(0);
+const total_pages = ref<number>(0);
 
 const searchGame = async () => {
   try {
@@ -274,6 +284,8 @@ const getGames = async (url?: string) => {
     const { data } = await axios.get(requestUrl);
 
     gamesArr.value = data?.results ?? [];
+    total_count.value = data?.totalCount || 0;
+    total_pages.value = data?.totalPages || 0;
 
     const parsedUrl = new URL(requestUrl, window.location.origin);
     const current = Number(parsedUrl.searchParams.get("page")) || 1;

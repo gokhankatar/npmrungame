@@ -15,7 +15,7 @@
           icon="mdi-step-backward"
         />
         <p
-          class="text-caption text-sm-subtitle-2 text-lg-1 default-title-letter text-grey-lighten-1"
+          class="text-caption text-sm-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
         >
           Keşfetmeye Devam Et
         </p>
