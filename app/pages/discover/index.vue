@@ -10,13 +10,16 @@
     <!-- Game Platform Chips -->
     <v-row class="d-flex align-center mt-5 mt-lg-10">
       <v-col cols="12" sm="6" lg="4">
+        <Animated_Text
+          @click="resetAllFilter"
+          text="Tüm Oyunlar"
+          class="cursor-pointer"
+          :msPerChar="50"
+          :duration="550"
+          :loop="true"
+        />
         <p
-          class="text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-grey-lighten-1 default-title-letter text-center text-sm-start"
-        >
-          Tüm Oyunlar
-        </p>
-        <p
-          class="text-center text-sm-start text-caption text-lg-subtitle-2 text-grey-darken-1 default-title-letter"
+          class="text-center text-sm-start text-caption text-lg-subtitle-2 text-blue-grey-darken-2 default-title-letter"
         >
           {{ formatNumber(total_count) }} oyun bulundu, yaklaşık
           {{ formatNumber(totalPagesDisplay) }} sayfa.
@@ -69,20 +72,12 @@
       <Game_Card :loading="isLoading" :arr="gamesArr" :onRowClick="handleRowClick" />
 
       <v-row
-        class="d-flex justify-center align-center w-100 mx-auto my-3 my-lg-6"
+        class="d-flex justify-space-evenly align-center w-100 mx-auto my-3 my-lg-6"
         :dense="display.smAndDown.value"
       >
-        <v-col cols="6" lg="3" xl="2">
-          <v-skeleton-loader
-            v-if="isLoading"
-            type="text"
-            width="100%"
-            :height="display.smAndDown.value ? 36 : 56"
-            style="border-radius: 5rem"
-          />
-
+        <!-- prev -->
+        <v-col cols="4" lg="4" xl="3">
           <v-btn
-            v-else
             :disabled="!_store.prevPage"
             @click="goPrev"
             variant="tonal"
@@ -95,17 +90,35 @@
           />
         </v-col>
 
-        <v-col cols="6" lg="3" xl="2">
-          <v-skeleton-loader
-            v-if="isLoading"
-            type="text"
-            width="100%"
-            :height="display.smAndDown.value ? 36 : 56"
-            style="border-radius: 5rem"
-          />
+        <!-- pagination -->
+        <v-col cols="4" lg="3" xl="2" class="d-flex justify-center">
+          <v-chip
+            class="d-flex align-center justify-center"
+            color="primary"
+            style="padding: 0 8px; height: 36px; min-width: 80px"
+          >
+            <input
+              type="number"
+              v-model.number="currentPageInput"
+              @input="onPageChange"
+              :min="1"
+              :max="totalPagesDisplay"
+              style="
+                width: 50px;
+                border: none;
+                background: transparent;
+                text-align: center;
+                color: white;
+                font-weight: bold;
+              "
+            />
+            <span style="margin-left: 4px; color: white">/ {{ totalPagesDisplay }}</span>
+          </v-chip>
+        </v-col>
 
+        <!-- Next -->
+        <v-col cols="4" lg="4" xl="3">
           <v-btn
-            v-else
             :disabled="!_store.nextPage"
             @click="goNext"
             variant="tonal"
@@ -227,6 +240,7 @@ import axios from "axios";
 import Game_Genres from "~/components/common/Game_Genres.vue";
 import Game_Card from "~/components/common/Game_Card.vue";
 import { useDiscoverStore } from "~/store/queryStore";
+import Animated_Text from "~/components/common/Animated_Text.vue";
 
 useHead({
   title: "npmrungame | Keşfet",
@@ -252,6 +266,25 @@ const searchResults = ref<any[]>([]);
 const searchGameText = ref<string>("");
 const total_count = ref<number>(0);
 const total_pages = ref<number>(0);
+const currentPageInput = ref(Number(route.query.page) || 1);
+
+const onPageChange = () => {
+  let page = currentPageInput.value;
+
+  if (page < 1) page = 1;
+  if (page > totalPagesDisplay.value) page = totalPagesDisplay.value;
+
+  currentPageInput.value = page;
+
+  router.push({
+    query: {
+      ...route.query,
+      page: page.toString(),
+    },
+  });
+
+  getGames();
+};
 
 const searchGame = async () => {
   try {
@@ -330,6 +363,16 @@ const handleGamePlatform = (platform: any) => {
       },
     });
   }
+};
+
+const resetAllFilter = () => {
+  _store.clearActiveGamePlatform();
+
+  router.push({
+    query: {
+      page: 1,
+    },
+  });
 };
 
 const handleRowClick = (item: any) => {
