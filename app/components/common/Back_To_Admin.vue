@@ -54,6 +54,7 @@ const display = useDisplay();
 const hover = ref(false);
 const hoverDev = ref(false);
 </script>
+
 <style scoped>
 @import "~/assets/css/main.css";
 
@@ -74,7 +75,7 @@ const hoverDev = ref(false);
   position: fixed;
   bottom: 2rem;
   left: 1rem;
-  z-index: 999;
+  z-index: 999999;
   text-transform: none;
   transition: all 0.2s ease;
 }
@@ -92,7 +93,7 @@ const hoverDev = ref(false);
   position: fixed;
   bottom: 2rem;
   right: 1rem;
-  z-index: 999;
+  z-index: 9999999;
   text-transform: none;
   transition: all 0.2s ease;
 }

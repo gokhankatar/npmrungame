@@ -353,7 +353,7 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped> 
 @import "~/assets/css/main.css";
 @import "~/assets/css/discover.css";
 </style>

@@ -1,43 +1,28 @@
 <template>
   <div
     class="navbar d-flex justify-space-between align-center mx-auto rounded py-1 py-lg-3 px-3 px-md-5 px-lg-7 px-xl-12"
-    :class="isScrolledToBottom ? 'scrolled-navbar' : ''"
-  >
+    :class="isScrolledToBottom ? 'scrolled-navbar' : ''">
     <img :src="logo" width="90" class="cursor-pointer" @click="router.replace('/')" />
 
     <div class="d-none d-lg-flex justify-center align-center ga-2 ga-lg-5">
-      <div
-        v-for="(item, index) of navbarListItems"
-        :key="item.path"
-        @click="router.replace(item.path)"
+      <div v-for="(item, index) of navbarListItems" :key="item.path" @click="goTo(item)"
         class="navbar-item transition d-flex align-center ga-1 pa-2 rounded cursor-pointer"
-        :class="route.fullPath.includes(item.path) ? 'active-navbar-item-link' : ''"
-      >
-        <p
-          class="default-title-letter transition text-caption text-lg-subtitle-2"
-          :class="route.fullPath.includes(item.path) ? 'active-navbar-item-title' : ''"
-        >
+        :class="route.fullPath.includes(item.path) ? 'active-navbar-item-link' : ''">
+        <p class="default-title-letter transition text-caption text-lg-subtitle-2"
+          :class="route.fullPath.includes(item.path) ? 'active-navbar-item-title' : ''">
           {{ item.title }}
         </p>
-        <v-icon
-          :icon="item.icon"
-          :color="route.fullPath.includes(item.path) ? 'black' : 'grey-lighten-1'"
-          class="navbar-item-icon transition"
-          size="small"
-        />
+        <template v-if="loadingItem === item.path">
+          <v-progress-circular indeterminate size="16" color="black" />
+        </template>
+        <v-icon v-else :icon="item.icon" :color="route.fullPath.includes(item.path) ? 'black' : 'grey-lighten-1'"
+          class="navbar-item-icon transition" size="small" />
       </div>
     </div>
 
-    <v-btn
-      :size="isSmallScreen ? 'default' : 'large'"
-      :ripple="false"
-      prepend-icon="mdi-dots-grid"
-      text="Menu"
-      variant="tonal"
-      class="d-flex d-lg-none text-capitalize default-title-letter"
-      color="white"
-      @click="isOpenResponsiveBar = !isOpenResponsiveBar"
-    />
+    <v-btn :size="isSmallScreen ? 'default' : 'large'" :ripple="false" prepend-icon="mdi-dots-grid" text="Menu"
+      variant="tonal" class="d-flex d-lg-none text-capitalize default-title-letter" color="white"
+      @click="isOpenResponsiveBar = !isOpenResponsiveBar" />
   </div>
 
   <Back_To_Admin />
@@ -45,64 +30,46 @@
 
   <!-- ! Responsive Bar -->
   <transition name="slide-down">
-    <div class="responsive-bar" v-if="isOpenResponsiveBar">
-      <v-btn
-        variant="text"
-        icon="mdi-close"
-        class="close-icon-in-responsive-bar ma-2"
-        size="large"
-        @click="isOpenResponsiveBar = false"
-      />
-      <div class="d-flex flex-column aling-start ga-2 pa-5 mt-12">
-        <div
-          class="responsive-text cursor-pointer transition d-flex aling-center ga-5 pa-1 rounded-lg"
-          @click="handleRouteForResponsive('/')"
-        >
-          <v-icon icon="mdi-home" size="large" color="grey-darken-1" />
-          <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
-            Anasayfa
-          </p>
-        </div>
-        <div
-          class="responsive-text cursor-pointer transition d-flex aling-center ga-5 pa-1 rounded-lg"
-          v-for="(item, index) of navbarListItems"
-          :key="item.title"
-          @click="handleRouteForResponsive(item.path)"
-        >
-          <v-icon :icon="item.icon" size="large" color="grey-darken-1" />
-          <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
-            {{ item.title }}
-          </p>
-        </div>
+  <div class="responsive-bar" v-if="isOpenResponsiveBar">
+    <v-btn variant="text" icon="mdi-close" class="close-icon-in-responsive-bar ma-2" size="large"
+      @click="isOpenResponsiveBar = false" />
+
+    <div class="d-flex flex-column align-start ga-2 pa-5 mt-12">
+      <div class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg"
+           @click="handleRouteForResponsive('/')">
+        <template v-if="loadingItem === '/'">
+          <v-progress-circular indeterminate size="20" color="grey-darken-1" />
+        </template>
+        <v-icon v-else icon="mdi-home" size="large" color="grey-darken-1" />
+        <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
+          Anasayfa
+        </p>
       </div>
 
-      <v-row class="action-buttons-in-responsive-bar w-100 mx-auto" dense>
-        <v-col :cols="_store.isAdmin ? 6 : 12">
-          <v-btn
-            @click="handleRouteForResponsive('/contact')"
-            variant="tonal"
-            text="İletişim"
-            class="text-capitalize"
-            :size="isSmallScreen ? 'small' : 'default'"
-            :ripple="false"
-            prepend-icon="mdi-email"
-            block
-          />
-        </v-col>
-        <v-col cols="6" v-if="_store.isAdmin">
-          <v-btn
-            @click="handleRouteForResponsive('/admin')"
-            variant="tonal"
-            text="Admin Paneli"
-            class="text-capitalize"
-            :size="isSmallScreen ? 'small' : 'default'"
-            :ripple="false"
-            prepend-icon="mdi-security"
-            block
-          />
-        </v-col>
-      </v-row>
+      <div class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg"
+           v-for="(item, index) of navbarListItems" :key="item.title" 
+           @click="handleRouteForResponsive(item.path)">
+        <template v-if="loadingItem === item.path">
+          <v-progress-circular indeterminate size="20" color="grey-darken-1" />
+        </template>
+        <v-icon v-else :icon="item.icon" size="large" color="grey-darken-1" />
+        <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
+          {{ item.title }}
+        </p>
+      </div>
     </div>
+
+    <v-row class="action-buttons-in-responsive-bar w-100 mx-auto" dense>
+      <v-col :cols="_store.isAdmin ? 6 : 12">
+        <v-btn @click="handleRouteForResponsive('/contact')" variant="tonal" text="İletişim" class="text-capitalize"
+               :size="isSmallScreen ? 'small' : 'default'" :ripple="false" prepend-icon="mdi-email" block />
+      </v-col>
+      <v-col cols="6" v-if="_store.isAdmin">
+        <v-btn @click="handleRouteForResponsive('/admin')" variant="tonal" text="Admin Paneli" class="text-capitalize"
+               :size="isSmallScreen ? 'small' : 'default'" :ripple="false" prepend-icon="mdi-security" block />
+      </v-col>
+    </v-row>
+  </div>
   </transition>
 </template>
 
@@ -122,6 +89,14 @@ const isSmallScreen = computed(() => display.smAndDown.value);
 const isScrolledToBottom = ref(false);
 const isOpenResponsiveBar = ref(false);
 
+const loadingItem = ref<string | null>(null)
+
+const goTo = async (item: { path: string; title: string }) => {
+  loadingItem.value = item.path;
+  await router.replace(item.path);
+  loadingItem.value = null;
+};
+
 const handleScroll = () => {
   //@ts-ignore
   if (process.client) {
@@ -133,8 +108,10 @@ const handleScroll = () => {
   }
 };
 
-const handleRouteForResponsive = (path: string) => {
-  router.replace(path);
+const handleRouteForResponsive = async (path: string) => {
+  loadingItem.value = path;
+  await router.replace(path);
+  loadingItem.value = null;
   isOpenResponsiveBar.value = false;
 };
 
