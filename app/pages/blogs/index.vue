@@ -9,11 +9,13 @@
         <div class="d-flex flex-wrap justify-center justify-sm-start align-center ga-2">
           <img :src="blogAnimImg" width="50" />
           <p
-            class="text-center text-sm-start text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter text-grey-lighten-1">
+            class="text-center text-sm-start text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter text-grey-lighten-1"
+          >
             Oyun Dünyasından En Son Haberler
           </p>
           <p
-            class="text-center text-sm-start text-caption text-md-subtitle-2 text-lg-subtitle-1 text-grey-darken-1 default-title-letter">
+            class="text-center text-sm-start text-caption text-md-subtitle-2 text-lg-subtitle-1 text-grey-darken-1 default-title-letter"
+          >
             Güncel çıkışlar, stüdyo gelişmeleri ve toplulukta öne çıkan detaylarla oyun
             dünyasının nabzını burada tutuyoruz. Yeni çıkan oyunlar, oyun
             değerlendirmeleri, oyun dünyasından haberler ve birçok blog yazısı...
@@ -22,23 +24,50 @@
       </v-col>
 
       <v-col cols="12" md="6" xl="4">
-        <v-text-field v-model="searchText" @input="searchBlog" variant="solo" label="Blog Ara"
-          :density="isSmallScreen ? 'compact' : 'comfortable'" clearable rounded="lg" :elevation="0"
-          prepend-inner-icon="mdi-magnify" class="text-grey-lighten-1" />
+        <v-text-field
+          v-model="searchText"
+          @input="searchBlog"
+          variant="solo"
+          label="Blog Ara"
+          :density="isSmallScreen ? 'compact' : 'comfortable'"
+          clearable
+          rounded="lg"
+          :elevation="0"
+          prepend-inner-icon="mdi-magnify"
+          class="text-grey-lighten-1"
+        />
         <v-row no-gutters class="d-flex ga-1">
-          <v-chip v-for="kw in keywords" :key="kw" :size="isSmallScreen ? 'x-small' : 'small'"
-            :variant="selectedKeyword === kw ? 'elevated' : 'tonal'" color="blue-lighten-1" :ripple="false"
-            @click="filterByKeyword(kw)" :prepend-icon="selectedKeyword === kw ? 'mdi-check' : ''" :text="kw" />
-          <v-chip v-if="selectedKeyword" prepend-icon="mdi-broom" variant="outlined"
-            :size="isSmallScreen ? 'x-small' : 'small'" @click="resetKeyword" :ripple="false" text="Filtreyi temizle" />
+          <v-chip
+            v-for="kw in keywords"
+            :key="kw"
+            :size="isSmallScreen ? 'x-small' : 'small'"
+            :variant="selectedKeyword === kw ? 'elevated' : 'tonal'"
+            color="blue-lighten-1"
+            :ripple="false"
+            @click="filterByKeyword(kw)"
+            :prepend-icon="selectedKeyword === kw ? 'mdi-check' : ''"
+            :text="kw"
+          />
+          <v-chip
+            v-if="selectedKeyword"
+            prepend-icon="mdi-broom"
+            variant="outlined"
+            :size="isSmallScreen ? 'x-small' : 'small'"
+            @click="resetKeyword"
+            :ripple="false"
+            text="Filtreyi temizle"
+          />
         </v-row>
       </v-col>
 
       <v-divider class="w-100 mt-1 mb-3 mb-lg-5" color="white" />
 
       <!-- Blog Banner -->
-      <v-row v-if="!isSmallScreen && searchText?.length < 3 && !selectedKeyword" :align="'stretch'"
-        :density="isSmallScreen ? 'compact' : 'comfortable'">
+      <v-row
+        v-if="!isSmallScreen && searchText?.length < 3 && !selectedKeyword"
+        :align="'stretch'"
+        :density="isSmallScreen ? 'compact' : 'comfortable'"
+      >
         <!-- Initial Blog -->
         <v-col cols="12" md="6">
           <template v-if="isGettingBlogs">
@@ -53,31 +82,53 @@
             </v-card>
           </template>
 
-          <v-card v-else class="blog-card cursor-pointer d-flex flex-column ga-2 flex-grow-1" height="100%"
-            @click="handleBlogClick(randomInitialBlog)" :ripple="false" :elevation="0">
-            <v-img :src="randomInitialBlog?.imageUrl" class="blog-card-img rounded-lg w-100 h-75" cover />
+          <v-card
+            v-else
+            class="blog-card cursor-pointer d-flex flex-column ga-2 flex-grow-1"
+            height="100%"
+            @click="handleBlogClick(randomInitialBlog)"
+            :ripple="false"
+            :elevation="0"
+          >
+            <v-img
+              :src="randomInitialBlog?.imageUrl"
+              class="blog-card-img rounded-lg w-100 h-75"
+              cover
+            />
 
-            <v-card-actions class="d-flex flex-column align-start ga-1 ga-lg-2 px-2 px-lg-5">
-              <p class="text-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1">
+            <v-card-actions
+              class="d-flex flex-column align-start ga-1 ga-lg-2 px-2 px-lg-5"
+            >
+              <p
+                class="text-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
+              >
                 {{ randomInitialBlog?.title }}
               </p>
 
-              <p class="d-flex d-lg-none text-caption text-lg-subtitle-2 text-grey-darken-1">
+              <p
+                class="d-flex d-lg-none text-caption text-lg-subtitle-2 text-grey-darken-1"
+              >
                 {{ truncateText(randomInitialBlog?.content_raw, 250) }}
               </p>
 
-              <p class="d-none d-lg-flex d-xl-none text-caption text-lg-subtitle-2 text-grey-darken-1">
+              <p
+                class="d-none d-lg-flex d-xl-none text-caption text-lg-subtitle-2 text-grey-darken-1"
+              >
                 {{ truncateText(randomInitialBlog?.content_raw, 125) }}
               </p>
 
-              <p class="d-none d-xl-flex text-caption text-lg-subtitle-2 text-grey-darken-1">
+              <p
+                class="d-none d-xl-flex text-caption text-lg-subtitle-2 text-grey-darken-1"
+              >
                 {{ truncateText(randomInitialBlog?.content_raw, 300) }}
               </p>
 
-              <div class="w-100 d-none d-lg-flex justiy-start justify-lg-end align-center">
+              <div
+                class="w-100 d-none d-lg-flex justiy-start justify-lg-end align-center"
+              >
                 <span class="text-subtitle-2 text-grey-lighten-1">{{
                   formatDateTR(randomInitialBlog?.createdAt)
-                  }}</span>
+                }}</span>
               </div>
             </v-card-actions>
           </v-card>
@@ -85,7 +136,11 @@
 
         <!-- Random Two Blogs Skeleton -->
         <v-col cols="12" md="6" class="d-flex flex-column ga-4" v-if="isGettingBlogs">
-          <div class="blog-card d-flex flex-column flex-lg-row h-100 ga-3" v-for="i in 2" :key="i">
+          <div
+            class="blog-card d-flex flex-column flex-lg-row h-100 ga-3"
+            v-for="i in 2"
+            :key="i"
+          >
             <!-- Image Container -->
             <div class="rounded-lg w-100 w-lg-50" style="aspect-ratio: 16/9">
               <v-skeleton-loader type="image" class="w-100 h-100" />
@@ -104,36 +159,62 @@
 
         <!-- Random Two Blogs -->
         <v-col cols="12" md="6" class="d-flex flex-column ga-4">
-          <div class="blog-card cursor-pointer d-flex flex-column flex-lg-row justify-space-between alig-center h-100"
-            v-for="(item, index) of randomTwoBlogs" :key="index" @click="handleBlogClick(item)">
-            <v-img :src="item.imageUrl" class="blog-card-img rounded-lg w-100 w-lg-50 h-auto h-lg-100" cover />
+          <div
+            class="blog-card cursor-pointer d-flex flex-column flex-lg-row justify-space-between alig-center h-100"
+            v-for="(item, index) of randomTwoBlogs"
+            :key="index"
+            @click="handleBlogClick(item)"
+          >
+            <v-img
+              :src="item.imageUrl"
+              class="blog-card-img rounded-lg w-100 w-lg-50 h-auto h-lg-100"
+              cover
+            />
 
-            <div class="d-flex flex-column align-start justify-start ga-1 ga-lg-2 px-2 px-lg-5 mt-2 mt-lg-0">
-              <p class="text-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1">
+            <div
+              class="d-flex flex-column align-start justify-start ga-1 ga-lg-2 px-2 px-lg-5 mt-2 mt-lg-0"
+            >
+              <p
+                class="text-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
+              >
                 {{ item.title }}
               </p>
 
-              <p class="d-flex d-lg-none text-caption text-lg-subtitle-2 text-grey-darken-1">
+              <p
+                class="d-flex d-lg-none text-caption text-lg-subtitle-2 text-grey-darken-1"
+              >
                 {{ truncateText(item.content_raw, 200) }}
               </p>
 
-              <p class="d-none d-lg-flex d-xl-none text-caption text-lg-subtitle-2 text-grey-darken-1">
+              <p
+                class="d-none d-lg-flex d-xl-none text-caption text-lg-subtitle-2 text-grey-darken-1"
+              >
                 {{ truncateText(item.content_raw, 125) }}
               </p>
 
-              <p class="d-none d-xl-flex text-caption text-lg-subtitle-2 text-grey-darken-1">
+              <p
+                class="d-none d-xl-flex text-caption text-lg-subtitle-2 text-grey-darken-1"
+              >
                 {{ truncateText(item.content_raw, 300) }}
               </p>
 
               <div class="d-flex flex-wrap align-center ga-1">
-                <v-chip class="rounded-xl cursor-default" variant="outlined" size="small" color="grey-lighten-1"
-                  prepend-icon="mdi-tag" :ripple="false" v-for="(tag, tagIndex) of item.keywords" :text="tag" />
+                <v-chip
+                  class="rounded-xl cursor-default"
+                  variant="outlined"
+                  size="small"
+                  color="grey-lighten-1"
+                  prepend-icon="mdi-tag"
+                  :ripple="false"
+                  v-for="(tag, tagIndex) of item.keywords"
+                  :text="tag"
+                />
               </div>
 
               <div class="d-none d-lg-flex align-center w-100">
                 <span class="text-subtitle-2 text-grey-lighten-1 ma-1 ma-lg-2">{{
                   formatDateTR(item.createdAt)
-                  }}</span>
+                }}</span>
               </div>
             </div>
           </div>
@@ -143,15 +224,30 @@
       <!-- Searching Blogs -->
       <v-col cols="12" v-if="isLoadingSearchBlog">
         <div class="d-flex align-center ga-2 w-100">
-          <v-progress-circular indeterminate color="blue-grey-lighten-1" size="16" width="2" />
-          <Animated_Text text="Blog Aranıyor..." :msPerChar="50" :duration="550" :loop="true" />
+          <v-progress-circular
+            indeterminate
+            color="blue-grey-lighten-1"
+            size="16"
+            width="2"
+          />
+          <Animated_Text
+            text="Blog Aranıyor..."
+            :msPerChar="50"
+            :duration="550"
+            :loop="true"
+          />
         </div>
       </v-col>
 
       <!-- No Result -->
       <v-col cols="12" v-if="searchText?.length > 2 && blogs?.length == 0">
         <div class="d-flex align-center ga-2 w-100">
-          <Animated_Text text="Eşleşen Blog Yok 🔍" :msPerChar="50" :duration="550" :loop="true" />
+          <Animated_Text
+            text="Eşleşen Blog Yok 🔍"
+            :msPerChar="50"
+            :duration="550"
+            :loop="true"
+          />
         </div>
       </v-col>
 
@@ -220,6 +316,7 @@ const getBlogsFromDb = async () => {
   try {
     isGettingBlogs.value = true;
 
+    // 1️⃣ Blogs çek
     const blogsCol = collection($firestore, "blogs");
     const blogsSnapshot = await getDocs(blogsCol);
 
@@ -232,7 +329,39 @@ const getBlogsFromDb = async () => {
       };
     });
 
-    allBlogs.value = blogsList;
+    // 2️⃣ Votes çek
+    const votesCol = collection($firestore, "blog_votes");
+    const votesSnapshot = await getDocs(votesCol);
+
+    const blogVotes: Record<
+      string,
+      { total: number; count: number; average_votes?: number }
+    > = {};
+
+    votesSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const total = data.total ?? 0;
+      const count = data.count ?? 0;
+      blogVotes[doc.id] = {
+        total,
+        count,
+        average_votes: count > 0 ? total / count : 0,
+      };
+    });
+
+    // 3️⃣ Bloglara average_votes ve total_voters ekle
+    const blogsWithVotes = blogsList.map((blog) => {
+      const votes = blogVotes[blog.firestoreId];
+      return {
+        ...blog,
+        average_votes: votes?.average_votes ?? 0,
+        total_votes: votes?.total ?? 0,
+        total_voters: votes?.count ?? 0, // ← bu eklendi
+      };
+    });
+
+    allBlogs.value = blogsWithVotes;
+    console.log(blogsWithVotes);
 
     pickRandomBlogs();
     extractKeywords();
@@ -249,7 +378,7 @@ const getBlogsFromDb = async () => {
       });
     }
 
-    const filteredBlogs = blogsList.filter(
+    const filteredBlogs = blogsWithVotes.filter(
       (blog) => !existedBlogsIdArr.includes(blog.firestoreId)
     );
 

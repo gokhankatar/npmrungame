@@ -3,6 +3,13 @@
     background: transparent;
 }
 
+.vote-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 9999;
+}
+
 .blog-time {
     position: absolute;
     bottom: 0;

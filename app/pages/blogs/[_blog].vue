@@ -20,7 +20,7 @@
 
       <v-col cols="12" lg="10" xl="8">
         <img class="rounded-lg w-100" :src="blog?.imageUrl" cover />
-        <div class="d-flex flex-column align-start ga-2 ga-lg-5 mt-2 mt-lg-5">
+        <div class="d-flex flex-column align-start ga-2 ga-lg-3 ga-xl-5 mt-2 mt-lg-5">
           <p
             class="text-center text-md-start text-subtitle-2 text-sm-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3 shadowed-text default-title-letter"
             style="text-transform: capitalize !important"
@@ -31,6 +31,34 @@
           <v-divider class="w-100 w-lg-50" />
 
           <div class="d-flex flex-column ga-1 ga-lg-2" v-html="blog?.content"></div>
+
+          <div
+            v-if="blog?.average_votes > 0"
+            class="d-flex flex-wrap align-center ga-2 ga-lg-3"
+          >
+            <span
+              v-if="!display.smAndDown.value"
+              class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter"
+            >
+              Ortalama Verilen Puan
+            </span>
+
+            <v-tooltip location="top">
+              <template #activator="{ props }">
+                <v-chip
+                  v-bind="props"
+                  class="rounded-xl"
+                  variant="text"
+                  prepend-icon="mdi-thumb-up"
+                  :color="getRatingColor(blog?.average_votes)"
+                  :size="display.smAndDown.value ? 'small' : 'default'"
+                  :ripple="false"
+                  :text="`5 / ${blog?.average_votes.toFixed(1)}`"
+                />
+              </template>
+              <span>{{ blog?.total_voters }} kişi oy verdi</span>
+            </v-tooltip>
+          </div>
 
           <div class="d-flex flex-wrap align-center ga-2 ga-lg-3">
             <span
@@ -112,7 +140,7 @@
 
 <script lang="ts" setup>
 import { doc, getDoc, increment, setDoc, updateDoc } from "firebase/firestore";
-import { useFirestoreDateFormatted } from "~/composables/data/handleData";
+import { getRatingColor, useFirestoreDateFormatted } from "~/composables/data/handleData";
 import store from "~/store/store";
 import { useVotesStore } from "~/store/votes";
 import successfullImg from "~/assets/img/successfully_done_anim.gif";
@@ -140,6 +168,7 @@ const fetchActiveBlog = async () => {
 
   try {
     isFetchingBlog.value = true;
+
     const blogRef = doc($firestore, "blogs", activeId);
     const blogSnap = await getDoc(blogRef);
 
@@ -148,10 +177,26 @@ const fetchActiveBlog = async () => {
       return null;
     }
 
-    const blogData = {
+    const blogData: any = {
       firestoreId: blogSnap.id,
       ...blogSnap.data(),
     };
+
+    const voteDocRef = doc($firestore, "blog_votes", activeId);
+    const voteDocSnap = await getDoc(voteDocRef);
+
+    if (voteDocSnap.exists()) {
+      const voteData = voteDocSnap.data();
+      const total = voteData.total ?? 0;
+      const count = voteData.count ?? 0;
+      blogData.average_votes = count > 0 ? total / count : 0;
+      blogData.total_votes = total;
+      blogData.total_voters = count;
+    } else {
+      blogData.average_votes = 0;
+      blogData.total_votes = 0;
+      blogData.total_voters = 0;
+    }
 
     blog.value = blogData;
   } catch (error: any) {
@@ -172,9 +217,15 @@ const voteBlog = async (firestoreId: string, rating: number) => {
   const voteDoc = await getDoc(voteDocRef);
 
   if (voteDoc.exists()) {
-    await updateDoc(voteDocRef, { total: increment(rating) });
+    await updateDoc(voteDocRef, {
+      total: increment(rating),
+      count: increment(1),
+    });
   } else {
-    await setDoc(voteDocRef, { total: rating });
+    await setDoc(voteDocRef, {
+      total: rating,
+      count: 1,
+    });
   }
 
   votesStore.addVote(firestoreId);
@@ -184,6 +235,7 @@ const voteBlog = async (firestoreId: string, rating: number) => {
     showThanksMessage.value = false;
   }, 3000);
 };
+
 const defaultTitle = "npmrungame - Blog Detayı";
 
 useHead({

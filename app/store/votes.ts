@@ -1,9 +1,8 @@
-// store/votes.ts
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useVotesStore = defineStore("votes", () => {
-  const votedBlogs = ref<string[]>([]); // firestoreId'leri
+  const votedBlogs = ref<string[]>([]);
 
   const addVote = (firestoreId: string) => {
     if (!votedBlogs.value.includes(firestoreId)) {
@@ -14,4 +13,10 @@ export const useVotesStore = defineStore("votes", () => {
   const hasVoted = (firestoreId: string) => votedBlogs.value.includes(firestoreId);
 
   return { votedBlogs, addVote, hasVoted };
-});
+},
+  {
+    persist: {
+      storage: piniaPluginPersistedstate.localStorage(),
+    },
+  }
+);

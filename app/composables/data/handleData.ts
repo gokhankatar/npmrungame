@@ -81,6 +81,13 @@ export const formatNumber = (value: number) => {
   return value.toLocaleString("tr-TR");
 };
 
+export const getRatingColor = (averageVotes: number) => {
+  if (averageVotes <= 0) return "grey-darken-2";
+  if (averageVotes < 2.5) return "error";
+  if (averageVotes < 4) return "#F8C555";
+  return "success";
+};
+
 export const getUniquePlatformIcons = (platforms: any[] | null | undefined): string[] => {
   const safePlatforms = platforms ?? [];
 

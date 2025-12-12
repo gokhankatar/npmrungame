@@ -32,6 +32,24 @@
         :elevation="0"
         @click="onRowClick(item)"
       >
+        <div class="vote-icon ma-1 ma-lg-2" style="z-index: 10">
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <v-chip
+                v-if="item?.average_votes > 0"
+                v-bind="props"
+                class="rounded-xl text-grey-darken-4"
+                variant="elevated"
+                prepend-icon="mdi-thumb-up"
+                :color="getRatingColor(item?.average_votes ?? 0)"
+                size="small"
+                :ripple="false"
+                :text="`${item?.average_votes?.toFixed(1) ?? 0} / 5`"
+              />
+            </template>
+            <span>{{ item?.total_voters ?? 0 }} kişi oy verdi</span>
+          </v-tooltip>
+        </div>
         <v-img :src="item.imageUrl" class="blog-card-img rounded-lg w-100 h-50" cover />
 
         <v-card-actions class="d-flex flex-column align-start ga-1 ga-lg-2">
@@ -93,7 +111,7 @@
 </template>
 <script lang="ts" setup>
 import { truncateText } from "~/composables/core/basicFunc";
-import { useFirestoreDateFormatted } from "~/composables/data/handleData";
+import { getRatingColor, useFirestoreDateFormatted } from "~/composables/data/handleData";
 
 const { formatDateTR } = useFirestoreDateFormatted();
 
