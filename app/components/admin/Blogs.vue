@@ -292,7 +292,7 @@
           @click="showFullContent = !showFullContent" :text="showFullContent ? 'Daha az göster' : 'Devamını göster'" />
       </div>
 
-      <v-btn @click="handleDeleteBlog(activeBlog)" rounded="xl" v-if="display.smAndDown.value" block size="small"
+      <v-btn @click="handleDeleteBlog(activeBlog)" rounded="xl" class="mt-3" v-if="display.smAndDown.value" block size="small"
         text="Sil" prepend-icon="mdi-delete" color="error" variant="tonal" :ripple="false" />
     </div>
   </v-dialog>
