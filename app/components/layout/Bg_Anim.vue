@@ -8,12 +8,11 @@
           <p class="text-grey-lighten-1 text-h5 text-md-h4 text-lg-h3 text-xl-h2 font-weight-bold defautl-title-letter">
             npmrungame
           </p>
-          <p class="text-center text-sm-start text-grey-darken-1 text-subtitle-2 text-sm-subtitle-1 text-md-h5" :style="display.mdAndUp.value ? { lineHeight: '2.1rem' } : { lineHeight: '1.2rem' }
+          <p class="text-center text-sm-start text-grey-lighten-1 text-subtitle-2 text-md-subtitle-1 text-lg-h5" :style="display.mdAndUp.value ? { lineHeight: '2.1rem' } : { lineHeight: '1.2rem' }
             ">
-            4K oyun dünyasının nabzını tutan, yeni çıkan AAA yapımları, bağımsız projeleri
-            ve hızla gelişen oyun teknolojilerini yakından inceleyen bir kanal. Donanım
-            trendlerinden grafik motorlarına, yapay zekâ destekli oyun deneyimlerinden
-            gerçek zamanlı performans testlerine kadar her şeyi burada bulacaksın.
+            4K oyun dünyasının nabzını tutan bir kanal. <br>
+            Niş indielerden, yeni çıkan AAA oyunlara, donanım trendlerinden güncel oyun haberlerine kadar birçok içerik
+            sunar. Gelişen ekosistemimizin parçası olun.
           </p>
         </div>
       </v-col>
@@ -43,7 +42,7 @@
               ? 'small'
               : 'default'
             " href="https://www.youtube.com/@npmrungame" target="_blank" append-icon="mdi-youtube-subscription"
-            :ripple="false" block />
+            rounded="xl" :ripple="false" block />
         </v-col>
 
         <v-col v-if="display.xs.value" cols="8">

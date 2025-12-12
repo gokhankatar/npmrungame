@@ -16,7 +16,8 @@
 
     <v-col cols="12" lg="10">
       <v-data-table :headers="header_blogs" :loading="isGettingBlogs" :items="blogs"
-        class="admin-data-table rounded-lg w-100" items-per-page-text="Sayfa Başı Blog Sayısı" :hide-default-header="display.smAndDown.value" hover>
+        class="admin-data-table rounded-lg w-100" items-per-page-text="Sayfa Başı Blog Sayısı"
+        :hide-default-header="display.smAndDown.value" hover>
         <template #item="{ item, index }">
           <template v-if="display.smAndDown.value">
             <tr class="table-row cursor-pointer" @click="handleRowClick(item)">
@@ -26,8 +27,8 @@
                   <p class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter">
                     {{
                       display.xs.value
-                        ? truncateText(item.title, 20)
-                        : truncateText(item.title, 50)
+                        ? truncateText(item.title, 30)
+                        : truncateText(item.title, 150)
                     }}
                   </p>
 
@@ -35,9 +36,8 @@
                     :text="formatDateTR(item.createdAt)" :ripple="false" />
 
                   <div class="d-flex align-center ga-1 flex-wrap py-1">
-                    <v-chip v-for="(keyword, index) in item.keywords" :key="index"
-                      size="x-small" color="green-accent-2" variant="tonal" :ripple="false"
-                      :text="truncateText(keyword,22)" />
+                    <v-chip v-for="(keyword, index) in item.keywords" :key="index" size="x-small" color="green-accent-2"
+                      variant="tonal" :ripple="false" :text="truncateText(keyword, 22)" />
                   </div>
                 </div>
               </td>
@@ -241,6 +241,9 @@
           @click="showFullContent = !showFullContent"
           :text="showFullContent ? 'Daha az göster' : 'Açıklamanın tamamını oku'" />
       </div>
+
+      <v-btn @click="handleDeleteBlog(activeBlog)" v-if="display.smAndDown.value" block size="small" text="Sil"
+        prepend-icon="mdi-delete" color="error" variant="tonal" :ripple="false" />
     </div>
   </v-dialog>
 

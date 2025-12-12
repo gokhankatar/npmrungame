@@ -6,7 +6,7 @@
 
     <div class="d-none d-lg-flex justify-center align-center ga-2 ga-lg-5">
       <div v-for="(item, index) of navbarListItems" :key="item.path" @click="goTo(item)"
-        class="navbar-item transition d-flex align-center ga-1 pa-2 rounded cursor-pointer"
+        class="navbar-item transition d-flex align-center ga-1 pa-2 rounded-xl cursor-pointer"
         :class="route.fullPath.includes(item.path) ? 'active-navbar-item-link' : ''">
         <p class="default-title-letter transition text-caption text-lg-subtitle-2"
           :class="route.fullPath.includes(item.path) ? 'active-navbar-item-title' : ''">
