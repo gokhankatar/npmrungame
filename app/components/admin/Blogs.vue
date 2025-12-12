@@ -217,7 +217,7 @@
       -webkit-backdrop-filter: blur(0.7rem);
     ">
     <div
-      class="blog-detail-in-admin d-flex flex-column align-start ga-1 ga-lg-3 pa-2 pa-md-5 pa-lg-10 rounded-lg w-100">
+      class="blog-detail-in-admin d-flex flex-column align-start ga-1 ga-lg-3 pa-3 pa-md-5 pa-lg-10 rounded-lg w-100">
       <v-btn class="close-icon-in-blog-detail ma-1 ma-lg-2" icon="mdi-close" color="grey-lighten-1" size="small"
         :ripple="false" @click="isOpenBlogDetail = false" variant="text" />
 
@@ -235,15 +235,14 @@
         {{ displayedContent }}
       </p>
 
-      <div class="d-flex align-center justify-end w-100">
-        <v-btn variant="text" size="small" :ripple="false"
+      <div v-if="activeBlog?.content_raw?.length > 250" class="d-flex align-center justify-end w-100">
+        <v-btn variant="tonal" color="grey-lighten-1" rounded="xl" size="small" :ripple="false"
           :append-icon="showFullContent ? 'mdi-arrow-left' : 'mdi-arrow-right'" class="text-grey-lighten-1"
-          @click="showFullContent = !showFullContent"
-          :text="showFullContent ? 'Daha az göster' : 'Açıklamanın tamamını oku'" />
+          @click="showFullContent = !showFullContent" :text="showFullContent ? 'Daha az göster' : 'Devamını göster'" />
       </div>
 
-      <v-btn @click="handleDeleteBlog(activeBlog)" v-if="display.smAndDown.value" block size="small" text="Sil"
-        prepend-icon="mdi-delete" color="error" variant="tonal" :ripple="false" />
+      <v-btn @click="handleDeleteBlog(activeBlog)" rounded="xl" v-if="display.smAndDown.value" block size="small"
+        text="Sil" prepend-icon="mdi-delete" color="error" variant="tonal" :ripple="false" />
     </div>
   </v-dialog>
 
@@ -254,7 +253,7 @@
       -webkit-backdrop-filter: blur(0.7rem);
     ">
     <div
-      class="blog-detail-in-admin d-flex flex-column align-start ga-1 ga-lg-3 pa-2 pa-md-5 pa-lg-10 rounded-lg w-100">
+      class="blog-detail-in-admin d-flex flex-column align-start ga-1 ga-lg-3 pa-3 pa-md-5 pa-lg-10 rounded-lg w-100">
       <p class="text-subtitle-2 text-md-subtitle-1 text-xl-h5 default-title-letter text-grey-lighten-1">
         Bu blog yazsını veri tabanından silmek istediğinden emin misin ?
       </p>
@@ -275,11 +274,11 @@
           {{ displayedContent }}
         </p>
 
-        <div class="d-flex align-center justify-end w-100">
-          <v-btn variant="text" size="small" :ripple="false"
-            :append-icon="showFullContent ? 'mdi-arrow-left' : 'mdi-arrow-right'" class="text-grey-lighten-1"
+        <div v-if="activeBlog?.content_raw?.length > 250" class="d-flex align-center justify-end w-100">
+          <v-btn variant="tonal" color="grey-lighten-1" rounded="xl" size="small" :ripple="false"
+            :append-icon="showFullContent ? 'mdi-arrow-left' : 'mdi-arrow-right'" class="text-grey-lighten-1 rounded-lg"
             @click="showFullContent = !showFullContent"
-            :text="showFullContent ? 'Daha az göster' : 'Açıklamanın tamamını oku'" />
+            :text="showFullContent ? 'Daha az göster' : 'Devamını göster'" />
         </div>
       </div>
 
@@ -305,7 +304,8 @@
       <v-btn @click="blogToastModels.blogToastBar = false"
         class="close-icon-in-successfully-done-container ma-1 ma-lg-2" icon="mdi-close" :ripple="false" variant="text"
         color="grey-darken-1" size="small" />
-      <v-img :src="successfullyDoneImg" :width="isSmallScreen ? 50 : 75" />
+      <v-img :class="blogToastModels?.status == 'warning' ? 'bg-warning rounded-xl' : ''"
+        :src="getImgSrcByToastStatus(blogToastModels?.status)" :width="isSmallScreen ? 50 : 75" />
       <p class="text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter">
         {{ blogToastModels?.msg }}
       </p>
@@ -322,7 +322,7 @@ import {
   getDocs,
   serverTimestamp,
 } from "firebase/firestore";
-import type { Add_Blog_Form_Model } from "~/composables/core/interfaces";
+import { type Blog_Toast_Admin, type Add_Blog_Form_Model } from "~/composables/core/interfaces";
 import { VForm } from "vuetify/components";
 import { header_blogs } from "~/composables/data/headerTables";
 import { truncateText } from "~/composables/core/basicFunc";
@@ -331,6 +331,8 @@ import {
   useFirestoreDateFormatted,
 } from "~/composables/data/handleData";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
+import warningImg from "~/assets/img/warning_anim.gif"
+import deletedImg from "~/assets/img/deleted_anim.gif"
 
 const { $firestore } = useNuxtApp();
 const { formatDateTR } = useFirestoreDateFormatted();
@@ -353,8 +355,9 @@ const blogs = ref<any[]>([]);
 const activeBlog = ref<any | null>(null);
 const step = shallowRef([1]);
 
-const blogToastModels = ref({
+const blogToastModels = ref<Blog_Toast_Admin>({
   blogToastBar: false,
+  status: "success",
   msg: "",
 });
 
@@ -432,8 +435,13 @@ const submitBlog = async () => {
       updatedAt: serverTimestamp(),
     });
 
+    blogToastModels.value.status = "success"
     blogToastModels.value.msg = "Blog başarı ile eklendi!";
     blogToastModels.value.blogToastBar = true;
+
+    setTimeout(() => {
+      blogToastModels.value.blogToastBar = false;
+    }, 3500);
 
     await getBlogsFromDb();
 
@@ -445,6 +453,7 @@ const submitBlog = async () => {
   } catch (err) {
     console.error(err);
 
+    blogToastModels.value.status = "warning"
     blogToastModels.value.msg = "Blog eklerken hata oluştu!";
     blogToastModels.value.blogToastBar = true;
   } finally {
@@ -492,8 +501,13 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
 
     console.log("The blog deleted from DB :", firestoreId);
 
+    blogToastModels.value.status = "deleted"
     blogToastModels.value.msg = `${activeBlog.value?.title} başlıklı blog başarıyla silindi!`;
     blogToastModels.value.blogToastBar = true;
+
+    setTimeout(() => {
+      blogToastModels.value.blogToastBar = false;
+    }, 3500);
   } catch (error) {
     console.error("Silme hatası:", error);
   } finally {
@@ -504,6 +518,16 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
     await getBlogsFromDb();
   }
 };
+
+const getImgSrcByToastStatus = (status: "success" | "warning" | "deleted") => {
+  if (status === "success") {
+    return successfullyDoneImg
+  } else if (status === "deleted") {
+    return deletedImg
+  } else {
+    return warningImg
+  }
+}
 
 watch(
   () => formModels.value.file,

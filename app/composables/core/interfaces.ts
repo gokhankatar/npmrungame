@@ -5,6 +5,12 @@ export interface Admin_User {
   lastSignInTime: string;
 }
 
+export interface Blog_Toast_Admin {
+  blogToastBar: boolean;
+  status: "success" | "warning" | "deleted";
+  msg: string;
+}
+
 export interface StoreNpmRunGame {
   isAdmin: boolean;
   theme?: "dark" | "light";
