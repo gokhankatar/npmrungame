@@ -13,7 +13,8 @@
           {{ item.title }}
         </p>
         <template v-if="loadingItem === item.path">
-          <v-progress-circular indeterminate size="16" color="black" />
+          <v-progress-circular indeterminate size="14" width="1"
+            :color="route.fullPath.includes(item.path) ? 'black' : 'grey-lighten-1'" />
         </template>
         <v-icon v-else :icon="item.icon" :color="route.fullPath.includes(item.path) ? 'black' : 'grey-lighten-1'"
           class="navbar-item-icon transition" size="small" />
@@ -30,46 +31,45 @@
 
   <!-- ! Responsive Bar -->
   <transition name="slide-down">
-  <div class="responsive-bar" v-if="isOpenResponsiveBar">
-    <v-btn variant="text" icon="mdi-close" class="close-icon-in-responsive-bar ma-2" size="large"
-      @click="isOpenResponsiveBar = false" />
+    <div class="responsive-bar" v-if="isOpenResponsiveBar">
+      <v-btn variant="text" icon="mdi-close" class="close-icon-in-responsive-bar ma-2" size="large"
+        @click="isOpenResponsiveBar = false" />
 
-    <div class="d-flex flex-column align-start ga-2 pa-5 mt-12">
-      <div class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg"
-           @click="handleRouteForResponsive('/')">
-        <template v-if="loadingItem === '/'">
-          <v-progress-circular indeterminate size="20" color="grey-darken-1" />
-        </template>
-        <v-icon v-else icon="mdi-home" size="large" color="grey-darken-1" />
-        <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
-          Anasayfa
-        </p>
+      <div class="d-flex flex-column align-start ga-2 pa-5 mt-12">
+        <div class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg"
+          @click="handleRouteForResponsive('/')">
+          <template v-if="loadingItem === '/'">
+            <v-progress-circular indeterminate size="20" width="2" color="grey-darken-1" />
+          </template>
+          <v-icon v-else icon="mdi-home" size="large" color="grey-darken-1" />
+          <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
+            Anasayfa
+          </p>
+        </div>
+
+        <div class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg"
+          v-for="(item, index) of navbarListItems" :key="item.title" @click="handleRouteForResponsive(item.path)">
+          <template v-if="loadingItem === item.path">
+            <v-progress-circular indeterminate size="20" color="grey-darken-1" />
+          </template>
+          <v-icon v-else :icon="item.icon" size="large" color="grey-darken-1" />
+          <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
+            {{ item.title }}
+          </p>
+        </div>
       </div>
 
-      <div class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg"
-           v-for="(item, index) of navbarListItems" :key="item.title" 
-           @click="handleRouteForResponsive(item.path)">
-        <template v-if="loadingItem === item.path">
-          <v-progress-circular indeterminate size="20" color="grey-darken-1" />
-        </template>
-        <v-icon v-else :icon="item.icon" size="large" color="grey-darken-1" />
-        <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
-          {{ item.title }}
-        </p>
-      </div>
+      <v-row class="action-buttons-in-responsive-bar w-100 mx-auto" dense>
+        <v-col :cols="_store.isAdmin ? 6 : 12">
+          <v-btn @click="handleRouteForResponsive('/contact')" variant="tonal" text="İletişim" class="text-capitalize"
+            :size="isSmallScreen ? 'small' : 'default'" :ripple="false" prepend-icon="mdi-email" block />
+        </v-col>
+        <v-col cols="6" v-if="_store.isAdmin">
+          <v-btn @click="handleRouteForResponsive('/admin')" variant="tonal" text="Admin Paneli" class="text-capitalize"
+            :size="isSmallScreen ? 'small' : 'default'" :ripple="false" prepend-icon="mdi-security" block />
+        </v-col>
+      </v-row>
     </div>
-
-    <v-row class="action-buttons-in-responsive-bar w-100 mx-auto" dense>
-      <v-col :cols="_store.isAdmin ? 6 : 12">
-        <v-btn @click="handleRouteForResponsive('/contact')" variant="tonal" text="İletişim" class="text-capitalize"
-               :size="isSmallScreen ? 'small' : 'default'" :ripple="false" prepend-icon="mdi-email" block />
-      </v-col>
-      <v-col cols="6" v-if="_store.isAdmin">
-        <v-btn @click="handleRouteForResponsive('/admin')" variant="tonal" text="Admin Paneli" class="text-capitalize"
-               :size="isSmallScreen ? 'small' : 'default'" :ripple="false" prepend-icon="mdi-security" block />
-      </v-col>
-    </v-row>
-  </div>
   </transition>
 </template>
 

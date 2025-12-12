@@ -2,137 +2,96 @@
   <v-responsive height="100" />
 
   <v-container class="py-2 py-lg-5 px-md-5 px-lg-10 px-xl-15">
-    <v-row
-      class="d-flex justify-center align-center mx-auto"
-      :density="isSmallScreen ? 'compact' : 'comfortable'"
-    >
+    <v-row class="d-flex justify-center align-center mx-auto" :density="isSmallScreen ? 'compact' : 'comfortable'">
       <v-col cols="12" lg="10" xl="8">
         <div class="d-flex justify-center justify-sm-end w-100">
-          <v-btn
-            @click="router.replace('/blogs')"
-            text="Bloglara Dön"
-            prepend-icon="mdi-arrow-left"
-            :ripple="false"
-            variant="tonal"
-          />
+          <v-btn @click="router.replace('/blogs')" text="Bloglara Dön" prepend-icon="mdi-arrow-left" :ripple="false"
+            variant="tonal" />
         </div>
       </v-col>
 
+
       <v-col cols="12" lg="10" xl="8">
-        <img class="rounded-lg w-100" :src="blog?.imageUrl" cover />
-        <div class="d-flex flex-column align-start ga-2 ga-lg-3 ga-xl-5 mt-2 mt-lg-5">
-          <p
-            class="text-center text-md-start text-subtitle-2 text-sm-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3 shadowed-text default-title-letter"
-            style="text-transform: capitalize !important"
-          >
-            {{ blog?.title }}
-          </p>
+        <template v-if="isFetchingBlog">
+          <v-skeleton-loader type="image, heading, paragraph, paragraph, paragraph" class="rounded-lg w-100" />
+          <v-skeleton-loader type="chip, chip, chip" class="mt-3" />
+          <v-skeleton-loader type="chip, chip" class="mt-2" />
+        </template>
+        <template v-else>
+          <img class="rounded-lg w-100" :src="blog?.imageUrl" cover />
+          <div class="d-flex flex-column align-start ga-2 ga-lg-3 ga-xl-5 mt-2 mt-lg-5">
+            <p class="text-center text-md-start text-subtitle-2 text-sm-subtitle-1 text-md-h5 text-lg-h4 text-xl-h3 shadowed-text default-title-letter"
+              style="text-transform: capitalize !important">
+              {{ blog?.title }}
+            </p>
 
-          <v-divider class="w-100 w-lg-50" />
+            <v-divider class="w-100 w-lg-50" />
 
-          <div class="d-flex flex-column ga-1 ga-lg-2" v-html="blog?.content"></div>
+            <div class="d-flex flex-column ga-1 ga-lg-2" v-html="blog?.content"></div>
 
-          <div
-            v-if="blog?.average_votes > 0"
-            class="d-flex flex-wrap align-center ga-2 ga-lg-3"
-          >
-            <span
-              v-if="!display.smAndDown.value"
-              class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter"
-            >
-              Ortalama Verilen Puan
-            </span>
+            <div v-if="blog?.average_votes > 0" class="d-flex flex-wrap align-center ga-2 ga-lg-3">
+              <span v-if="!display.smAndDown.value"
+                class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter">
+                Ortalama Verilen Puan
+              </span>
 
-            <v-tooltip location="top">
-              <template #activator="{ props }">
-                <v-chip
-                  v-bind="props"
-                  class="rounded-xl"
-                  variant="text"
-                  prepend-icon="mdi-thumb-up"
-                  :color="getRatingColor(blog?.average_votes)"
-                  :size="display.smAndDown.value ? 'small' : 'default'"
-                  :ripple="false"
-                  :text="`5 / ${blog?.average_votes.toFixed(1)}`"
-                />
-              </template>
-              <span>{{ blog?.total_voters }} kişi oy verdi</span>
-            </v-tooltip>
+              <v-tooltip location="top">
+                <template #activator="{ props }">
+                  <v-chip v-bind="props" class="rounded-xl" variant="text" prepend-icon="mdi-thumb-up"
+                    :color="getRatingColor(blog?.average_votes)" :size="display.smAndDown.value ? 'small' : 'default'"
+                    :ripple="false" :text="`5 / ${blog?.average_votes.toFixed(1)}`" />
+                </template>
+                <span>{{ blog?.total_voters }} kişi oy verdi</span>
+              </v-tooltip>
+            </div>
+
+            <div class="d-flex flex-wrap align-center ga-2 ga-lg-3">
+              <span v-if="!display.smAndDown.value"
+                class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter">Anahtar
+                Kelimeler
+              </span>
+              <v-chip class="rounded-xl" variant="tonal" prepend-icon="mdi-tag" color="primary"
+                :size="display.smAndDown.value ? 'small' : 'default'" :ripple="false"
+                v-for="(tag, tagIndex) of blog?.keywords" :text="tag" />
+            </div>
+
+            <div class="d-flex flex-wrap align-center ga-2 ga-lg-3">
+              <span v-if="!display.smAndDown.value"
+                class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter">Tarih
+              </span>
+
+              <v-chip class="rounded-xl" variant="outlined" color="grey-lighten-1"
+                :size="display.smAndDown.value ? 'small' : 'default'" prepend-icon="mdi-update" :ripple="false"
+                :text="formatDateTR(blog?.createdAt)" />
+            </div>
+
+            <div v-if="blog" class="d-flex flex-wrap align-center ga-2 ga-lg-3">
+              <span v-if="!display.smAndDown.value"
+                class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter">
+                Oyla
+              </span>
+
+              <v-rating hover :length="5" :size="26" :model-value="ratingValue" active-color="primary"
+                :readonly="votesStore.hasVoted(blog?.firestoreId ?? '')"
+                @update:model-value="(value) => blog?.firestoreId && voteBlog(blog.firestoreId, value as number)" />
+
+              <span v-if="votesStore.hasVoted(blog.firestoreId) && !showThanksMessage"
+                class="text-grey-lighten-1 text-caption text-lg-subtitle-2 default-title-letter">
+                Oyladınız
+              </span>
+
+              <transition name="slide-up-fade" appear>
+                <div v-if="showThanksMessage" class="w-100 my-2 d-flex align-center ga-2">
+                  <img :src="successfullImg" width="40" />
+                  <span class="text-success text-caption text-lg-subtitle-2 default-title-letter">
+                    Oy verdiğiniz için teşekkürler!
+                  </span>
+                </div>
+              </transition>
+            </div>
           </div>
+        </template>
 
-          <div class="d-flex flex-wrap align-center ga-2 ga-lg-3">
-            <span
-              v-if="!display.smAndDown.value"
-              class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter"
-              >Anahtar Kelimeler
-            </span>
-            <v-chip
-              class="rounded-xl"
-              variant="tonal"
-              prepend-icon="mdi-tag"
-              color="primary"
-              :size="display.smAndDown.value ? 'small' : 'default'"
-              :ripple="false"
-              v-for="(tag, tagIndex) of blog?.keywords"
-              :text="tag"
-            />
-          </div>
-
-          <div class="d-flex flex-wrap align-center ga-2 ga-lg-3">
-            <span
-              v-if="!display.smAndDown.value"
-              class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter"
-              >Tarih
-            </span>
-
-            <v-chip
-              class="rounded-xl"
-              variant="outlined"
-              color="grey-lighten-1"
-              :size="display.smAndDown.value ? 'small' : 'default'"
-              prepend-icon="mdi-update"
-              :ripple="false"
-              :text="formatDateTR(blog?.createdAt)"
-            />
-          </div>
-
-          <div v-if="blog" class="d-flex flex-wrap align-center ga-2 ga-lg-3">
-            <span
-              v-if="!display.smAndDown.value"
-              class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter"
-            >
-              Oyla
-            </span>
-
-            <v-rating
-              hover
-              :length="5"
-              :size="26"
-              :model-value="ratingValue"
-              active-color="primary"
-              :readonly="votesStore.hasVoted(blog?.firestoreId ?? '')"
-              @update:model-value="(value) => blog?.firestoreId && voteBlog(blog.firestoreId, value as number)"
-            />
-
-            <span
-              v-if="votesStore.hasVoted(blog.firestoreId) && !showThanksMessage"
-              class="text-grey-lighten-1 text-caption text-lg-subtitle-2 default-title-letter"
-            >
-              Oyladınız
-            </span>
-
-            <transition name="slide-up-fade" appear>
-              <div v-if="showThanksMessage" class="w-100 my-2 d-flex align-center ga-2">
-                <img :src="successfullImg" width="40" />
-                <span
-                  class="text-success text-caption text-lg-subtitle-2 default-title-letter"
-                >
-                  Oy verdiğiniz için teşekkürler!
-                </span>
-              </div>
-            </transition>
-          </div>
-        </div>
       </v-col>
     </v-row>
   </v-container>

@@ -161,8 +161,8 @@ onBeforeUnmount(() => {
 
 .banner-content {
   z-index: 9999;
-  backdrop-filter: blur(0.1rem);
-  -webkit-backdrop-filter: blur(0.1rem);
+  backdrop-filter: blur(0.02rem);
+  -webkit-backdrop-filter: blur(0.02rem);
 }
 
 .banner-content-lg {
