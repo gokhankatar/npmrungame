@@ -27,7 +27,7 @@ export const header_blogs: DeepReadonly<
   { title: "Blog", key: "title", align: "start", sortable: true },
   {
     title: "Kayıt Tarihi",
-    key: "created_time",
+    key: "createdAt.seconds",
     align: "start",
     sortable: true,
   },
