@@ -3,8 +3,7 @@
 - Endpointler store da olsun (prev,page,next)
 - router guard middleware ları yaz
 - admin giriş safyası icidne bir vantajs kullan
-- Admin panel icindeki tabloların mobile gorunumleri yapılacak.
-- bitirdigimm oyunlar ve oynanacaklar sayfasında bazı aksıyıonlar eklenecek (sıralama filtreleme gibi)
+- bitirdigim oyunlar ve oynanacaklar sayfasında bazı aksıyıonlar eklenecek (sıralama filtreleme gibi)
 - Routingler için loading barı başlat (ui opt.)
 - mail servisleri eklenecek
 - anasayfaya sıkca sorulan sorular gibi bir component ekle
