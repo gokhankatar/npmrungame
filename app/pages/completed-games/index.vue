@@ -3,33 +3,20 @@
   <v-responsive height="70" v-else />
 
   <v-container class="pa-2 pa-md-5 pa-lg-10 pa-xl-15">
-    <v-row
-      class="d-flex justify-start align-center mx-auto"
-      :density="smallScreen ? 'compact' : 'comfortable'"
-    >
+    <v-row class="d-flex justify-start align-center mx-auto" :density="smallScreen ? 'compact' : 'comfortable'">
       <!-- Total Game -->
       <v-col cols="12" sm="6" md="3">
-        <v-card
-          class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
-          :min-height="isMediumScreen ? 100 : 'auto'"
-        >
+        <v-card class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
+          :min-height="isMediumScreen ? 100 : 'auto'">
           <p
-            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
-          >
+            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1">
             Toplam Oyun
           </p>
 
-          <v-progress-circular
-            v-if="isGettingCompletedGames"
-            size="20"
-            width="2"
-            color="green-accent-2"
-            indeterminate
-          />
-          <p
-            v-else
-            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-          >
+          <v-progress-circular v-if="isGettingCompletedGames" size="20" width="2" color="green-accent-2"
+            indeterminate />
+          <p v-else
+            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter">
             {{ completedGames?.length }}
           </p>
         </v-card>
@@ -37,27 +24,17 @@
 
       <!-- Total Playtime -->
       <v-col cols="12" sm="6" md="3">
-        <v-card
-          class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
-          :min-height="isMediumScreen ? 100 : 'auto'"
-        >
+        <v-card class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
+          :min-height="isMediumScreen ? 100 : 'auto'">
           <p
-            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
-          >
+            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1">
             Toplam Bitirme Süresi
           </p>
 
-          <v-progress-circular
-            v-if="isGettingCompletedGames"
-            size="20"
-            width="2"
-            color="green-accent-2"
-            indeterminate
-          />
-          <p
-            v-else
-            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-          >
+          <v-progress-circular v-if="isGettingCompletedGames" size="20" width="2" color="green-accent-2"
+            indeterminate />
+          <p v-else
+            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter">
             {{ `${totalPlaytime} saat` }}
           </p>
         </v-card>
@@ -65,26 +42,16 @@
 
       <!-- Common Genre -->
       <v-col cols="12" sm="6" md="3">
-        <v-card
-          class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
-          :min-height="isMediumScreen ? 100 : 'auto'"
-        >
+        <v-card class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
+          :min-height="isMediumScreen ? 100 : 'auto'">
           <p
-            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
-          >
+            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1">
             En Yaygın Tür
           </p>
-          <v-progress-circular
-            v-if="isGettingCompletedGames"
-            size="20"
-            width="2"
-            color="green-accent-2"
-            indeterminate
-          />
-          <p
-            v-else
-            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-          >
+          <v-progress-circular v-if="isGettingCompletedGames" size="20" width="2" color="green-accent-2"
+            indeterminate />
+          <p v-else
+            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter">
             {{ mostCommonGenre }}
           </p>
         </v-card>
@@ -92,27 +59,17 @@
 
       <!-- Avg Metacritic Point -->
       <v-col cols="12" sm="6" md="3">
-        <v-card
-          class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
-          :min-height="isMediumScreen ? 100 : 'auto'"
-        >
+        <v-card class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
+          :min-height="isMediumScreen ? 100 : 'auto'">
           <p
-            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
-          >
+            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1">
             Ortalama Metacritic Puan
           </p>
 
-          <v-progress-circular
-            v-if="isGettingCompletedGames"
-            size="20"
-            width="2"
-            color="green-accent-2"
-            indeterminate
-          />
-          <p
-            v-else
-            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-          >
+          <v-progress-circular v-if="isGettingCompletedGames" size="20" width="2" color="green-accent-2"
+            indeterminate />
+          <p v-else
+            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter">
             {{ avgMetacritic?.toFixed(0) }}
           </p>
         </v-card>
@@ -120,13 +77,9 @@
 
       <!-- Completed Games  -->
       <v-col cols="12">
-        <div
-          class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5"
-        >
+        <div class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5">
           <v-icon icon="mdi-trophy-outline" :size="smallScreen ? 'small' : 'x-large'" />
-          <p
-            class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
-          >
+          <p class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter">
             Bitirdiğim Oyunlar
           </p>
         </div>
@@ -134,21 +87,17 @@
         <v-divider color="white" class="w-100 mt-2 mb-5" />
       </v-col>
 
-      <Game_Card
-        :loading="isGettingCompletedGames"
-        :arr="completedGames"
-        :onRowClick="handleRowClick"
-      />
+      <Game_Card :loading="isGettingCompletedGames" :arr="completedGames" :onRowClick="handleRowClick" />
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts" setup>
-import axios from "axios";
-import { getDocs, collection, addDoc } from "firebase/firestore";
+import { getDocs, collection } from "firebase/firestore";
 import pkg from "lodash";
 import store from "~/store/store";
 import Game_Card from "~/components/common/Game_Card.vue";
+import { slugify } from "~/composables/core/basicFunc";
 
 useHead({
   title: "npmrungame | Bitirdiğim Oyunlar",
@@ -213,7 +162,7 @@ const mostCommonGenre = computed(() => {
 
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);
-  router.replace(`/game-detail/${item.name}`);
+  router.replace(`/game-detail/${slugify(item.name)}`);
 };
 
 onMounted(() => {
