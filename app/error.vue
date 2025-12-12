@@ -2,13 +2,16 @@
 
 useHead({ title: 'npmrungame | Sayfa Bulunamadı' })
 const router = useRouter()
+const route = useRoute();
+
+const errorMsg = computed(() => `Kaybolmuş gibisin. Aradığın sayfa (${route.fullPath}) mevcut değil ya da bulunamadı.`)
 </script>
 
 <template>
     <div class="error-container">
         <v-empty-state class="error-content text-grey-lighten-1" color="grey-lighten-1" icon="mdi-magnify"
-            title="Sayfa Bulunamadı" text="Kaybolmuş gibisin. Aradığın sayfa mevcut değil ya da bulunamadı."
-            action-text="Anasayfaya Dön" @click:action="router.replace('/')" />
+            title="Sayfa Bulunamadı" :text="errorMsg" action-text="Anasayfaya Dön"
+            @click:action="router.replace('/')" />
     </div>
 </template>
 
