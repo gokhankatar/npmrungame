@@ -9,9 +9,60 @@
         </p>
       </div>
 
-      <v-btn icon="mdi-refresh" class="rounded text-caption text-lg-subtitle-2" :ripple="false" variant="text"
-        rounded="xl" :color="isGettingCurrentGames ? 'green-accent-2' : 'grey-lighten-1'" @click="getCurrentGames"
-        :size="smallScreen ? 'x-small' : 'small'" :loading="isGettingCurrentGames" />
+      <div class="d-flex align-center ga-1 ga-lg-2">
+        <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
+          <template #activator="{ props }">
+            <v-btn v-if="!display.xs.value" v-bind="props" icon="mdi-sort"
+              class="rounded text-caption text-lg-subtitle-2" :ripple="false" variant="text" rounded="xl"
+              color="grey-lighten-1" :size="display.smAndDown.value ? 'x-small' : 'small'" />
+          </template>
+
+          <v-card class="pa-1 pa-sm-2" :ripple="false"
+            style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,.15); backdrop-filter: blur(.5rem); -webkit-backdrop-filter: blur(.5rem);"
+            elevation="2">
+            <v-list density="compact" class="bg-transparent">
+              <v-list-item @click="sortBy('new')" prepend-icon="mdi-arrow-up">
+                <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Tarihe Göre En
+                  Yeni</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item @click="sortBy('old')" :ripple="false" prepend-icon="mdi-arrow-down">
+                <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Tarihe Göre En
+                  Eski</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </v-menu>
+
+        <v-btn icon="mdi-refresh" class="rounded text-caption text-lg-subtitle-2" :ripple="false" variant="text"
+          rounded="xl" :color="isGettingCurrentGames ? 'green-accent-2' : 'grey-lighten-1'" @click="getCurrentGames"
+          :size="smallScreen ? 'x-small' : 'small'" :loading="isGettingCurrentGames" />
+      </div>
+    </v-col>
+
+    <v-col cols="12" v-if="display.xs.value">
+      <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
+        <template #activator="{ props }">
+          <v-btn prepend-icon="mdi-sort" v-bind="props" class="text-caption text-lg-subtitle-2" :ripple="false"
+            text="Sırala" variant="tonal" rounded="xl" color="grey-lighten-1" size="small" block />
+        </template>
+
+        <v-card class="pa-1 pa-sm-2" :ripple="false"
+          style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,.15); backdrop-filter: blur(.5rem); -webkit-backdrop-filter: blur(.5rem);"
+          elevation="2">
+          <v-list density="compact" class="bg-transparent">
+            <v-list-item @click="sortBy('new')" prepend-icon="mdi-arrow-up">
+              <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Tarihe Göre En
+                Yeni</v-list-item-title>
+            </v-list-item>
+
+            <v-list-item @click="sortBy('old')" :ripple="false" prepend-icon="mdi-arrow-down">
+              <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Tarihe Göre En
+                Eski</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-menu>
     </v-col>
 
     <v-col cols="12" lg="10">
@@ -263,6 +314,7 @@
 
 <script lang="ts" setup>
 import axios from "axios";
+import _ from "lodash"
 import {
   doc,
   getDocs,
@@ -455,6 +507,21 @@ const addGameToDb = async () => {
     isAddingToDb.value = false;
     selectedGamesAfterResearch.value = [];
   }
+};
+
+const sortGames = (games: any[], type: "new" | "old") => {
+  if (!currentGames.value || currentGames.value?.length === 0) return [];
+
+  const sorted = _.sortBy(currentGames.value, (game: any) => game?.released ?? 0);
+
+  return type === "new"
+    ? sorted.reverse()
+    : sorted;
+};
+
+const sortBy = (mode: string) => {
+  if (mode === "new") currentGames.value = sortGames(currentGames.value, "new");
+  if (mode === "old") currentGames.value = sortGames(currentGames.value, "old");
 };
 
 watch(
