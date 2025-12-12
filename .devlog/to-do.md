@@ -8,7 +8,6 @@
 - Routingler için loading barı başlat (ui opt.)
 - mail servisleri eklenecek
 - anasayfaya sıkca sorulan sorular gibi bir component ekle
-- blog yazıları için ratings (vuetify dan) ekle
 - anasayfaya timelines ekle (vuetifydan)
 
 <!-- Final İşlemleri -->
