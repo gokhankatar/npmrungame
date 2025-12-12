@@ -34,13 +34,16 @@
 
           <div class="d-flex flex-wrap align-center ga-2 ga-lg-3">
             <span
+              v-if="!display.smAndDown.value"
               class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter"
-              >Anahtar Kelimeler :
+              >Anahtar Kelimeler
             </span>
             <v-chip
               class="rounded-xl"
               variant="tonal"
               prepend-icon="mdi-tag"
+              color="primary"
+              :size="display.smAndDown.value ? 'small' : 'default'"
               :ripple="false"
               v-for="(tag, tagIndex) of blog?.keywords"
               :text="tag"
@@ -49,17 +52,57 @@
 
           <div class="d-flex flex-wrap align-center ga-2 ga-lg-3">
             <span
+              v-if="!display.smAndDown.value"
               class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter"
-              >Tarih :
+              >Tarih
             </span>
 
             <v-chip
               class="rounded-xl"
-              variant="tonal"
+              variant="outlined"
+              color="grey-lighten-1"
+              :size="display.smAndDown.value ? 'small' : 'default'"
               prepend-icon="mdi-update"
               :ripple="false"
               :text="formatDateTR(blog?.createdAt)"
             />
+          </div>
+
+          <div v-if="blog" class="d-flex flex-wrap align-center ga-2 ga-lg-3">
+            <span
+              v-if="!display.smAndDown.value"
+              class="text-grey-darken-1 text-caption text-md-subtitle-2 text-lg-subtitle-1 default-title-letter"
+            >
+              Oyla
+            </span>
+
+            <v-rating
+              hover
+              :length="5"
+              :size="26"
+              :model-value="ratingValue"
+              active-color="primary"
+              :readonly="votesStore.hasVoted(blog?.firestoreId ?? '')"
+              @update:model-value="(value) => blog?.firestoreId && voteBlog(blog.firestoreId, value as number)"
+            />
+
+            <span
+              v-if="votesStore.hasVoted(blog.firestoreId) && !showThanksMessage"
+              class="text-grey-lighten-1 text-caption text-lg-subtitle-2 default-title-letter"
+            >
+              Oyladınız
+            </span>
+
+            <transition name="slide-up-fade" appear>
+              <div v-if="showThanksMessage" class="w-100 my-2 d-flex align-center ga-2">
+                <img :src="successfullImg" width="40" />
+                <span
+                  class="text-success text-caption text-lg-subtitle-2 default-title-letter"
+                >
+                  Oy verdiğiniz için teşekkürler!
+                </span>
+              </div>
+            </transition>
           </div>
         </div>
       </v-col>
@@ -68,9 +111,11 @@
 </template>
 
 <script lang="ts" setup>
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, increment, setDoc, updateDoc } from "firebase/firestore";
 import { useFirestoreDateFormatted } from "~/composables/data/handleData";
 import store from "~/store/store";
+import { useVotesStore } from "~/store/votes";
+import successfullImg from "~/assets/img/successfully_done_anim.gif";
 
 const { $firestore } = useNuxtApp();
 
@@ -82,6 +127,8 @@ const isSmallScreen = computed(() => display.smAndDown.value);
 const { formatDateTR } = useFirestoreDateFormatted();
 
 const isFetchingBlog = ref(false);
+const showThanksMessage = ref(false);
+
 const blog = ref<any | null>(null);
 
 const fetchActiveBlog = async () => {
@@ -114,6 +161,46 @@ const fetchActiveBlog = async () => {
     isFetchingBlog.value = false;
   }
 };
+
+const votesStore = useVotesStore();
+const ratingValue = ref(3);
+
+const voteBlog = async (firestoreId: string, rating: number) => {
+  if (votesStore.hasVoted(firestoreId)) return;
+
+  const voteDocRef = doc($firestore, "blog_votes", firestoreId);
+  const voteDoc = await getDoc(voteDocRef);
+
+  if (voteDoc.exists()) {
+    await updateDoc(voteDocRef, { total: increment(rating) });
+  } else {
+    await setDoc(voteDocRef, { total: rating });
+  }
+
+  votesStore.addVote(firestoreId);
+  showThanksMessage.value = true;
+
+  setTimeout(() => {
+    showThanksMessage.value = false;
+  }, 3000);
+};
+const defaultTitle = "npmrungame - Blog Detayı";
+
+useHead({
+  title: defaultTitle,
+});
+
+watch(blog, (newBlog) => {
+  if (newBlog?.title) {
+    useHead({
+      title: `${newBlog.title} - NPM Run Game`,
+    });
+  } else {
+    useHead({
+      title: defaultTitle,
+    });
+  }
+});
 
 onMounted(() => {
   fetchActiveBlog();

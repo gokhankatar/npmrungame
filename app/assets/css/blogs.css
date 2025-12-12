@@ -9,3 +9,20 @@
     left: 0;
     z-index: 999;
 }
+
+.slide-up-fade-enter-active,
+.slide-up-fade-leave-active {
+    transition: all 0.3s ease;
+}
+
+.slide-up-fade-enter-from,
+.slide-up-fade-leave-to {
+    transform: translateY(20px);
+    opacity: 0;
+}
+
+.slide-up-fade-enter-to,
+.slide-up-fade-leave-from {
+    transform: translateY(0);
+    opacity: 1;
+}
