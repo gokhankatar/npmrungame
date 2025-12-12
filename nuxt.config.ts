@@ -1,3 +1,5 @@
+import { overlay } from "three/tsl";
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   modules: [
@@ -45,7 +47,6 @@ export default defineNuxtConfig({
     ],
   },
   css: ["~/assets/css/main.css"],
-
   devtools: { enabled: false },
   devServer: {
     host: "0.0.0.0",
