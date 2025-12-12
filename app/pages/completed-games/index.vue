@@ -77,14 +77,81 @@
 
       <!-- Completed Games  -->
       <v-col cols="12">
-        <div class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5">
-          <v-icon icon="mdi-trophy-outline" :size="smallScreen ? 'small' : 'x-large'" />
-          <p class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter">
-            Bitirdiğim Oyunlar
-          </p>
+        <div class="d-flex justify-space-between align-center">
+          <div class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5">
+            <v-icon icon="mdi-trophy-outline" :size="smallScreen ? 'small' : 'x-large'" />
+            <p class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter">
+              Bitirdiğim Oyunlar
+            </p>
+          </div>
+
+          <div class="d-flex align-center ga-1 ga-lg-2">
+            <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
+              <template #activator="{ props }">
+                <v-btn v-if="!display.xs.value" v-bind="props" icon="mdi-sort"
+                  class="rounded text-caption text-lg-subtitle-2" :ripple="false" variant="text" rounded="xl"
+                  color="grey-lighten-1" :size="display.smAndDown.value ? 'x-small' : 'small'" />
+              </template>
+
+              <v-card class="pa-1 pa-sm-2" :ripple="false"
+                style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,.15); backdrop-filter: blur(.5rem); -webkit-backdrop-filter: blur(.5rem);"
+                elevation="2">
+                <v-list density="compact" class="bg-transparent">
+                  <v-list-item @click="sortBy('meta')" prepend-icon="mdi-star">
+                    <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Metacritic
+                      Puanı</v-list-item-title>
+                  </v-list-item>
+
+                  <v-list-item @click="sortBy('new')" prepend-icon="mdi-arrow-up">
+                    <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Tarihe Göre En
+                      Yeni</v-list-item-title>
+                  </v-list-item>
+
+                  <v-list-item @click="sortBy('old')" :ripple="false" prepend-icon="mdi-arrow-down">
+                    <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Tarihe Göre En
+                      Eski</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </v-menu>
+
+            <v-btn icon="mdi-refresh" class="rounded text-caption text-lg-subtitle-2" :ripple="false" variant="text"
+              rounded="xl" :color="isGettingCompletedGames ? 'green-accent-2' : 'grey-lighten-1'"
+              @click="getCompletedGames" :size="smallScreen ? 'x-small' : 'small'" :loading="isGettingCompletedGames" />
+          </div>
         </div>
 
-        <v-divider color="white" class="w-100 mt-2 mb-5" />
+        <v-divider color="white" class="w-100 mt-2" />
+      </v-col>
+
+      <v-col cols="12" v-if="display.xs.value">
+        <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
+          <template #activator="{ props }">
+            <v-btn prepend-icon="mdi-sort" v-bind="props" class="text-caption text-lg-subtitle-2" :ripple="false"
+              text="Sırala" variant="tonal" rounded="xl" color="grey-lighten-1" size="small" block />
+          </template>
+
+          <v-card class="pa-1 pa-sm-2" :ripple="false"
+            style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,.15); backdrop-filter: blur(.5rem); -webkit-backdrop-filter: blur(.5rem);"
+            elevation="2">
+            <v-list density="compact" class="bg-transparent">
+              <v-list-item @click="sortBy('meta')" prepend-icon="mdi-star">
+                <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Metacritic
+                  Puanı</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item @click="sortBy('new')" prepend-icon="mdi-arrow-up">
+                <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Tarihe Göre En
+                  Yeni</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item @click="sortBy('old')" :ripple="false" prepend-icon="mdi-arrow-down">
+                <v-list-item-title class="text-caption text-sm-subtitle-2 text-grey-lighten-1">Tarihe Göre En
+                  Eski</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </v-menu>
       </v-col>
 
       <Game_Card :loading="isGettingCompletedGames" :arr="completedGames" :onRowClick="handleRowClick" />
@@ -96,6 +163,7 @@
 import { getDocs, collection } from "firebase/firestore";
 import pkg from "lodash";
 import store from "~/store/store";
+import _ from "lodash"
 import Game_Card from "~/components/common/Game_Card.vue";
 import { slugify } from "~/composables/core/basicFunc";
 
@@ -114,7 +182,6 @@ const isMediumScreen = computed(() => display.mdAndUp.value);
 
 const completedGames = ref<any[]>([]);
 const isGettingCompletedGames = ref(false);
-const isAddingToDb = ref(false);
 
 const getCompletedGames = async () => {
   try {
@@ -126,7 +193,7 @@ const getCompletedGames = async () => {
       ...doc.data(),
     }));
 
-    completedGames.value = gamesList;
+    completedGames.value = _.sortBy(gamesList, (g: any) => g.released).reverse();;
   } catch (error) {
     console.error("Error getting games :", error);
     return [];
@@ -163,6 +230,25 @@ const mostCommonGenre = computed(() => {
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);
   router.replace(`/game-detail/${slugify(item.name)}`);
+};
+
+const sortGames = (games: any[], type: "new" | "old" | "meta") => {
+  if (!games || games.length === 0) return [];
+
+  if (type === "meta") {
+    const byMeta = _.sortBy(games, (g) => g?.metacritic ?? 0);
+    return byMeta.reverse();
+  }
+
+  const byDate = _.sortBy(games, (g) => g?.released ?? 0);
+
+  return type === "new"
+    ? byDate.reverse()
+    : byDate;
+};
+
+const sortBy = (mode: "new" | "old" | "meta") => {
+  completedGames.value = sortGames(completedGames.value, mode);
 };
 
 onMounted(() => {
