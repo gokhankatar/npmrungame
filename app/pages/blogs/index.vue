@@ -433,7 +433,6 @@ const getBlogsFromDb = async () => {
     });
 
     allBlogs.value = blogsWithVotes;
-    console.log(blogsWithVotes);
 
     pickRandomBlogs();
     extractKeywords();

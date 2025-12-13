@@ -2,7 +2,7 @@
   <v-stepper-vertical
     v-model="step"
     :mandatory="false"
-    color="green-accent-2"
+    color="blue-grey-darken-1"
     next-text="Sonraki"
     prev-text="Önceki"
     class="d-flex flex-column ga-2"
