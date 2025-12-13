@@ -15,7 +15,7 @@
     <v-stepper-vertical-item
       title="npmrungame nedir?"
       class="text-caption text-sm-subtitle-2 text-md-subtitle-1 text-lg-h5"
-      value="5"
+      value="1"
       editable
     >
       <p class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter">
@@ -30,7 +30,7 @@
     <v-stepper-vertical-item
       title="Oyun önerileri nasıl çalışacak?"
       class="text-caption text-sm-subtitle-2 text-md-subtitle-1 text-lg-h5"
-      value="6"
+      value="2"
       editable
     >
       <p class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter">
@@ -44,7 +44,7 @@
     <v-stepper-vertical-item
       title="Oyunlarımı veya favori oyunlarımı paylaşabilecek miyim?"
       class="text-caption text-sm-subtitle-2 text-md-subtitle-1 text-lg-h5"
-      value="7"
+      value="3"
       editable
     >
       <p class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter">
@@ -58,7 +58,7 @@
     <v-stepper-vertical-item
       title="Projelerimle ilgili etkileşim alabilir miyim?"
       class="text-caption text-sm-subtitle-2 text-md-subtitle-1 text-lg-h5"
-      value="8"
+      value="4"
       editable
     >
       <p class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter">
@@ -72,7 +72,7 @@
     <v-stepper-vertical-item
       title="İletişim veya destek almak istiyorum, nasıl ulaşabilirim?"
       class="text-caption text-sm-subtitle-2 text-md-subtitle-1 text-lg-h5"
-      value="9"
+      value="5"
       editable
     >
       <p class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter">
@@ -86,7 +86,7 @@
 
 <script lang="ts" setup>
 const display = useDisplay();
-const step = shallowRef([5]);
+const step = shallowRef([1]);
 </script>
 
 <style scoped>
