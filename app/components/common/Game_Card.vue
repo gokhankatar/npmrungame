@@ -1,4 +1,5 @@
 <template>
+  <v-row :dense="display.smAndDown.value">
   <v-col v-for="(item, index) of arr" :key="index" cols="12" sm="6" md="4" lg="3">
     <v-skeleton-loader v-if="loading" type="card" class="rounded-lg h-100" />
 
@@ -124,6 +125,7 @@
       </div>
     </v-card>
   </v-col>
+  </v-row>
 </template>
 <script lang="ts" setup>
 import fireAnimationSrc from "~/assets/img/fire_anim.gif";
