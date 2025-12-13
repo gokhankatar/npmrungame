@@ -339,6 +339,61 @@
     z-index: 999;
 }
 
+.chart-gant {
+    display: inline-block;
+    animation: pulseMove 2s ease-in-out infinite;
+}
+
+.question-icon {
+    display: inline-block;
+    animation: swingRotate 3s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@keyframes swingRotate {
+    0% {
+        transform: rotate(0deg) translateX(0);
+    }
+
+    25% {
+        transform: rotate(10deg) translateX(2px);
+    }
+
+    50% {
+        transform: rotate(0deg) translateX(0);
+    }
+
+    75% {
+        transform: rotate(-10deg) translateX(-2px);
+    }
+
+    100% {
+        transform: rotate(0deg) translateX(0);
+    }
+}
+
+@keyframes pulseMove {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+
+    25% {
+        transform: translateY(-5px) scale(1.05);
+    }
+
+    50% {
+        transform: translateY(0) scale(1.1);
+    }
+
+    75% {
+        transform: translateY(5px) scale(1.05);
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
 @keyframes blogBounce {
     0% {
         transform: translateY(0);
@@ -407,7 +462,6 @@
     }
 }
 
-
 @keyframes pulseScanDot {
     0% {
         transform: scale(0.7);
@@ -424,7 +478,6 @@
         opacity: 0;
     }
 }
-
 
 @keyframes bounce {
     0% {
