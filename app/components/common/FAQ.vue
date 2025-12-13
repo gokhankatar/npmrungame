@@ -7,7 +7,6 @@
     prev-text="Önceki"
     class="d-flex flex-column ga-2"
     multiple
-    icon="mdi-comment-question-outline"
     non-linear
     :hide-actions="display.xs.value"
   >
@@ -48,9 +47,9 @@
       editable
     >
       <p class="text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter">
-        Evet! 2026 yılı içinde (yol haritamızdan bakabilirsiniz), oyunlarınızı platformda paylaşabilecek ve diğer kullanıcıların önerilerini
-        görebileceksiniz. Ayrıca yorum yapabilecek, beğenebilecek ve favorilerinizi
-        kaydedebileceksiniz.
+        Evet! 2026 yılı içinde (yol haritamızdan bakabilirsiniz), oyunlarınızı platformda
+        paylaşabilecek ve diğer kullanıcıların önerilerini görebileceksiniz. Ayrıca yorum
+        yapabilecek, beğenebilecek ve favorilerinizi kaydedebileceksiniz.
       </p>
     </v-stepper-vertical-item>
 
