@@ -2,7 +2,7 @@
   <div ref="vantaRef" class="bg-anim">
     <!-- Banner Content -->
     <v-row class="banner-content mx-auto w-100 w-md-75 w-lg-50 pa-2 pa-lg-5 rounded-lg"
-      :class="display.smAndDown.value ? 'banner-content-sm' : 'banner-content-lg'">
+      :class="display.xs.value ? 'banner-content-sm' : 'banner-content-lg'">
       <v-col cols="12">
         <div class="d-flex flex-column align-center align-sm-start ga-3 ga-sm-5 ga-lg-8">
           <p class="text-grey-lighten-1 text-h5 text-md-h4 text-lg-h3 text-xl-h2 font-weight-bold defautl-title-letter">
@@ -18,11 +18,11 @@
       </v-col>
 
       <v-row class="w-100 mx-auto mt-lg-5 mt-xl-10 justify-center justify-sm-start align-center"
-        :dense="display.smAndDown.value">
+        :dense="display.xs.value">
         <v-col cols="8" sm="5" lg="4">
           <v-btn class="default-title-letter" text="Keşfet" :size="display.lgAndUp.value
             ? 'x-large'
-            : display.smAndDown.value
+            : display.xs.value
               ? 'small'
               : 'default'
             " variant="elevated" rounded="xl" color="green-accent-2" @click="handleRoute('/discover')" :ripple="false"
@@ -48,7 +48,7 @@
         <v-col v-if="display.xs.value" cols="8">
           <v-btn class="default-title-letter" text="Oyun Öner" :size="display.lgAndUp.value
             ? 'x-large'
-            : display.smAndDown.value
+            : display.xs.value
               ? 'small'
               : 'default'
             " color="deep-purple" rounded="xl" @click="handleRoute('/recommend-games')" variant="elevated"
@@ -64,7 +64,7 @@
     </v-row>
 
     <!-- Action Buttons -->
-    <v-row v-if="display.smAndUp.value" class="action-buttons mx-auto w-100 d-flex justify-center align-center">
+    <v-row v-if="!display.xs.value" class="action-buttons mx-auto w-100 d-flex justify-center align-center">
       <v-col cols="4" lg="3">
         <v-btn class="action-btn default-title-letter" text="Oyun Öner"
           :size="display.xlAndUp.value ? 'x-large' : 'default'" @click="handleRoute('/recommend-games')" :ripple="false"
@@ -173,7 +173,7 @@ onBeforeUnmount(() => {
 
 .banner-content-sm {
   position: absolute;
-  top: 50%;
+  top: 80%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
