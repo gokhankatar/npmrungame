@@ -104,7 +104,7 @@
           <v-chip
             v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
             :key="index"
-            color="grey-darken-1"
+            color="blue-grey-lighten-1"
             size="x-small"
             class="rounded text-black"
             variant="elevated"
@@ -113,7 +113,7 @@
           />
           <v-chip
             v-if="useLimitedTags(item.tags, 3).hiddenCount > 0"
-            color="grey-darken-2"
+            color="blue-grey-darken-1"
             size="x-small"
             variant="elevated"
             class="rounded text-white"
