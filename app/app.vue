@@ -4,7 +4,7 @@ import store from "./store/store";
 const _store = store();
 
 useHead({
-  title: "npmrungame – Oyun Keşfet ve Favori Oyunlarını Öner",
+  title: "npmrungame – 800,000'den fazla oyunları keşfet ve favori oyunlarını öner",
   meta: [
     {
       name: "description",
