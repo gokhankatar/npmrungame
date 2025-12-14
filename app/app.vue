@@ -13,6 +13,7 @@ useHead({
     },
     { name: "robots", content: "index, follow" },
 
+    // Open Graph (Facebook / LinkedIn)
     { property: "og:title", content: "npmrungame – Oyun Keşfet" },
     {
       property: "og:description",
@@ -20,11 +21,7 @@ useHead({
     },
     { property: "og:type", content: "website" },
     { property: "og:url", content: "https://www.npmrungame.com" },
-    {
-      property: "og:image",
-      content:
-        "https://gbfhkvefbnlgkqaqqwxp.supabase.co/storage/v1/object/public/gokhan_katar_profile/Macbook-Air-www.npmrungame.com.png",
-    },
+    { property: "og:image", content: "https://www.npmrungame.com/og-image.png" }, // public klasörden
 
     // Twitter Card
     { name: "twitter:card", content: "summary_large_image" },
@@ -33,14 +30,11 @@ useHead({
       name: "twitter:description",
       content: "Oyunları keşfet, favori oyunlarını öner ve özel önerilerimizi gör.",
     },
-    {
-      name: "twitter:image",
-      content:
-        "https://gbfhkvefbnlgkqaqqwxp.supabase.co/storage/v1/object/public/gokhan_katar_profile/Macbook-Air-www.npmrungame.com.png",
-    },
+    { name: "twitter:image", content: "https://www.npmrungame.com/og-image.png" }, // public klasörden
   ],
   link: [{ rel: "canonical", href: "https://www.npmrungame.com" }],
 });
+
 </script>
 
 <template>
