@@ -24,7 +24,7 @@ Key highlights:
 - **User authentication & management** using Firebase and Supabase.  
 - **Dynamic animations** using Vanta.js and Three.js for immersive gameplay.  
 - **Game search engine** with optimized state management (Pinia + persisted state).  
-- **Dark/Light mode toggle** for better UX.  
+- **Recommend game** recommend game to npmrungame.
 - **Email notifications** via Nodemailer for important events.  
 - **Full TypeScript support** across frontend and backend for type safety.  
 - **Secure networking**: Axios requests with proper error handling and secure API calls.  
@@ -33,13 +33,13 @@ Key highlights:
 
 ## Technologies
 
-**Frontend:** Vue 3, Nuxt 4 (SSR), Vuetify, SwiperJS  
+**Frontend:** Vue 3, Nuxt 4 (SSR), Vuetify, 
 **Backend / Realtime:** Firebase, Supabase  
 **State Management:** Pinia, pinia-plugin-persistedstate  
 **3D & Animations:** Three.js, Vanta.js, Anime.js  
 **Networking:** Axios, secure API calls  
 **Email / Notifications:** Nodemailer  
-**Language:** TypeScript  
+**Language:** TypeScript && Javascript
 **Hosting / Deployment:** Vercel (HTTPS enabled)  
 
 ---
