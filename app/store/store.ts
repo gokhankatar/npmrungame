@@ -2,9 +2,11 @@ import { defineStore } from "pinia";
 import type {
   Admin_User,
   AdminListItem,
+  Active_Game_Genre,
   Game_Genre_Name,
   Game_Genre_Slug,
   StoreNpmRunGame,
+  Game_Filter_Type,
 } from "~/composables/core/interfaces";
 
 const store = defineStore("npmrungame_store", {
@@ -20,12 +22,7 @@ const store = defineStore("npmrungame_store", {
     currentPage: 1,
     nextPage: null,
     active_detailed_game: { id: null, name: null },
-    active_game_genre: {
-      title: "Aksiyon",
-      slug: "adventure",
-      // @ts-ignore
-      type: "genre",
-    },
+    active_game_genre: null,
     active_games_endpoint: null,
   }),
 
@@ -64,21 +61,15 @@ const store = defineStore("npmrungame_store", {
     setActiveGameGenre(
       slug: Game_Genre_Slug,
       title: Game_Genre_Name,
-      type: "genre" | "tag"
+      type: Game_Filter_Type
     ) {
-      this.active_game_genre = {
-        // @ts-ignore
-        slug,
-        title,
-        type,
-      };
+      this.active_game_genre = { slug, title, type };
     },
     setActiveGameEndpoint(endpoint: string) {
       this.active_games_endpoint = endpoint;
     },
-    clearToActiveGameGenre() {
-      this.active_game_genre.slug = null;
-      this.active_game_genre.title = null;
+    clearActiveGameGenre() {
+      this.active_game_genre = null;
     },
     setActiveBlogId(id: string) {
       this.active_blog_id = id;

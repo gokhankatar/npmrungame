@@ -356,6 +356,24 @@ const handleRowClick = (item: any) => {
   router.replace(`/game-detail/${slugify(item.name)}`);
 };
 
+// const onPageChange = () => {
+//   let page = currentPageInput.value;
+
+//   if (page < 1) page = 1;
+//   if (page > totalPagesDisplay.value) page = totalPagesDisplay.value;
+
+//   currentPageInput.value = page;
+
+//   router.push({
+//     query: {
+//       ...route.query,
+//       page: page.toString(),
+//     },
+//   });
+
+//   getGames();
+// };
+
 const getGames = async (url?: string) => {
   try {
     isLoading.value = true;
@@ -375,24 +393,6 @@ const getGames = async (url?: string) => {
   } finally {
     isLoading.value = false;
   }
-};
-
-const onPageChange = () => {
-  let page = currentPageInput.value;
-
-  if (page < 1) page = 1;
-  if (page > totalPagesDisplay.value) page = totalPagesDisplay.value;
-
-  currentPageInput.value = page;
-
-  router.push({
-    query: {
-      ...route.query,
-      page: page.toString(),
-    },
-  });
-
-  getGames();
 };
 
 const goNext = () => {

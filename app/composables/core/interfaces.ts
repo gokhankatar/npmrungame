@@ -19,26 +19,6 @@ export type AdminListItemSlug =
   | "settings"
   | string;
 
-export type Game_Genre_Name =
-  | "Aksiyon"
-  | "Strateji"
-  | "Nişancı"
-  | "Indie"
-  | "Rol Yapma"
-  | "Macera"
-  | "Korku"
-  | "Souls-Like";
-
-export type Game_Genre_Slug =
-  | "action"
-  | "strategy"
-  | "role-playing-games-rpg"
-  | "adventure"
-  | "shooter"
-  | "indie"
-  | "horror"
-  | "souls-like";
-
 export interface Blog_Toast_Admin {
   blogToastBar: boolean;
   status: "success" | "warning" | "deleted";
@@ -50,46 +30,6 @@ export interface FeedbackMessageOnContact {
   display_name: string;
   type: "error" | "success";
   message: string;
-}
-
-export interface StoreNpmRunGame {
-  isAdmin: boolean;
-  theme?: "dark" | "light";
-  active_game_platform: string;
-  active_detailed_game: {
-    id: number | string | null;
-    name: string | null;
-  };
-  prevPage: string | null;
-  currentPage: string | number | null;
-  nextPage: string | null;
-  active_games_endpoint: string | null;
-  active_blog_id: string | null;
-  hasAnySuccessfulLogin: boolean;
-  active_admin_list_item: AdminListItemSlug;
-  admin_user: Admin_User | null;
-  active_game_genre: {
-    title:
-      | "Aksiyon"
-      | "Strateji"
-      | "Nişancı"
-      | "Indie"
-      | "Rol Yapma"
-      | "Macera"
-      | "Korku"
-      | "Souls-Like"
-      | null;
-    slug:
-      | "action"
-      | "strategy"
-      | "adventure"
-      | "shooter"
-      | "indie"
-      | "rpg"
-      | "horror"
-      | "souls-like"
-      | null;
-  };
 }
 
 export interface NavbarList {
@@ -131,13 +71,6 @@ export interface Add_Blog_Form_Model {
   keywords: string[] | any;
 }
 
-export interface Game_Genre {
-  name: Game_Genre_Name;
-  slug: Game_Genre_Slug;
-  background_img: string;
-  type: "genre" | "tag";
-}
-
 interface Footer_SubItem {
   subtitle: string;
   path: string;
@@ -158,4 +91,63 @@ export interface BlogBlock {
 export interface Footer_Link {
   title: string;
   items: Footer_SubItem[];
+}
+
+// 🔹 Genre / Tag ortak filter tipi
+export type Game_Filter_Type = "genre" | "tag";
+
+// 🔹 Genre isimleri
+export type Game_Genre_Name =
+  | "Aksiyon"
+  | "Strateji"
+  | "Nişancı"
+  | "Indie"
+  | "Rol Yapma"
+  | "Macera"
+  | "Korku"
+  | "Souls-Like";
+
+// 🔹 Genre slug’ları (RAWG ile birebir)
+export type Game_Genre_Slug =
+  | "action"
+  | "strategy"
+  | "role-playing-games-rpg"
+  | "adventure"
+  | "shooter"
+  | "indie"
+  | "horror"
+  | "souls-like";
+
+// 🔹 Aktif genre / tag modeli (TEK KAYNAK)
+export interface Active_Game_Genre {
+  title: Game_Genre_Name | null;
+  slug: Game_Genre_Slug | null;
+  type: Game_Filter_Type | null;
+}
+
+export interface StoreNpmRunGame {
+  isAdmin: boolean;
+  theme?: "dark" | "light";
+
+  active_game_platform: string;
+
+  active_detailed_game: {
+    id: number | string | null;
+    name: string | null;
+  };
+
+  prevPage: string | null;
+  currentPage: number | null;
+  nextPage: string | null;
+
+  active_games_endpoint: string | null;
+  active_blog_id: string | null;
+
+  hasAnySuccessfulLogin: boolean;
+
+  active_admin_list_item: AdminListItemSlug;
+  admin_user: Admin_User | null;
+
+  // 🔥 ARTIK INLINE TYPE YOK
+  active_game_genre: Active_Game_Genre | null;
 }

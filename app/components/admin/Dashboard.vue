@@ -18,7 +18,7 @@
           <!-- Account Informations -->
           <v-col cols="12" lg="4">
             <v-card
-              class="card-admin-panel-info d-flex flex-column align-start justify-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100"
+              class="card-admin-panel-info d-flex flex-column align-start justify-center ga-1 ga-lg-2 pa-3 pa-xl-5 rounded-xl w-100"
               :elevation="0"
               :ripple="false"
               :height="isMediumScreen ? 350 : 'auto'"
@@ -31,7 +31,7 @@
                   color="grey"
                   variant="tonal"
                   rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'large'"
+                  :size="isSmallScreen ? 'small' : 'default'"
                   prepend-icon="mdi-email"
                 />
                 <p class="text-grey-lighten-1 text-caption text-lg-subtitle-2">
@@ -47,7 +47,7 @@
                   color="grey"
                   variant="tonal"
                   rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'large'"
+                  :size="isSmallScreen ? 'small' : 'default'"
                   prepend-icon="mdi-update"
                 />
                 <p class="text-grey-lighten-1 text-caption text-lg-subtitle-2">
@@ -64,7 +64,7 @@
                   color="grey"
                   variant="tonal"
                   rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'large'"
+                  :size="isSmallScreen ? 'small' : 'default'"
                   prepend-icon="mdi-calendar-range"
                 />
                 <p class="text-grey-lighten-1 text-caption text-lg-subtitle-2">
@@ -81,7 +81,7 @@
                   color="grey"
                   variant="tonal"
                   rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'large'"
+                  :size="isSmallScreen ? 'small' : 'default'"
                   prepend-icon="mdi-key"
                 />
                 <div class="d-flex align-center ga-1">
@@ -104,11 +104,11 @@
           <!-- Messages & Registered Users -->
           <v-col cols="12" md="6" lg="4">
             <v-card
-              class="card-admin-panel-info d-flex flex-column align-center justify-center pa-2 pa-lg-5 rounded-xl w-100"
+              class="card-admin-panel-info d-flex flex-column align-center justify-center pa-2 pa-xl-5 rounded-xl w-100"
               :elevation="0"
               :height="isMediumScreen ? 350 : 'auto'"
             >
-              <v-row class="w-100 mx-auto">
+              <v-row class="w-100 mx-auto" dense>
                 <!-- Registered Users Count -->
                 <v-col cols="6">
                   <v-card
@@ -249,14 +249,14 @@
           <!-- Youtube Stats Cards -->
           <v-col cols="12" md="6" lg="4">
             <v-card
-              class="card-admin-panel-info d-flex flex-column align-center justify-center pa-2 pa-lg-5 rounded-xl w-100"
+              class="card-admin-panel-info d-flex flex-column align-center justify-center pa-2 pa-xl-5 rounded-xl w-100"
               :elevation="0"
               :height="isMediumScreen ? 350 : 'auto'"
             >
-              <v-row class="w-100 mx-auto">
+              <v-row class="w-100 mx-auto" dense>
                 <v-col cols="6">
                   <v-card
-                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
+                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-xl-5 rounded-xl w-100 h-100"
                     :elevation="0"
                   >
                     <p

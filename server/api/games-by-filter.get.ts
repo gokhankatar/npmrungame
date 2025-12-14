@@ -1,37 +1,59 @@
 export default defineEventHandler(async (event) => {
-    const query = getQuery(event);
-    const type = query.type as string;
-    const slug = query.slug as string;
-    const page_size = Number(query.page_size ?? 40);
-    const config = useRuntimeConfig();
+  const query = getQuery(event);
+  const config = useRuntimeConfig();
 
-    if (!type || !slug) {
-        throw createError({
-            statusCode: 400,
-            statusMessage: "Both type and slug are required",
-        });
-    }
+  const type = query.type as string;
+  const slug = query.slug as string;
 
-    const allowed = ["genres", "tags"];
-    if (!allowed.includes(type)) {
-        throw createError({
-            statusCode: 400,
-            statusMessage: "Type must be 'genres' or 'tags'",
-        });
-    }
+  const page = Number(query.page) || 1;
+  const page_size = Number(query.page_size ?? 40);
 
-    const data: any = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-            key: config.rawg_api_key,
-            [type]: slug,
-            page_size,
-        },
+  const MAX_RAWG_PAGE = 1000;
+
+  if (!type || !slug) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Both type and slug are required",
     });
+  }
 
-    return {
-        results: data.results ?? [],
-        count: data.count ?? 0,
-        next: data.next ?? null,
-        previous: data.previous ?? null,
-    };
+  if (!["genres", "tags"].includes(type)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Type must be 'genres' or 'tags'",
+    });
+  }
+
+  const params: any = {
+    key: config.rawg_api_key,
+    [type]: slug,
+    page,
+    page_size,
+  };
+
+  const data: any = await $fetch("https://api.rawg.io/api/games", { params });
+
+  const makeProxyUrl = (rawUrl: string | null) => {
+    if (!rawUrl) return null;
+
+    const url = new URL(rawUrl);
+    const nextPage = url.searchParams.get("page");
+
+    return `/api/games-by-filter?page=${nextPage}&page_size=${page_size}&type=${type}&slug=${slug}`;
+  };
+
+  const totalCount = data?.count || 0;
+  const totalPages = Math.min(
+    Math.ceil(totalCount / page_size),
+    MAX_RAWG_PAGE
+  );
+
+  return {
+    current: page,
+    next: makeProxyUrl(data?.next),
+    previous: makeProxyUrl(data?.previous),
+    totalPages,
+    totalCount,
+    results: data?.results ?? [],
+  };
 });
