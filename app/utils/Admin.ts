@@ -6,6 +6,11 @@ export const adminListItems: AdminListItem[] = [
     slug: "dashboard",
     icon: "mdi-view-dashboard-outline",
   },
+  {
+    title: "Bildirimler",
+    slug: "notifications",
+    icon: "mdi-bell",
+  },
    {
     title: "Kayıtlar ve Mesajlar",
     slug: "messages",

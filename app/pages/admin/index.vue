@@ -8,7 +8,7 @@
       <template v-slot:prepend>
         <v-list class="bg-transparent mt-10" :density="isExtraLargeScreen ? 'comfortable' : 'compact'">
           <v-list-item v-for="(item, index) of adminListItems" :key="index" :prepend-icon="item.icon"
-            @click="_store.setActiveAdminListItem(item.slug)" :ripple="false" class="rounded-xl" :class="_store.active_admin_list_item == item.slug ? 'active-admin-list-item' : ''
+            @click="_store.setActiveAdminListItem(item.slug as any)" :ripple="false" class="rounded-xl" :class="_store.active_admin_list_item == item.slug ? 'active-admin-list-item' : ''
               ">
             <v-list-item-title class="default-title-letter text-caption text-lg-subtitle-2">
               {{ item.title }}
@@ -19,6 +19,13 @@
 
       <template v-slot:append>
         <v-list bg-color="transparent" class="mb-1" :density="isExtraLargeScreen ? 'comfortable' : 'compact'">
+          <v-list-item @click="_store.setActiveAdminListItem('settings' as any)" prepend-icon="mdi-cog" rounded="xl"
+            :ripple="false" class="default-title-letter text-caption text-lg-subtitle-2" active-class="main-nav-active">
+            <v-list-item-title class="default-title-letter text-caption text-lg-subtitle-2">
+              Ayarlar
+            </v-list-item-title>
+          </v-list-item>
+
           <v-list-item :to="'/'" prepend-icon="mdi-home-outline" rounded="xl" :ripple="false"
             class="default-title-letter text-caption text-lg-subtitle-2" active-class="main-nav-active">
             <v-list-item-title class="default-title-letter text-caption text-lg-subtitle-2">
@@ -47,13 +54,13 @@
           <div class="responsive-admin-list-bar pa-2" v-if="isOpenResponsiveBar">
             <v-btn class="close-btn-in-responsive-admin-list-bar ma-2" icon="mdi-close" color="grey-darken-1"
               size="large" variant="text" :ripple="false" @click="isOpenResponsiveBar = false" />
-            <div class="d-flex flex-column ga-3 mt-10">
+            <div class="d-flex flex-column ga-1 mt-10">
               <div
-                class="responsive-admin-bar-list-item transition d-flex align-center ga-4 pa-2 rounded-lg cursor-pointer"
+                class="responsive-admin-bar-list-item transition d-flex align-center ga-3 pa-2 rounded-lg cursor-pointer"
                 v-for="(item, index) of adminListItems" @click="handleRouteForResponsive(item.slug as any)"
                 :key="item.title">
                 <v-icon size="large" :icon="item.icon" />
-                <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
+                <p class="text-subtitle-1 text-sm-h5 default-title-letter text-grey-darken-1">
                   {{ item.title }}
                 </p>
               </div>
@@ -76,15 +83,15 @@
 
       <!-- Content -->
       <Dashboard v-if="_store.active_admin_list_item == 'dashboard'" />
+      <Notificiations v-if="_store.active_admin_list_item == 'notifications'" />
       <Completed_Games v-if="_store.active_admin_list_item == 'completed_games'" />
       <Blogs v-if="_store.active_admin_list_item == 'blog'" />
       <To_Play_Games v-if="_store.active_admin_list_item == 'to_play_games'" />
-      <!-- @vue-ignore -->
       <Current_Games v-if="_store.active_admin_list_item == 'current_games'" />
-      <!-- @vue-ignore -->
       <Registered_Users_Messages v-if="_store.active_admin_list_item == 'messages'" />
-      <!-- @vue-ignore -->
       <Recommended_Games v-if="_store.active_admin_list_item == 'recommended_games'" />
+      <Settings v-if="_store.active_admin_list_item == 'settings'" />
+
     </v-container>
   </template>
 
@@ -152,7 +159,7 @@
 import store from "~/store/store";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { VForm } from "vuetify/components";
-import type { Admin_User } from "~/composables/core/interfaces";
+import type { Admin_User, AdminListItemSlug } from "~/composables/core/interfaces";
 import Dashboard from "~/components/admin/Dashboard.vue";
 import Completed_Games from "~/components/admin/Completed_Games.vue";
 import Blogs from "~/components/admin/Blogs.vue";
@@ -160,6 +167,8 @@ import To_Play_Games from "~/components/admin/To_Play_Games.vue";
 import Current_Games from "~/components/admin/Current_Games.vue";
 import Registered_Users_Messages from "~/components/admin/Registered_Users_Messages.vue";
 import Recommended_Games from "~/components/admin/Recommended_Games.vue";
+import Notificiations from "~/components/admin/Notificiations.vue";
+import Settings from "~/components/admin/Settings.vue";
 
 definePageMeta({
   layout: "admin",
@@ -219,30 +228,21 @@ const handleLogout = () => {
 };
 
 const handleRouteForResponsive = (
-  slug:
-    | "dashboard"
-    | "completed_games"
-    | "to_play_games"
-    | "blog"
-    | "home"
-    | "logout"
-    | "current_games"
-    | "messages"
-) => {
+  slug: AdminListItemSlug) => {
 
-  if (slug !== "home" && slug !== "logout") {
+  if (slug !== "home" && slug !== "logout" && slug !== "settings") {
     _store.setActiveAdminListItem(
-      slug as "dashboard" | "completed_games" | "to_play_games" | "blog" | "current_games"
+      slug as any
     );
     isOpenResponsiveBar.value = false;
   } else if (slug == "home") {
     router.replace("/");
     isOpenResponsiveBar.value = false;
-    _store.setActiveAdminListItem("dashboard");
+    _store.setActiveAdminListItem("dashboard" as any);
   } else {
     handleLogout();
     isOpenResponsiveBar.value = false;
-    _store.setActiveAdminListItem("dashboard");
+    _store.setActiveAdminListItem("dashboard" as any);
     console.log("cıkıs gerek");
   }
 };

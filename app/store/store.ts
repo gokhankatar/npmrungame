@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import type {
   Admin_User,
+  AdminListItem,
   Game_Genre_Name,
   Game_Genre_Slug,
   StoreNpmRunGame,
@@ -43,16 +44,7 @@ const store = defineStore("npmrungame_store", {
       this.nextPage = next;
       this.prevPage = prev;
     },
-    setActiveAdminListItem(
-      item:
-        | "dashboard"
-        | "completed_games"
-        | "to_play_games"
-        | "blog"
-        | "messages"
-        | "current_games"
-        | "recommended_games"
-    ) {
+    setActiveAdminListItem(item: AdminListItem) {
       // @ts-ignore
       this.active_admin_list_item = item;
     },

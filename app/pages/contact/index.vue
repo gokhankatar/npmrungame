@@ -1,8 +1,8 @@
 <template>
-  <Contact_Anim />
+  <Contact_Section />
 </template>
 <script lang="ts" setup>
-import Contact_Anim from "~/components/layout/Contact_Anim.vue";
+import Contact_Section from '~/components/layout/Contact_Section.vue';
 
 useHead({
   title: "npmrungame | İletişim",

@@ -5,6 +5,40 @@ export interface Admin_User {
   lastSignInTime: string;
 }
 
+export type AdminListItemSlug =
+  | "logout"
+  | "home"
+  | "dashboard"
+  | "completed_games"
+  | "to_play_games"
+  | "blog"
+  | "messages"
+  | "current_games"
+  | "recommended_games"
+  | "notifications"
+  | "settings"
+  | string;
+
+export type Game_Genre_Name =
+  | "Aksiyon"
+  | "Strateji"
+  | "Nişancı"
+  | "Indie"
+  | "Rol Yapma"
+  | "Macera"
+  | "Korku"
+  | "Souls-Like";
+
+export type Game_Genre_Slug =
+  | "action"
+  | "strategy"
+  | "role-playing-games-rpg"
+  | "adventure"
+  | "shooter"
+  | "indie"
+  | "horror"
+  | "souls-like";
+
 export interface Blog_Toast_Admin {
   blogToastBar: boolean;
   status: "success" | "warning" | "deleted";
@@ -13,7 +47,7 @@ export interface Blog_Toast_Admin {
 
 export interface FeedbackMessageOnContact {
   show: boolean;
-  display_name: string
+  display_name: string;
   type: "error" | "success";
   message: string;
 }
@@ -32,33 +66,29 @@ export interface StoreNpmRunGame {
   active_games_endpoint: string | null;
   active_blog_id: string | null;
   hasAnySuccessfulLogin: boolean;
-  active_admin_list_item:
-  | "dashboard"
-  | "completed_games"
-  | "to_play_games"
-  | "blog";
+  active_admin_list_item: AdminListItemSlug;
   admin_user: Admin_User | null;
   active_game_genre: {
     title:
-    | "Aksiyon"
-    | "Strateji"
-    | "Nişancı"
-    | "Indie"
-    | "Rol Yapma"
-    | "Macera"
-    | "Korku"
-    | "Souls-Like"
-    | null;
+      | "Aksiyon"
+      | "Strateji"
+      | "Nişancı"
+      | "Indie"
+      | "Rol Yapma"
+      | "Macera"
+      | "Korku"
+      | "Souls-Like"
+      | null;
     slug:
-    | "action"
-    | "strategy"
-    | "adventure"
-    | "shooter"
-    | "indie"
-    | "rpg"
-    | "horror"
-    | "souls-like"
-    | null;
+      | "action"
+      | "strategy"
+      | "adventure"
+      | "shooter"
+      | "indie"
+      | "rpg"
+      | "horror"
+      | "souls-like"
+      | null;
   };
 }
 
@@ -82,14 +112,7 @@ export interface Feature_Card {
 
 export interface AdminListItem {
   title: string;
-  slug:
-  | "dashboard"
-  | "completed_games"
-  | "to_play_games"
-  | "blog"
-  | "messages"
-  | "current_games"
-  | "recommended_games";
+  slug: AdminListItemSlug;
   icon: string;
 }
 
@@ -107,26 +130,6 @@ export interface Add_Blog_Form_Model {
   content: string;
   keywords: string[] | any;
 }
-
-export type Game_Genre_Name =
-  | "Aksiyon"
-  | "Strateji"
-  | "Nişancı"
-  | "Indie"
-  | "Rol Yapma"
-  | "Macera"
-  | "Korku"
-  | "Souls-Like";
-
-export type Game_Genre_Slug =
-  | "action"
-  | "strategy"
-  | "role-playing-games-rpg"
-  | "adventure"
-  | "shooter"
-  | "indie"
-  | "horror"
-  | "souls-like";
 
 export interface Game_Genre {
   name: Game_Genre_Name;
