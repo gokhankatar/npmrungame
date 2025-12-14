@@ -1,75 +1,73 @@
-# Nuxt Minimal Starter
+# NpmRunGame 🎮
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+<img src="/assets/screenshots/general.png" alt="NpmRunGame Screenshot" />
 
-## Setup
+## Description
 
-Make sure to install dependencies:
+**NpmRunGame** is a full-stack, browser-based online gaming platform built with Nuxt 4 and TypeScript. It provides fast, interactive, and secure experiences for users, supporting multiple games and real-time features.  
 
+Key highlights:
+- Full-stack architecture using **Nuxt 4 (SSR) + TypeScript** for type safety and maintainability.  
+- **Frontend:** Vue 3 + Vuetify for responsive UI.  
+- **Backend & Realtime:** Firebase + Supabase for authentication, database, and real-time updates.  
+- **Animations & 3D:** Three.js, Vanta.js, Anime.js for smooth visuals and game effects.  
+- **State Management:** Pinia + persisted state plugin for user session and settings.  
+- **Network Security:** HTTPS, Supabase security rules, and safe API interactions.  
+- **Responsive Design:** Optimized for mobile, tablet, and desktop.  
+- **SSR & SEO Friendly:** Fast loading pages and pre-rendered content for better SEO.
+
+---
+
+## Features
+
+- **Real-time gaming and leaderboards** with Supabase subscriptions.  
+- **User authentication & management** using Firebase and Supabase.  
+- **Dynamic animations** using Vanta.js and Three.js for immersive gameplay.  
+- **Game search engine** with optimized state management (Pinia + persisted state).  
+- **Dark/Light mode toggle** for better UX.  
+- **Email notifications** via Nodemailer for important events.  
+- **Full TypeScript support** across frontend and backend for type safety.  
+- **Secure networking**: Axios requests with proper error handling and secure API calls.  
+
+---
+
+## Technologies
+
+**Frontend:** Vue 3, Nuxt 4 (SSR), Vuetify, SwiperJS  
+**Backend / Realtime:** Firebase, Supabase  
+**State Management:** Pinia, pinia-plugin-persistedstate  
+**3D & Animations:** Three.js, Vanta.js, Anime.js  
+**Networking:** Axios, secure API calls  
+**Email / Notifications:** Nodemailer  
+**Language:** TypeScript  
+**Hosting / Deployment:** Vercel (HTTPS enabled)  
+
+---
+
+## Screenshots
+
+### Game Dashboard
+<img src="/assets/screenshots/general2.png" alt="Game Dashboard" />
+
+### Game Search
+<img src="/assets/screenshots/searchEngine.png" alt="Game Search Engine" />
+
+### Mobile View
+<img src="/assets/screenshots/mobileView.png" alt="Mobile View" />
+
+### Tablet View
+<img src="/assets/screenshots/tabletView.png" alt="Tablet View" />
+
+---
+
+## Live Demo
+
+Check the live project here: [https://npmrungame.com](https://npmrungame.com)  
+
+---
+
+## Installation & Setup
+
+### 1. Clone the repository
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+git clone https://github.com/gokhankatar/npmrungame
