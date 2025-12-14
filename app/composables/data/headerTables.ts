@@ -8,13 +8,13 @@ export const header_games: DeepReadonly<
     sortable: boolean;
   }[]
 > = [
-  { title: "Oyun Adı", key: "name", align: "start", sortable: true },
-  { title: "Çıkış Tarihi", key: "released", align: "start", sortable: true },
-  { title: "Türler", key: "genres", align: "start", sortable: true },
-  { title: "Platformlar", key: "platforms", align: "start", sortable: true },
-  { title: "Metacritic", key: "metacritic", align: "start", sortable: true },
-  { title: "Sil", key: "delete", align: "start", sortable: false },
-];
+    { title: "Oyun Adı", key: "name", align: "start", sortable: true },
+    { title: "Çıkış Tarihi", key: "released", align: "start", sortable: true },
+    { title: "Türler", key: "genres", align: "start", sortable: true },
+    { title: "Platformlar", key: "platforms", align: "start", sortable: true },
+    { title: "Metacritic", key: "metacritic", align: "start", sortable: true },
+    { title: "Sil", key: "delete", align: "start", sortable: false },
+  ];
 
 export const header_blogs: DeepReadonly<
   {
@@ -24,16 +24,16 @@ export const header_blogs: DeepReadonly<
     sortable: boolean;
   }[]
 > = [
-  { title: "Blog", key: "title", align: "start", sortable: true },
-  {
-    title: "Kayıt Tarihi",
-    key: "createdAt.seconds",
-    align: "start",
-    sortable: true,
-  },
-  { title: "Anahtar Kelime", key: "keywords", align: "start", sortable: true },
-  { title: "Aksiyon", key: "action", align: "start", sortable: false },
-];
+    { title: "Blog", key: "title", align: "start", sortable: true },
+    {
+      title: "Kayıt Tarihi",
+      key: "createdAt.seconds",
+      align: "start",
+      sortable: true,
+    },
+    { title: "Anahtar Kelime", key: "keywords", align: "start", sortable: true },
+    { title: "Aksiyon", key: "action", align: "start", sortable: false },
+  ];
 
 export const header_registered_users: DeepReadonly<
   {
@@ -43,13 +43,33 @@ export const header_registered_users: DeepReadonly<
     sortable: boolean;
   }[]
 > = [
-  { title: "Kullanıcı", key: "title", align: "start", sortable: true },
-  { title: "Email", key: "title", align: "start", sortable: true },
+    { title: "Kullanıcı", key: "title", align: "start", sortable: true },
+    { title: "Email", key: "title", align: "start", sortable: true },
+    {
+      title: "Kayıt Tarihi",
+      key: "created_time",
+      align: "start",
+      sortable: true,
+    },
+    { title: "Aksiyon", key: "action", align: "start", sortable: false },
+  ];
+
+export const header_messages: DeepReadonly<
   {
-    title: "Kayıt Tarihi",
-    key: "created_time",
-    align: "start",
-    sortable: true,
-  },
-  { title: "Aksiyon", key: "action", align: "start", sortable: false },
-];
+    title: string;
+    key: string;
+    align: "start" | "center" | "end";
+    sortable: boolean;
+  }[]
+> = [
+    { title: "Ad", key: "name", align: "start", sortable: true },
+    { title: "Email", key: "email", align: "start", sortable: true },
+    {
+      title: "Mesaj Tarihi",
+      key: "createdAt",
+      align: "start",
+      sortable: true,
+    },
+    { title: "Sil", key: "action", align: "start", sortable: false },
+  ];
+

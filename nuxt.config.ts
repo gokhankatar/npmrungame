@@ -14,6 +14,8 @@ export default defineNuxtConfig({
     youtube_api_key: process.env.YOUTUBE_API_KEY,
     youtube_channel_id: process.env.YOUTUBE_CHANNEL_ID,
     adminPassw: process.env.ADMIN_PASSWORD_KEY,
+    mail: process.env.MAIL,
+    mail_password: process.env.MAIL_PASSWORD,
     public: {
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       supabaseUrl: process.env.SUPABASE_URL,

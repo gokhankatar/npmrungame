@@ -11,6 +11,13 @@ export interface Blog_Toast_Admin {
   msg: string;
 }
 
+export interface FeedbackMessageOnContact {
+  show: boolean;
+  display_name: string
+  type: "error" | "success";
+  message: string;
+}
+
 export interface StoreNpmRunGame {
   isAdmin: boolean;
   theme?: "dark" | "light";
@@ -26,32 +33,32 @@ export interface StoreNpmRunGame {
   active_blog_id: string | null;
   hasAnySuccessfulLogin: boolean;
   active_admin_list_item:
-    | "dashboard"
-    | "completed_games"
-    | "to_play_games"
-    | "blog";
+  | "dashboard"
+  | "completed_games"
+  | "to_play_games"
+  | "blog";
   admin_user: Admin_User | null;
   active_game_genre: {
     title:
-      | "Aksiyon"
-      | "Strateji"
-      | "Nişancı"
-      | "Indie"
-      | "Rol Yapma"
-      | "Macera"
-      | "Korku"
-      | "Souls-Like"
-      | null;
+    | "Aksiyon"
+    | "Strateji"
+    | "Nişancı"
+    | "Indie"
+    | "Rol Yapma"
+    | "Macera"
+    | "Korku"
+    | "Souls-Like"
+    | null;
     slug:
-      | "action"
-      | "strategy"
-      | "adventure"
-      | "shooter"
-      | "indie"
-      | "rpg"
-      | "horror"
-      | "souls-like"
-      | null;
+    | "action"
+    | "strategy"
+    | "adventure"
+    | "shooter"
+    | "indie"
+    | "rpg"
+    | "horror"
+    | "souls-like"
+    | null;
   };
 }
 
@@ -76,13 +83,13 @@ export interface Feature_Card {
 export interface AdminListItem {
   title: string;
   slug:
-    | "dashboard"
-    | "completed_games"
-    | "to_play_games"
-    | "blog"
-    | "messages"
-    | "current_games"
-    | "recommended_games";
+  | "dashboard"
+  | "completed_games"
+  | "to_play_games"
+  | "blog"
+  | "messages"
+  | "current_games"
+  | "recommended_games";
   icon: string;
 }
 

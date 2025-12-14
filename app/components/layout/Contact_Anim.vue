@@ -19,6 +19,7 @@
         <v-divider class="mt-2 mb-4 mb-lg-8 w-100" color="white" />
 
         <v-text-field
+          :rules="rules.name"
           v-model="formModels.name"
           label="Adınız"
           variant="outlined"
@@ -31,6 +32,7 @@
         />
 
         <v-text-field
+          :rules="rules.email"
           v-model="formModels.email"
           label="Email"
           variant="outlined"
@@ -43,7 +45,8 @@
         />
 
         <v-textarea
-          v-model="formModels.email"
+          :rules="rules.msg"
+          v-model="formModels.msg"
           label="Mesajınız"
           variant="outlined"
           prepend-inner-icon="mdi-message"
@@ -55,12 +58,13 @@
           clearable
         />
 
-        <div class="w-100 d-flex align-center justify-center justify-lg-end">
+        <div class="w-100 d-flex align-center justify-center justify-sm-end">
           <v-btn
             type="submit"
             text="Gönder"
             :elevation="0"
-            variant="tonal"
+            :loading="isLoadingFormSubmit"
+            variant="elevated"
             class="mt-1"
             rounded="xl"
             color="blue-lighten-1"
@@ -73,19 +77,63 @@
       </v-form>
     </v-col>
   </v-row>
+
+  <v-dialog
+    v-model="feedback.show"
+    :max-width="600"
+    style="
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(0.1rem);
+      -webkit-backdrop-filter: blur(0.1rem);
+    "
+  >
+    <div
+      class="feedback-container d-flex flex-column align-center justify-center ga-1 ga-lg-2 rounded-lg pa-2 pa-5"
+    >
+      <v-btn
+        @click="feedback.show = false"
+        variant="text"
+        size="small"
+        :ripple="false"
+        icon="mdi-close"
+        class="close-icon-in-feedback-container ma-1 ma-lg-2"
+        color="grey-lighten-1"
+      />
+      <img
+        :src="feedback.type == 'success' ? successfullyDoneImg : warningImg"
+        :width="display.smAndDown.value ? 50 : 75"
+      />
+      <p
+        class="text-subtitle-2 text-md-subtitle-1 text-xl-h5 default-title-letter text-grey-lighten-2"
+      >
+        {{ `Sevgili ${feedback.display_name},` }}
+      </p>
+      <p
+        class="text-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
+      >
+        {{ feedback.message }}
+      </p>
+    </div>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { VForm } from "vuetify/components";
+import { type FeedbackMessageOnContact } from "~/composables/core/interfaces";
+import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
+import warningImg from "~/assets/img/warning_anim.gif"
 
-let vantaEffect: any = null;
-const vantaRefContact = ref<HTMLElement | null>(null);
+const { $firestore } = useNuxtApp();
 
 const display = useDisplay();
 const router = useRouter();
 
+const vantaRefContact = ref<HTMLElement | null>(null);
 const contactForm = ref<InstanceType<typeof VForm> | null>(null);
 const contactFormNameRef = ref<InstanceType<typeof VForm> | null>(null);
+
+let vantaEffect: any = null;
 
 const isLoadingFormSubmit = ref(false);
 
@@ -95,6 +143,57 @@ const formModels = ref({
   msg: "",
 });
 
+const rules = ref({
+  name: [
+    (v: string) => !!v || "Adınız Gerekli",
+    (v: string) => (v && v.length >= 3) || "Adnınız en az 3 karakter olmalı",
+  ],
+  email: [
+    (v: string) => !!v || "Email Gerekli!",
+    (v: string) =>
+      (v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) || "Geçerli mail adresi giriniz",
+  ],
+   msg: [
+    (v: string) => !!v || "Mesajınız Gerekli",
+    (v: string) => (v && v.length >= 10) || "Mesajınız en az 10 karakter olmalı",
+  ],
+});
+
+const feedback = ref<FeedbackMessageOnContact>({
+  show: false,
+  display_name:"",
+  type: "success",
+  message: "",
+});
+
+const showFeedbackMessage = (name:string,type: "success" | "error", message: string, duration:number) => {
+  feedback.value.type = type;
+  feedback.value.display_name = name;
+  feedback.value.message = message;
+  feedback.value.show = true;
+
+  setTimeout(() => {
+    feedback.value.show = false;
+  }, duration);
+};
+
+const sendToDb = async () => {
+  try {
+    const messagesCollection = collection($firestore, "messages");
+
+    // 2️⃣ Add To Firebase
+    await addDoc(messagesCollection, {
+      name: formModels.value?.name,
+      email: formModels.value?.email,
+      message: formModels.value?.msg,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error: any) {
+    console.error("Error while send to db  :", error.message);
+  }
+};
+
 const handleForm = async () => {
   const result = await contactForm.value?.validate();
 
@@ -102,9 +201,31 @@ const handleForm = async () => {
 
   try {
     isLoadingFormSubmit.value = true;
+    await sendToDb();
+    await $fetch("/api/contact", {
+      method: "POST",
+      body: {
+        name: formModels.value?.name,
+        email: formModels.value?.email,
+        msg: formModels.value?.msg,
+      },
+    });
+
+ showFeedbackMessage(
+      formModels.value?.name,
+      "success",
+      "Mesajın başarıyla iletildi. En kısa sürede dönüş yapacağız 🙌",
+      3500
+    );
 
     contactForm.value?.reset();
   } catch (error: any) {
+     showFeedbackMessage(
+      formModels.value?.name,
+      "error",
+      "Bir hata oluştu. Lütfen biraz sonra tekrar dene.",
+      3500
+    );
     console.error(error.message);
   } finally {
     isLoadingFormSubmit.value = false;
@@ -146,33 +267,5 @@ onBeforeUnmount(() => {
 
 <style scoped>
 @import "~/assets/css/main.css";
-
-.bg-anim {
-  pointer-events: none !important;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh !important;
-  z-index: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.banner-content {
-  position: absolute;
-  z-index: 99999;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  backdrop-filter: blur(0.1rem);
-  -webkit-backdrop-filter: blur(0.1rem);
-}
-
-.form-container {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(0.1rem);
-  -webkit-backdrop-filter: blur(0.1rem);
-}
+@import "~/assets/css/contact.css";
 </style>

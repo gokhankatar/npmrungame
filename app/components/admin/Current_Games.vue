@@ -2,11 +2,13 @@
   <v-row class="d-flex justify-center align-center mx-auto mt-5 mt-lg-10">
     <v-col cols="12" lg="10" class="d-flex justify-space-between align-center">
       <div class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5">
-        <v-icon icon="mdi-trophy-outline" :size="smallScreen ? 'small' : 'x-large'" />
-        <p class="shadowed-text text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter">
-          Şuanda Oynanan Oyunlar
-          <strong class="font-weight-bold default-title-letter">({{ currentGames?.length }})</strong>
-        </p>
+         <Animated_Text
+          text="Şuan Oynanan Oyunlar"
+          class="cursor-pointer"
+          :msPerChar="50"
+          :duration="550"
+          :loop="true"
+        />
       </div>
 
       <div class="d-flex align-center ga-1 ga-lg-2">
@@ -330,6 +332,7 @@ import {
 } from "~/composables/data/handleData";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import Admin_Game_Table from "../common/Admin_Game_Table.vue";
+import Animated_Text from "../common/Animated_Text.vue";
 
 const { $firestore } = useNuxtApp();
 
