@@ -21,7 +21,7 @@ useHead({
     },
     { property: "og:type", content: "website" },
     { property: "og:url", content: "https://www.npmrungame.com" },
-    { property: "og:image", content: "https://www.npmrungame.com/og-image.png" }, // public klasörden
+    { property: "og:image", content: "https://www.npmrungame.com/og-image.png" },
 
     // Twitter Card
     { name: "twitter:card", content: "summary_large_image" },
@@ -30,11 +30,10 @@ useHead({
       name: "twitter:description",
       content: "Oyunları keşfet, favori oyunlarını öner ve özel önerilerimizi gör.",
     },
-    { name: "twitter:image", content: "https://www.npmrungame.com/og-image.png" }, // public klasörden
+    { name: "twitter:image", content: "https://www.npmrungame.com/og-image.png" },
   ],
   link: [{ rel: "canonical", href: "https://www.npmrungame.com" }],
 });
-
 </script>
 
 <template>
