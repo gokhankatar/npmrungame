@@ -71,6 +71,7 @@
                 v-bind="props"
                 :size="isSmallScreen ? 'x-small' : 'small'"
                 color="blue-lighten-1"
+                variant="tonal"
                 :ripple="false"
               >
                 {{ keywords.length - 4 }} tane daha var
@@ -93,7 +94,7 @@
                 v-for="(kw, index) in keywords.slice(4)"
                 :key="kw"
                 :size="isSmallScreen ? 'x-small' : 'small'"
-                :variant="selectedKeyword === kw ? 'elevated' : 'tonal'"
+                variant="elevated"
                 color="blue-lighten-1"
                 :ripple="false"
                 @click="filterByKeyword(kw)"

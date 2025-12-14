@@ -815,8 +815,6 @@ const addUserToDb = async () => {
 
     await addDoc(collection($firestore, "registered_users"), user);
 
-    console.log("User registered:", user);
-
     isSendMail.value = true;
 
     setTimeout(() => {

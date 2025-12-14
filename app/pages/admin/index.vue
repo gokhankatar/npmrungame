@@ -243,7 +243,6 @@ const handleRouteForResponsive = (
     handleLogout();
     isOpenResponsiveBar.value = false;
     _store.setActiveAdminListItem("dashboard" as any);
-    console.log("cıkıs gerek");
   }
 };
 

@@ -1,572 +1,567 @@
 * {
-    scrollbar-width: thin;
-    scrollbar-color: #979b9e #121212;
-    scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #979b9e #121212;
+  scroll-behavior: smooth;
 }
 
-
 .transition {
-    transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
 .default-title-letter {
-    letter-spacing: 1px !important;
-    font-weight: 500;
+  letter-spacing: 1px !important;
+  font-weight: 500;
 }
 
 .banner-container {
-    position: absolute;
-    height: 100vh;
-    width: 100%;
-    top: 0;
-    left: 0;
-    overflow: hidden;
+  position: absolute;
+  height: 100vh;
+  width: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
 }
 
 .banner-content {
-    position: absolute;
-    top: 65%;
-    width: 40%;
-    left: 10%;
-    z-index: 9999;
+  position: absolute;
+  top: 65%;
+  width: 40%;
+  left: 10%;
+  z-index: 9999;
 }
 
 .recommende-icon {
-    z-index: 9999;
+  z-index: 9999;
 }
 
 .discover-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3.5rem;
-    cursor: pointer;
-    transition: border-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3.5rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
 }
 
 .discover-btn:hover {
-    background-color: rgba(0, 0, 0, .75);
-    color: #fff;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
 }
 
 .discover-btn:hover .discover-icon {
-    animation: rotate360 0.6s ease-in-out;
+  animation: rotate360 0.6s ease-in-out;
 }
 
 .subscribe-btn {
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    display: inline-flex;
-    align-items: center;
-    border-radius: 3.5rem;
-    justify-content: center;
-    cursor: pointer;
-    transition: border-color 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: inline-flex;
+  align-items: center;
+  border-radius: 3.5rem;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
 }
 
 .subscribe-btn:hover {
-    background-color: red;
-    border-color: red !important;
+  background-color: red;
+  border-color: red !important;
 }
 
 .subscribe-btn:hover {
-    border-color: #999;
+  border-color: #999;
 }
 
 .subscribe-btn:hover .bell-icon {
-    animation: shake 0.4s ease-in-out;
+  animation: shake 0.4s ease-in-out;
 }
 
 .loading-text {
-    position: relative;
-    display: inline-block;
-    font-weight: 500;
-    background: linear-gradient(90deg,
-            rgba(200, 200, 200, 0.15) 25%,
-            rgba(255, 255, 255, 0.3) 50%,
-            rgba(200, 200, 200, 0.15) 75%);
-    background-size: 200% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation:
-        shimmer 1.6s infinite linear,
-        pulse 1.2s ease-in-out infinite;
+  position: relative;
+  display: inline-block;
+  font-weight: 500;
+  background: linear-gradient(
+    90deg,
+    rgba(200, 200, 200, 0.15) 25%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(200, 200, 200, 0.15) 75%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 1.6s infinite linear, pulse 1.2s ease-in-out infinite;
 }
 
 .game-card {
-    position: relative;
-    overflow: hidden;
+  position: relative;
+  overflow: hidden;
 }
 
 .metacritic-point {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 999;
-    backdrop-filter: blur(.2rem);
-    -webkit-backdrop-filter: blur(.2rem);
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999;
+  backdrop-filter: blur(0.2rem);
+  -webkit-backdrop-filter: blur(0.2rem);
 }
 
 .game-card-img {
-    object-position: center top;
-    filter: brightness(.7);
-    transition: transform 0.4s ease, filter 0.3s ease;
-    transform: scale(1);
+  object-position: center top;
+  filter: brightness(0.7);
+  transition: transform 0.4s ease, filter 0.3s ease;
+  transform: scale(1);
 }
 
 .game-card-img:hover {
-    filter: brightness(1);
-    transform: scale(1.1);
+  filter: brightness(1);
+  transform: scale(1.1);
 }
 
 .game-card-info {
-    background: rgba(0, 0, 0, .6);
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999;
+  background: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
 }
 
 .playtime-icon {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 999;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 999;
 }
 
 .category-chip:hover {
-    color: #fff !important;
+  color: #fff !important;
 }
 
 .active-game-platform-pc {
-    background-color: #0078D7 !important;
-    border-color: #0078D7;
-    color: #fff !important;
+  background-color: #0078d7 !important;
+  border-color: #0078d7;
+  color: #fff !important;
 }
 
 .active-game-platform-ps5 {
-    background-color: #003087 !important;
-    border-color: #003087;
-    color: #fff !important
+  background-color: #003087 !important;
+  border-color: #003087;
+  color: #fff !important;
 }
 
 .active-game-platform-xbox {
-    background-color: #107C10 !important;
-    border-color: #107C10;
-    color: #fff !important;
+  background-color: #107c10 !important;
+  border-color: #107c10;
+  color: #fff !important;
 }
 
 .active-game-platform-nintendo {
-    background-color: #E60012 !important;
-    border-color: #E60012;
-    color: #fff !important;
+  background-color: #e60012 !important;
+  border-color: #e60012;
+  color: #fff !important;
 }
 
 .active-game-platform-star {
-    background-color: #FFD700 !important;
-    border-color: #FFD700;
-    color: #000 !important;
+  background-color: #ffd700 !important;
+  border-color: #ffd700;
+  color: #000 !important;
 }
 
 .slide-down-enter-from {
-    transform: translateY(-100%);
-    opacity: 0;
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 .slide-down-enter-to {
-    transform: translateY(0);
-    opacity: 1;
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .slide-down-enter-active {
-    transition: all 0.35s ease;
+  transition: all 0.35s ease;
 }
 
 .slide-down-leave-from {
-    transform: translateY(0);
-    opacity: 1;
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .slide-down-leave-to {
-    transform: translateY(-100%);
-    opacity: 0;
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 .slide-down-leave-active {
-    transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .video-header-element {
-    background: #0008;
-    color: #fff;
+  background: #0008;
+  color: #fff;
 }
 
-
 .feature-card {
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    transition: 300ms ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 300ms ease;
 }
 
 .feature-card:hover {
-    background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .feature-card-icon {
-    transition: transform 350ms ease;
+  transition: transform 350ms ease;
 }
 
 .feature-card:hover .feature-card-icon {
-    animation: icon-bounce 450ms ease forwards;
+  animation: icon-bounce 450ms ease forwards;
 }
 
 .feature-card-title {
-    letter-spacing: 1px;
-    font-weight: 600;
-    text-transform: uppercase;
-    transition: 0.4s ease;
+  letter-spacing: 1px;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: 0.4s ease;
 }
 
 .feature-card:hover .feature-card-title {
-    animation: glow-text 1.2s ease forwards;
+  animation: glow-text 1.2s ease forwards;
 }
 
 .feature-card-title span {
-    opacity: 0;
-    display: inline-block;
-    transform: translateY(8px);
-    transition: 0.35s ease;
+  opacity: 0;
+  display: inline-block;
+  transform: translateY(8px);
+  transition: 0.35s ease;
 }
-
 
 .feature-card:hover .feature-card-icon {
-    animation: bounce 1.2s ease forwards;
+  animation: bounce 1.2s ease forwards;
 }
 
-
 .shadowed-text {
-    text-shadow: -2px 0 4px rgba(255, 255, 255, 0.5),
-        2px 0 4px rgba(255, 255, 255, 0.5), 0 0 8px rgba(255, 255, 255, 0.01);
+  text-shadow: -2px 0 4px rgba(255, 255, 255, 0.5),
+    2px 0 4px rgba(255, 255, 255, 0.5), 0 0 8px rgba(255, 255, 255, 0.01);
 }
 
 .scan-dot {
-    position: absolute;
-    background-color: #ff1e1e;
-    top: 1rem;
-    left: 1rem;
-    border-radius: 50%;
-    box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
-    z-index: 999;
+  position: absolute;
+  background-color: #ff1e1e;
+  top: 1rem;
+  left: 1rem;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
+  z-index: 999;
 }
 
 .blog-img-gif {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    z-index: 999;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 999;
 }
 
 .scan-dot::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    animation: pulseScanDot 1.2s infinite ease-out;
-    background-color: rgba(255, 0, 0, 0.6);
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: pulseScanDot 1.2s infinite ease-out;
+  background-color: rgba(255, 0, 0, 0.6);
 }
 
 .scan-dot-home-page {
-    position: relative;
-    background-color: #ff1e1e;
-    border-radius: 50%;
-    box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
-    z-index: 999;
+  position: relative;
+  background-color: #ff1e1e;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
+  z-index: 999;
 }
 
 .scan-dot-home-page::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background-color: rgba(255, 0, 0, 0.6);
-    animation: pulseScanDot 1.2s infinite ease-out;
-    z-index: -1;
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: rgba(255, 0, 0, 0.6);
+  animation: pulseScanDot 1.2s infinite ease-out;
+  z-index: -1;
 }
 
 .bell-shake {
-    animation: bellShake 1.2s infinite ease-in-out;
-    transform-origin: top center;
+  animation: bellShake 1.2s infinite ease-in-out;
+  transform-origin: top center;
 }
 
 .input-container {
-    background-image: linear-gradient(to top, #09203f 0%, #537895 100%);
-    border-radius: 2rem;
-    padding: 2rem;
+  background-image: linear-gradient(to top, #09203f 0%, #537895 100%);
+  border-radius: 2rem;
+  padding: 2rem;
 }
 
 .subs-email-input {
-    position: relative;
+  position: relative;
 }
 
 .subs-email-btn {
-    position: absolute;
-    right: .2rem;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 95%;
-    z-index: 999;
+  position: absolute;
+  right: 0.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 95%;
+  z-index: 999;
 }
 
 .blog-bounce {
-    animation: blogBounce 1.6s infinite ease-in-out;
+  animation: blogBounce 1.6s infinite ease-in-out;
 }
 
 .successful-registered-container {
-    position: relative;
-    background: rgba(0, 0, 0, .3);
-    border: 1px solid rgba(255, 255, 255, .15);
-    backdrop-filter: blur(1rem);
-    -webkit-backdrop-filter: blur(1rem);
+  position: relative;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
 }
 
 .close-btn-in-successful-registered-container {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 999;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999;
 }
 
 .chart-gant {
-    display: inline-block;
-    animation: pulseMove 2s ease-in-out infinite;
+  display: inline-block;
+  animation: pulseMove 2s ease-in-out infinite;
 }
 
 .question-icon {
-    display: inline-block;
-    animation: swingRotate 3s ease-in-out infinite;
-    transform-origin: center;
+  display: inline-block;
+  animation: swingRotate 3s ease-in-out infinite;
+  transform-origin: center;
 }
 
 @keyframes swingRotate {
-    0% {
-        transform: rotate(0deg) translateX(0);
-    }
+  0% {
+    transform: rotate(0deg) translateX(0);
+  }
 
-    25% {
-        transform: rotate(10deg) translateX(2px);
-    }
+  25% {
+    transform: rotate(10deg) translateX(2px);
+  }
 
-    50% {
-        transform: rotate(0deg) translateX(0);
-    }
+  50% {
+    transform: rotate(0deg) translateX(0);
+  }
 
-    75% {
-        transform: rotate(-10deg) translateX(-2px);
-    }
+  75% {
+    transform: rotate(-10deg) translateX(-2px);
+  }
 
-    100% {
-        transform: rotate(0deg) translateX(0);
-    }
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
 }
 
 @keyframes pulseMove {
-    0% {
-        transform: translateY(0) scale(1);
-    }
+  0% {
+    transform: translateY(0) scale(1);
+  }
 
-    25% {
-        transform: translateY(-5px) scale(1.05);
-    }
+  25% {
+    transform: translateY(-5px) scale(1.05);
+  }
 
-    50% {
-        transform: translateY(0) scale(1.1);
-    }
+  50% {
+    transform: translateY(0) scale(1.1);
+  }
 
-    75% {
-        transform: translateY(5px) scale(1.05);
-    }
+  75% {
+    transform: translateY(5px) scale(1.05);
+  }
 
-    100% {
-        transform: translateY(0) scale(1);
-    }
+  100% {
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes blogBounce {
-    0% {
-        transform: translateY(0);
-    }
+  0% {
+    transform: translateY(0);
+  }
 
-    20% {
-        transform: translateY(-4px);
-    }
+  20% {
+    transform: translateY(-4px);
+  }
 
-    40% {
-        transform: translateY(0);
-    }
+  40% {
+    transform: translateY(0);
+  }
 
-    60% {
-        transform: translateY(-2px);
-    }
+  60% {
+    transform: translateY(-2px);
+  }
 
-    80% {
-        transform: translateY(0);
-    }
+  80% {
+    transform: translateY(0);
+  }
 
-    100% {
-        transform: translateY(0);
-    }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes bellShake {
-    0% {
-        transform: rotate(0deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
 
-    10% {
-        transform: rotate(-15deg);
-    }
+  10% {
+    transform: rotate(-15deg);
+  }
 
-    20% {
-        transform: rotate(15deg);
-    }
+  20% {
+    transform: rotate(15deg);
+  }
 
-    30% {
-        transform: rotate(-12deg);
-    }
+  30% {
+    transform: rotate(-12deg);
+  }
 
-    40% {
-        transform: rotate(12deg);
-    }
+  40% {
+    transform: rotate(12deg);
+  }
 
-    50% {
-        transform: rotate(-8deg);
-    }
+  50% {
+    transform: rotate(-8deg);
+  }
 
-    60% {
-        transform: rotate(8deg);
-    }
+  60% {
+    transform: rotate(8deg);
+  }
 
-    70% {
-        transform: rotate(-4deg);
-    }
+  70% {
+    transform: rotate(-4deg);
+  }
 
-    80% {
-        transform: rotate(4deg);
-    }
+  80% {
+    transform: rotate(4deg);
+  }
 
-    100% {
-        transform: rotate(0deg);
-    }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 @keyframes pulseScanDot {
-    0% {
-        transform: scale(0.7);
-        opacity: 0.9;
-    }
+  0% {
+    transform: scale(0.7);
+    opacity: 0.9;
+  }
 
-    70% {
-        transform: scale(1.7);
-        opacity: 0;
-    }
+  70% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
 
-    100% {
-        transform: scale(0.7);
-        opacity: 0;
-    }
+  100% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
 }
 
 @keyframes bounce {
-    0% {
-        transform: translateY(0);
-    }
+  0% {
+    transform: translateY(0);
+  }
 
-    30% {
-        transform: translateY(-8px);
-    }
+  30% {
+    transform: translateY(-8px);
+  }
 
-    60% {
-        transform: translateY(4px);
-    }
+  60% {
+    transform: translateY(4px);
+  }
 
-    100% {
-        transform: translateY(0);
-    }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes shake {
-    0% {
-        transform: rotate(0deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
 
-    25% {
-        transform: rotate(10deg);
-    }
+  25% {
+    transform: rotate(10deg);
+  }
 
-    50% {
-        transform: rotate(-10deg);
-    }
+  50% {
+    transform: rotate(-10deg);
+  }
 
-    75% {
-        transform: rotate(6deg);
-    }
+  75% {
+    transform: rotate(6deg);
+  }
 
-    100% {
-        transform: rotate(0deg);
-    }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 @keyframes shimmer {
-    0% {
-        background-position: -200% 0;
-    }
+  0% {
+    background-position: -200% 0;
+  }
 
-    100% {
-        background-position: 200% 0;
-    }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
 
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-
-    50% {
-        transform: scale(1.05);
-        opacity: 1;
-    }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
 }
 
 @keyframes rotate360 {
-    from {
-        transform: rotate(0deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
 
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes icon-bounce {
-    0% {
-        transform: translateY(0);
-    }
+  0% {
+    transform: translateY(0);
+  }
 
-    30% {
-        transform: translateY(-6px);
-    }
+  30% {
+    transform: translateY(-6px);
+  }
 
-    70% {
-        transform: translateY(4px);
-    }
+  70% {
+    transform: translateY(4px);
+  }
 
-    100% {
-        transform: translateY(0);
-    }
+  100% {
+    transform: translateY(0);
+  }
 }

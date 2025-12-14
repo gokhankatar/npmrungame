@@ -155,7 +155,8 @@ onBeforeUnmount(() => {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh !important;
+  height: 100dvh !important;
+  overflow: hidden;
 }
 
 .banner-content {
@@ -173,7 +174,7 @@ onBeforeUnmount(() => {
 
 .banner-content-sm {
   position: absolute;
-  top: 80%;
+  top: 77%;
   left: 50%;
   transform: translate(-50%, -50%);
 }

@@ -1,46 +1,12 @@
 <template>
-  <!-- ! Only Development Mode -->
-
-  <v-btn
-    v-if="!_store.isAdmin"
-    :ripple="false"
-    class="dev-btn d-flex align-center"
-    variant="outlined"
-    rounded="xl"
-    @mouseover="hoverDev = true"
-    @mouseleave="hoverDev = false"
-    @click="router.replace('/admin')"
-  >
-    <v-icon class="dev-icon" icon="mdi-login" />
-
-    <transition name="text-slide">
-      <span
-        v-if="hoverDev"
-        class="ml-2 ml-lg-3 dev-text default-title-letter text-caption text-lg-subtitle-2"
-      >
-        Admin Paneline Git
-      </span>
-    </transition>
-  </v-btn>
-
-  <v-btn
-    v-if="_store.isAdmin"
-    :ripple="false"
-    class="back-btn d-flex align-center"
-    :variant="display.smAndDown.value ? 'elevated' : 'outlined'"
-    rounded="xl"
-    @mouseover="hover = true"
-    @mouseleave="hover = false"
-    @click="router.replace('/admin')"
-  >
+  <v-btn v-if="_store.isAdmin" :ripple="false" class="back-btn d-flex align-center"
+    :variant="display.smAndDown.value ? 'elevated' : 'outlined'" rounded="xl" @mouseover="hover = true"
+    @mouseleave="hover = false" @click="router.replace('/admin')">
     <v-icon class="back-icon" icon="mdi-arrow-right" />
 
     <transition name="text-slide">
-      <span
-        v-if="hover"
-        class="ml-2 ml-lg-3 back-text default-title-letter text-caption text-lg-subtitle-2"
-        >Admin Paneline Dön</span
-      >
+      <span v-if="hover" class="ml-2 ml-lg-3 back-text default-title-letter text-caption text-lg-subtitle-2">Admin
+        Paneline Dön</span>
     </transition>
   </v-btn>
 </template>
