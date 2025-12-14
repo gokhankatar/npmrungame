@@ -1,6 +1,6 @@
 # NpmRunGame 🎮
 
-<img src="/assets/screenshots/general.png" alt="NpmRunGame Screenshot" />
+<img src="/app/assets/screenshots/initial_ss.png" alt="NpmRunGame Screenshot" />
 
 ## Description
 
@@ -46,17 +46,17 @@ Key highlights:
 
 ## Screenshots
 
-### Game Dashboard
-<img src="/assets/screenshots/general2.png" alt="Game Dashboard" />
+### Dashboard && Admin
+<img src="/app/assets/screenshots/dashboard_ss.png" alt="Game Dashboard" />
 
-### Game Search
-<img src="/assets/screenshots/searchEngine.png" alt="Game Search Engine" />
+### Discover thousand games
+<img src="/app/assets/screenshots/games_ss.png" alt="Game Search Engine" />
 
 ### Mobile View
-<img src="/assets/screenshots/mobileView.png" alt="Mobile View" />
+<img src="/app/assets/screenshots/mobile_ss.png" alt="Mobile View" />
 
 ### Tablet View
-<img src="/assets/screenshots/tabletView.png" alt="Tablet View" />
+<img src="/app/assets/screenshots/tablet_ss.png" alt="Tablet View" />
 
 ---
 
