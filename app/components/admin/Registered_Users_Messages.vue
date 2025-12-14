@@ -37,7 +37,7 @@
         hover
       >
         <template #item="{ item, index }">
-          <tr class="table-row cursor-pointer" @click="handleRowClick(item)">
+          <tr class="table-row">
             <td>
               <div class="d-flex align-center ga-1 ga-lg-2 py-2">
                 <v-icon icon="mdi-account" size="small" />
@@ -136,7 +136,7 @@
         hover
       >
         <template #item="{ item, index }">
-          <tr class="table-row cursor-pointer" @click="handleRowClick(item)">
+          <tr class="table-row">
             <td>
               <div class="d-flex align-center ga-1 ga-lg-2 py-2">
                 <v-icon icon="mdi-account" size="small" />
@@ -171,7 +171,7 @@
             <td>
               <div class="d-flex justify-start align-center ga-1">
                 <v-btn
-                  @click.stop="handleDeleteUser(item)"
+                  @click.stop="handleDeleteMsg(item)"
                   variant="tonal"
                   prepend-icon="mdi-delete"
                   text="Sil"
@@ -264,8 +264,8 @@ const handleDeleteUser = (user: any) => {
   console.log(user);
 };
 
-const handleRowClick = (user: any) => {
-  console.log(user);
+const handleDeleteMsg = (msg: any) => {
+  console.log(msg);
 };
 
 onMounted(() => {

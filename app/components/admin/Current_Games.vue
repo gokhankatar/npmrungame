@@ -428,8 +428,6 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
     isDeletingGameFromDb.value = true;
 
     await deleteDoc(doc($firestore, "current_games", firestoreId));
-
-    console.log("The game deleted from DB :", firestoreId);
     sendNotification(`${activeGame.value?.name} adlı oyun veritabanından silindi!`);
   } catch (error) {
     console.error("Silme hatası:", error);
@@ -477,7 +475,6 @@ const addGameToDb = async () => {
     // 🔥 Single
     if (games.length === 1) {
       await addDoc(collection($firestore, "current_games"), games[0]);
-      console.log("Tek oyun eklendi:", games[0].name);
       isAddedToDb.value = true;
 
       setTimeout(() => {
@@ -495,8 +492,6 @@ const addGameToDb = async () => {
     });
 
     await batch.commit();
-
-    console.log(`${games.length} oyun toplu olarak eklendi`);
     isAddedToDb.value = true;
 
     setTimeout(() => {

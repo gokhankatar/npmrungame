@@ -487,8 +487,6 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
     isDeletingGameFromDb.value = true;
 
     await deleteDoc(doc($firestore, "recommended_games", firestoreId));
-
-    console.log("The game deleted from DB :", firestoreId);
     sendNotification(`${activeGame.value?.name} adlı oyun veritabanından silindi!`);
   } catch (error) {
     console.error("Silme hatası:", error);

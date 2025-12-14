@@ -536,8 +536,6 @@ const getBlogsFromDb = async () => {
 };
 
 const handleRowClick = (item: any) => {
-  console.log(item);
-
   activeBlog.value = item;
   isOpenBlogDetail.value = true;
 };
@@ -552,8 +550,6 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
     isDeletingBlogFromDb.value = true;
 
     await deleteDoc(doc($firestore, "blogs", firestoreId));
-
-    console.log("The blog deleted from DB :", firestoreId);
 
     blogToastModels.value.status = "deleted"
     blogToastModels.value.msg = `${activeBlog.value?.title} başlıklı blog başarıyla silindi!`;
