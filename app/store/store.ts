@@ -40,6 +40,9 @@ const store = defineStore("npmrungame_store", {
     setTrueIsSeenFeatureNewsToast() {
       this.isSeenFeatureNewsToast = true;
     },
+    setFalseIsSeenFeatureNewsToast() {
+      this.isSeenFeatureNewsToast = false;
+    },
     setPagination(current: number, next: string | null, prev: string | null) {
       this.currentPage = current;
       this.nextPage = next;

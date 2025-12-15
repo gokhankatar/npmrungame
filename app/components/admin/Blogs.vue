@@ -734,9 +734,6 @@
   <!-- ! Feature News Toast -->
   <v-dialog
     v-model="modelSeenFeatureNewsToast"
-    @close-on-click="handleCloseFeatureNewsToast()"
-    @close-on-escape="handleCloseFeatureNewsToast()"
-    @close-on-content-click="handleCloseFeatureNewsToast()"
     :max-width="600"
     style="
       background-color: rgba(0, 0, 0, 0.85);
@@ -748,7 +745,7 @@
       class="successfully-done-container d-flex flex-column align-center justify-center pa-5 rounded-xl"
     >
       <v-btn
-        @click="handleCloseFeatureNewsToast()"
+        @click="_store.setTrueIsSeenFeatureNewsToast"
         class="close-icon-in-successfully-done-container ma-1 ma-lg-2"
         icon="mdi-close"
         :ripple="false"
@@ -801,7 +798,7 @@ const _store = store()
 const isSmallScreen = computed(() => display.smAndDown.value);
 const isLargeScreen = computed(() => display.lgAndUp.value);
 
-const modelSeenFeatureNewsToast = ref(_store.isSeenFeatureNewsToast == false ? true:false);
+const modelSeenFeatureNewsToast = computed(() => !_store.isSeenFeatureNewsToast);
 const isSubmitting = ref(false);
 const isAddBlog = ref(false);
 const isGettingBlogs = ref(false);
@@ -1105,11 +1102,6 @@ const updateDocOnDb = async () => {
     getBlogsFromDb();
   }
 };
-
-const handleCloseFeatureNewsToast = () => {
-  blogToastModels.value.blogToastBar = false
-  _store.setTrueIsSeenFeatureNewsToast();
-}
 
 watch(
   () => formModels.value.file,
