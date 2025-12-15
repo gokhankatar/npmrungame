@@ -51,7 +51,7 @@
           </p>
         </div>
 
-        <div class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg"
+        <div class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg w-100"
           v-for="(item, index) of navbarListItems" :key="item.title" @click="handleRouteForResponsive(item.path)">
           <template v-if="loadingItem === item.path">
             <v-progress-circular indeterminate size="20" color="grey-darken-1" />
