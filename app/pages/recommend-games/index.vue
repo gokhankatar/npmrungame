@@ -5,275 +5,133 @@
     <v-row class="w-100 mx-auto" v-if="recommendedGames?.length > 0">
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center w-100">
-          <p
-            class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-deep-purple-lighten-1"
-          >
+          <p class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-deep-purple-lighten-1">
             Daha Önce Önerilen Oyunlar
           </p>
-          <v-btn
-            @click="getRecommendedGames"
-            :loading="isGettingRecommendedGames"
-            variant="text"
-            :ripple="false"
-            :color="isGettingRecommendedGames ? 'deep-purple' : 'grey-lighten-1'"
-            icon="mdi-refresh"
-            :size="display.smAndDown.value ? 'small' : 'default'"
-          />
+          <v-btn @click="getRecommendedGames" :loading="isGettingRecommendedGames" variant="text" :ripple="false"
+            :color="isGettingRecommendedGames ? 'deep-purple' : 'grey-lighten-1'" icon="mdi-refresh"
+            :size="display.smAndDown.value ? 'small' : 'default'" />
         </div>
 
         <v-divider class="mt-2 mb-3 mb-lg-6" />
       </v-col>
 
-      <Game_Card
-        :arr="recommendedGames"
-        :loading="isGettingRecommendedGames"
-        :onRowClick="handleRowClick"
-      />
+      <Game_Card :arr="recommendedGames" :loading="isGettingRecommendedGames" :onRowClick="handleRowClick" />
     </v-row>
 
     <!-- Recommend Game Section -->
-    <v-row
-      class="my-5 my-lg-8 w-100 mx-auto d-flex flex-column justify-center align-center"
-    >
+    <v-row class="my-5 my-lg-8 w-100 mx-auto d-flex flex-column justify-center align-center">
       <v-col cols="12" sm="8" lg="6" xl="4">
-        <v-btn
-          v-if="!isOpenRecommendGame"
-          @click="isOpenRecommendGame = true"
-          class="default-title-letter"
-          text="Oyun Öner"
-          variant="elevated"
-          :size="display.smAndDown.value ? 'default' : 'x-large'"
-          rounded="xl"
-          :ripple="false"
-          :elevation="0"
-          block
-          prepend-icon="mdi-microsoft-xbox-controller"
-          color="deep-purple"
-        />
-        <v-btn
-          v-else
-          @click="isOpenRecommendGame = false"
-          class="default-title-letter"
-          text="Iptal"
-          variant="elevated"
-          :size="display.smAndDown.value ? 'default' : 'x-large'"
-          rounded="xl"
-          :ripple="false"
-          :elevation="0"
-          block
-          prepend-icon="mdi-close"
-        />
+        <v-btn v-if="!isOpenRecommendGame" @click="isOpenRecommendGame = true" class="default-title-letter"
+          text="Oyun Öner" variant="elevated" :size="display.smAndDown.value ? 'default' : 'x-large'" rounded="xl"
+          :ripple="false" :elevation="0" block prepend-icon="mdi-microsoft-xbox-controller" color="deep-purple" />
+        <v-btn v-else @click="isOpenRecommendGame = false" class="default-title-letter" text="Iptal" variant="elevated"
+          :size="display.smAndDown.value ? 'default' : 'x-large'" rounded="xl" :ripple="false" :elevation="0" block
+          prepend-icon="mdi-close" />
       </v-col>
 
       <!-- Recommend Game Form -->
       <transition name="slide-down">
         <v-col cols="12" lg="8" xl="6" v-if="isOpenRecommendGame">
-          <v-form
-            class="recommend-game-form-container pa-5 pa-lg-10 rounded-lg"
-            ref="recommendGameForm"
-            @submit.prevent="handleRecommendGame"
-          >
-            <v-text-field
-              v-model="models.name"
-              :rules="rules.name"
-              rounded="xl"
-              label="Ad"
-              type="text"
-              variant="outlined"
-              class="default-title-letter text-grey-lighten-2"
-              prepend-inner-icon="mdi-account"
-              :density="display.smAndDown.value ? 'compact' : 'comfortable'"
-              clearable
-            />
-            <v-text-field
-              v-model="models.email"
-              :rules="rules.email"
-              rounded="xl"
-              label="Email"
-              type="email"
-              variant="outlined"
-              class="default-title-letter text-grey-lighten-2"
-              prepend-inner-icon="mdi-email"
-              :density="display.smAndDown.value ? 'compact' : 'comfortable'"
-              clearable
-            />
-            <v-textarea
-              rounded="xl"
-              label="Neden Bu Oyun/Oyunlar"
-              variant="outlined"
-              counter
-              class="default-title-letter text-grey-lighten-2"
-              prepend-inner-icon="mdi-email"
-              :density="display.smAndDown.value ? 'compact' : 'comfortable'"
-              clearable
-            />
+          <v-form class="recommend-game-form-container pa-5 pa-lg-10 rounded-lg" ref="recommendGameForm"
+            @submit.prevent="handleRecommendGame">
+            <v-text-field v-model="models.name" :rules="rules.name" rounded="xl" label="Ad" type="text"
+              variant="outlined" class="default-title-letter text-grey-lighten-2" prepend-inner-icon="mdi-account"
+              :density="display.smAndDown.value ? 'compact' : 'comfortable'" clearable />
+            <v-text-field v-model="models.email" :rules="rules.email" rounded="xl" label="Email" type="email"
+              variant="outlined" class="default-title-letter text-grey-lighten-2" prepend-inner-icon="mdi-email"
+              :density="display.smAndDown.value ? 'compact' : 'comfortable'" clearable />
+            <v-textarea rounded="xl" label="Neden Bu Oyun/Oyunlar" variant="outlined" counter
+              class="default-title-letter text-grey-lighten-2" prepend-inner-icon="mdi-email"
+              :density="display.smAndDown.value ? 'compact' : 'comfortable'" clearable />
 
-            <div
-              class="add-game-container d-flex flex-column align-center ga-2 ga-lg-4 rounded"
-            >
-              <v-text-field
-                v-model="searchGameText"
-                @input="searchGame"
-                prepend-inner-icon="mdi-magnify"
-                variant="outlined"
-                class="w-100 text-grey-lighten-1"
-                color="grey-lighten-1"
-                rounded="xl"
-                label="Oyun Ara"
-                placeholder="Black Myth Wukong..."
-                :density="display.xl.value ? 'comfortable' : 'compact'"
-                clearable
-              />
+            <div class="add-game-container d-flex flex-column align-center ga-2 ga-lg-4 rounded">
+              <v-text-field v-model="searchGameText" @input="searchGame" prepend-inner-icon="mdi-magnify"
+                variant="outlined" class="w-100 text-grey-lighten-1" color="grey-lighten-1" rounded="xl"
+                label="Oyun Ara" placeholder="Black Myth Wukong..."
+                :density="display.xl.value ? 'comfortable' : 'compact'" clearable />
 
               <transition name="slide-up">
-                <v-alert
-                  v-if="showNoGameSelectedWarning"
-                  type="warning"
-                  variant="tonal"
-                  density="compact"
-                  class="text-caption w-100"
-                  text="Lütfen en az 1 oyun seç."
-                />
+                <v-alert v-if="showNoGameSelectedWarning" type="warning" variant="tonal" density="compact"
+                  class="text-caption w-100" text="Lütfen en az 1 oyun seç." />
               </transition>
 
               <transition name="slide-up">
-                <v-alert
-                  v-if="showMaxLimitWarning"
-                  type="warning"
-                  variant="tonal"
-                  density="compact"
-                  class="text-caption w-100"
-                  text="En fazla 3 oyun önerebilirsin."
-                />
+                <v-alert v-if="showMaxLimitWarning" type="warning" variant="tonal" density="compact"
+                  class="text-caption w-100" text="En fazla 3 oyun önerebilirsin." />
               </transition>
 
               <!-- 🔥 Arama sonuç alanı -->
-              <div
-                v-if="searchGameText?.length"
-                class="w-100"
-                style="max-height: 350px; overflow-y: auto"
-              >
+              <div v-if="searchGameText?.length" class="w-100" style="max-height: 350px; overflow-y: auto">
                 <!-- Loading -->
-                <div
-                  v-if="isSearchingGameLoading"
-                  class="d-flex justify-start py-2 py-lg-4"
-                >
+                <div v-if="isSearchingGameLoading" class="d-flex justify-start py-2 py-lg-4">
                   <v-progress-circular indeterminate size="24" color="grey-lighten-1" />
                 </div>
 
                 <!-- Search Results -->
                 <template v-else>
-                  <p
-                    v-if="searchResults?.length"
-                    class="text-caption text-grey-darken-1 text-start default-title-letter"
-                  >
+                  <p v-if="searchResults?.length"
+                    class="text-caption text-grey-darken-1 text-start default-title-letter">
                     {{ `${searchResults?.length} oyun bulundu` }}
                   </p>
-                  <v-card
-                    v-for="game in searchResults"
-                    :key="game.id"
-                    :ripple="false"
+                  <v-card v-for="game in searchResults" :key="game.id" :ripple="false"
                     class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer"
-                    @click="selectGameAfterSearch(game)"
-                    :class="{
+                    @click="selectGameAfterSearch(game)" :class="{
                       'selected-research-game': selectedGamesAfterResearch.some(
                         (i) => i.id === game.id
                       ),
-                    }"
-                  >
+                    }">
                     <v-avatar :size="display.smAndDown.value ? 30 : 48" rounded>
                       <v-img :src="game.background_image" :alt="game.name" cover />
                     </v-avatar>
 
                     <div class="d-flex flex-column">
-                      <p
-                        class="text-caption text-lg-subtitle-2 default-title-letter"
-                        :class="
-                          selectedGamesAfterResearch.some((i) => i.id === game.id)
-                            ? 'text-grey-lighten-3'
-                            : 'text-grey-lighten-1'
-                        "
-                      >
+                      <p class="text-caption text-lg-subtitle-2 default-title-letter" :class="selectedGamesAfterResearch.some((i) => i.id === game.id)
+                        ? 'text-grey-lighten-3'
+                        : 'text-grey-lighten-1'
+                        ">
                         {{ `${game.name}` }}
-                        <span v-if="game.released"
-                          >({{ new Date(game.released).getFullYear() }})</span
-                        >
+                        <span v-if="game.released">({{ new Date(game.released).getFullYear() }})</span>
                       </p>
 
-                      <p
-                        class="text-caption"
-                        :class="`text-${useMetacriticStyle(game?.metacritic).color}`"
-                      >
+                      <p class="text-caption" :class="`text-${useMetacriticStyle(game?.metacritic).color}`">
                         Metacritic: {{ game.metacritic ?? "N/A" }}
                       </p>
                     </div>
                   </v-card>
 
                   <!-- No Result -->
-                  <p
-                    v-if="searchResults?.length === 0 && searchGameText?.length > 2"
-                    class="text-center text-grey-darken-1 mt-3"
-                  >
+                  <p v-if="searchResults?.length === 0 && searchGameText?.length > 2"
+                    class="text-center text-grey-darken-1 mt-3">
                     Sonuç bulunamadı
                   </p>
                 </template>
               </div>
 
-              <v-row
-                class="w-100 mx-auto d-flex align-center"
-                :class="
-                  selectedGamesAfterResearch.length == 0
-                    ? 'justify-end'
-                    : 'justify-center'
-                "
-                dense
-              >
+              <v-row class="w-100 mx-auto d-flex align-center" :class="selectedGamesAfterResearch.length == 0
+                ? 'justify-end'
+                : 'justify-center'
+                " dense>
                 <v-col cols="12" sm="6">
-                  <v-btn
-                    @click="handleRecommendGame"
-                    :loading="isAddingToDb"
-                    :text="
-                      selectedGamesAfterResearch.length > 0
-                        ? `Öner (${selectedGamesAfterResearch?.length})`
-                        : 'Öner'
-                    "
-                    :size="display.smAndDown.value ? 'small' : 'large'"
-                    :ripple="false"
-                    prepend-icon="mdi-plus"
-                    variant="elevated"
-                    color="deep-purple"
-                    rounded="xl"
-                    class="text-capitalize"
-                    block
-                  />
+                  <v-btn @click="handleRecommendGame" :loading="isAddingToDb" :text="selectedGamesAfterResearch.length > 0
+                    ? `Öner (${selectedGamesAfterResearch?.length})`
+                    : 'Öner'
+                    " :size="display.smAndDown.value ? 'small' : 'large'" :ripple="false" prepend-icon="mdi-plus"
+                    variant="elevated" color="deep-purple" rounded="xl" class="text-capitalize" block />
                 </v-col>
 
                 <v-col cols="12" sm="6" v-if="selectedGamesAfterResearch?.length > 0">
-                  <v-btn
-                    @click="selectedGamesAfterResearch = []"
-                    text="Tüm Seçimleri Kaldır"
-                    variant="tonal"
-                    color="warning"
-                    :size="display.smAndDown.value ? 'small' : 'large'"
-                    rounded="xl"
-                    :ripple="false"
-                    class="text-capitalize"
-                    prepend-icon="mdi-broom"
-                    block
-                  />
+                  <v-btn @click="selectedGamesAfterResearch = []" text="Tüm Seçimleri Kaldır" variant="tonal"
+                    color="warning" :size="display.smAndDown.value ? 'small' : 'large'" rounded="xl" :ripple="false"
+                    class="text-capitalize" prepend-icon="mdi-broom" block />
                 </v-col>
               </v-row>
 
               <transition name="slide-up">
                 <v-row class="w-100" v-if="isAddedToDb">
                   <v-col cols="12">
-                    <v-alert
-                      class="w-100 text-caption text-lg-subtitle-2"
-                      density="compact"
-                      color="success"
-                      variant="text"
-                      :text="`${addedGameToDbCount} oyun eklendi`"
-                    />
+                    <v-alert class="w-100 text-caption text-lg-subtitle-2" density="compact" color="success"
+                      variant="text" :text="`${addedGameToDbCount} oyun eklendi`" />
                   </v-col>
                 </v-row>
               </transition>
@@ -283,36 +141,18 @@
       </transition>
     </v-row>
   </v-container>
-  <v-dialog
-    v-model="isAddedToDb"
-    :max-width="600"
-    style="
+  <v-dialog v-model="isAddedToDb" :max-width="600" style="
       background-color: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(0.2rem);
       -webkit-backdrop-filter: blur(0.2rem);
-    "
-  >
+    ">
     <div
-      class="successfull-recommended-pop-up-container d-flex flex-column align-center ga-1 ga-lg-3 pa-2 pa-md-5 pa-lg-10 rounded-lg w-100"
-    >
-      <v-btn
-        class="successfull-recommended-pop-up-container-close-btn ma-1 ma-lg-2"
-        variant="text"
-        size="small"
-        icon="mdi-close"
-        color="grey"
-        :ripple="false"
-        @click="isAddedToDb = false"
-      />
+      class="successfull-recommended-pop-up-container d-flex flex-column align-center ga-1 ga-lg-3 pa-2 pa-md-5 pa-lg-10 rounded-lg w-100">
+      <v-btn class="successfull-recommended-pop-up-container-close-btn ma-1 ma-lg-2" variant="text" size="small"
+        icon="mdi-close" color="grey" :ripple="false" @click="isAddedToDb = false" />
 
-      <v-img
-        v-if="msgGenre == 'successfull'"
-        :src="successfullyDoneImg"
-        :width="display.smAndDown.value ? 50 : 75"
-      />
-      <p
-        class="text-center text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter"
-      >
+      <v-img v-if="msgGenre == 'successfull'" :src="successfullyDoneImg" :width="display.smAndDown.value ? 50 : 75" />
+      <p class="text-center text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter">
         {{ dialogMsg }}
       </p>
     </div>
@@ -464,6 +304,15 @@ const addGameToRecommendedGames = async () => {
       const finalGameData = { ...game, ...metadata };
       await addDoc(collection($firestore, "recommended_games"), finalGameData);
 
+      await addDoc(collection($firestore, "notifications"), {
+        game_name: game?.name || game?.title || null,
+        recommender_name: metadata.recommender_name,
+        recommender_email: metadata.recommender_email,
+        status: "recommended_game",
+        read_status: false,
+        created_at: new Date().toISOString(),
+      });
+
       resetForm();
       msgGenre.value = "successfull";
       dialogMsg.value = "Oyun öneriniz başarıyla iletildi! 🎉";
@@ -482,6 +331,17 @@ const addGameToRecommendedGames = async () => {
       const ref = doc(collection($firestore, "recommended_games"));
       const finalGameData = { ...g, ...metadata };
       batch.set(ref, finalGameData);
+
+      // notifications
+      const notificationRef = doc(collection($firestore, "notifications"));
+      batch.set(notificationRef, {
+        game_name: g?.name || g?.title || null,
+        recommender_name: metadata.recommender_name,
+        recommender_email: metadata.recommender_email,
+        status: "recommended_game",
+        read_status: false,
+        created_at: new Date().toISOString(),
+      });
     });
 
     await batch.commit();

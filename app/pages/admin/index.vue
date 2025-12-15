@@ -7,9 +7,21 @@
         :ripple="false" size="sm" />
       <template v-slot:prepend>
         <v-list class="bg-transparent mt-10" :density="isExtraLargeScreen ? 'comfortable' : 'compact'">
-          <v-list-item v-for="(item, index) of adminListItems" :key="index" :prepend-icon="item.icon"
-            @click="_store.setActiveAdminListItem(item.slug as any)" :ripple="false" class="rounded-xl" :class="_store.active_admin_list_item == item.slug ? 'active-admin-list-item' : ''
-              ">
+          <v-list-item v-for="(item, index) in adminListItems" :key="index"
+            @click="_store.setActiveAdminListItem(item.slug as any)" :ripple="false" class="rounded-xl"
+            :class="_store.active_admin_list_item === item.slug ? 'active-admin-list-item' : ''">
+            <!-- ICON + BADGE -->
+            <template #prepend>
+              <v-badge v-if="item.slug === 'notifications' && unreadNotificationCount > 0" location="top right"
+                color="error" :content="unreadNotificationCount > 99 ? '99+' : unreadNotificationCount">
+                <v-icon :icon="item.icon" />
+              </v-badge>
+
+              <!-- Normal icon (badge yokken) -->
+              <v-icon v-else :icon="item.icon" />
+            </template>
+
+            <!-- TITLE -->
             <v-list-item-title class="default-title-letter text-caption text-lg-subtitle-2">
               {{ item.title }}
             </v-list-item-title>
@@ -57,9 +69,18 @@
             <div class="d-flex flex-column ga-1 mt-10">
               <div
                 class="responsive-admin-bar-list-item transition d-flex align-center ga-3 pa-2 rounded-lg cursor-pointer"
-                v-for="(item, index) of adminListItems" @click="handleRouteForResponsive(item.slug as any)"
-                :key="item.title">
-                <v-icon size="large" :icon="item.icon" />
+                v-for="(item, index) of adminListItems" :key="item.title"
+                @click="handleRouteForResponsive(item.slug as any)">
+                <!-- ICON + BADGE -->
+                <v-badge v-if="item.slug === 'notifications' && unreadNotificationCount > 0" location="top right"
+                  color="error" :content="unreadNotificationCount > 99 ? '99+' : unreadNotificationCount">
+                  <v-icon size="large" :icon="item.icon" />
+                </v-badge>
+
+                <!-- ICON (badge yoksa) -->
+                <v-icon v-else size="large" :icon="item.icon" />
+
+                <!-- TITLE -->
                 <p class="text-subtitle-1 text-sm-h5 default-title-letter text-grey-darken-1">
                   {{ item.title }}
                 </p>
@@ -169,6 +190,7 @@ import Registered_Users_Messages from "~/components/admin/Registered_Users_Messa
 import Recommended_Games from "~/components/admin/Recommended_Games.vue";
 import Notificiations from "~/components/admin/Notificiations.vue";
 import Settings from "~/components/admin/Settings.vue";
+import { collection, getDocs } from "firebase/firestore";
 
 definePageMeta({
   layout: "admin",
@@ -177,6 +199,8 @@ definePageMeta({
 useHead({
   title: "npmrungame | Admin",
 });
+
+const { $firestore } = useNuxtApp();
 
 const _store = store();
 const router = useRouter();
@@ -292,6 +316,35 @@ const handleAdminAuth = async () => {
   }
 };
 
+const notifications = ref<any[]>([])
+const isGettingNotifications = ref(false)
+
+const unreadNotificationCount = computed(() => {
+  return notifications.value?.filter(
+    (n: any) => n.read_status === false
+  ).length || 0
+})
+
+const getNotifications = async () => {
+  try {
+    isGettingNotifications.value = true
+
+    const notificationsCol = collection($firestore, "notifications");
+    const notificationsSnapshot = await getDocs(notificationsCol);
+
+    const notificationsList = notificationsSnapshot.docs.map((doc) => ({
+      firestoreId: doc.id,
+      ...doc.data(),
+    }));
+
+    notifications.value = notificationsList;
+  } catch (error: any) {
+    console.error("While get notificitions error : ", error.messag)
+  } finally {
+    isGettingNotifications.value = false
+  }
+}
+
 watch(
   () => adminModels.value.isSelectedRememberMe,
   async (val) => {
@@ -311,6 +364,8 @@ onMounted(() => {
   if (!_store.isAdmin) {
     adminFormEmailRef.value?.focus();
   }
+
+  getNotifications()
 });
 </script>
 

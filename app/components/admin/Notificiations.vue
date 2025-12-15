@@ -75,20 +75,51 @@
 
         <v-col cols="12" lg="10">
             <v-list class="w-100 rounded bg-transparent" :density="display.mdAndDown.value ? 'compact' : 'comfortable'">
-                <template v-if="notifications?.length > 0">
-                    <v-list-item v-for="(item, index) of notifications" :key="index" class="notification-item rounded">
-                        <v-list-item-title
-                            class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1">
-                            {{ item }}
-                        </v-list-item-title>
-                    </v-list-item>
+                <template v-if="notifications?.length">
+
+                    <v-list-group v-for="item in notifications" :key="item.id" :value="item.id"
+                        @click="handleExpand(item)" class="notification-item rounded">
+                        <!-- HEADER -->
+                        <template #activator="{ props }">
+                            <v-list-item v-bind="props" class="rounded">
+                                <div class="d-flex flex-column align-start ga-1">
+                                    <p class="text-caption text-lg-subtitle-2 default-title-letter">
+                                        🎮 {{ item.game_name }}
+                                    </p>
+                                    <v-chip :text="item.status" size="x-small"
+                                        :color="item.status == 'recommended_game' ? 'deep-purple' : 'grey-lighten-1'"
+                                        :ripple="false" />
+                                </div>
+
+                                <!-- GREEN DOT -->
+                                <template #append>
+                                    <span v-if="!item.read_status" class="unread-dot" />
+                                </template>
+                            </v-list-item>
+                        </template>
+
+                        <!-- EXPANDED -->
+                        <v-list-item class="pl-6">
+                            <v-list-item-subtitle>
+                                <strong>Öneren:</strong> {{ item.recommender_name }}
+                            </v-list-item-subtitle>
+
+                            <v-list-item-subtitle>
+                                <strong>E-posta:</strong> {{ item.recommender_email }}
+                            </v-list-item-subtitle>
+
+                            <v-list-item-subtitle class="text-grey-lighten-1">
+                                {{ new Date(item.created_at).toLocaleString() }}
+                            </v-list-item-subtitle>
+                        </v-list-item>
+
+                    </v-list-group>
                 </template>
 
                 <template v-else>
-                    <v-list-item class="empty-notification rounded">
-                        <v-list-item-title
-                            class="text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1">
-                            Henüz bildirim yok!
+                    <v-list-item>
+                        <v-list-item-title class="text-caption text-grey-lighten-1">
+                            Henüz bildirim yok
                         </v-list-item-title>
                     </v-list-item>
                 </template>
@@ -105,6 +136,7 @@ import {
     collection,
     deleteDoc,
     addDoc,
+    updateDoc,
 } from "firebase/firestore";
 
 const { $firestore } = useNuxtApp();
@@ -131,6 +163,21 @@ const getNotifications = async () => {
         console.error("While get notificitions error : ", error.messag)
     } finally {
         isGettingNotifications.value = false
+    }
+}
+
+const handleExpand = async (item: any) => {
+    if (item.read_status) return
+
+    item.read_status = true
+
+    try {
+        await updateDoc(
+            doc($firestore, 'notifications', item.id),
+            { read_status: true }
+        )
+    } catch (err) {
+        console.error('Read status update failed', err)
     }
 }
 

@@ -2,7 +2,11 @@
   <div
     class="navbar d-flex justify-space-between align-center mx-auto rounded py-1 py-lg-3 px-3 px-md-5 px-lg-7 px-xl-12"
     :class="isScrolledToBottom ? 'scrolled-navbar' : ''">
-    <img :src="logo" width="90" class="cursor-pointer" @click="router.replace('/')" />
+    <div class="d-flex align-center ga-1 ga-lg-2">
+      <img :src="logo" :width="display.smAndDown.value ? 70:90" class="cursor-pointer" @click="router.replace('/')" />
+      <v-chip :size="display.smAndDown.value ? 'x-small' : 'small'" variant="tonal" class="rounded" text="v1.1"
+        color="green-accent-2" />
+    </div>
 
     <div class="d-none d-lg-flex justify-center align-center ga-2 ga-lg-5">
       <div v-for="(item, index) of navbarListItems" :key="item.path" @click="goTo(item)"
@@ -21,8 +25,8 @@
       </div>
     </div>
 
-    <v-btn :size="isSmallScreen ? 'default' : 'large'" :ripple="false" prepend-icon="mdi-dots-grid" text="Menu"
-      variant="tonal" class="d-flex d-lg-none text-capitalize default-title-letter" color="white"
+    <v-btn :size="isSmallScreen ? 'small' : 'default'" :ripple="false" prepend-icon="mdi-dots-grid" text="Menu"
+      variant="outlined" class="d-flex d-lg-none text-capitalize default-title-letter" color="white"
       @click="isOpenResponsiveBar = !isOpenResponsiveBar" />
   </div>
 
