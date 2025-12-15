@@ -191,6 +191,7 @@ import Recommended_Games from "~/components/admin/Recommended_Games.vue";
 import Notificiations from "~/components/admin/Notificiations.vue";
 import Settings from "~/components/admin/Settings.vue";
 import { collection, getDocs } from "firebase/firestore";
+import { useNotificationsStore } from "~/store/notifications";
 
 definePageMeta({
   layout: "admin",
@@ -211,12 +212,20 @@ const isRail = ref(false);
 
 const { $auth } = useNuxtApp();
 
+
+
 const adminForm = ref<InstanceType<typeof VForm> | null>(null);
 const adminFormEmailRef = ref<InstanceType<typeof VForm> | null>(null);
 
 const showPassword = ref(false);
 const isLoadingLogin = ref(false);
 const isOpenResponsiveBar = ref(false);
+
+const notificationStore = useNotificationsStore()
+
+const unreadNotificationCount = computed(
+  () => notificationStore.unreadCount
+)
 
 const adminModels = ref({
   email: "",
@@ -316,35 +325,6 @@ const handleAdminAuth = async () => {
   }
 };
 
-const notifications = ref<any[]>([])
-const isGettingNotifications = ref(false)
-
-const unreadNotificationCount = computed(() => {
-  return notifications.value?.filter(
-    (n: any) => n.read_status === false
-  ).length || 0
-})
-
-const getNotifications = async () => {
-  try {
-    isGettingNotifications.value = true
-
-    const notificationsCol = collection($firestore, "notifications");
-    const notificationsSnapshot = await getDocs(notificationsCol);
-
-    const notificationsList = notificationsSnapshot.docs.map((doc) => ({
-      firestoreId: doc.id,
-      ...doc.data(),
-    }));
-
-    notifications.value = notificationsList;
-  } catch (error: any) {
-    console.error("While get notificitions error : ", error.messag)
-  } finally {
-    isGettingNotifications.value = false
-  }
-}
-
 watch(
   () => adminModels.value.isSelectedRememberMe,
   async (val) => {
@@ -364,8 +344,6 @@ onMounted(() => {
   if (!_store.isAdmin) {
     adminFormEmailRef.value?.focus();
   }
-
-  getNotifications()
 });
 </script>
 
