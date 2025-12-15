@@ -88,7 +88,9 @@ export const getRatingColor = (averageVotes: number) => {
   return "success";
 };
 
-export const getUniquePlatformIcons = (platforms: any[] | null | undefined): string[] => {
+export const getUniquePlatformIcons = (
+  platforms: any[] | null | undefined
+): string[] => {
   const safePlatforms = platforms ?? [];
 
   const icons = safePlatforms
@@ -99,12 +101,12 @@ export const getUniquePlatformIcons = (platforms: any[] | null | undefined): str
 };
 
 export const parseRequirements = (raw?: string) => {
-  if (!raw) return []
+  if (!raw) return [];
   return raw
-    .split('\n')
-    .map(line => line.replace(/^Minimum:|^Recommended:\s*/g, ''))
+    .split("\n")
+    .map((line) => line.replace(/^Minimum:|^Recommended:\s*/g, ""))
     .filter(Boolean);
-}
+};
 
 export const useTRFormat = () => {
   const formatTR = (timestamp: string | number): string => {
@@ -152,13 +154,9 @@ export const useFirestoreDateFormatted = () => {
         timestamp.seconds * 1000 +
         Math.floor(timestamp.nanoseconds / 1_000_000);
       date = new Date(ms);
-    }
-
-    else if (!Number.isNaN(Number(timestamp))) {
+    } else if (!Number.isNaN(Number(timestamp))) {
       date = new Date(Number(timestamp));
-    }
-
-    else if (typeof timestamp === "string") {
+    } else if (typeof timestamp === "string") {
       const parsed = new Date(timestamp);
       if (!Number.isNaN(parsed.getTime())) date = parsed;
     }
@@ -206,14 +204,18 @@ export const useBlogHtmlFormatter = (rawText: string): string => {
     // Main title (#)
     if (line.startsWith("# ")) {
       const content = line.replace(/^#\s*/, "");
-      result.push(`<p class="text-grey-lighten-1 text-subtitle-2 text-sm-subtitle-1 text-lg-h5 default-title-letter font-weight-bold mb-3">${content}</p>`);
+      result.push(
+        `<p class="text-grey-lighten-1 text-subtitle-2 text-sm-subtitle-1 text-lg-h5 default-title-letter font-weight-bold mb-3">${content}</p>`
+      );
       continue;
     }
 
     // Subtitle (##)
     if (line.startsWith("## ")) {
       const content = line.replace(/^##\s*/, "");
-      result.push(`<p class="text-grey-lighten-1 text-subtitle-2 text-lg-h6 default-title-letter font-medium mb-2">${content}</p>`);
+      result.push(
+        `<p class="text-grey-lighten-1 text-subtitle-2 text-lg-h6 default-title-letter font-medium mb-2">${content}</p>`
+      );
       continue;
     }
 
@@ -224,7 +226,9 @@ export const useBlogHtmlFormatter = (rawText: string): string => {
     }
 
     // Normal text
-    result.push(`<p class="text-grey-darken-1 text-caption text-lg-subtitle-2 text-xl-subtitle-1 mb-2">${line}</p>`);
+    result.push(
+      `<p class="text-grey-darken-1 text-caption text-lg-subtitle-2 text-xl-subtitle-1 mb-2">${line}</p>`
+    );
   }
 
   return result.join("\n");
@@ -234,4 +238,28 @@ export const extractNameFromEmail = (email: string): string => {
   if (!email || !email.includes("@")) return "";
 
   return email.split("@")[0] as string;
+};
+
+export const getNotificationStatusByStatus = (status: string): string => {
+  if (status === "recommended_game") {
+    return "oyun önerisi";
+  } else if (status === "registered_user") {
+    return "kullanıcı kaydı";
+  } else if (status === "message") {
+    return "kullanıcı mesajı";
+  }
+
+  return "bildirim";
+};
+
+export const getNotificationColorByStatus = (status: string): string => {
+  if (status === "recommended_game") {
+    return "#673AB7";
+  } else if (status === "registered_user") {
+    return "#2196F3";
+  } else if (status === "message") {
+    return "#4CAF50";
+  }
+
+  return "#9E9E9E";
 };

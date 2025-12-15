@@ -81,7 +81,9 @@
             <v-list class="w-100 rounded bg-transparent" :density="display.mdAndDown.value ? 'compact' : 'comfortable'">
                 <!-- 🔄 LOADING -->
                 <template v-if="notificationStore.isLoading">
-                    <v-list-item v-for="i in 3" :key="i" class="my-2">
+                    <v-list-item
+                        v-for="i of notificationStore.notifications?.length > 0 ? notificationStore.notifications?.length : 3"
+                        :key="i" class="my-2">
                         <v-skeleton-loader type="list-item-two-line" class="w-100" />
                     </v-list-item>
                 </template>
@@ -98,9 +100,8 @@
                                         🎮 {{ item.game_name }}
                                     </p>
 
-                                    <v-chip :text="item.status" size="x-small" :color="item.status === 'recommended_game'
-                                        ? 'deep-purple'
-                                        : 'grey-lighten-1'" :ripple="false" />
+                                    <v-chip :text="getNotificationStatusByStatus(item.status)" size="x-small"
+                                        :color="getNotificationColorByStatus(item.status)" :ripple="false" />
                                 </div>
 
                                 <!-- GREEN DOT -->
@@ -199,12 +200,12 @@
 
             <div class="w-100 d-flex align-center justify-end ga-1 mt-2">
                 <v-btn @click="isOpenConfirmationDialog = false" :ripple="false" class="rounded"
-                    :size="display.lgAndUp.value ? 'default' : 'small'" color="grey-lighten-2" variant="text"
-                    prepend-icon="mdi-close" text="Iptal" />
+                    :size="display.lgAndUp.value ? 'default' : 'small'" :loading="notificationStore.isLoading"
+                    color="grey-lighten-2" variant="text" prepend-icon="mdi-close" text="Iptal" />
 
-                <v-btn @click="notificationStore.deleteAll($firestore)" :loading="notificationStore.isLoading"
-                    :ripple="false" class="rounded" color="error" :size="display.lgAndUp.value ? 'default' : 'small'"
-                    variant="tonal" prepend-icon="mdi-delete" text="Evet" />
+                <v-btn @click="handleDelete" :loading="notificationStore.isLoading" :ripple="false" class="rounded"
+                    color="error" :size="display.lgAndUp.value ? 'default' : 'small'" variant="tonal"
+                    prepend-icon="mdi-delete" text="Evet" />
             </div>
         </div>
     </v-dialog>
@@ -214,6 +215,7 @@ import Animated_Text from '../common/Animated_Text.vue';
 import _ from "lodash";
 import { useNotificationsStore } from '~/store/notifications';
 import deleteAnim from "~/assets/img/deleted_anim.gif"
+import { getNotificationColorByStatus, getNotificationStatusByStatus } from '~/composables/data/handleData';
 
 const { $firestore } = useNuxtApp();
 
@@ -238,6 +240,11 @@ const sortBy = (mode: 'new' | 'old') => {
             return mode === 'new' ? db - da : da - db
         }
     )
+}
+
+const handleDelete = () => {
+    notificationStore.deleteAll($firestore);
+    isOpenConfirmationDialog.value = false
 }
 
 onMounted(() => {
