@@ -21,7 +21,7 @@ export type AdminListItemSlug =
 
 export interface Blog_Toast_Admin {
   blogToastBar: boolean;
-  status: "success" | "warning" | "deleted";
+  status: "success" | "warning" | "deleted" | "updated";
   msg: string;
 }
 
@@ -139,6 +139,7 @@ export interface StoreNpmRunGame {
   prevPage: string | null;
   currentPage: number | null;
   nextPage: string | null;
+  isSeenFeatureNewsToast: boolean;
 
   active_games_endpoint: string | null;
   active_blog_id: string | null;

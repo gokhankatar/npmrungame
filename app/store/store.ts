@@ -18,6 +18,7 @@ const store = defineStore("npmrungame_store", {
     admin_user: null,
     active_blog_id: null,
     hasAnySuccessfulLogin: false,
+    isSeenFeatureNewsToast: false,
     prevPage: null,
     currentPage: 1,
     nextPage: null,
@@ -35,6 +36,9 @@ const store = defineStore("npmrungame_store", {
     },
     clearActiveGamePlatform() {
       this.active_game_platform = "All";
+    },
+    setTrueIsSeenFeatureNewsToast() {
+      this.isSeenFeatureNewsToast = true;
     },
     setPagination(current: number, next: string | null, prev: string | null) {
       this.currentPage = current;

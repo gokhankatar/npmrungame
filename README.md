@@ -1,10 +1,10 @@
-# NpmRunGame 🎮
+# 🎮 npmrungame
 
 <img src="/app/assets/screenshots/initial_ss.png" alt="NpmRunGame Screenshot" />
 
 ## Description
 
-**NpmRunGame** is a full-stack, browser-based online gaming platform built with Nuxt 4 and TypeScript. It provides fast, interactive, and secure experiences for users, supporting multiple games and real-time features.  
+**npmrungame** is a full-stack, browser-based online gaming platform built with Nuxt 4 and TypeScript. It provides fast, interactive, and secure experiences for users, supporting multiple games and real-time features.  
 
 Key highlights:
 - Full-stack architecture using **Nuxt 4 (SSR) + TypeScript** for type safety and maintainability.  
@@ -60,7 +60,7 @@ Key highlights:
 
 ---
 
-## Live Demo
+## Live 
 
 Check the live project here: [https://npmrungame.com](https://npmrungame.com)  
 
