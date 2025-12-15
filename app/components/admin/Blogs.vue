@@ -279,7 +279,7 @@
 
     <v-col cols="12" lg="10">
       <v-btn
-        @click="isAddBlog = true"
+        @click="handleAddBlog"
         :ripple="false"
         color="green-accent-2"
         text="Blog Ekle"
@@ -418,7 +418,7 @@
       <p
         class="text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-xl-h4 text-grey-lighten-1 default-title-letter"
       >
-        Blog Ekle
+        {{ isUpdateMode ? "Blog Güncelle" : "Yeni Blog Ekle" }}
       </p>
 
       <v-btn
@@ -971,6 +971,20 @@ const getBlogsFromDb = async () => {
 const handleRowClick = (item: any) => {
   activeBlog.value = item;
   isOpenBlogDetail.value = true;
+};
+
+const handleAddBlog = () => {
+  isUpdateMode.value = false;
+  isAddBlog.value = true;
+
+  formModels.value.title = "";
+  formModels.value.content = "";
+  formModels.value.keywords = [];
+  formModels.value.previewUrl = "";
+  formModels.value.file = null;
+
+  addBlogForm.value?.reset();
+  addBlogForm.value?.resetValidation();
 };
 
 const handleDeleteBlog = (blog: any) => {
