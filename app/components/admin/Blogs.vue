@@ -597,12 +597,24 @@
       </div>
 
       <v-btn
+        @click.stop="handleUpdate(activeBlog)"
+        variant="tonal"
+        prepend-icon="mdi-pencil"
+        rounded="xl"
+        text="Güncelle"
+        class="text-caption text-lg-subtitle-2 default-title-letter my-1"
+        size="small"
+        :ripple="false"
+        block
+        color="primary"
+      />
+      <v-btn
         @click="handleDeleteBlog(activeBlog)"
         rounded="xl"
-        class="mt-3"
         v-if="display.smAndDown.value"
         block
         size="small"
+        class="text-caption text-lg-subtitle-2 default-title-letter"
         text="Sil"
         prepend-icon="mdi-delete"
         color="error"
