@@ -45,8 +45,8 @@
     height: 100%;
     z-index: 9999999;
     background: rgba(0, 0, 0, .85);
-    backdrop-filter: blur(1.2rem);
-    -webkit-backdrop-filter: blur(1.2rem);
+    backdrop-filter: blur(.3rem);
+    -webkit-backdrop-filter: blur(.3rem);
 }
 
 .close-icon-in-responsive-bar {

@@ -464,7 +464,7 @@ import {
   useMetacriticStyle,
 } from "~/composables/data/handleData";
 import { useDiscoverStore } from "~/store/queryStore";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import warningImg from "~/assets/img/warning_anim.gif";
 
@@ -546,6 +546,24 @@ const addToRecommendGame = async () => {
   try {
     isRecommendingGame.value = true;
 
+    const recommendedGamesCollection = collection($firestore, "recommended_games");
+
+    const q = query(recommendedGamesCollection, where("id", "==", game.value.id));
+
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      toastModels.value.status = "warning";
+      toastModels.value.msg = "Bu oyun zaten önerilerde mevcut.";
+      toastModels.value.toastbar = true;
+
+      setTimeout(() => {
+        toastModels.value.toastbar = false;
+      }, 3000);
+
+      return;
+    }
+
     const metadata = {
       recommender_name: "Bilinmeyen Kullanıcı",
       recommender_email: "Kesfetten Onerildi",
@@ -553,9 +571,11 @@ const addToRecommendGame = async () => {
       recommended_at: new Date().toISOString(),
     };
 
-    const finalGameData = { ...game.value, ...metadata };
+    const finalGameData = {
+      ...game.value,
+      ...metadata,
+    };
 
-    const recommendedGamesCollection = collection($firestore, "recommended_games");
     await addDoc(recommendedGamesCollection, finalGameData);
 
     toastModels.value.status = "success";
