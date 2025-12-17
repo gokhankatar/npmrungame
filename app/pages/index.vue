@@ -775,7 +775,7 @@ const goToChannel = () => {
 
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);
-  router.replace(`/game-detail/${item.name}`);
+  router.replace(`/game-detail/${slugify(item.name)}`);
 };
 
 const emailRule = (v: string) => {

@@ -78,6 +78,7 @@ import { useDiscoverStore } from "~/store/queryStore";
 import Game_Card from "~/components/common/Game_Card.vue";
 import { formatNumber } from "~/composables/data/handleData";
 import Animated_Text from "~/components/common/Animated_Text.vue";
+import { slugify } from "~/composables/core/basicFunc";
 
 const router = useRouter();
 const route = useRoute()
@@ -131,7 +132,7 @@ const handleToBack = () => {
 
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);
-  router.replace(`/game-detail/${item.name}`);
+  router.replace(`/game-detail/${slugify(item.name)}`);
 };
 
 const goNext = () => {

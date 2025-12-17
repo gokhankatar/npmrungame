@@ -169,11 +169,11 @@
             >
               <v-col cols="6">
                 <v-btn
-                  size="small"
                   prepend-icon="mdi-home-outline"
                   text="Anasayfaya Dön"
                   :ripple="false"
-                  variant="tonal"
+                  :size="display.xs.value ? 'small':'default'"
+                  variant="outlined"
                   block
                   @click="router.replace('/')"
                 />
@@ -181,11 +181,11 @@
 
               <v-col cols="6">
                 <v-btn
-                  size="small"
+                  :size="display.xs.value ? 'small':'default'"
+                  variant="outlined"
                   prepend-icon="mdi-logout"
                   text="Çıkış Yap"
                   :ripple="false"
-                  variant="tonal"
                   block
                   @click="handleRouteForResponsive('logout')"
                 />

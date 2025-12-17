@@ -368,6 +368,24 @@
         </v-col>
       </v-row>
     </template>
+
+    <v-row class="d-flex justify-center justify-sm-end align-center my-2 my-lg-4">
+      <v-col cols="12" sm="4" md="3" lg="2">
+        <v-btn
+          @click="addToRecommendGame"
+          text="Bu Oyunu Oner"
+          class="text-caption text-sm-subtitle-2 text-xl-subtitle-1 default-title-letter"
+          prepend-icon="mdi-thumb-up"
+          rounded="xl"
+          color="deep-purple-darken-1"
+          variant="elevated"
+          :loading="isRecommendingGame"
+          :size="display.smAndDown.value ? 'small' : 'default'"
+          :ripple="false"
+          block
+        />
+      </v-col>
+    </v-row>
   </v-row>
 
   <!-- Image Detail Pop Up -->
@@ -401,6 +419,40 @@
       />
     </div>
   </v-dialog>
+
+  <v-dialog
+    v-model="toastModels.toastbar"
+    :max-width="600"
+    style="
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(0.1rem);
+      -webkit-backdrop-filter: blur(0.1rem);
+    "
+  >
+    <div
+      class="successfully-done-container d-flex flex-column align-center justify-center pa-5 rounded-xl"
+    >
+      <v-btn
+        @click="toastModels.toastbar = false"
+        class="close-icon-in-successfully-done-container ma-1 ma-lg-2"
+        icon="mdi-close"
+        :ripple="false"
+        variant="text"
+        color="grey-darken-1"
+        size="small"
+      />
+      <v-img
+        :class="toastModels?.status == 'warning' ? 'bg-warning rounded-xl' : ''"
+        :src="toastModels?.status == 'success' ? successfullyDoneImg : warningImg"
+        :width="isSmallScreen ? 50 : 75"
+      />
+      <p
+        class="text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter"
+      >
+        {{ toastModels?.msg }}
+      </p>
+    </div>
+  </v-dialog>
 </template>
 <script lang="ts" setup>
 import axios from "axios";
@@ -412,6 +464,11 @@ import {
   useMetacriticStyle,
 } from "~/composables/data/handleData";
 import { useDiscoverStore } from "~/store/queryStore";
+import { addDoc, collection } from "firebase/firestore";
+import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
+import warningImg from "~/assets/img/warning_anim.gif";
+
+const { $firestore } = useNuxtApp();
 
 const _store = store();
 const discover_store = useDiscoverStore();
@@ -423,10 +480,17 @@ const isSmallScreen = computed(() => display.smAndDown.value);
 const isGettingGame = ref(false);
 const isGettingScreenshots = ref(false);
 const isOpenImgDetail = ref(false);
+const isRecommendingGame = ref(false);
 
 const game = ref<any | null>(null);
 const imgDetailSrc = ref<string | null>(null);
 const imgArr = ref<any[]>([]);
+
+const toastModels = ref<any>({
+  toastbar: false,
+  status: "success",
+  msg: "",
+});
 
 const goBackToDiscover = () => {
   router.replace({
@@ -475,6 +539,36 @@ const getGamesById = async () => {
     console.error("Error fetching game:", err.message);
   } finally {
     isGettingGame.value = false;
+  }
+};
+
+const addToRecommendGame = async () => {
+  try {
+    isRecommendingGame.value = true;
+
+    const metadata = {
+      recommender_name: "Bilinmeyen Kullanıcı",
+      recommender_email: "Kesfetten Onerildi",
+      recommender_suggestion_msg: "Kesfetten Onerildi",
+      recommended_at: new Date().toISOString(),
+    };
+
+    const finalGameData = { ...game.value, ...metadata };
+
+    const recommendedGamesCollection = collection($firestore, "recommended_games");
+    await addDoc(recommendedGamesCollection, finalGameData);
+
+    toastModels.value.status = "success";
+    toastModels.value.msg = `${game.value?.name} adlı oyun başarıyla önerildi!`;
+    toastModels.value.toastbar = true;
+
+    setTimeout(() => {
+      toastModels.value.toastbar = false;
+    }, 3500);
+  } catch (error: any) {
+    console.error(error.message);
+  } finally {
+    isRecommendingGame.value = false;
   }
 };
 

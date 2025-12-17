@@ -11,10 +11,36 @@
     z-index: 9999;
 }
 
-.back-to-discover-btn{
+.back-to-discover-btn {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.back-to-discover-btn:hover{
+.back-to-discover-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+.successfully-done-container {
+    position: relative;
+    background: rgba(0, 0, 0, .15);
+    border: 1px solid rgba(255, 255, 255, .15);
+    backdrop-filter: blur(.5rem);
+    -webkit-backdrop-filter: blur(.5rem);
+}
+
+.close-icon-in-successfully-done-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 999;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+    transition: all 0.3s ease;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+    opacity: 0;
+    transform: translateY(20px);
 }

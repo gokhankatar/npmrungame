@@ -1,12 +1,25 @@
 <template>
-  <v-btn v-if="_store.isAdmin" :ripple="false" class="back-btn d-flex align-center"
-    :variant="display.smAndDown.value ? 'elevated' : 'outlined'" rounded="xl" @mouseover="hover = true"
-    @mouseleave="hover = false" @click="router.replace('/admin')">
-    <v-icon class="back-icon" icon="mdi-arrow-right" />
+  <v-btn
+    :ripple="false"
+    class="back-btn d-flex align-center"
+    :variant="display.smAndDown.value ? 'elevated' : 'outlined'"
+    rounded="xl"
+    @mouseover="hover = true"
+    @mouseleave="hover = false"
+    @click="router.replace('/admin')"
+  >
+    <v-icon
+      class="back-icon"
+      :icon="_store.isAdmin ? 'mdi-arrow-right' : 'mdi-shield-home'"
+    />
 
     <transition name="text-slide">
-      <span v-if="hover" class="ml-2 ml-lg-3 back-text default-title-letter text-caption text-lg-subtitle-2">Admin
-        Paneline Dön</span>
+      <span
+        v-if="hover"
+        class="ml-2 ml-lg-3 back-text default-title-letter text-caption text-lg-subtitle-2"
+      >
+        {{ _store.isAdmin ? "Admin Paneline Dön" : "Admin Girişi" }}
+      </span>
     </transition>
   </v-btn>
 </template>
@@ -19,6 +32,11 @@ const display = useDisplay();
 
 const hover = ref(false);
 const hoverDev = ref(false);
+
+const adminButton = computed(() => ({
+  icon: _store.isAdmin ? "mdi-arrow-right" : "mdi-shield-home",
+  text: _store.isAdmin ? "Admin Paneline Dön" : "Admin Girişi",
+}));
 </script>
 
 <style scoped>

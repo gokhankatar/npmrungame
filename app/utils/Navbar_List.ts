@@ -17,6 +17,11 @@ export const navbarListItems: NavbarList[] = [
         icon: "mdi-trophy-outline",
     },
     {
+        title: "Oyun Öner",
+        path: "/recommend-games",
+        icon: "mdi-microsoft-xbox-controller",
+    },
+    {
         title: "Oynayacaklarım",
         path: "/to-play-games",
         icon: "mdi-controller-classic-outline",
