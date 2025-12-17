@@ -164,7 +164,7 @@
             </div>
 
             <v-row
-              class="action-buttons-in-responsive-admin-list-bar w-100 mx-auto pa-2"
+              class="action-buttons-in-responsive-admin-list-bar w-100 mx-auto pa-1 pa-xs-2"
               dense
             >
               <v-col cols="6">
@@ -172,7 +172,8 @@
                   prepend-icon="mdi-home-outline"
                   text="Anasayfaya Dön"
                   :ripple="false"
-                  :size="display.xs.value ? 'small':'default'"
+                  class="text-caption text-sm-subtitle-2 defaul-title-letter"
+                  :size="display.xs.value ? 'small' : 'default'"
                   variant="outlined"
                   block
                   @click="router.replace('/')"
@@ -181,8 +182,9 @@
 
               <v-col cols="6">
                 <v-btn
-                  :size="display.xs.value ? 'small':'default'"
+                  :size="display.xs.value ? 'small' : 'default'"
                   variant="outlined"
+                  class="text-caption text-sm-subtitle-2 defaul-title-letter"
                   prepend-icon="mdi-logout"
                   text="Çıkış Yap"
                   :ripple="false"
