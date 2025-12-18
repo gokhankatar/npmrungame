@@ -370,11 +370,18 @@
     </template>
 
     <v-row class="d-flex justify-center justify-sm-end align-center my-2 my-lg-4">
-      <v-col v-if="_store.isAdmin" cols="12" sm="4" lg="3">
+      <v-col v-if="_store.isAdmin && gameCollectionStatus" cols="12" sm="4" lg="3">
         <div class="d-flex flex-column align-center align-sm-start ga-2 ga-lg-4">
-          <Animated_Text :text="
-          getGameStatusTextByGameCollectionStatus(gameCollectionStatus)?.slug_msg!" "
-          class="cursor-pointer" :msPerChar="50" :duration="550" :loop="true" />
+          <Animated_Text
+            v-if="getGameStatusTextByGameCollectionStatus(gameCollectionStatus)?.slug_msg"
+            :text="
+              getGameStatusTextByGameCollectionStatus(gameCollectionStatus)?.slug_msg!
+            "
+            class="cursor-pointer"
+            :msPerChar="50"
+            :duration="550"
+            :loop="true"
+          />
           <v-btn
             :text="
               getGameStatusTextByGameCollectionStatus(gameCollectionStatus)?.btn_text
@@ -392,7 +399,7 @@
         </div>
       </v-col>
 
-      <v-col v-else cols="12" sm="4" lg="3">
+      <v-col v-if="!_store.isAdmin" cols="12" sm="4" lg="3">
         <v-btn
           @click="addToRecommendGame"
           text="Bu Oyunu Oner"
