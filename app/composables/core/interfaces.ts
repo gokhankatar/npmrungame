@@ -93,10 +93,8 @@ export interface Footer_Link {
   items: Footer_SubItem[];
 }
 
-// 🔹 Genre / Tag ortak filter tipi
 export type Game_Filter_Type = "genre" | "tag";
 
-// 🔹 Genre isimleri
 export type Game_Genre_Name =
   | "Aksiyon"
   | "Strateji"
@@ -107,7 +105,6 @@ export type Game_Genre_Name =
   | "Korku"
   | "Souls-Like";
 
-// 🔹 Genre slug’ları (RAWG ile birebir)
 export type Game_Genre_Slug =
   | "action"
   | "strategy"
@@ -118,7 +115,8 @@ export type Game_Genre_Slug =
   | "horror"
   | "souls-like";
 
-// 🔹 Aktif genre / tag modeli (TEK KAYNAK)
+export type Existed_Game_Collection = "completed_games" | "current_games" | "to_play_games" | "recommended_games" | null
+
 export interface Active_Game_Genre {
   title: Game_Genre_Name | null;
   slug: Game_Genre_Slug | null;

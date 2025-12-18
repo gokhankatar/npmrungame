@@ -1,3 +1,5 @@
+import type { Existed_Game_Collection } from "../core/interfaces";
+
 export const useLimitedTags = (tags: any[] | null | undefined, limit = 3) => {
   const safeTags = tags ?? [];
   const visibleTags = safeTags.slice(0, limit);
@@ -263,3 +265,30 @@ export const getNotificationColorByStatus = (status: string): string => {
 
   return "#9E9E9E";
 };
+
+
+export const getGameStatusTextByGameCollectionStatus = (status: Existed_Game_Collection) => {
+  if (status == null) return
+
+  if (status == "completed_games") {
+    return {
+      slug_msg: "Bu Oyunu Tamamladın",
+      btn_text: "Tamamlananlardan Çıkar"
+    }
+  } else if (status == "current_games") {
+    return {
+      slug_msg: "Bu Oyunu Şuan Oynuyorsun",
+      btn_text: "Tamamlananlara Ekle"
+    }
+  } else if (status == "recommended_games") {
+    return {
+      slug_msg: "Bu Oyun Sana Önerildi",
+      btn_text: "Oynanacaklara Ekle"
+    }
+  } else if (status == "to_play_games") {
+    return {
+      slug_msg: "Bu Oyunu Oynanacaklarda",
+      btn_text: "Şuan Oynanlara Ekle"
+    }
+  }
+}

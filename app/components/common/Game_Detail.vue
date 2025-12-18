@@ -370,7 +370,29 @@
     </template>
 
     <v-row class="d-flex justify-center justify-sm-end align-center my-2 my-lg-4">
-      <v-col cols="12" sm="4" md="3" lg="2">
+      <v-col v-if="_store.isAdmin" cols="12" sm="4" lg="3">
+        <div class="d-flex flex-column align-center align-sm-start ga-2 ga-lg-4">
+          <Animated_Text :text="
+          getGameStatusTextByGameCollectionStatus(gameCollectionStatus)?.slug_msg!" "
+          class="cursor-pointer" :msPerChar="50" :duration="550" :loop="true" />
+          <v-btn
+            :text="
+              getGameStatusTextByGameCollectionStatus(gameCollectionStatus)?.btn_text
+            "
+            class="text-caption text-sm-subtitle-2 text-xl-subtitle-1 default-title-letter"
+            prepend-icon="mdi-thumb-up"
+            rounded="xl"
+            color="grey-lighten-1"
+            variant="tonal"
+            :loading="isGettingGameStatus"
+            :size="display.smAndDown.value ? 'small' : 'default'"
+            :ripple="false"
+            block
+          />
+        </div>
+      </v-col>
+
+      <v-col v-else cols="12" sm="4" lg="3">
         <v-btn
           @click="addToRecommendGame"
           text="Bu Oyunu Oner"
@@ -459,6 +481,7 @@ import axios from "axios";
 import store from "~/store/store";
 import fireAnimation from "~/assets/img/fire_anim.gif";
 import {
+  getGameStatusTextByGameCollectionStatus,
   getUniquePlatformIcons,
   parseRequirements,
   useMetacriticStyle,
@@ -467,6 +490,8 @@ import { useDiscoverStore } from "~/store/queryStore";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import warningImg from "~/assets/img/warning_anim.gif";
+import { useGameCollectionStatus } from "~/composables/data/useGameCollectionStatus";
+import Animated_Text from "./Animated_Text.vue";
 
 const { $firestore } = useNuxtApp();
 
@@ -599,8 +624,15 @@ const handleMetacriticUrl = () => {
   }
 };
 
-onMounted(() => {
-  getGamesById();
+const {
+  gameCollectionStatus,
+  isGettingGameStatus,
+  getGameCollectionStatus,
+} = useGameCollectionStatus($firestore);
+
+onMounted(async () => {
+  await getGamesById();
+  await getGameCollectionStatus(game.value?.id);
 });
 </script>
 
