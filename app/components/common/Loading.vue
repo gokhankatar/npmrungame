@@ -1,11 +1,11 @@
 <template>
   <div class="main-container-loading d-flex justify-center align-center">
     <div class="preloader">
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
+      <span class="rounded-xs" />
+      <span class="rounded-xs" />
+      <span class="rounded-xs" />
+      <span class="rounded-xs" />
+      <span class="rounded-xs" />
     </div>
   </div>
 </template>
@@ -23,15 +23,14 @@
 
 .preloader {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.2rem;
 }
 
 .preloader span {
   display: block;
-  width: 0.4rem;
-  height: 0.6rem;
+  width: 0.3rem;
+  height: 0.8rem;
   background: #cfcfcf;
-  border-radius: 0.5rem;
   animation: upDown 1.2s infinite ease-in-out;
 }
 
@@ -53,15 +52,15 @@
 
 @keyframes upDown {
   0% {
-    height: 0.8rem;
-    background: #3a3a3a;
+    height: 1rem;
+    background: #69f0ae;
   }
   50% {
-    height: 3rem;
+    height: 1.8rem;
     background: #8c8c8c;
   }
   100% {
-    height: 0.8rem;
+    height: 1rem;
     background: #cfcfcf;
   }
 }

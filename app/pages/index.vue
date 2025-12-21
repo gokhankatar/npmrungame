@@ -46,7 +46,7 @@
             class="align-self-center"
             :image="item.video_img"
             rounded="xl"
-            :autoplay="true"
+            :autoplay="false"
             :density="display.lgAndUp.value ? 'comfortable' : 'compact'"
             :controls-variant="smallScreen ? 'mini' : 'tube'"
             :src="item.video_src"
@@ -54,7 +54,6 @@
             color="green-accent-2"
             controls
             volume="0"
-            eager
             loop
           >
             <template v-slot:header v-if="!display.xs.value">

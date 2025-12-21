@@ -151,7 +151,7 @@
                   <v-icon size="large" :icon="item.icon" />
                 </v-badge>
 
-                <!-- ICON (badge yoksa) -->
+                <!-- ICON -->
                 <v-icon v-else size="large" :icon="item.icon" />
 
                 <!-- TITLE -->
@@ -504,6 +504,8 @@ onMounted(() => {
   if (!_store.isAdmin) {
     adminFormEmailRef.value?.focus();
   }
+
+  notificationStore.fetchNotifications($firestore);
 });
 </script>
 
