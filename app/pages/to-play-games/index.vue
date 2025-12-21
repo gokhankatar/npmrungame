@@ -394,7 +394,7 @@ const getToPlayGames = async () => {
 
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);
-  router.replace(`/game-detail/${item.name}`);
+  router.push(`/game-detail/${item.name}`);
 };
 
 const sortGames = (games: any[], type: "new" | "old" | "meta") => {

@@ -124,7 +124,7 @@ const getGamesByTagOrGenre = async () => {
 };
 
 const handleToBack = () => {
-  router.replace({
+  router.push({
     path: "/discover",
     query: discover_store.lastQuery || {},
   });
@@ -132,7 +132,7 @@ const handleToBack = () => {
 
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);
-  router.replace(`/game-detail/${slugify(item.name)}`);
+  router.push(`/game-detail/${slugify(item.name)}`);
 };
 
 const goNext = () => {

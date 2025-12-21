@@ -474,7 +474,7 @@ const filterByKeyword = (kw: string) => {
 const handleBlogClick = (blog: any) => {
   const prefixedTitle = slugify(blog?.title);
   _store.setActiveBlogId(blog?.firestoreId);
-  router.replace(`/blogs/${prefixedTitle}`);
+  router.push(`/blogs/${prefixedTitle}`);
 };
 
 const searchBlog = async () => {

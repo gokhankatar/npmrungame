@@ -42,7 +42,7 @@ const isSmallScreen = computed(() => display.smAndDown.value);
 
 const handleRouteGameGenre = (item: Game_Genre) => {
   _store.setActiveGameGenre(item.slug, item.name, item.type);
-  router.replace(`/discover/${item.slug}-games`);
+  router.push(`/discover/${item.slug}-games`);
 };
 </script>
 <style scoped>

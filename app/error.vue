@@ -11,7 +11,7 @@ const errorMsg = computed(() => `Kaybolmuş gibisin. Aradığın sayfa (${route.
     <div class="error-container">
         <v-empty-state class="error-content text-grey-lighten-1" color="grey-lighten-1" icon="mdi-magnify"
             title="Sayfa Bulunamadı" :text="errorMsg" action-text="Anasayfaya Dön"
-            @click:action="router.replace('/')" />
+            @click:action="router.push('/')" />
     </div>
 </template>
 

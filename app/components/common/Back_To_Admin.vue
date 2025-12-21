@@ -6,7 +6,7 @@
     rounded="xl"
     @mouseover="hover = true"
     @mouseleave="hover = false"
-    @click="router.replace('/admin')"
+    @click="router.push('/admin')"
   >
     <v-icon
       class="back-icon"

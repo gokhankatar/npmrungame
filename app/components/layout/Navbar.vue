@@ -8,7 +8,7 @@
         :src="logo"
         :width="display.smAndDown.value ? 70 : 90"
         class="cursor-pointer"
-        @click="router.replace('/')"
+        @click="router.push('/')"
       />
       <v-chip
         :size="display.smAndDown.value ? 'x-small' : 'small'"
@@ -162,7 +162,7 @@ const loadingItem = ref<string | null>(null);
 
 const goTo = async (item: { path: string; title: string }) => {
   loadingItem.value = item.path;
-  await router.replace(item.path);
+  await router.push(item.path);
   loadingItem.value = null;
 };
 
@@ -179,7 +179,7 @@ const handleScroll = () => {
 
 const handleRouteForResponsive = async (path: string) => {
   loadingItem.value = path;
-  await router.replace(path);
+  await router.push(path);
   loadingItem.value = null;
   isOpenResponsiveBar.value = false;
 };

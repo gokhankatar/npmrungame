@@ -117,7 +117,7 @@ const loadingItem = ref<string | null>(null)
 
 const handleRoute = async (path: string) => {
   loadingItem.value = path;
-  await router.replace(path);
+  await router.push(path);
   loadingItem.value = null;
 };
 

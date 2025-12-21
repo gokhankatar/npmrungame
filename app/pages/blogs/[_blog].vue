@@ -5,7 +5,7 @@
     <v-row class="d-flex justify-center align-center mx-auto" :density="isSmallScreen ? 'compact' : 'comfortable'">
       <v-col cols="12" lg="10" xl="8">
         <div class="d-flex justify-center justify-sm-end w-100">
-          <v-btn @click="router.replace('/blogs')" text="Bloglara Dön" prepend-icon="mdi-arrow-left" :ripple="false"
+          <v-btn @click="router.push('/blogs')" text="Bloglara Dön" prepend-icon="mdi-arrow-left" :ripple="false"
             variant="tonal" />
         </div>
       </v-col>

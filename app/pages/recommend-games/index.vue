@@ -427,7 +427,7 @@ const getRecommendedGames = async () => {
 
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);
-  router.replace(`/game-detail/${item.name}`);
+  router.push(`/game-detail/${item.name}`);
 };
 
 const handleRecommendGame = async () => {

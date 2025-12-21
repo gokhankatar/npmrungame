@@ -404,7 +404,7 @@ const getCompletedGames = async () => {
 
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);
-  router.replace(`/game-detail/${slugify(item.name)}`);
+  router.push(`/game-detail/${slugify(item.name)}`);
 };
 
 const sortGames = (games: any[], type: "new" | "old" | "meta") => {

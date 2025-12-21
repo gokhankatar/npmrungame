@@ -525,7 +525,7 @@ const toastModels = ref<any>({
 });
 
 const goBackToDiscover = () => {
-  router.replace({
+  router.push({
     path: "/discover",
     query: discover_store.lastQuery || {},
   });

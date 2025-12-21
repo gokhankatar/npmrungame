@@ -246,7 +246,7 @@ const handleRowClick = (item: any) => {
   discover_store.setQuery(route.query);
 
   _store.setActiveDetailedGame(item.id, item.name);
-  router.replace(`/game-detail/${slugify(item.name)}`);
+  router.push(`/game-detail/${slugify(item.name)}`);
 };
 
 // const onPageChange = () => {

@@ -176,7 +176,7 @@
                   :size="display.xs.value ? 'small' : 'default'"
                   variant="outlined"
                   block
-                  @click="router.replace('/')"
+                  @click="router.push('/')"
                 />
               </v-col>
 
@@ -231,7 +231,7 @@
           <v-btn
             v-bind="props"
             class="back-to-home-btn ma-1 ma-lg-2 text-caption text-lg-subtitle-2 pa-1"
-            @click="router.replace('/')"
+            @click="router.push('/')"
             size="xs"
             icon="mdi-arrow-left"
             variant="text"
@@ -420,7 +420,7 @@ const togglePasswordVisibility = () => {
 const handleLogout = () => {
   _store.logOut();
   setTimeout(() => {
-    router.replace("/");
+    router.push("/");
   }, 150);
 };
 
@@ -429,7 +429,7 @@ const handleRouteForResponsive = (slug: AdminListItemSlug) => {
     _store.setActiveAdminListItem(slug as any);
     isOpenResponsiveBar.value = false;
   } else if (slug == "home") {
-    router.replace("/");
+    router.push("/");
     isOpenResponsiveBar.value = false;
     _store.setActiveAdminListItem("dashboard" as any);
   } else {

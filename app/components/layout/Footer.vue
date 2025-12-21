@@ -6,7 +6,7 @@
       <!-- logo section -->
       <v-col cols="12" sm="6" class="d-flex flex-column align-start ga-2 ga-lg-3">
         <v-img
-          @click="router.replace('/')"
+          @click="router.push('/')"
           :src="logo"
           :width="isSmallScreen ? 100 : 150"
           class="cursor-pointer"
@@ -54,7 +54,7 @@
               </p>
               <div class="d-flex flex-column align-start ga-1">
                 <p
-                  @click="router.replace(subItem.path)"
+                  @click="router.push(subItem.path)"
                   class="footer-link transition cursor-pointer text-caption text-grey-darken-1 text-lg-subtitle-2 default-title-letter"
                   v-for="subItem of item.items"
                 >

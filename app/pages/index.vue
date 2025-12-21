@@ -300,7 +300,7 @@
           class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
         >
           <div
-            @click="router.replace('/blogs')"
+            @click="router.push('/blogs')"
             class="cursor-pointer d-flex justify-center align-center ga-2 ga-lg-3"
           >
             <v-icon
@@ -407,7 +407,7 @@
           class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
         >
           <div
-            @click="router.replace('/blogs')"
+            @click="router.push('/blogs')"
             class="cursor-pointer d-flex justify-center align-center ga-2 ga-lg-3"
           >
             <v-icon
@@ -437,7 +437,7 @@
           class="d-flex flex-column align-center justify-center ga-2 ga-lg-5 my-3 my-sm-5 my-lg-10 my-xl-15"
         >
           <div
-            @click="router.replace('/blogs')"
+            @click="router.push('/blogs')"
             class="cursor-pointer d-flex justify-center align-center ga-2 ga-lg-3"
           >
             <v-icon
@@ -765,7 +765,7 @@ const getBlogsFromDb = async () => {
 const handleBlogClick = (blog: any) => {
   const prefixedTitle = slugify(blog?.title);
   _store.setActiveBlogId(blog?.firestoreId);
-  router.replace(`/blogs/${prefixedTitle}`);
+  router.push(`/blogs/${prefixedTitle}`);
 };
 
 const goToChannel = () => {
@@ -775,7 +775,7 @@ const goToChannel = () => {
 
 const handleRowClick = (item: any) => {
   _store.setActiveDetailedGame(item.id, item.name);
-  router.replace(`/game-detail/${slugify(item.name)}`);
+  router.push(`/game-detail/${slugify(item.name)}`);
 };
 
 const emailRule = (v: string) => {
