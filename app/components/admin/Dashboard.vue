@@ -169,8 +169,8 @@
                       Abone Gizlik
                     </p>
                     <v-icon :icon="youtubeChannelStats?.hiddenSubscriberCount
-                        ? 'mdi-eye'
-                        : 'mdi-eye-off'
+                      ? 'mdi-eye'
+                      : 'mdi-eye-off'
                       " :size="isSmallScreen ? 'small' : 'large'" color="blue-lighten-1" />
                   </v-card>
                 </v-col>
@@ -200,10 +200,14 @@
                     <p class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center">
                       Toplam İzlenme
                     </p>
-                    <p
-                      class="text-blue-lighten-1 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter">
-                      {{ youtubeChannelStats?.viewCount }}
-                    </p>
+                    <v-tooltip location="top" :text="formatNumber(Number(youtubeChannelStats?.viewCount)).number_row">
+                      <template #activator="{ props }">
+                        <p v-bind="props"
+                          class="text-blue-lighten-1 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter">
+                          {{ formatNumber(Number(youtubeChannelStats?.viewCount)).number_slug }}
+                        </p>
+                      </template>
+                    </v-tooltip>
                   </v-card>
                 </v-col>
 
@@ -338,6 +342,7 @@
 import {
   normalizeText,
   useFirestoreDateFormatted,
+  useNumberFormat,
   useTRFormat,
 } from "~/composables/data/handleData";
 import store from "~/store/store";
@@ -357,6 +362,8 @@ import { truncateText } from "~/composables/core/basicFunc";
 const { $firestore } = useNuxtApp();
 const { formatTR } = useTRFormat();
 const { formatDateTR } = useFirestoreDateFormatted();
+const { formatNumber } = useNumberFormat()
+
 
 const router = useRouter();
 const _store = store();

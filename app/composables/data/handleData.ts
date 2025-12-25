@@ -266,29 +266,62 @@ export const getNotificationColorByStatus = (status: string): string => {
   return "#9E9E9E";
 };
 
-
-export const getGameStatusTextByGameCollectionStatus = (status: Existed_Game_Collection) => {
-  if (status == null) return
+export const getGameStatusTextByGameCollectionStatus = (
+  status: Existed_Game_Collection
+) => {
+  if (status == null) return;
 
   if (status == "completed_games") {
     return {
       slug_msg: "Bu Oyunu Tamamladın",
-      btn_text: "Tamamlananlardan Çıkar"
-    }
+      btn_text: "Tamamlananlardan Çıkar",
+    };
   } else if (status == "current_games") {
     return {
       slug_msg: "Bu Oyunu Şuan Oynuyorsun",
-      btn_text: "Tamamlananlara Ekle"
-    }
+      btn_text: "Tamamlananlara Ekle",
+    };
   } else if (status == "recommended_games") {
     return {
       slug_msg: "Bu Oyun Sana Önerildi",
-      btn_text: "Oynanacaklara Ekle"
-    }
+      btn_text: "Oynanacaklara Ekle",
+    };
   } else if (status == "to_play_games") {
     return {
       slug_msg: "Bu Oyunu Oynanacaklarda",
-      btn_text: "Şuan Oynanlara Ekle"
-    }
+      btn_text: "Şuan Oynanlara Ekle",
+    };
   }
-}
+};
+
+export const useNumberFormat = () => {
+  const formatNumber = (value: number) => {
+    if (isNaN(value)) {
+      return {
+        number_slug: "0",
+        number_row: "0",
+      };
+    }
+
+    const number_row = value.toLocaleString("en-US");
+
+    let number_slug = "";
+
+    if (value >= 1_000_000) {
+      number_slug = `${Math.floor(value / 1_000_000)}M`;
+    } else if (value >= 1_000) {
+      number_slug = `${Math.floor(value / 1_000)}k`;
+    } else {
+      number_slug = value.toString();
+    }
+
+    return {
+      number_slug,
+      number_row,
+    };
+  };
+
+  return {
+    formatNumber,
+  };
+};
