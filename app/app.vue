@@ -38,7 +38,7 @@ useHead({
 
 <template>
   <v-app :theme="_store.theme">
-    <v-main>
+    <v-main class="root-main">
       <v-container>
         <NuxtLayout />
       </v-container>

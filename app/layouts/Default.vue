@@ -22,3 +22,4 @@ onMounted(async () => {
     <Footer />
   </template>
 </template>
+
