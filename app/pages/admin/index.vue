@@ -222,7 +222,7 @@
       "
     />
     <v-form
-      class="admin-form rounded-lg pa-2 pa-lg-5 mx-auto"
+      class="admin-form rounded-lg pa-3 pa-lg-5 mx-auto"
       ref="adminForm"
       @submit.prevent="handleAdminAuth"
     >
@@ -265,6 +265,7 @@
         label="Email"
         prepend-inner-icon="mdi-email"
         clearable
+        :hide-details="display.smAndDown.value ? true : false"
         :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
       />
 
@@ -275,6 +276,8 @@
         rounded="xl"
         prepend-inner-icon="mdi-lock"
         variant="outlined"
+        :class="display.smAndDown.value ? 'my-2' : ''"
+        :hide-details="display.smAndDown.value ? true : false"
         :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
         label="Şifre"
       >
@@ -303,8 +306,9 @@
         v-model="adminModels.isSelectedRememberMe"
         density="compact"
         :ripple="false"
+        :hide-details="display.smAndDown.value ? true : false"
         class="text-caption text-lg-subtitle-2"
-        color="green-accent-2"
+        color="blue-lighten-1"
       >
         <template #label>
           <div class="d-flex align-center ga-1 ga-lg-2">
@@ -358,7 +362,6 @@ import Registered_Users_Messages from "~/components/admin/Registered_Users_Messa
 import Recommended_Games from "~/components/admin/Recommended_Games.vue";
 import Notificiations from "~/components/admin/Notificiations.vue";
 import Settings from "~/components/admin/Settings.vue";
-import { collection, getDocs } from "firebase/firestore";
 import { useNotificationsStore } from "~/store/notifications";
 
 definePageMeta({

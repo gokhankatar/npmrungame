@@ -34,7 +34,7 @@ const showScrollBtn = ref(false);
 
 onMounted(() => {
   window.addEventListener("scroll", () => {
-    showScrollBtn.value = window.scrollY > 300;
+    showScrollBtn.value = window.scrollY > 450;
   });
 });
 </script>

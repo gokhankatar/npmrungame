@@ -64,7 +64,6 @@
   </div>
 
   <Back_To_Admin />
-  <Scroll_To_Top />
 
   <!-- ! Responsive Bar -->
   <transition name="slide-down">

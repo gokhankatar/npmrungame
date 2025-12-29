@@ -2,6 +2,7 @@
 import Navbar from "~/components/layout/Navbar.vue";
 import Loading from "~/components/common/Loading.vue";
 import Footer from "~/components/layout/Footer.vue";
+import Scroll_To_Top from "~/components/common/Scroll_To_Top.vue";
 
 const isLoading = ref(true);
 
@@ -20,6 +21,7 @@ onMounted(async () => {
     <Navbar />
     <NuxtPage />
     <Footer />
+    <Scroll_To_Top />
   </template>
 </template>
 

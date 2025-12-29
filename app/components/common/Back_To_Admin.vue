@@ -1,5 +1,6 @@
 <template>
   <v-btn
+    v-if="isVisible"
     :ripple="false"
     class="back-btn d-flex align-center"
     :variant="display.smAndDown.value ? 'elevated' : 'outlined'"
@@ -31,12 +32,14 @@ const router = useRouter();
 const display = useDisplay();
 
 const hover = ref(false);
-const hoverDev = ref(false);
 
-const adminButton = computed(() => ({
-  icon: _store.isAdmin ? "mdi-arrow-right" : "mdi-shield-home",
-  text: _store.isAdmin ? "Admin Paneline Dön" : "Admin Girişi",
-}));
+const isVisible = ref(false);
+
+onMounted(() => {
+  window.addEventListener("scroll", () => {
+    isVisible.value = window.scrollY > 100;
+  });
+});
 </script>
 
 <style scoped>
