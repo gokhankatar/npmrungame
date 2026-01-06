@@ -50,10 +50,17 @@
 }
 
 .close-icon-in-responsive-bar {
-    position: absolute;
-    top: 0;
-    right: 0;
     z-index: 999;
+}
+
+.logo-in-responsive-bar {
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.2));
+}
+
+.logo-in-responsive-bar:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 4px 8px rgba(255, 255, 255, 0.3));
 }
 
 .action-buttons-in-responsive-bar {
@@ -67,4 +74,76 @@
 .responsive-text:hover {
     color: #fff !important;
     background-color: rgba(255, 255, 255, .15) !important;
+}
+
+.menu-toggle-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-toggle-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.menu-toggle-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.menu-toggle-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.menu-toggle-btn-open {
+    transform: rotate(180deg) scale(1.1);
+    background: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.3);
+}
+
+.menu-toggle-btn-open:hover {
+    transform: rotate(180deg) scale(1.15);
+}
+
+.menu-toggle-btn :deep(.v-btn__prepend) {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-toggle-btn-open :deep(.v-btn__prepend) {
+    transform: rotate(90deg);
+}
+
+/* Slide Down Transition Animations */
+.slide-down-enter-active {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-down-leave-active {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-down-enter-from {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+.slide-down-leave-to {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+.slide-down-enter-to,
+.slide-down-leave-from {
+    opacity: 1;
+    transform: translateY(0);
 }

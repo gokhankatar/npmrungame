@@ -729,9 +729,31 @@ const addGameToDb = async () => {
 
     addedGameToDbCount.value = games.length;
 
+    // Helper function to check if game is completed in 2026
+    // Check current year - if we're adding the game in 2026, it means we completed it in 2026
+    const isCompletedIn2026 = () => {
+      const currentYear = new Date().getFullYear();
+      return currentYear === 2026;
+    };
+
     // 🔥 Single
     if (games.length === 1) {
-      await addDoc(collection($firestore, "completed_games"), games[0]);
+      const game = games[0];
+      
+      // Add completed_at timestamp to the game
+      const gameWithTimestamp = {
+        ...game,
+        completed_at: new Date().toISOString(),
+      };
+      
+      // Add to completed_games
+      await addDoc(collection($firestore, "completed_games"), gameWithTimestamp);
+      
+      // If game is completed in 2026, also add to completed_games_2026
+      if (isCompletedIn2026()) {
+        await addDoc(collection($firestore, "completed_games_2026"), gameWithTimestamp);
+      }
+      
       isAddedToDb.value = true;
 
       setTimeout(() => {
@@ -742,13 +764,35 @@ const addGameToDb = async () => {
 
     // 🔥 Multiple
     const batch = writeBatch($firestore);
+    const batch2026 = writeBatch($firestore);
+
+    const is2026 = isCompletedIn2026();
 
     games.forEach((g) => {
+      // Add completed_at timestamp to the game
+      const gameWithTimestamp = {
+        ...g,
+        completed_at: new Date().toISOString(),
+      };
+      
+      // Add to completed_games
       const ref = doc(collection($firestore, "completed_games"));
-      batch.set(ref, g);
+      batch.set(ref, gameWithTimestamp);
+      
+      // If game is completed in 2026, also add to completed_games_2026
+      if (is2026) {
+        const ref2026 = doc(collection($firestore, "completed_games_2026"));
+        batch2026.set(ref2026, gameWithTimestamp);
+      }
     });
 
     await batch.commit();
+    
+    // Commit 2026 batch if we're in 2026
+    if (is2026) {
+      await batch2026.commit();
+    }
+    
     isAddedToDb.value = true;
 
     setTimeout(() => {

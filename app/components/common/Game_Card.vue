@@ -6,6 +6,7 @@
     <v-card
       v-if="!loading"
       class="game-card bg-transparent rounded-lg cursor-pointer transition"
+      :style="{ animationDelay: `${index * 0.1}s` }"
       :height="smallScreen ? 250 : 375"
       :ripple="false"
       @click="onRowClick(item)"
@@ -15,6 +16,9 @@
         class="game-card-img h-100 rounded-lg"
         cover
       />
+      
+      <!-- Hover overlay effect -->
+      <div class="game-card-overlay"></div>
 
       <!-- Playtime -->
       <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">

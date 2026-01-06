@@ -128,161 +128,126 @@
 
       <v-divider class="w-100 mt-1 mb-3 mb-lg-5" color="white" />
 
-      <!-- Blog Banner -->
+      <!-- Featured Blog Hero Section -->
       <v-row
-        v-if="!isSmallScreen && searchText?.length < 3 && !selectedKeyword"
-        :align="'stretch'"
+        v-if="searchText?.length < 3 && !selectedKeyword"
+        class="featured-blog-section"
         :density="isSmallScreen ? 'compact' : 'comfortable'"
       >
-        <!-- Initial Blog -->
-        <v-col cols="12" md="6">
+        <!-- Featured Hero Blog -->
+        <v-col cols="12" lg="8" class="featured-hero-col">
           <template v-if="isGettingBlogs">
-            <v-card class="d-flex flex-column flex-grow-1" height="100%">
-              <v-skeleton-loader type="image" class="w-100 h-100" />
-
-              <v-card-actions class="px-3 py-4 d-flex align-start flex-column ga-2">
-                <v-skeleton-loader type="text" width="70%" />
-                <v-skeleton-loader type="text" width="90%" />
-                <v-skeleton-loader type="text" width="50%" />
+            <v-card class="featured-hero-blog skeleton-card" height="100%">
+              <v-skeleton-loader type="image" class="w-100" height="400" />
+              <v-card-actions class="px-4 py-5 d-flex flex-column align-start ga-3">
+                <v-skeleton-loader type="text" width="80%" />
+                <v-skeleton-loader type="text" width="100%" />
+                <v-skeleton-loader type="text" width="60%" />
+                <v-skeleton-loader type="chip" />
               </v-card-actions>
             </v-card>
           </template>
 
           <v-card
             v-else
-            class="blog-card cursor-pointer d-flex flex-column ga-2 flex-grow-1"
-            height="100%"
+            class="featured-hero-blog cursor-pointer"
             @click="handleBlogClick(randomInitialBlog)"
             :ripple="false"
             :elevation="0"
           >
+            <div class="featured-hero-overlay"></div>
             <v-img
               :src="randomInitialBlog?.imageUrl"
-              class="blog-card-img rounded-lg w-100 h-75"
+              class="featured-hero-img"
               cover
-            />
-
-            <v-card-actions
-              class="d-flex flex-column align-start ga-1 ga-lg-2 px-2 px-lg-5"
+              height="450"
             >
-              <p
-                class="text-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
-              >
-                {{ randomInitialBlog?.title }}
-              </p>
-
-              <p
-                class="d-flex d-lg-none text-caption text-lg-subtitle-2 text-grey-darken-1"
-              >
-                {{ truncateText(randomInitialBlog?.content_raw, 250) }}
-              </p>
-
-              <p
-                class="d-none d-lg-flex d-xl-none text-caption text-lg-subtitle-2 text-grey-darken-1"
-              >
-                {{ truncateText(randomInitialBlog?.content_raw, 125) }}
-              </p>
-
-              <p
-                class="d-none d-xl-flex text-caption text-lg-subtitle-2 text-grey-darken-1"
-              >
-                {{ truncateText(randomInitialBlog?.content_raw, 300) }}
-              </p>
-
-              <div
-                class="w-100 d-none d-lg-flex justiy-start justify-lg-end align-center"
-              >
-                <span class="text-subtitle-2 text-grey-lighten-1">{{
-                  formatDateTR(randomInitialBlog?.createdAt)
-                }}</span>
+              <div class="featured-hero-content">
+                <div class="featured-hero-badge">
+                  <v-icon icon="mdi-star" size="small" />
+                  <span>Öne Çıkan Blog</span>
+                </div>
+                <h2 class="featured-hero-title">
+                  {{ randomInitialBlog?.title }}
+                </h2>
+                <p class="featured-hero-description">
+                  {{ truncateText(randomInitialBlog?.content_raw, 200) }}
+                </p>
+                <div class="featured-hero-footer">
+                  <div class="d-flex align-center ga-2">
+                    <v-icon icon="mdi-calendar" size="small" color="grey-lighten-1" />
+                    <span class="text-body-2 text-grey-lighten-1">
+                      {{ formatDateTR(randomInitialBlog?.createdAt) }}
+                    </span>
+                  </div>
+                  <div class="d-flex flex-wrap ga-1">
+                    <v-chip
+                      v-for="(tag, idx) of randomInitialBlog?.keywords?.slice(0, 3)"
+                      :key="idx"
+                      size="small"
+                      variant="outlined"
+                      color="grey-lighten-1"
+                      class="featured-tag-chip"
+                      :ripple="false"
+                    >
+                      {{ tag }}
+                    </v-chip>
+                  </div>
+                </div>
               </div>
-            </v-card-actions>
+            </v-img>
           </v-card>
         </v-col>
 
-        <!-- Random Two Blogs Skeleton -->
-        <v-col cols="12" md="6" class="d-flex flex-column ga-4" v-if="isGettingBlogs">
-          <div
-            class="blog-card d-flex flex-column flex-lg-row h-100 ga-3"
-            v-for="i in 2"
-            :key="i"
-          >
-            <!-- Image Container -->
-            <div class="rounded-lg w-100 w-lg-50" style="aspect-ratio: 16/9">
-              <v-skeleton-loader type="image" class="w-100 h-100" />
+        <!-- Sidebar Featured Blogs -->
+        <v-col cols="12" lg="4" class="sidebar-blogs-col">
+          <template v-if="isGettingBlogs">
+            <div
+              class="sidebar-blog-card skeleton-card"
+              v-for="i in 2"
+              :key="i"
+            >
+              <v-skeleton-loader type="image" height="180" />
+              <div class="px-3 py-3">
+                <v-skeleton-loader type="text" width="80%" />
+                <v-skeleton-loader type="text" width="100%" class="mt-2" />
+                <v-skeleton-loader type="text" width="60%" class="mt-2" />
+              </div>
             </div>
+          </template>
 
-            <!-- Content -->
-            <div class="d-flex flex-column ga-2 px-2 px-lg-5 mt-2 mt-lg-0 w-100">
-              <v-skeleton-loader type="text" width="60%" />
-              <v-skeleton-loader type="text" width="90%" />
-              <v-skeleton-loader type="text" width="70%" />
-              <v-skeleton-loader type="chip" class="mt-1" />
-              <v-skeleton-loader type="text" width="40%" />
-            </div>
-          </div>
-        </v-col>
-
-        <!-- Random Two Blogs -->
-        <v-col cols="12" md="6" class="d-flex flex-column ga-4">
           <div
-            class="blog-card cursor-pointer d-flex flex-column flex-lg-row justify-space-between alig-center h-100"
+            v-else
+            class="sidebar-blog-card cursor-pointer"
             v-for="(item, index) of randomTwoBlogs"
             :key="index"
             @click="handleBlogClick(item)"
+            :style="{ animationDelay: `${index * 0.15}s` }"
           >
+            <div class="sidebar-blog-overlay"></div>
             <v-img
               :src="item.imageUrl"
-              class="blog-card-img rounded-lg w-100 w-lg-50 h-auto h-lg-100"
+              class="sidebar-blog-img"
               cover
-            />
-
-            <div
-              class="d-flex flex-column align-start justify-start ga-1 ga-lg-2 px-2 px-lg-5 mt-2 mt-lg-0"
+              height="200"
             >
-              <p
-                class="text-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
-              >
-                {{ item.title }}
-              </p>
-
-              <p
-                class="d-flex d-lg-none text-caption text-lg-subtitle-2 text-grey-darken-1"
-              >
-                {{ truncateText(item.content_raw, 200) }}
-              </p>
-
-              <p
-                class="d-none d-lg-flex d-xl-none text-caption text-lg-subtitle-2 text-grey-darken-1"
-              >
-                {{ truncateText(item.content_raw, 125) }}
-              </p>
-
-              <p
-                class="d-none d-xl-flex text-caption text-lg-subtitle-2 text-grey-darken-1"
-              >
-                {{ truncateText(item.content_raw, 300) }}
-              </p>
-
-              <div class="d-flex flex-wrap align-center ga-1">
-                <v-chip
-                  class="rounded-xl cursor-default"
-                  variant="outlined"
-                  size="small"
-                  color="grey-lighten-1"
-                  prepend-icon="mdi-tag"
-                  :ripple="false"
-                  v-for="(tag, tagIndex) of item.keywords"
-                  :text="tag"
-                />
+              <div class="sidebar-blog-content">
+                <h3 class="sidebar-blog-title">
+                  {{ item.title }}
+                </h3>
+                <p class="sidebar-blog-description">
+                  {{ truncateText(item.content_raw, 120) }}
+                </p>
+                <div class="sidebar-blog-footer">
+                  <div class="d-flex align-center ga-1">
+                    <v-icon icon="mdi-calendar" size="x-small" color="grey-lighten-1" />
+                    <span class="text-caption text-grey-lighten-1">
+                      {{ formatDateTR(item.createdAt) }}
+                    </span>
+                  </div>
+                </div>
               </div>
-
-              <div class="d-none d-lg-flex align-center w-100">
-                <span class="text-subtitle-2 text-grey-lighten-1 ma-1 ma-lg-2">{{
-                  formatDateTR(item.createdAt)
-                }}</span>
-              </div>
-            </div>
+            </v-img>
           </div>
         </v-col>
       </v-row>
