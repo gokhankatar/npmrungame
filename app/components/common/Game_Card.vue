@@ -75,7 +75,7 @@
       <div
         class="game-card-info d-flex flex-column align-start ga-1 pa-1"
       >
-        <!-- Name & Date -->
+        <!-- Name & Date (Always Visible) -->
         <div class="d-flex flex-column align-start">
           <p class="default-title-letter text-caption text-white font-weight-medium">
             {{ truncateText(item.name, 30) }}
@@ -83,48 +83,51 @@
           <p class="text-white text-caption text-grey-lighten-2">
             {{ new Date(item.released).getFullYear() }}
           </p>
+        </div>
 
+        <!-- Hover Details (Platforms, Genres, Tags) -->
+        <div class="game-card-hover-details d-flex flex-column align-start ga-1">
           <!-- Platforms -->
           <div class="d-flex align-center flex-wrap ga-1">
             <template v-for="icon in getUniquePlatformIcons(item.platforms)" :key="icon">
               <v-icon v-if="icon" size="x-small" color="grey-lighten-1" :icon="icon" />
             </template>
           </div>
-        </div>
 
-        <!-- Genres -->
-        <div class="d-flex flex-wrap ga-1">
-          <v-chip
-            v-for="(genre, index) in item.genres?.slice(0, 2)"
-            :key="index"
-            size="x-small"
-            variant="outlined"
-            :ripple="false"
-            :text="truncateText(genre.name, 12)"
-          />
-        </div>
+          <!-- Genres -->
+          <div class="d-flex flex-wrap ga-1">
+            <v-chip
+              v-for="(genre, index) in item.genres?.slice(0, 3)"
+              :key="index"
+              size="x-small"
+              variant="outlined"
+              :ripple="false"
+              :text="truncateText(genre.name, 12)"
+            />
+          </div>
 
-        <!-- Tags -->
-        <div class="d-none d-lg-flex flex-wrap ga-1">
-          <v-chip
-            v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
-            :key="index"
-            color="blue-grey-lighten-1"
-            size="x-small"
-            class="rounded text-black"
-            variant="elevated"
-            :ripple="false"
-            :text="truncateText(tag.name, 15)"
-          />
-          <v-chip
-            v-if="useLimitedTags(item.tags, 3).hiddenCount > 0"
-            color="blue-grey-darken-1"
-            size="x-small"
-            variant="elevated"
-            class="rounded text-white"
-            :ripple="false"
-            :text="useLimitedTags(item.tags, 3).hiddenText"
-          />
+          <!-- Tags -->
+          <div class="d-flex flex-wrap ga-1">
+            <v-chip
+              v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
+              :key="index"
+              color="blue-grey-lighten-1"
+              size="x-small"
+              class="rounded text-black"
+              variant="elevated"
+              :ripple="false"
+              :text="truncateText(tag.name, 15)"
+            />
+            <v-chip
+              v-if="useLimitedTags(item.tags, 3).hiddenCount > 0"
+              color="blue-grey-darken-1"
+              size="x-small"
+              variant="elevated"
+              class="rounded text-white"
+              :ripple="false"
+              :text="useLimitedTags(item.tags, 3).hiddenText"
+            />
+          </div>
         </div>
       </div>
     </v-card>
@@ -154,4 +157,30 @@ const fireAnimation = fireAnimationSrc;
 
 <style scoped>
 @import "~/assets/css/main.css";
+
+.game-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.game-card-hover-details {
+  opacity: 0;
+  max-height: 0;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+  overflow: hidden;
+}
+
+.game-card:hover .game-card-hover-details {
+  opacity: 1;
+  max-height: 200px;
+}
+
+.game-card-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 70%, transparent 100%);
+  border-radius: 0 0 8px 8px;
+}
 </style>

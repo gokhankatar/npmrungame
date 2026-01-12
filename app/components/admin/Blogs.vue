@@ -19,6 +19,58 @@
       </div>
 
       <div class="d-flex flex-wrap align-center ga-1 ga-lg-2">
+        <!-- View Selector -->
+        <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
+          <template #activator="{ props }">
+            <v-btn
+              v-if="!display.xs.value"
+              v-bind="props"
+              icon="mdi-view-module"
+              class="rounded text-caption text-lg-subtitle-2"
+              :ripple="false"
+              variant="text"
+              rounded="xl"
+              color="grey-lighten-1"
+              :size="isSmallScreen ? 'x-small' : 'small'"
+            />
+          </template>
+
+          <v-card
+            class="pa-1 pa-sm-2"
+            :ripple="false"
+            style="
+              background: rgba(0, 0, 0, 0.2);
+              border: 1px solid rgba(255, 255, 255, 0.15);
+              backdrop-filter: blur(0.5rem);
+              -webkit-backdrop-filter: blur(0.5rem);
+            "
+            elevation="2"
+          >
+            <v-list density="compact" class="bg-transparent">
+              <v-list-item @click="viewMode = 'card'" prepend-icon="mdi-view-grid">
+                <v-list-item-title
+                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                  >Kart Görünümü</v-list-item-title
+                >
+              </v-list-item>
+
+              <v-list-item @click="viewMode = 'list'" prepend-icon="mdi-view-list">
+                <v-list-item-title
+                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                  >Liste Görünümü</v-list-item-title
+                >
+              </v-list-item>
+
+              <v-list-item @click="viewMode = 'table'" prepend-icon="mdi-table">
+                <v-list-item-title
+                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                  >Tablo Görünümü</v-list-item-title
+                >
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </v-menu>
+
         <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
           <template #activator="{ props }">
             <v-btn
@@ -93,21 +145,76 @@
     </v-col>
 
     <v-col cols="12" v-if="display.xs.value">
-      <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
-        <template #activator="{ props }">
-          <v-btn
-            prepend-icon="mdi-sort"
-            v-bind="props"
-            class="text-caption text-lg-subtitle-2"
-            :ripple="false"
-            text="Sırala"
-            variant="tonal"
-            rounded="xl"
-            color="grey-lighten-1"
-            size="small"
-            block
-          />
-        </template>
+      <v-row dense>
+        <v-col cols="6">
+          <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
+            <template #activator="{ props }">
+              <v-btn
+                prepend-icon="mdi-view-module"
+                v-bind="props"
+                class="text-caption text-lg-subtitle-2"
+                :ripple="false"
+                text="Görünüm"
+                variant="tonal"
+                rounded="xl"
+                color="grey-lighten-1"
+                size="small"
+                block
+              />
+            </template>
+
+            <v-card
+              class="pa-1 pa-sm-2"
+              :ripple="false"
+              style="
+                background: rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(0.5rem);
+                -webkit-backdrop-filter: blur(0.5rem);
+              "
+              elevation="2"
+            >
+              <v-list density="compact" class="bg-transparent">
+                <v-list-item @click="viewMode = 'card'" prepend-icon="mdi-view-grid">
+                  <v-list-item-title
+                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                    >Kart</v-list-item-title
+                  >
+                </v-list-item>
+
+                <v-list-item @click="viewMode = 'list'" prepend-icon="mdi-view-list">
+                  <v-list-item-title
+                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                    >Liste</v-list-item-title
+                  >
+                </v-list-item>
+
+                <v-list-item @click="viewMode = 'table'" prepend-icon="mdi-table">
+                  <v-list-item-title
+                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                    >Tablo</v-list-item-title
+                  >
+                </v-list-item>
+              </v-list>
+            </v-card>
+          </v-menu>
+        </v-col>
+        <v-col cols="6">
+          <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
+            <template #activator="{ props }">
+              <v-btn
+                prepend-icon="mdi-sort"
+                v-bind="props"
+                class="text-caption text-lg-subtitle-2"
+                :ripple="false"
+                text="Sırala"
+                variant="tonal"
+                rounded="xl"
+                color="grey-lighten-1"
+                size="small"
+                block
+              />
+            </template>
 
         <v-card
           class="pa-1 pa-sm-2"
@@ -141,10 +248,32 @@
           </v-list>
         </v-card>
       </v-menu>
+        </v-col>
+      </v-row>
     </v-col>
 
     <v-col cols="12" lg="10">
+      <!-- Card View -->
+      <Blog_Card
+        v-if="viewMode === 'card'"
+        :loading="isGettingBlogs"
+        :skeleton_number="blogs.length || 8"
+        :arr="blogs"
+        :onRowClick="handleRowClick"
+      />
+
+      <!-- List View -->
+      <Admin_Blog_List
+        v-else-if="viewMode === 'list'"
+        :loading="isGettingBlogs"
+        :arr="blogs"
+        :onRowClick="handleRowClick"
+        :onDeleteClick="handleDeleteBlog"
+      />
+
+      <!-- Table View -->
       <v-data-table
+        v-else
         :headers="header_blogs"
         :loading="isGettingBlogs"
         :items="blogs"
@@ -800,6 +929,8 @@ import warningImg from "~/assets/img/warning_anim.gif"
 import deletedImg from "~/assets/img/deleted_anim.gif"
 import store from "~/store/store";
 import featureImg from "~/assets/img/admin_gokhan_katar.jpg"
+import Blog_Card from "~/components/common/Blog_Card.vue";
+import Admin_Blog_List from "~/components/common/Admin_Blog_List.vue";
 
 const { $firestore } = useNuxtApp();
 const { formatDateTR } = useFirestoreDateFormatted();
@@ -820,6 +951,7 @@ const isOpenConfirmationDialog = ref(false);
 const isDeletingBlogFromDb = ref(false);
 const isUpdateMode = ref(false);
 const isUpdatingBlogInDb = ref(false);
+const viewMode = ref<"card" | "list" | "table">("table");
 
 const addBlogForm = ref<InstanceType<typeof VForm> | null>(null);
 const blogs = ref<any[]>([]);
