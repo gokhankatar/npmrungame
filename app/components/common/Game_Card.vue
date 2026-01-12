@@ -1,12 +1,12 @@
 <template>
   <v-row :dense="display.smAndDown.value">
-  <v-col v-for="(item, index) of arr" :key="index" cols="12" sm="6" md="4" lg="3">
+  <v-col v-for="(item, index) of arr" :key="index" cols="12" sm="6" md="4" lg="3" xl="2">
     <v-skeleton-loader v-if="loading" type="card" class="rounded-lg h-100" />
 
     <v-card
       v-if="!loading"
       class="game-card bg-transparent rounded-lg cursor-pointer transition"
-      :height="smallScreen ? 250 : 375"
+      :height="smallScreen ? 220 : 280"
       :ripple="false"
       @click="onRowClick(item)"
     >
@@ -22,9 +22,9 @@
           <v-chip
             v-if="item.playtime"
             v-bind="props"
-            class="playtime-icon rounded-xl ma-1 ma-lg-2"
+            class="playtime-icon rounded-xl ma-1"
             :ripple="false"
-            size="small"
+            size="x-small"
             variant="elevated"
             prepend-icon="mdi-timer-outline"
             color="black"
@@ -33,7 +33,7 @@
         </template>
       </v-tooltip>
 
-      <div class="metacritic-point d-flex align-center ga-1 ga-lg-2 ma-1 ma-lg-2">
+      <div class="metacritic-point d-flex align-center ga-1 ma-1">
         <!-- Metacritic -->
         <v-tooltip text="Metacritic puanı" location="top">
           <template #activator="{ props }">
@@ -42,7 +42,7 @@
               v-bind="props"
               class="rounded-xl"
               :ripple="false"
-              size="small"
+              size="x-small"
               :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
               :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
               variant="elevated"
@@ -60,7 +60,7 @@
               v-bind="props"
               class="recommende-icon rounded-xl"
               :ripple="false"
-              size="small"
+              size="x-small"
               color="deep-purple"
               icon="mdi-thumb-up"
             />
@@ -69,14 +69,14 @@
       </div>
 
       <div
-        class="game-card-info d-flex flex-column align-start ga-1 ga-lg-2 pa-1 pa-lg-2"
+        class="game-card-info d-flex flex-column align-start ga-1 pa-1"
       >
         <!-- Name & Date -->
         <div class="d-flex flex-column align-start">
-          <p class="default-title-letter text-caption text-lg-subtitle-2 text-white">
-            {{ item.name }}
+          <p class="default-title-letter text-caption text-white font-weight-medium">
+            {{ truncateText(item.name, 30) }}
           </p>
-          <p class="text-white text-caption">
+          <p class="text-white text-caption text-grey-lighten-2">
             {{ new Date(item.released).getFullYear() }}
           </p>
 
@@ -91,17 +91,17 @@
         <!-- Genres -->
         <div class="d-flex flex-wrap ga-1">
           <v-chip
-            v-for="(genre, index) in item.genres"
+            v-for="(genre, index) in item.genres?.slice(0, 2)"
             :key="index"
-            :size="smallScreen ? 'x-small' : 'small'"
+            size="x-small"
             variant="outlined"
             :ripple="false"
-            :text="genre.name"
+            :text="truncateText(genre.name, 12)"
           />
         </div>
 
         <!-- Tags -->
-        <div class="d-none d-md-flex flex-wrap ga-1">
+        <div class="d-none d-lg-flex flex-wrap ga-1">
           <v-chip
             v-for="(tag, index) in useLimitedTags(item.tags, 3).visibleTags"
             :key="index"
