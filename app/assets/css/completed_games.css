@@ -54,3 +54,160 @@
   opacity: 0;
   transform: translateY(20px);
 }
+
+/* ============================================
+   2026 Completed Games Section Styles
+   ============================================ */
+
+.games-2026-section {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(105, 240, 174, 0.08) 0%,
+    rgba(105, 240, 174, 0.03) 50%,
+    transparent 100%
+  );
+  border-radius: 24px;
+  border: 1px solid rgba(105, 240, 174, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.games-2026-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(105, 240, 174, 0.6) 50%,
+    transparent 100%
+  );
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.year-badge-2026 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(
+    135deg,
+    rgba(105, 240, 174, 0.2) 0%,
+    rgba(105, 240, 174, 0.1) 100%
+  );
+  border: 2px solid rgba(105, 240, 174, 0.4);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(105, 240, 174, 0.2);
+  transition: all 0.3s ease;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(105, 240, 174, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 6px 30px rgba(105, 240, 174, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+.year-badge-2026:hover {
+  border-color: rgba(105, 240, 174, 0.6);
+  box-shadow: 0 6px 30px rgba(105, 240, 174, 0.4);
+  transform: scale(1.05);
+}
+
+.year-text-2026 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #69f0ae;
+  text-shadow: 0 0 10px rgba(105, 240, 174, 0.5);
+  letter-spacing: 1px;
+}
+
+@media (min-width: 600px) {
+  .year-text-2026 {
+    font-size: 2rem;
+  }
+}
+
+.section-title-2026 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #69f0ae;
+  text-shadow: 0 2px 10px rgba(105, 240, 174, 0.3);
+}
+
+@media (min-width: 600px) {
+  .section-title-2026 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 960px) {
+  .section-title-2026 {
+    font-size: 1.75rem;
+  }
+}
+
+.games-2026-container {
+  position: relative;
+  z-index: 1;
+}
+
+.games-2026-container :deep(.game-card) {
+  border: 1px solid rgba(105, 240, 174, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.games-2026-container :deep(.game-card:hover) {
+  border-color: rgba(105, 240, 174, 0.4);
+  box-shadow: 0 8px 30px rgba(105, 240, 174, 0.2),
+    0 0 20px rgba(105, 240, 174, 0.1);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.games-2026-container :deep(.game-card-overlay) {
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(105, 240, 174, 0.15) 0%,
+    transparent 70%
+  );
+}
+
+@media (max-width: 960px) {
+  .games-2026-section {
+    padding: 1.5rem 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .year-badge-2026 {
+    padding: 0.5rem 1rem;
+  }
+  
+  .year-text-2026 {
+    font-size: 1.25rem;
+  }
+}

@@ -107,7 +107,8 @@
         :key="item.title"
       >
         <v-card
-          class="feature-card transition rounded-xl pa-2 pa-lg-5 d-flex flex-column align-center align-lg-start justify-center justify-lg-start ga-2 ga-lg-5 cursor-default"
+          class="feature-card transition rounded-xl pa-2 pa-lg-5 d-flex flex-column align-center align-lg-start justify-center justify-lg-start ga-2 ga-lg-5 cursor-pointer"
+          :style="{ animationDelay: `${index * 0.1}s` }"
           :ripple="false"
           :hover="false"
           :elevation="0"
@@ -131,6 +132,9 @@
           >
             {{ item.description }}
           </p>
+          
+          <!-- Animated background effect -->
+          <div class="feature-card-bg-effect"></div>
         </v-card>
       </v-col>
 
@@ -179,6 +183,7 @@
           <v-card
             v-if="!isGettingCurrentGame"
             class="game-card bg-transparent rounded-lg cursor-pointer transition"
+            :style="{ animationDelay: `${index * 0.1}s` }"
             :height="smallScreen ? 250 : 375"
             :ripple="false"
             @click="handleRowClick(item)"
@@ -188,6 +193,9 @@
               class="game-card-img h-100 rounded-lg"
               cover
             />
+            
+            <!-- Hover overlay effect -->
+            <div class="game-card-overlay"></div>
 
             <!-- Playtime -->
             <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">
@@ -319,13 +327,13 @@
         </div>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3" v-for="(item, index) of randomBlogs" :key="index">
+      <v-col cols="12" sm="6" lg="3" v-for="(item, index) of randomBlogs" :key="index" class="d-flex">
         <v-card
           class="blog-card cursor-pointer"
           :ripple="false"
           :elevation="0"
+          :style="{ animationDelay: `${index * 0.1}s` }"
           @click="handleBlogClick(item)"
-          :height="getBlogCardHeight()"
         >
           <div class="vote-icon ma-1 ma-lg-2" style="z-index: 10">
             <v-tooltip location="top">
@@ -346,57 +354,29 @@
             </v-tooltip>
           </div>
 
-          <v-img :src="item.imageUrl" class="blog-card-img rounded-lg w-100 h-50" cover />
+          <v-img :src="item.imageUrl" class="blog-card-img rounded-lg" cover />
+          
+          <!-- Hover overlay effect -->
+          <div class="blog-card-overlay"></div>
 
-          <v-card-actions class="d-flex flex-column align-start ga-1 ga-lg-2">
+          <v-card-actions class="d-flex flex-column align-start ga-0">
             <p
-              class="text-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
+              class="blog-card-title text-caption text-sm-subtitle-2 text-lg-subtitle-2 default-title-letter text-grey-lighten-1"
             >
               {{ item.title }}
             </p>
 
-            <p class="text-caption text-lg-subtitle-2 text-grey-darken-1">
-              {{ truncateText(item.content_raw, 100) }}
+            <p class="blog-card-content text-caption text-grey-darken-1">
+              {{ truncateText(item.content_raw, 70) }}
             </p>
-
-            <div class="d-flex d-sm-none d-flex flex-wrap align-center ga-1">
-              <p class="text-caption text-grey-darken-1">Tarih :</p>
-              <span class="text-caption text-grey-lighten-1">{{
-                formatDateTR(item.createdAt)
-              }}</span>
-            </div>
-
-            <div class="d-none d-sm-flex flex-wrap align-center ga-1">
-              <v-chip
-                class="rounded"
-                variant="tonal"
-                color="white"
-                prepend-icon="mdi-tag"
-                size="x-small"
-                :ripple="false"
-                v-for="(tag, tagIndex) of item.keywords"
-                :text="tag"
-              />
-            </div>
-
-            <div class="d-flex d-sm-none flex-wrap align-center ga-1">
-              <p class="text-caption text-grey-darken-1">Etiketler :</p>
-              <v-chip
-                class="rounded"
-                variant="tonal"
-                color="green-accent-2"
-                prepend-icon="mdi-tag"
-                size="x-small"
-                :ripple="false"
-                v-for="(tag, tagIndex) of item.keywords"
-                :text="tag"
-              />
-            </div>
           </v-card-actions>
 
-          <span class="d-none d-sm-flex text-caption text-grey-lighten-1 ma-1 ma-lg-2">{{
-            formatDateTR(item.createdAt)
-          }}</span>
+          <div class="blog-card-date d-flex align-center ga-1">
+            <v-icon icon="mdi-calendar" size="small" color="grey-lighten-1" />
+            <span class="text-caption text-grey-lighten-1">{{
+              formatDateTR(item.createdAt)
+            }}</span>
+          </div>
         </v-card>
       </v-col>
 

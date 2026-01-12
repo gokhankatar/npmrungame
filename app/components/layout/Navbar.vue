@@ -14,7 +14,7 @@
         :size="display.smAndDown.value ? 'x-small' : 'small'"
         variant="tonal"
         class="rounded"
-        text="v1.1"
+        text="v1.2"
         color="green-accent-2"
       />
     </div>
@@ -54,10 +54,11 @@
     <v-btn
       :size="isSmallScreen ? 'small' : 'default'"
       :ripple="false"
-      prepend-icon="mdi-dots-grid"
+      :prepend-icon="isOpenResponsiveBar ? 'mdi-close' : 'mdi-menu'"
       text="Menu"
       variant="outlined"
-      class="d-flex d-lg-none text-capitalize default-title-letter"
+      class="d-flex d-lg-none text-capitalize default-title-letter menu-toggle-btn"
+      :class="{ 'menu-toggle-btn-open': isOpenResponsiveBar }"
       color="white"
       @click="isOpenResponsiveBar = !isOpenResponsiveBar"
     />
@@ -68,15 +69,23 @@
   <!-- ! Responsive Bar -->
   <transition name="slide-down">
     <div class="responsive-bar" v-if="isOpenResponsiveBar">
-      <v-btn
-        variant="text"
-        icon="mdi-close"
-        class="close-icon-in-responsive-bar ma-2"
-        size="large"
-        @click="isOpenResponsiveBar = false"
-      />
+      <div class="d-flex justify-space-between align-center pa-3">
+        <img
+          :src="logo"
+          :width="display.smAndDown.value ? 70 : 90"
+          class="cursor-pointer logo-in-responsive-bar"
+          @click="handleRouteForResponsive('/')"
+        />
+        <v-btn
+          variant="text"
+          icon="mdi-close"
+          class="close-icon-in-responsive-bar"
+          size="large"
+          @click="isOpenResponsiveBar = false"
+        />
+      </div>
 
-      <div class="d-flex flex-column align-start ga-2 pa-5 mt-12">
+      <div class="d-flex flex-column align-start ga-2 pa-5 mt-4">
         <div
           class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg"
           @click="handleRouteForResponsive('/')"

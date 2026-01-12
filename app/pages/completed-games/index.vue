@@ -117,6 +117,40 @@
         </v-card>
       </v-col>
 
+      <!-- 2026 Completed Games Section -->
+      <v-col cols="12" v-if="games2026.length > 0" class="games-2026-section">
+        <div class="d-flex align-center justify-space-between mb-4">
+          <div class="d-flex align-center ga-2 ga-lg-4">
+            <div class="year-badge-2026">
+              <v-icon icon="mdi-calendar-star" color="#69f0ae" :size="smallScreen ? 'default' : 'large'" />
+              <span class="year-text-2026">2026</span>
+            </div>
+            <div class="d-flex flex-column">
+              <Animated_Text
+                text="2026'da Bitirdiğim Oyunlar"
+                class="section-title-2026"
+                :msPerChar="50"
+                :duration="550"
+                :loop="true"
+              />
+              <p class="text-caption text-grey-darken-1 mt-1">
+                {{ games2026.length }} oyun tamamlandı
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="games-2026-container">
+          <Game_Card
+            :loading="isGettingGames2026"
+            :arr="games2026"
+            :onRowClick="handleRowClick"
+          />
+        </div>
+
+        <v-divider color="rgba(105, 240, 174, 0.3)" class="w-100 mt-6 mb-4" />
+      </v-col>
+
       <!-- Completed Games  -->
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center">
@@ -352,10 +386,12 @@ const smallScreen = computed(() => display.smAndDown.value);
 const isMediumScreen = computed(() => display.mdAndUp.value);
 
 const isGettingCompletedGames = ref(false);
+const isGettingGames2026 = ref(false);
 const isLoadingSearchGame = ref(false);
 const noGameFound = ref(false);
 
 const completedGames = ref<any[]>([]);
+const games2026 = ref<any[]>([]);
 const searchText = ref<string>("");
 
 const totalPlaytime = computed(() => sumBy(completedGames.value, "playtime"));
@@ -398,6 +434,33 @@ const getCompletedGames = async () => {
   } finally {
     setTimeout(() => {
       isGettingCompletedGames.value = false;
+    }, 250);
+  }
+};
+
+const getGames2026 = async () => {
+  try {
+    isGettingGames2026.value = true;
+    const gamesCol = collection($firestore, "completed_games_2026");
+    const gamesSnapshot = await getDocs(gamesCol);
+    const gamesList = gamesSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    games2026.value = _.sortBy(gamesList, (g: any) => {
+      // Sort by completed_at if available, otherwise by released
+      if (g.completed_at) {
+        return new Date(g.completed_at).getTime();
+      }
+      return g.released ?? 0;
+    }).reverse();
+  } catch (error) {
+    console.error("Error getting 2026 games :", error);
+    games2026.value = [];
+  } finally {
+    setTimeout(() => {
+      isGettingGames2026.value = false;
     }, 250);
   }
 };
@@ -465,6 +528,7 @@ watch(
 
 onMounted(() => {
   getCompletedGames();
+  getGames2026();
 });
 </script>
 
