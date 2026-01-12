@@ -12,11 +12,71 @@
       </div>
 
       <div class="d-flex align-center ga-1 ga-lg-2">
+        <!-- View Selector -->
         <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
           <template #activator="{ props }">
-            <v-btn v-if="!display.xs.value" v-bind="props" icon="mdi-sort"
-              class="rounded text-caption text-lg-subtitle-2" :ripple="false" variant="text" rounded="xl"
-              color="grey-lighten-1" :size="display.smAndDown.value ? 'x-small' : 'small'" />
+            <v-btn
+              v-if="!display.xs.value"
+              v-bind="props"
+              icon="mdi-view-module"
+              class="rounded text-caption text-lg-subtitle-2"
+              :ripple="false"
+              variant="text"
+              rounded="xl"
+              color="grey-lighten-1"
+              :size="display.smAndDown.value ? 'x-small' : 'small'"
+            />
+          </template>
+
+          <v-card
+            class="pa-1 pa-sm-2"
+            :ripple="false"
+            style="
+              background: rgba(0, 0, 0, 0.2);
+              border: 1px solid rgba(255, 255, 255, 0.15);
+              backdrop-filter: blur(0.5rem);
+              -webkit-backdrop-filter: blur(0.5rem);
+            "
+            elevation="2"
+          >
+            <v-list density="compact" class="bg-transparent">
+              <v-list-item @click="viewMode = 'card'" prepend-icon="mdi-view-grid">
+                <v-list-item-title
+                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                  >Kart Görünümü</v-list-item-title
+                >
+              </v-list-item>
+
+              <v-list-item @click="viewMode = 'list'" prepend-icon="mdi-view-list">
+                <v-list-item-title
+                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                  >Liste Görünümü</v-list-item-title
+                >
+              </v-list-item>
+
+              <v-list-item @click="viewMode = 'table'" prepend-icon="mdi-table">
+                <v-list-item-title
+                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                  >Tablo Görünümü</v-list-item-title
+                >
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </v-menu>
+
+        <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
+          <template #activator="{ props }">
+            <v-btn
+              v-if="!display.xs.value"
+              v-bind="props"
+              icon="mdi-sort"
+              class="rounded text-caption text-lg-subtitle-2"
+              :ripple="false"
+              variant="text"
+              rounded="xl"
+              color="grey-lighten-1"
+              :size="display.smAndDown.value ? 'x-small' : 'small'"
+            />
           </template>
 
           <v-card class="pa-1 pa-sm-2" :ripple="false"
@@ -39,15 +99,91 @@
         <v-btn icon="mdi-refresh" class="rounded text-caption text-lg-subtitle-2" :ripple="false" variant="text"
           rounded="xl" :color="isGettingCurrentGames ? 'green-accent-2' : 'grey-lighten-1'" @click="getCurrentGames"
           :size="smallScreen ? 'x-small' : 'small'" :loading="isGettingCurrentGames" />
+
+        <v-btn
+          icon="mdi-plus"
+          class="rounded text-caption text-lg-subtitle-2"
+          :ripple="false"
+          variant="text"
+          rounded="xl"
+          color="green-accent-2"
+          @click="isAddGame = true"
+          :size="smallScreen ? 'x-small' : 'small'"
+        />
       </div>
     </v-col>
 
     <v-col cols="12" v-if="display.xs.value">
-      <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
-        <template #activator="{ props }">
-          <v-btn prepend-icon="mdi-sort" v-bind="props" class="text-caption text-lg-subtitle-2" :ripple="false"
-            text="Sırala" variant="tonal" rounded="xl" color="grey-lighten-1" size="small" block />
-        </template>
+      <v-row dense>
+        <v-col cols="6">
+          <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
+            <template #activator="{ props }">
+              <v-btn
+                prepend-icon="mdi-view-module"
+                v-bind="props"
+                class="text-caption text-lg-subtitle-2"
+                :ripple="false"
+                text="Görünüm"
+                variant="tonal"
+                rounded="xl"
+                color="grey-lighten-1"
+                size="small"
+                block
+              />
+            </template>
+
+            <v-card
+              class="pa-1 pa-sm-2"
+              :ripple="false"
+              style="
+                background: rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(0.5rem);
+                -webkit-backdrop-filter: blur(0.5rem);
+              "
+              elevation="2"
+            >
+              <v-list density="compact" class="bg-transparent">
+                <v-list-item @click="viewMode = 'card'" prepend-icon="mdi-view-grid">
+                  <v-list-item-title
+                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                    >Kart</v-list-item-title
+                  >
+                </v-list-item>
+
+                <v-list-item @click="viewMode = 'list'" prepend-icon="mdi-view-list">
+                  <v-list-item-title
+                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                    >Liste</v-list-item-title
+                  >
+                </v-list-item>
+
+                <v-list-item @click="viewMode = 'table'" prepend-icon="mdi-table">
+                  <v-list-item-title
+                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
+                    >Tablo</v-list-item-title
+                  >
+                </v-list-item>
+              </v-list>
+            </v-card>
+          </v-menu>
+        </v-col>
+        <v-col cols="6">
+          <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
+            <template #activator="{ props }">
+              <v-btn
+                prepend-icon="mdi-sort"
+                v-bind="props"
+                class="text-caption text-lg-subtitle-2"
+                :ripple="false"
+                text="Sırala"
+                variant="tonal"
+                rounded="xl"
+                color="grey-lighten-1"
+                size="small"
+                block
+              />
+            </template>
 
         <v-card class="pa-1 pa-sm-2" :ripple="false"
           style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,.15); backdrop-filter: blur(.5rem); -webkit-backdrop-filter: blur(.5rem);"
@@ -65,16 +201,36 @@
           </v-list>
         </v-card>
       </v-menu>
+        </v-col>
+      </v-row>
     </v-col>
 
     <v-col cols="12" lg="10">
-      <Admin_Game_Table :loading="isGettingCurrentGames" :arr="currentGames" :onDeleteClick="handleDeleteGame"
-        :onRowClick="handleRowClick" />
-    </v-col>
+      <!-- Card View -->
+      <Game_Card
+        v-if="viewMode === 'card'"
+        :loading="isGettingCurrentGames"
+        :arr="currentGames"
+        :onRowClick="handleRowClick"
+      />
 
-    <v-col cols="12" lg="10">
-      <v-btn @click="isAddGame = true" :ripple="false" color="green-accent-2" text="Oyun Ekle" prepend-icon="mdi-plus"
-        class="float-right" :block="smallScreen ? true : false" />
+      <!-- List View -->
+      <Admin_Game_List
+        v-else-if="viewMode === 'list'"
+        :loading="isGettingCurrentGames"
+        :arr="currentGames"
+        :onDeleteClick="handleDeleteGame"
+        :onRowClick="handleRowClick"
+      />
+
+      <!-- Table View -->
+      <Admin_Game_Table
+        v-else
+        :loading="isGettingCurrentGames"
+        :arr="currentGames"
+        :onDeleteClick="handleDeleteGame"
+        :onRowClick="handleRowClick"
+      />
     </v-col>
   </v-row>
 
@@ -332,6 +488,8 @@ import {
 } from "~/composables/data/handleData";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import Admin_Game_Table from "../common/Admin_Game_Table.vue";
+import Admin_Game_List from "../common/Admin_Game_List.vue";
+import Game_Card from "../common/Game_Card.vue";
 import Animated_Text from "../common/Animated_Text.vue";
 
 const { $firestore } = useNuxtApp();
@@ -357,6 +515,7 @@ const isAddingToDb = ref(false);
 
 const addedGameToDbCount = ref(0);
 const currentGames = ref<any[]>([]);
+const viewMode = ref<"card" | "list" | "table">("card");
 const activeGame = ref<any | null>(null);
 const selectedGamesAfterResearch = ref<any[]>([]);
 const searchGameText = ref<string>("");

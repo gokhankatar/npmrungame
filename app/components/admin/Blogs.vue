@@ -78,6 +78,17 @@
           :size="isSmallScreen ? 'x-small' : 'small'"
           :loading="isGettingBlogs"
         />
+
+        <v-btn
+          icon="mdi-plus"
+          class="rounded text-caption text-lg-subtitle-2"
+          :ripple="false"
+          variant="text"
+          rounded="xl"
+          color="green-accent-2"
+          @click="handleAddBlog"
+          :size="isSmallScreen ? 'x-small' : 'small'"
+        />
       </div>
     </v-col>
 
@@ -277,17 +288,6 @@
       </v-data-table>
     </v-col>
 
-    <v-col cols="12" lg="10">
-      <v-btn
-        @click="handleAddBlog"
-        :ripple="false"
-        color="green-accent-2"
-        text="Blog Ekle"
-        prepend-icon="mdi-plus"
-        class="float-right"
-        :block="isSmallScreen ? true : false"
-      />
-    </v-col>
 
     <v-col cols="12" lg="10" class="mt-5 mt-lg-10">
       <p class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-grey-lighten-1">

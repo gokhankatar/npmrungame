@@ -11,6 +11,7 @@ export type AdminListItemSlug =
   | "dashboard"
   | "completed_games"
   | "to_play_games"
+  | "target_2026_games"
   | "blog"
   | "messages"
   | "current_games"
