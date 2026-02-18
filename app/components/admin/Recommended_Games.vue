@@ -505,6 +505,164 @@
     </div>
   </v-dialog>
 
+  <!-- Add Game -->
+  <v-dialog
+    v-model="isAddGame"
+    :max-width="600"
+    style="
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(0.7rem);
+      -webkit-backdrop-filter: blur(0.7rem);
+    "
+  >
+    <div class="add-game-pop-up d-flex flex-column align-center ga-2 ga-lg-4 rounded pa-2 pa-lg-5">
+      <v-btn
+        @click="isAddGame = false"
+        icon="mdi-close"
+        color="grey-darken-1"
+        class="close-btn ma-1"
+        variant="text"
+        size="small"
+        :ripple="false"
+      />
+
+      <div class="d-flex justify-center align-center ga-2">
+        <p
+          class="text-center text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-grey-darken-1 default-title-letter"
+        >
+          Oyun Ekle
+        </p>
+        <v-icon icon="mdi-plus" color="grey-darken-1" />
+      </div>
+
+      <v-text-field
+        v-model="searchGameText"
+        @input="searchGame"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        class="w-100 text-grey-lighten-1"
+        color="grey-lighten-1"
+        rounded="xl"
+        label="Oyun Ara"
+        placeholder="Black Myth Wukong..."
+        :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
+        clearable
+      />
+
+      <!-- 🔥 Arama sonuç alanı -->
+      <div class="w-100" style="max-height: 350px; overflow-y: auto">
+        <!-- Loading -->
+        <div v-if="isSearchingGameLoading" class="d-flex justify-start py-2 py-lg-4">
+          <v-progress-circular indeterminate size="24" color="grey-lighten-1" />
+        </div>
+
+        <!-- Search Results -->
+        <template v-else>
+          <p
+            v-if="searchResults?.length"
+            class="text-caption text-grey-darken-1 text-start default-title-letter"
+          >
+            {{ `${searchResults?.length} oyun bulundu` }}
+          </p>
+          <v-card
+            v-for="game in searchResults"
+            :key="game.id"
+            :ripple="false"
+            class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer"
+            @click="selectGameAfterSearch(game)"
+            :class="{
+              'selected-research-game': selectedGamesAfterResearch.some(
+                (i) => i.id === game.id
+              ),
+            }"
+          >
+            <v-avatar :size="smallScreen ? 30 : 48" rounded>
+              <v-img :src="game.background_image" :alt="game.name" cover />
+            </v-avatar>
+
+            <div class="d-flex flex-column">
+              <p
+                class="text-caption text-lg-subtitle-2 default-title-letter"
+                :class="
+                  selectedGamesAfterResearch.some((i) => i.id === game.id)
+                    ? 'text-black'
+                    : 'text-grey-lighten-1'
+                "
+              >
+                {{ `${game.name}` }}
+                <span v-if="game.released"
+                  >({{ new Date(game.released).getFullYear() }})</span
+                >
+              </p>
+
+              <p
+                class="text-caption"
+                :class="`text-${useMetacriticStyle(game?.metacritic).color}`"
+              >
+                Metacritic: {{ game.metacritic ?? "N/A" }}
+              </p>
+            </div>
+          </v-card>
+
+          <!-- No Result -->
+          <p
+            v-if="searchResults?.length === 0 && searchGameText?.length > 2"
+            class="text-center text-grey-darken-1 mt-3"
+          >
+            Sonuç bulunamadı
+          </p>
+        </template>
+      </div>
+
+      <transition name="slide-up">
+        <v-row
+          v-if="selectedGamesAfterResearch?.length > 0"
+          class="w-100 mx-auto d-flex align-center"
+          dense
+        >
+          <v-col cols="12" sm="6">
+            <v-btn
+              @click="addGameToDb"
+              :loading="isAddingToDb"
+              :text="`Önerilen Oyunlar Ekle (${selectedGamesAfterResearch?.length})`"
+              size="small"
+              :ripple="false"
+              prepend-icon="mdi-plus"
+              class="text-capitalize"
+              block
+            />
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-btn
+              @click="selectedGamesAfterResearch = []"
+              text="Tüm Seçimleri Kaldır"
+              size="small"
+              :ripple="false"
+              class="text-capitalize"
+              prepend-icon="mdi-broom"
+              block
+            />
+          </v-col>
+        </v-row>
+      </transition>
+
+      <transition name="slide-up">
+        <v-row class="w-100" v-if="isAddedToDb">
+          <v-col cols="12">
+            <v-alert
+              class="w-100 text-caption text-lg-subtitle-2"
+              density="compact"
+              color="success"
+              variant="text"
+              :text="`${addedGameToDbCount} oyun eklendi`"
+            />
+          </v-col>
+        </v-row>
+      </transition>
+    </div>
+  </v-dialog>
+
   <!-- Toast -->
   <v-dialog
     v-model="notificationModels.isAvailable"
@@ -538,7 +696,8 @@
 </template>
 
 <script lang="ts" setup>
-import { doc, getDocs, collection, deleteDoc } from "firebase/firestore";
+import axios from "axios";
+import { doc, getDocs, collection, deleteDoc, addDoc, writeBatch } from "firebase/firestore";
 import _ from "lodash";
 import { truncateText } from "~/composables/core/basicFunc";
 import {
@@ -576,6 +735,9 @@ const addedGameToDbCount = ref(0);
 const recommendedGames = ref<any[]>([]);
 const viewMode = ref<"card" | "list" | "table">("card");
 const activeGame = ref<any | null>(null);
+const selectedGamesAfterResearch = ref<any[]>([]);
+const searchGameText = ref<string>("");
+const searchResults = ref<any[]>([]);
 
 const displayedDescription = computed(() => {
   if (showFullDescription.value) return activeGame.value?.description;
@@ -653,6 +815,99 @@ const sortBy = (mode: string) => {
   if (mode === "new") recommendedGames.value = sortGames(recommendedGames.value, "new");
   if (mode === "old") recommendedGames.value = sortGames(recommendedGames.value, "old");
 };
+
+const selectGameAfterSearch = (item: any) => {
+  const exists = selectedGamesAfterResearch.value.some(
+    (game: any) => game.id === item.id
+  );
+
+  if (exists) {
+    selectedGamesAfterResearch.value = selectedGamesAfterResearch.value.filter(
+      (game: any) => game.id !== item.id
+    );
+  } else {
+    selectedGamesAfterResearch.value.push(item);
+  }
+};
+
+const searchGame = async () => {
+  try {
+    if (searchGameText.value.length > 2) {
+      isSearchingGameLoading.value = true;
+
+      const { data } = await axios.get("/api/search-games", {
+        params: {
+          search: searchGameText.value,
+        },
+      });
+
+      searchResults.value = data?.results ?? [];
+    } else {
+      searchResults.value = [];
+    }
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isSearchingGameLoading.value = false;
+  }
+};
+
+const addGameToDb = async () => {
+  const games = selectedGamesAfterResearch.value;
+
+  if (!games || games.length === 0) return;
+
+  try {
+    isAddingToDb.value = true;
+
+    addedGameToDbCount.value = games.length;
+
+    // 🔥 Single
+    if (games.length === 1) {
+      await addDoc(collection($firestore, "recommended_games"), games[0]);
+      isAddedToDb.value = true;
+
+      setTimeout(() => {
+        isAddedToDb.value = false;
+      }, 2500);
+      return;
+    }
+
+    // 🔥 Multiple
+    const batch = writeBatch($firestore);
+
+    games.forEach((g) => {
+      const ref = doc(collection($firestore, "recommended_games"));
+      batch.set(ref, g);
+    });
+
+    await batch.commit();
+    isAddedToDb.value = true;
+
+    setTimeout(() => {
+      isAddedToDb.value = false;
+    }, 2500);
+    return;
+  } catch (error: any) {
+    console.error("Error while add to db : ", error.message);
+  } finally {
+    await getRecommendedGames();
+    isAddingToDb.value = false;
+    selectedGamesAfterResearch.value = [];
+  }
+};
+
+watch(
+  () => searchGameText.value,
+  (val) => {
+    if (!val || val.length < 2) {
+      searchResults.value = [];
+      isSearchingGameLoading.value = false;
+      return;
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   getRecommendedGames();

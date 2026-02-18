@@ -78,9 +78,15 @@
                     </td>
 
                     <td>
-                        <v-btn @click.stop="onDeleteClick(item)" variant="tonal" prepend-icon="mdi-delete"
-                            class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl" text="Sil"
-                            color="error" block />
+                        <v-btn
+                            @click.stop="onDeleteClick(item)"
+                            variant="tonal"
+                            prepend-icon="mdi-delete"
+                            class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl"
+                            text="Sil"
+                            color="error"
+                            block
+                        />
                     </td>
                 </tr>
             </template>
