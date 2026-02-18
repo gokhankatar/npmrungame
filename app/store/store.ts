@@ -15,6 +15,7 @@ const store = defineStore("npmrungame_store", {
     active_game_platform: "All",
     active_admin_list_item: "dashboard",
     admin_user: null,
+    user: null,
     active_blog_id: null,
     hasAnySuccessfulLogin: false,
     isSeenFeatureNewsToast: false,
@@ -82,6 +83,12 @@ const store = defineStore("npmrungame_store", {
     },
     setAnySuccessfullLogin() {
       this.hasAnySuccessfulLogin = true;
+    },
+    setUser(user: any) {
+      this.user = user;
+    },
+    clearUser() {
+      this.user = null;
     },
   },
   persist: piniaPluginPersistedstate.localStorage(),

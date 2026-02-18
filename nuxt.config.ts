@@ -16,10 +16,12 @@ export default defineNuxtConfig({
     adminPassw: process.env.ADMIN_PASSWORD_KEY,
     mail: process.env.MAIL,
     mail_password: process.env.MAIL_PASSWORD,
+    steam_web_api_key: process.env.STEAM_WEB_API_KEY,
     public: {
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_KEY,
+      rawg_api_key: process.env.API_KEY,
     },
   },
   app: {
@@ -53,5 +55,8 @@ export default defineNuxtConfig({
   devServer: {
     host: "0.0.0.0",
     port: 4000,
+  },
+  routeRules: {
+    "/profile/**": { ssr: false },
   },
 });

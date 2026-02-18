@@ -80,12 +80,10 @@
   position: relative;
   display: inline-block;
   font-weight: 500;
-  background: linear-gradient(
-    90deg,
-    rgba(200, 200, 200, 0.15) 25%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(200, 200, 200, 0.15) 75%
-  );
+  background: linear-gradient(90deg,
+      rgba(200, 200, 200, 0.15) 25%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(200, 200, 200, 0.15) 75%);
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -117,12 +115,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(0, 0, 0, 0.3) 50%,
-    rgba(0, 0, 0, 0.85) 100%
-  );
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.3) 50%,
+      rgba(0, 0, 0, 0.85) 100%);
   z-index: 1;
   opacity: 1;
   transition: opacity 0.4s ease;
@@ -160,12 +156,10 @@
 }
 
 .game-card-info {
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.95) 0%,
-    rgba(0, 0, 0, 0.85) 50%,
-    rgba(0, 0, 0, 0.7) 100%
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.85) 50%,
+      rgba(0, 0, 0, 0.7) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   position: absolute;
@@ -179,12 +173,10 @@
 }
 
 .game-card:hover .game-card-info {
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.98) 0%,
-    rgba(0, 0, 0, 0.9) 50%,
-    rgba(0, 0, 0, 0.75) 100%
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.98) 0%,
+      rgba(0, 0, 0, 0.9) 50%,
+      rgba(0, 0, 0, 0.75) 100%);
   border-top-color: rgba(105, 240, 174, 0.3);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
 }
@@ -228,11 +220,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(
-    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(105, 240, 174, 0.15) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(105, 240, 174, 0.15) 0%,
+      transparent 70%);
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
@@ -361,11 +351,9 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(105, 240, 174, 0.1) 0%,
-    transparent 50%
-  );
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(105, 240, 174, 0.1) 0%,
+      transparent 50%);
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
@@ -376,7 +364,7 @@
   opacity: 1;
 }
 
-.feature-card > * {
+.feature-card>* {
   position: relative;
   z-index: 1;
 }
@@ -487,6 +475,18 @@
 
 .subs-email-input {
   position: relative;
+}
+
+.extra-xsmall-text {
+  font-size: 0.45rem !important;
+}
+
+.extra-small-text {
+  font-size: 0.55rem !important;
+}
+
+.small-text {
+  font-size: 0.75rem !important;
 }
 
 .subs-email-btn {
@@ -708,6 +708,7 @@
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     transform: scale(1);
@@ -753,6 +754,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -760,9 +762,12 @@
 }
 
 @keyframes iconPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1.2) rotate(5deg);
   }
+
   50% {
     transform: scale(1.3) rotate(-5deg);
   }
@@ -773,6 +778,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

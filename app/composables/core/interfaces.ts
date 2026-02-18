@@ -147,6 +147,7 @@ export interface StoreNpmRunGame {
 
   active_admin_list_item: AdminListItemSlug;
   admin_user: Admin_User | null;
+  user: any | null;
 
   // 🔥 ARTIK INLINE TYPE YOK
   active_game_genre: Active_Game_Genre | null;

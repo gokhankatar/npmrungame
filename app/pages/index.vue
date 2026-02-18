@@ -29,9 +29,8 @@
         <v-col
           v-for="item in videos"
           :key="item.video_src"
-          cols="12"
-          md="6"
-          lg="4"
+          cols="6"
+          sm="4"
           xl="3"
           class="video-container"
         >
@@ -121,7 +120,12 @@
             :size="smallScreen ? 'small' : 'large'"
           />
           <p
-            class="feature-card-title text-center text-lg-start text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter"
+            class="feature-card-title text-center text-lg-start default-title-letter"
+            :class="
+              smallScreen
+                ? 'extra-small-text'
+                : 'text-caption text-sm-subtitle-2 text-lg-subtitle-1'
+            "
           >
             {{ item.title }}
           </p>
@@ -132,7 +136,7 @@
           >
             {{ item.description }}
           </p>
-          
+
           <!-- Animated background effect -->
           <div class="feature-card-bg-effect"></div>
         </v-card>
@@ -142,6 +146,7 @@
       <v-row
         class="w-100 mx-auto d-flex justify-center align-center mt-5"
         v-if="currentGames?.length"
+        :dense="smallScreen"
       >
         <v-col cols="12">
           <div
@@ -166,14 +171,7 @@
           </div>
         </v-col>
 
-        <v-col
-          v-for="(item, index) of currentGames"
-          :key="index"
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
-        >
+        <v-col v-for="(item, index) of currentGames" :key="index" cols="6" md="4" lg="3">
           <v-skeleton-loader
             v-if="isGettingCurrentGame"
             type="card"
@@ -184,7 +182,7 @@
             v-if="!isGettingCurrentGame"
             class="game-card bg-transparent rounded-lg cursor-pointer transition"
             :style="{ animationDelay: `${index * 0.1}s` }"
-            :height="smallScreen ? 250 : 375"
+            :height="display.xs.value ? 170 : smallScreen ? 250 : 375"
             :ripple="false"
             @click="handleRowClick(item)"
           >
@@ -193,7 +191,7 @@
               class="game-card-img h-100 rounded-lg"
               cover
             />
-            
+
             <!-- Hover overlay effect -->
             <div class="game-card-overlay"></div>
 
@@ -218,7 +216,7 @@
             <v-tooltip text="Metacritic puanı" location="top">
               <template #activator="{ props }">
                 <v-chip
-                  v-if="item.metacritic"
+                  v-if="item.metacritic && !display.xs.value"
                   v-bind="props"
                   class="metacritic-point rounded-xl ma-1 ma-lg-2"
                   :ripple="false"
@@ -238,16 +236,24 @@
               <!-- Name & Date -->
               <div class="d-flex flex-column align-start">
                 <p
-                  class="default-title-letter text-caption text-lg-subtitle-2 text-white"
+                  class="default-title-letter text-white"
+                  :class="
+                    display.xs.value
+                      ? 'extra-small-text'
+                      : 'text-caption text-lg-subtitle-2'
+                  "
                 >
                   {{ item.name }}
                 </p>
-                <p class="text-white text-caption">
+                <p
+                  class="text-white"
+                  :class="display.xs.value ? 'extra-xsmall-text' : 'text-caption'"
+                >
                   {{ new Date(item.released).getFullYear() }}
                 </p>
 
                 <!-- Platforms -->
-                <div class="d-flex align-center flex-wrap ga-1">
+                <div v-if="!display.xs.value" class="d-flex align-center flex-wrap ga-1">
                   <template
                     v-for="icon in getUniquePlatformIcons(item.platforms)"
                     :key="icon"
@@ -263,7 +269,7 @@
               </div>
 
               <!-- Genres -->
-              <div class="d-flex flex-wrap ga-1">
+              <div v-if="!display.xs.value" class="d-flex flex-wrap ga-1">
                 <v-chip
                   v-for="(genre, index) in item.genres"
                   :key="index"
@@ -327,7 +333,14 @@
         </div>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3" v-for="(item, index) of randomBlogs" :key="index" class="d-flex">
+      <v-col
+        cols="6"
+        md="4"
+        lg="3"
+        v-for="(item, index) of randomBlogs"
+        :key="index"
+        class="d-flex"
+      >
         <v-card
           class="blog-card cursor-pointer"
           :ripple="false"
@@ -355,23 +368,24 @@
           </div>
 
           <v-img :src="item.imageUrl" class="blog-card-img rounded-lg" cover />
-          
+
           <!-- Hover overlay effect -->
           <div class="blog-card-overlay"></div>
 
           <v-card-actions class="d-flex flex-column align-start ga-0">
             <p
-              class="blog-card-title text-caption text-sm-subtitle-2 text-lg-subtitle-2 default-title-letter text-grey-lighten-1"
+              class="blog-card-title default-title-letter text-grey-lighten-1"
+              :class="display.xs.value ? 'extra-small-text' : 'text-caption text-sm-subtitle-2 text-lg-subtitle-2'"
             >
               {{ item.title }}
             </p>
 
             <p class="blog-card-content text-caption text-grey-darken-1">
-              {{ truncateText(item.content_raw, 70) }}
+              {{ truncateText(item.content_raw, 50) }}
             </p>
           </v-card-actions>
 
-          <div class="blog-card-date d-flex align-center ga-1">
+          <div v-if="!display.xs.value" class="blog-card-date d-flex align-center ga-1">
             <v-icon icon="mdi-calendar" size="small" color="grey-lighten-1" />
             <span class="text-caption text-grey-lighten-1">{{
               formatDateTR(item.createdAt)
@@ -832,4 +846,16 @@ onMounted(() => {
 <style scoped>
 @import url("~/assets/css/main.css");
 @import url("~/assets/css/blogs.css");
+
+/* Mobil ekranlarda video play ikonunu küçült */
+@media screen and (max-width: 599px) {
+  .video-container :deep(.v-video__play) {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .video-container :deep(.v-video__play .v-icon) {
+    font-size: 24px !important;
+  }
+}
 </style>

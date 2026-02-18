@@ -45,6 +45,7 @@ export const header_registered_users: DeepReadonly<
 > = [
     { title: "Kullanıcı", key: "title", align: "start", sortable: true },
     { title: "Email", key: "title", align: "start", sortable: true },
+    { title: "Steam ID", key: "steamId", align: "start", sortable: true },
     {
       title: "Kayıt Tarihi",
       key: "created_time",

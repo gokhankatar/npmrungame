@@ -39,9 +39,29 @@ useHead({
 <template>
   <v-app :theme="_store.theme">
     <v-main class="root-main">
-      <v-container>
+      <v-container class="root-container">
         <NuxtLayout />
       </v-container>
     </v-main>
   </v-app>
 </template>
+
+<style scoped>
+@media screen and (min-width: 2000px) {
+  .root-container {
+    padding: 0 20rem;
+  }
+}
+
+@media screen and (min-width: 1400px) and (max-width: 1999px) {
+  .root-container {
+    padding: 0 15rem;
+  }
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1399px) {
+  .root-container {
+    padding: 0 5rem;
+  }
+}
+</style>

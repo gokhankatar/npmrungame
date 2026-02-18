@@ -49,6 +49,45 @@
           size="small"
         />
       </div>
+
+      <!-- Auth Buttons -->
+      <div v-if="_store.user" class="d-flex align-center ga-2">
+        <v-btn
+          @click="goToDashboard"
+          variant="tonal"
+          color="green-accent-2"
+          :size="isSmallScreen ? 'small' : 'default'"
+          :prepend-icon="isSmallScreen ? undefined : 'mdi-view-dashboard'"
+          :ripple="false"
+          rounded="xl"
+          class="text-caption text-lg-subtitle-2 default-title-letter"
+        >
+          <span v-if="!isSmallScreen">Dashboard</span>
+          <v-icon v-else icon="mdi-view-dashboard" />
+        </v-btn>
+        <v-btn
+          @click="goToProfile"
+          variant="tonal"
+          color="blue-grey-lighten-1"
+          :size="isSmallScreen ? 'small' : 'default'"
+          :prepend-icon="isSmallScreen ? undefined : 'mdi-account'"
+          :ripple="false"
+          rounded="xl"
+          class="text-caption text-lg-subtitle-2 default-title-letter"
+        >
+          <span v-if="!isSmallScreen">{{ _store.user?.username || 'Profil' }}</span>
+          <v-icon v-else icon="mdi-account" />
+        </v-btn>
+        <v-btn
+          @click="handleLogout"
+          icon="mdi-logout"
+          variant="text"
+          color="error"
+          :size="isSmallScreen ? 'small' : 'default'"
+          :ripple="false"
+          rounded="xl"
+        />
+      </div>
     </div>
 
     <v-btn
@@ -120,6 +159,54 @@
         </div>
       </div>
 
+      <!-- Auth in Responsive -->
+      <div v-if="_store.user" class="d-flex flex-column ga-2 pa-5">
+        <v-btn
+          @click="goToDashboard"
+          variant="tonal"
+          color="green-accent-2"
+          prepend-icon="mdi-view-dashboard"
+          :ripple="false"
+          block
+          class="text-capitalize"
+        >
+          Dashboard
+        </v-btn>
+        <v-btn
+          @click="goToProfile"
+          variant="tonal"
+          color="blue-grey-lighten-1"
+          prepend-icon="mdi-account"
+          :ripple="false"
+          block
+          class="text-capitalize"
+        >
+          {{ _store.user?.username || 'Profil' }}
+        </v-btn>
+        <v-btn
+          @click="handleLogout"
+          variant="outlined"
+          color="error"
+          prepend-icon="mdi-logout"
+          text="Çıkış Yap"
+          :ripple="false"
+          block
+          class="text-capitalize"
+        />
+      </div>
+      <div v-else class="pa-5">
+        <v-btn
+          @click="isAuthDialogOpen = true"
+          variant="tonal"
+          color="green-accent-2"
+          prepend-icon="mdi-login"
+          text="Giriş Yap / Kayıt Ol"
+          :ripple="false"
+          block
+          class="text-capitalize"
+        />
+      </div>
+
       <v-row class="action-buttons-in-responsive-bar w-100 mx-auto" dense>
         <v-col :cols="_store.isAdmin ? 6 : 12">
           <v-btn
@@ -148,6 +235,9 @@
       </v-row>
     </div>
   </transition>
+
+  <!-- Auth Dialog -->
+  <Auth_Dialog v-model="isAuthDialogOpen" @success="handleAuthSuccess" />
 </template>
 
 <script lang="ts" setup>
@@ -155,16 +245,20 @@ import logo from "@/assets/img/logo_fixed.webp";
 import store from "~/store/store";
 import Back_To_Admin from "../common/Back_To_Admin.vue";
 import Scroll_To_Top from "../common/Scroll_To_Top.vue";
+import Auth_Dialog from "../common/Auth_Dialog.vue";
+import { signOut } from "firebase/auth";
 
 const router = useRouter();
 const route = useRoute();
 const _store = store();
 const display = useDisplay();
+const { $auth } = useNuxtApp();
 
 const isSmallScreen = computed(() => display.smAndDown.value);
 
 const isScrolledToBottom = ref(false);
 const isOpenResponsiveBar = ref(false);
+const isAuthDialogOpen = ref(false);
 
 const loadingItem = ref<string | null>(null);
 
@@ -189,6 +283,32 @@ const handleRouteForResponsive = async (path: string) => {
   loadingItem.value = path;
   await router.push(path);
   loadingItem.value = null;
+  isOpenResponsiveBar.value = false;
+};
+
+const goToDashboard = () => {
+  router.push("/dashboard");
+  isOpenResponsiveBar.value = false;
+};
+
+const goToProfile = () => {
+  if (_store.user?.uid) {
+    router.push(`/profile/${_store.user.uid}`);
+    isOpenResponsiveBar.value = false;
+  }
+};
+
+const handleLogout = async () => {
+  try {
+    await signOut($auth);
+    _store.clearUser();
+    isOpenResponsiveBar.value = false;
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+};
+
+const handleAuthSuccess = (user: any) => {
   isOpenResponsiveBar.value = false;
 };
 
