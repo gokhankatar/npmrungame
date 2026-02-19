@@ -49,45 +49,6 @@
           size="small"
         />
       </div>
-
-      <!-- Auth Buttons -->
-      <div v-if="_store.user" class="d-flex align-center ga-2">
-        <v-btn
-          @click="goToDashboard"
-          variant="tonal"
-          color="green-accent-2"
-          :size="isSmallScreen ? 'small' : 'default'"
-          :prepend-icon="isSmallScreen ? undefined : 'mdi-view-dashboard'"
-          :ripple="false"
-          rounded="xl"
-          class="text-caption text-lg-subtitle-2 default-title-letter"
-        >
-          <span v-if="!isSmallScreen">Dashboard</span>
-          <v-icon v-else icon="mdi-view-dashboard" />
-        </v-btn>
-        <v-btn
-          @click="goToProfile"
-          variant="tonal"
-          color="blue-grey-lighten-1"
-          :size="isSmallScreen ? 'small' : 'default'"
-          :prepend-icon="isSmallScreen ? undefined : 'mdi-account'"
-          :ripple="false"
-          rounded="xl"
-          class="text-caption text-lg-subtitle-2 default-title-letter"
-        >
-          <span v-if="!isSmallScreen">{{ _store.user?.username || 'Profil' }}</span>
-          <v-icon v-else icon="mdi-account" />
-        </v-btn>
-        <v-btn
-          @click="handleLogout"
-          icon="mdi-logout"
-          variant="text"
-          color="error"
-          :size="isSmallScreen ? 'small' : 'default'"
-          :ripple="false"
-          rounded="xl"
-        />
-      </div>
     </div>
 
     <v-btn

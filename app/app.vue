@@ -49,13 +49,13 @@ useHead({
 <style scoped>
 @media screen and (min-width: 2000px) {
   .root-container {
-    padding: 0 20rem;
+    padding: 0 15rem;
   }
 }
 
 @media screen and (min-width: 1400px) and (max-width: 1999px) {
   .root-container {
-    padding: 0 15rem;
+    padding: 0 10rem;
   }
 }
 
