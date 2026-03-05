@@ -4,111 +4,82 @@
   <v-container class="pa-2 pa-md-5 pa-lg-10 pa-xl-15">
     <v-row class="d-flex justify-start align-center mx-auto" :dense="smallScreen">
       <!-- Total Game -->
-      <v-col cols="12" sm="6" md="3">
-        <v-card
-          class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
-          :min-height="isMediumScreen ? 100 : 'auto'"
-        >
-          <p
-            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
-          >
-            Toplam Oyun
-          </p>
-          <v-progress-circular
-            v-if="isGettingToPlayGames"
-            size="20"
-            width="2"
-            color="green-accent-2"
-            indeterminate
-          />
-          <p
-            v-else
-            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-          >
-            {{ toPlayGames?.length }}
-          </p>
+      <v-col cols="12" sm="6" md="3" class="d-flex">
+        <v-card class="stat-card stat-card-games rounded-xl pa-4 h-100 w-100">
+          <div class="d-flex align-center justify-space-between">
+            <div class="d-flex flex-column ga-1">
+              <p class="stat-card-label default-title-letter">Toplam Oyun</p>
+              <v-progress-circular
+                v-if="isGettingToPlayGames"
+                size="24"
+                width="2"
+                color="green-accent-2"
+                indeterminate
+              />
+              <p v-else class="stat-card-value">{{ toPlayGames?.length }}</p>
+            </div>
+            <v-icon icon="mdi-trophy-outline" class="stat-card-icon" color="green-accent-2" size="40" />
+          </div>
         </v-card>
       </v-col>
 
       <!-- Total Playtime -->
-      <v-col cols="12" sm="6" md="3">
-        <v-card
-          class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
-          :min-height="isMediumScreen ? 100 : 'auto'"
-        >
-          <p
-            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
-          >
-            Toplam Bitirme Süresi
-          </p>
-
-          <v-progress-circular
-            v-if="isGettingToPlayGames"
-            size="20"
-            width="2"
-            color="green-accent-2"
-            indeterminate
-          />
-          <p
-            v-else
-            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-          >
-            {{ `${totalPlaytime} saat` }}
-          </p>
+      <v-col cols="12" sm="6" md="3" class="d-flex">
+        <v-card class="stat-card stat-card-time rounded-xl pa-4 h-100 w-100">
+          <div class="d-flex align-center justify-space-between">
+            <div class="d-flex flex-column ga-1">
+              <p class="stat-card-label default-title-letter">Bitirme Süresi</p>
+              <v-progress-circular
+                v-if="isGettingToPlayGames"
+                size="24"
+                width="2"
+                color="green-accent-2"
+                indeterminate
+              />
+              <p v-else class="stat-card-value">{{ `${totalPlaytime} saat` }}</p>
+            </div>
+            <v-icon icon="mdi-timer-outline" class="stat-card-icon" color="green-accent-2" size="40" />
+          </div>
         </v-card>
       </v-col>
 
       <!-- Common Genre -->
-      <v-col cols="12" sm="6" md="3">
-        <v-card
-          class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
-          :min-height="isMediumScreen ? 100 : 'auto'"
-        >
-          <p
-            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
-          >
-            En Yaygın Tür
-          </p>
-          <v-progress-circular
-            v-if="isGettingToPlayGames"
-            size="20"
-            width="2"
-            color="green-accent-2"
-            indeterminate
-          />
-          <p
-            v-else
-            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-          >
-            {{ mostCommonGenre }}
-          </p>
+      <v-col cols="12" sm="6" md="3" class="d-flex">
+        <v-card class="stat-card stat-card-genre rounded-xl pa-4 h-100 w-100">
+          <div class="d-flex align-center justify-space-between">
+            <div class="d-flex flex-column ga-1 flex-grow-1 stat-card-genre-text">
+              <p class="stat-card-label default-title-letter">En Yaygın Tür</p>
+              <v-progress-circular
+                v-if="isGettingToPlayGames"
+                size="24"
+                width="2"
+                color="green-accent-2"
+                indeterminate
+              />
+              <p v-else class="stat-card-value text-truncate">{{ mostCommonGenre }}</p>
+            </div>
+            <v-icon icon="mdi-tag-outline" class="stat-card-icon flex-shrink-0" color="green-accent-2" size="40" />
+          </div>
         </v-card>
       </v-col>
 
       <!-- Avg Metacritic Point -->
-      <v-col cols="12" sm="6" md="3">
-        <v-card
-          class="rounded-lg d-flex flex-column align-center justify-center ga-2 pa-2 pa-lg-5"
-          :min-height="isMediumScreen ? 100 : 'auto'"
-        >
-          <p
-            class="text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1"
-          >
-            Ortalama Metacritic Puan
-          </p>
-          <v-progress-circular
-            v-if="isGettingToPlayGames"
-            size="20"
-            width="2"
-            color="green-accent-2"
-            indeterminate
-          />
-          <p
-            v-else
-            class="text-green-accent-2 text-subtitle-2 text-md-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-          >
-            {{ avgMetacritic?.toFixed(0) }}
-          </p>
+      <v-col cols="12" sm="6" md="3" class="d-flex">
+        <v-card class="stat-card stat-card-metacritic rounded-xl pa-4 h-100 w-100">
+          <div class="d-flex align-center justify-space-between">
+            <div class="d-flex flex-column ga-1">
+              <p class="stat-card-label default-title-letter">Ortalama Metacritic</p>
+              <v-progress-circular
+                v-if="isGettingToPlayGames"
+                size="24"
+                width="2"
+                color="green-accent-2"
+                indeterminate
+              />
+              <p v-else class="stat-card-value">{{ avgMetacritic?.toFixed(0) }}</p>
+            </div>
+            <v-icon icon="mdi-star-outline" class="stat-card-icon" color="green-accent-2" size="40" />
+          </div>
         </v-card>
       </v-col>
 

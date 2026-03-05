@@ -1,119 +1,77 @@
 <template>
-  <div ref="vantaRef" class="bg-anim">
-    <!-- Banner Content -->
-    <v-row class="banner-content mx-auto w-100 w-md-75 w-lg-50 pa-2 pa-lg-5 rounded-lg"
-      :class="display.xs.value ? 'banner-content-sm' : 'banner-content-lg'">
-      <v-col cols="12">
-        <div class="d-flex flex-column align-center align-sm-start ga-3 ga-sm-5 ga-lg-8">
-          <p class="text-grey-lighten-1 text-h5 text-md-h4 text-lg-h3 text-xl-h2 font-weight-bold defautl-title-letter">
-            npmrungame
-          </p>
-          <p class="text-center text-sm-start text-grey-lighten-1 text-subtitle-2 text-md-subtitle-1 text-lg-h5" :style="display.mdAndUp.value ? { lineHeight: '2.1rem' } : { lineHeight: '1.2rem' }
-            ">
-            4K oyun dünyasının nabzını tutan bir kanal. <br>
-            Niş indielerden, yeni çıkan AAA oyunlara, donanım trendlerinden güncel oyun haberlerine kadar birçok içerik
-            sunar. Gelişen ekosistemimizin parçası olun.
-          </p>
-        </div>
-      </v-col>
+  <div class="bg-anim">
+    <div class="banner-content">
+      <p ref="titleRef" class="title default-title-letter">
+        npmrungame
+      </p>
+      <p class="subtitle text-grey-lighten-1">
+        4K oyun dünyasının nabzını tutan bir kanal. <br>
+        Niş indielerden, yeni çıkan AAA oyunlara, donanım trendlerinden güncel oyun haberlerine kadar birçok içerik
+        sunar. Gelişen ekosistemimizin parçası olun.
+      </p>
 
-      <v-row class="w-100 mx-auto mt-lg-5 mt-xl-10 justify-center justify-sm-start align-center"
-        :dense="display.xs.value">
-        <v-col cols="8" sm="5" lg="4">
-          <v-btn class="default-title-letter" text="Keşfet" :size="display.lgAndUp.value
-            ? 'x-large'
-            : display.xs.value
-              ? 'small'
-              : 'default'
-            " variant="elevated" rounded="xl" color="green-accent-2" @click="handleRoute('/discover')" :ripple="false"
-            block>
-            <template v-slot:append>
-              <v-progress-circular v-if="loadingItem === '/discover'" indeterminate
-                :size="display.xlAndUp.value ? 16 : 14" width="1" color="black" />
-              <v-icon v-else icon="mdi-web" />
-            </template>
-          </v-btn>
-        </v-col>
-
-        <v-col cols="8" sm="5" lg="4">
-          <v-btn class="subscription-btn default-title-letter" text="Abone Ol" :size="display.lgAndUp.value
-            ? 'x-large'
-            : display.smAndDown.value
-              ? 'small'
-              : 'default'
-            " href="https://www.youtube.com/@npmrungame" target="_blank" append-icon="mdi-youtube-subscription"
-            rounded="xl" :ripple="false" block />
-        </v-col>
-
-        <v-col v-if="display.xs.value" cols="8">
-          <v-btn class="default-title-letter" text="Oyun Öner" :size="display.lgAndUp.value
-            ? 'x-large'
-            : display.xs.value
-              ? 'small'
-              : 'default'
-            " color="deep-purple" rounded="xl" @click="handleRoute('/recommend-games')" variant="elevated"
-            :ripple="false" block>
-            <template v-slot:append>
-              <v-progress-circular v-if="loadingItem === '/recommend-games'" indeterminate
-                :size="display.xlAndUp.value ? 16 : 14" width="1" color="white" />
-              <v-icon v-else icon="mdi-gamepad-up" />
-            </template>
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-row>
-
-    <!-- Action Buttons -->
-    <v-row v-if="!display.xs.value" class="action-buttons mx-auto w-100 d-flex justify-center align-center">
-      <v-col cols="4" lg="3">
-        <v-btn class="action-btn default-title-letter" text="Oyun Öner"
-          :size="display.xlAndUp.value ? 'x-large' : 'default'" @click="handleRoute('/recommend-games')" :ripple="false"
-          block>
-          <template v-slot:append>
-            <v-progress-circular v-if="loadingItem === '/recommend-games'" indeterminate
-              :size="display.xlAndUp.value ? 16 : 14" width="1" color="grey-lighten-1" />
-            <v-icon v-else icon="mdi-gamepad-up" />
+      <!-- 3 Ana CTA - Tek satır, düzenli gruplanmış -->
+      <div class="actions-row">
+        <v-chip
+          class="cta-chip cta-primary default-title-letter"
+          variant="elevated"
+          color="green-accent-2"
+          size="large"
+          rounded="lg"
+          :ripple="false"
+          @click="handleRoute('/discover')"
+        >
+          <template v-slot:prepend>
+            <v-progress-circular v-if="loadingItem === '/discover'" indeterminate :size="18" width="1" color="black" />
+            <v-icon v-else icon="mdi-compass-outline" size="small" />
           </template>
-        </v-btn>
-      </v-col>
+          Keşfet
+        </v-chip>
 
-      <v-col cols="4" lg="3">
-        <v-btn class="action-btn default-title-letter" text="Yeni Neler Var"
-          :size="display.xlAndUp.value ? 'x-large' : 'default'" @click="handleRoute('/blogs')" :ripple="false" block>
-          <template v-slot:append>
-            <v-progress-circular v-if="loadingItem === '/blogs'" indeterminate :size="display.xlAndUp.value ? 16 : 14"
-              width="1" color="grey-lighten-1" />
-            <v-icon v-else icon="mdi-newspaper" />
-          </template>
-        </v-btn>
-      </v-col>
+        <v-chip
+          class="cta-chip cta-youtube default-title-letter"
+          variant="elevated"
+          color="red"
+          size="large"
+          :ripple="false"
+          href="https://www.youtube.com/@npmrungame"
+          target="_blank"
+          prepend-icon="mdi-youtube"
+          rounded="sm"
+        >
+          Abone Ol
+        </v-chip>
 
-      <v-col cols="4" lg="3">
-        <v-btn class="action-btn default-title-letter" text="İletişim"
-          :size="display.xlAndUp.value ? 'x-large' : 'default'" @click="handleRoute('/contact')" :ripple="false" block>
-          <template v-slot:append>
-            <v-progress-circular v-if="loadingItem === '/contact'" indeterminate :size="display.xlAndUp.value ? 16 : 14"
-              width="1" color="grey-lighten-1" />
-            <v-icon icon="mdi-phone" v-else />
+        <v-chip
+          class="cta-chip cta-secondary default-title-letter"
+          variant="tonal"
+          color="grey-lighten-1"
+          size="large"
+          rounded="lg"
+          :ripple="false"
+          @click="handleRoute('/recommend-games')"
+        >
+          <template v-slot:prepend>
+            <v-progress-circular v-if="loadingItem === '/recommend-games'" indeterminate :size="18" width="1" color="grey-lighten-1" />
+            <v-icon v-else icon="mdi-gamepad-up" size="small" />
           </template>
-        </v-btn>
-      </v-col>
-    </v-row>
+          Oyun Öner
+        </v-chip>
+      </div>
+    </div>
   </div>
 
   <v-responsive height="100vh" />
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref } from "vue";
-
-let vantaEffect: any = null;
-const vantaRef = ref<HTMLElement | null>(null);
+import { ref, onMounted } from "vue";
+import { animate, stagger, splitText } from "animejs";
 
 const router = useRouter();
 const display = useDisplay();
-
-const loadingItem = ref<string | null>(null)
+const loadingItem = ref<string | null>(null);
+const titleRef = ref<HTMLElement | null>(null);
 
 const handleRoute = async (path: string) => {
   loadingItem.value = path;
@@ -121,29 +79,27 @@ const handleRoute = async (path: string) => {
   loadingItem.value = null;
 };
 
-onMounted(async () => {
-  // @ts-ignore
-  const VANTA = await import("vanta/dist/vanta.globe.min");
-  const THREE = await import("three");
+onMounted(() => {
+  if (!titleRef.value) return;
 
-  vantaEffect = VANTA.default({
-    el: vantaRef.value!,
-    THREE,
-    mouseControls: true,
-    touchControls: true,
-    gyroControls: false,
-    minHeight: 200.0,
-    minWidth: 200.0,
-    scale: 1.0,
-    scaleMobile: 1.0,
-    color: 0x546f54,
-    size: 0.8,
-    backgroundColor: 0x000000,
+  const { chars } = splitText(titleRef.value, { words: false, chars: true });
+
+  // Dalga efekti - harfler sırayla hafifçe yukarı kalkıp iniyor
+  animate(chars, {
+    y: [
+      { to: 0, duration: 0 },
+      { to: -6, ease: "outQuad", duration: 400 },
+      { to: 0, ease: "outBounce", duration: 500 },
+    ],
+    opacity: [
+      { to: 1, duration: 0 },
+      { to: 0.85, duration: 200 },
+      { to: 1, duration: 400 },
+    ],
+    delay: stagger(60, { from: "center" }),
+    loop: true,
+    loopDelay: 3500,
   });
-});
-
-onBeforeUnmount(() => {
-  if (vantaEffect) vantaEffect.destroy();
 });
 </script>
 
@@ -157,47 +113,82 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100dvh !important;
   overflow: hidden;
+  background: rgb(33, 20, 105);
+  background-image:
+    radial-gradient(circle at 90% 24%, rgba(209, 209, 209, 0.04) 0%, rgba(209, 209, 209, 0.04) 50%, rgba(160, 160, 160, 0.04) 50%, rgba(160, 160, 160, 0.04) 100%),
+    radial-gradient(circle at 91% 63%, rgba(45, 45, 45, 0.04) 0%, rgba(45, 45, 45, 0.04) 50%, rgba(87, 87, 87, 0.04) 50%, rgba(87, 87, 87, 0.04) 100%),
+    radial-gradient(circle at 17% 2%, rgba(124, 124, 124, 0.04) 0%, rgba(124, 124, 124, 0.04) 50%, rgba(117, 117, 117, 0.04) 50%, rgba(117, 117, 117, 0.04) 100%),
+    linear-gradient(88deg, rgb(33, 20, 105), rgb(7, 27, 23));
 }
 
 .banner-content {
-  z-index: 9999;
-  backdrop-filter: blur(0.02rem);
-  -webkit-backdrop-filter: blur(0.02rem);
-}
-
-.banner-content-lg {
   position: absolute;
-  top: 45%;
-  left: 5%;
-  transform: translateY(-50%);
-}
-
-.banner-content-sm {
-  position: absolute;
-  top: 77%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  max-width: 90%;
+  width: 100%;
+  padding: 1rem;
 }
 
-.action-buttons {
-  position: absolute;
-  bottom: 2%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 99999;
+.title {
+  color: #e8e8e8;
+  font-size: clamp(1.75rem, 6vw, 3.5rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: inline-block;
+  letter-spacing: 3px;
 }
 
-.action-btn {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(0.5rem);
-  -webkit-backdrop-filter: blur(0.5rem);
+.title :deep(span) {
+  display: inline-block;
 }
 
-.subscription-btn {
-  background: rgba(255, 255, 255, 0.02) !important;
-  backdrop-filter: blur(0.5rem);
-  -webkit-backdrop-filter: blur(0.5rem);
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+.subtitle {
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
+  line-height: 1.7;
+  max-width: 520px;
+  margin: 0 auto 2rem;
+  opacity: 0.9;
+}
+
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.cta-chip {
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  min-width: 120px;
+}
+
+.cta-chip:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.cta-primary:hover {
+  box-shadow: 0 8px 24px rgba(105, 240, 174, 0.35);
+}
+
+.cta-youtube {
+  padding-inline: 1.5rem !important;
+  font-weight: 700 !important;
+}
+
+.cta-youtube:hover {
+  box-shadow: 0 8px 28px rgba(255, 0, 0, 0.5);
+}
+
+.cta-secondary:hover {
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
 }
 </style>

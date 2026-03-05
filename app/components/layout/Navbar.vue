@@ -24,7 +24,7 @@
         v-for="(item, index) of navbarListItems"
         :key="item.path"
         @click="goTo(item)"
-        class="navbar-item transition d-flex align-center ga-1 pa-2 rounded-xl cursor-pointer"
+        class="navbar-item transition d-flex align-center ga-1 pa-2 rounded cursor-pointer"
         :class="route.fullPath.includes(item.path) ? 'active-navbar-item-link' : ''"
       >
         <p
@@ -118,54 +118,6 @@
             {{ item.title }}
           </p>
         </div>
-      </div>
-
-      <!-- Auth in Responsive -->
-      <div v-if="_store.user" class="d-flex flex-column ga-2 pa-5">
-        <v-btn
-          @click="goToDashboard"
-          variant="tonal"
-          color="green-accent-2"
-          prepend-icon="mdi-view-dashboard"
-          :ripple="false"
-          block
-          class="text-capitalize"
-        >
-          Dashboard
-        </v-btn>
-        <v-btn
-          @click="goToProfile"
-          variant="tonal"
-          color="blue-grey-lighten-1"
-          prepend-icon="mdi-account"
-          :ripple="false"
-          block
-          class="text-capitalize"
-        >
-          {{ _store.user?.username || 'Profil' }}
-        </v-btn>
-        <v-btn
-          @click="handleLogout"
-          variant="outlined"
-          color="error"
-          prepend-icon="mdi-logout"
-          text="Çıkış Yap"
-          :ripple="false"
-          block
-          class="text-capitalize"
-        />
-      </div>
-      <div v-else class="pa-5">
-        <v-btn
-          @click="isAuthDialogOpen = true"
-          variant="tonal"
-          color="green-accent-2"
-          prepend-icon="mdi-login"
-          text="Giriş Yap / Kayıt Ol"
-          :ripple="false"
-          block
-          class="text-capitalize"
-        />
       </div>
 
       <v-row class="action-buttons-in-responsive-bar w-100 mx-auto" dense>

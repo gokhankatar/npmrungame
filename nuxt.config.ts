@@ -51,6 +51,28 @@ export default defineNuxtConfig({
     ],
   },
   css: ["~/assets/css/main.css"],
+  vuetify: {
+    vuetifyOptions: {
+      theme: {
+        defaultTheme: "dark",
+        themes: {
+          dark: {
+            dark: true,
+            colors: {
+              background: "#0D1421",
+              surface: "#0D1421",
+              primary: "#69F0AE",
+              secondary: "#D1D1D1",
+              error: "#CF6679",
+              info: "#2196F3",
+              success: "#4CAF50",
+              warning: "#FB8C00",
+            },
+          },
+        },
+      },
+    },
+  },
   devtools: { enabled: false },
   devServer: {
     host: "0.0.0.0",
