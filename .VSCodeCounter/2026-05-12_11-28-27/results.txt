@@ -1,0 +1,173 @@
+Date : 2026-05-12 11:28:27
+Directory : c:\Repositories\npmrungame
+Total : 106 files,  32699 codes, 359 comments, 2594 blanks, all 35652 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| vue                |         53 |     15,461 |        322 |      1,948 |     17,731 |
+| JSON               |          3 |     13,485 |          0 |          2 |     13,487 |
+| CSS                |         14 |      2,175 |         16 |        375 |      2,566 |
+| TypeScript         |         33 |      1,498 |         21 |        243 |      1,762 |
+| Markdown           |          2 |         60 |          0 |         25 |         85 |
+| JSON with Comments |          1 |         20 |          0 |          1 |         21 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                          | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                             |        106 |     32,699 |        359 |      2,594 |     35,652 |
+| . (Files)                                                                     |          6 |     13,639 |          0 |         27 |     13,666 |
+| .devlog                                                                       |          1 |          9 |          0 |          3 |         12 |
+| app                                                                           |         87 |     18,723 |        355 |      2,482 |     21,560 |
+| app (Files)                                                                   |          2 |         76 |          0 |         13 |         89 |
+| app\assets                                                                    |         14 |      2,175 |         16 |        375 |      2,566 |
+| app\assets\css                                                                |         14 |      2,175 |         16 |        375 |      2,566 |
+| app\components                                                                |         34 |     10,938 |        242 |      1,325 |     12,505 |
+| app\components\admin                                                          |         10 |      6,555 |        164 |        786 |      7,505 |
+| app\components\common                                                         |         16 |      2,321 |         56 |        285 |      2,662 |
+| app\components\layout                                                         |          5 |        794 |          7 |        110 |        911 |
+| app\components\user                                                           |          3 |      1,268 |         15 |        144 |      1,427 |
+| app\composables                                                               |          5 |        509 |          7 |         96 |        612 |
+| app\composables\core                                                          |          2 |        148 |          3 |         31 |        182 |
+| app\composables\data                                                          |          3 |        361 |          4 |         65 |        430 |
+| app\layouts                                                                   |          3 |         47 |          0 |         12 |         59 |
+| app\pages                                                                     |         14 |      4,400 |         80 |        598 |      5,078 |
+| app\pages (Files)                                                             |          1 |        755 |         20 |         87 |        862 |
+| app\pages\about                                                               |          1 |        110 |          5 |         15 |        130 |
+| app\pages\admin                                                               |          1 |        456 |         10 |         53 |        519 |
+| app\pages\auth                                                                |          1 |        122 |          0 |         21 |        143 |
+| app\pages\auth\steam                                                          |          1 |        122 |          0 |         21 |        143 |
+| app\pages\blogs                                                               |          2 |        620 |          6 |         92 |        718 |
+| app\pages\completed-games                                                     |          1 |        451 |          8 |         54 |        513 |
+| app\pages\contact                                                             |          1 |         13 |          0 |          3 |         16 |
+| app\pages\discover                                                            |          2 |        462 |          9 |         88 |        559 |
+| app\pages\game-detail                                                         |          1 |         16 |          0 |          2 |         18 |
+| app\pages\profile                                                             |          1 |        596 |         10 |         63 |        669 |
+| app\pages\recommend-games                                                     |          1 |        417 |          6 |         72 |        495 |
+| app\pages\to-play-games                                                       |          1 |        382 |          6 |         48 |        436 |
+| app\plugins                                                                   |          4 |         92 |          7 |         20 |        119 |
+| app\store                                                                     |          4 |        215 |          3 |         29 |        247 |
+| app\utils                                                                     |          7 |        271 |          0 |         14 |        285 |
+| server                                                                        |         11 |        323 |          4 |         81 |        408 |
+| server\api                                                                    |         11 |        323 |          4 |         81 |        408 |
+| server\api (Files)                                                            |          7 |        225 |          4 |         58 |        287 |
+| server\api\admin                                                              |          1 |          7 |          0 |          2 |          9 |
+| server\api\steam                                                              |          3 |         91 |          0 |         21 |        112 |
+| types                                                                         |          1 |          5 |          0 |          1 |          6 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                      | language           | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| c:\Repositories\npmrungame\.devlog\to-do.md                                   | Markdown           |          9 |          0 |          3 |         12 |
+| c:\Repositories\npmrungame\README.md                                          | Markdown           |         51 |          0 |         22 |         73 |
+| c:\Repositories\npmrungame\app\app.vue                                        | vue                |         59 |          0 |          9 |         68 |
+| c:\Repositories\npmrungame\app\assets\css\admin.css                           | CSS                |        185 |          0 |         31 |        216 |
+| c:\Repositories\npmrungame\app\assets\css\admin_blogs.css                     | CSS                |         30 |          0 |          4 |         34 |
+| c:\Repositories\npmrungame\app\assets\css\blogs.css                           | CSS                |        672 |          7 |         97 |        776 |
+| c:\Repositories\npmrungame\app\assets\css\completed_games.css                 | CSS                |        219 |          6 |         34 |        259 |
+| c:\Repositories\npmrungame\app\assets\css\contact.css                         | CSS                |         36 |          0 |          5 |         41 |
+| c:\Repositories\npmrungame\app\assets\css\discover.css                        | CSS                |         35 |          0 |          6 |         41 |
+| c:\Repositories\npmrungame\app\assets\css\error.css                           | CSS                |         15 |          0 |          2 |         17 |
+| c:\Repositories\npmrungame\app\assets\css\footer.css                          | CSS                |         16 |          0 |          2 |         18 |
+| c:\Repositories\npmrungame\app\assets\css\game_detail.css                     | CSS                |         39 |          0 |          7 |         46 |
+| c:\Repositories\npmrungame\app\assets\css\main.css                            | CSS                |        659 |          1 |        135 |        795 |
+| c:\Repositories\npmrungame\app\assets\css\navbar.css                          | CSS                |        121 |          2 |         26 |        149 |
+| c:\Repositories\npmrungame\app\assets\css\recommended_games.css               | CSS                |         50 |          0 |         11 |         61 |
+| c:\Repositories\npmrungame\app\assets\css\target_2026_games.css               | CSS                |         49 |          0 |          8 |         57 |
+| c:\Repositories\npmrungame\app\assets\css\to_play_games.css                   | CSS                |         49 |          0 |          7 |         56 |
+| c:\Repositories\npmrungame\app\components\admin\Blogs.vue                     | vue                |      1,130 |         16 |        126 |      1,272 |
+| c:\Repositories\npmrungame\app\components\admin\Completed_Games.vue           | vue                |        854 |         21 |        101 |        976 |
+| c:\Repositories\npmrungame\app\components\admin\Current_Games.vue             | vue                |        594 |         21 |         91 |        706 |
+| c:\Repositories\npmrungame\app\components\admin\Dashboard.vue                 | vue                |        760 |         18 |         78 |        856 |
+| c:\Repositories\npmrungame\app\components\admin\Notificiations.vue            | vue                |        213 |         13 |         32 |        258 |
+| c:\Repositories\npmrungame\app\components\admin\Recommended_Games.vue         | vue                |        810 |         21 |         91 |        922 |
+| c:\Repositories\npmrungame\app\components\admin\Registered_Users_Messages.vue | vue                |        295 |          4 |         49 |        348 |
+| c:\Repositories\npmrungame\app\components\admin\Settings.vue                  | vue                |         21 |          0 |          4 |         25 |
+| c:\Repositories\npmrungame\app\components\admin\Target_2026_Games.vue         | vue                |        717 |         18 |         85 |        820 |
+| c:\Repositories\npmrungame\app\components\admin\To_Play_Games.vue             | vue                |      1,161 |         32 |        129 |      1,322 |
+| c:\Repositories\npmrungame\app\components\common\Admin_Blog_List.vue          | vue                |         89 |          2 |         11 |        102 |
+| c:\Repositories\npmrungame\app\components\common\Admin_Game_List.vue          | vue                |        110 |          4 |         14 |        128 |
+| c:\Repositories\npmrungame\app\components\common\Admin_Game_Table.vue         | vue                |        105 |          3 |         15 |        123 |
+| c:\Repositories\npmrungame\app\components\common\Animated_Text.vue            | vue                |        111 |          0 |         15 |        126 |
+| c:\Repositories\npmrungame\app\components\common\Animated_Title.vue           | vue                |         36 |          0 |          7 |         43 |
+| c:\Repositories\npmrungame\app\components\common\Auth_Dialog.vue              | vue                |        450 |          2 |         57 |        509 |
+| c:\Repositories\npmrungame\app\components\common\Back_To_Admin.vue            | vue                |         81 |          0 |         15 |         96 |
+| c:\Repositories\npmrungame\app\components\common\Blog_Card.vue                | vue                |         74 |          6 |         12 |         92 |
+| c:\Repositories\npmrungame\app\components\common\FAQ.vue                      | vue                |         82 |          5 |          7 |         94 |
+| c:\Repositories\npmrungame\app\components\common\Game_Card.vue                | vue                |        211 |          5 |         23 |        239 |
+| c:\Repositories\npmrungame\app\components\common\Game_Detail.vue              | vue                |        569 |         22 |         59 |        650 |
+| c:\Repositories\npmrungame\app\components\common\Game_Genres.vue              | vue                |         47 |          0 |          5 |         52 |
+| c:\Repositories\npmrungame\app\components\common\Loading.vue                  | vue                |         62 |          0 |          6 |         68 |
+| c:\Repositories\npmrungame\app\components\common\Scroll_To_Top.vue            | vue                |         79 |          0 |         14 |         93 |
+| c:\Repositories\npmrungame\app\components\common\Steam_Achievements.vue       | vue                |        106 |          3 |         11 |        120 |
+| c:\Repositories\npmrungame\app\components\common\Timeline.vue                 | vue                |        109 |          4 |         14 |        127 |
+| c:\Repositories\npmrungame\app\components\layout\Anim_Recommend_Game.vue      | vue                |        122 |          1 |         24 |        147 |
+| c:\Repositories\npmrungame\app\components\layout\Bg_Anim.vue                  | vue                |        170 |          1 |         24 |        195 |
+| c:\Repositories\npmrungame\app\components\layout\Contact_Section.vue          | vue                |        179 |          0 |         30 |        209 |
+| c:\Repositories\npmrungame\app\components\layout\Footer.vue                   | vue                |        110 |          3 |          9 |        122 |
+| c:\Repositories\npmrungame\app\components\layout\Navbar.vue                   | vue                |        213 |          2 |         23 |        238 |
+| c:\Repositories\npmrungame\app\components\user\User_Completed_Games.vue       | vue                |        428 |          5 |         48 |        481 |
+| c:\Repositories\npmrungame\app\components\user\User_Target_2026_Games.vue     | vue                |        425 |          5 |         48 |        478 |
+| c:\Repositories\npmrungame\app\components\user\User_To_Play_Games.vue         | vue                |        415 |          5 |         48 |        468 |
+| c:\Repositories\npmrungame\app\composables\core\basicFunc.ts                  | TypeScript         |         21 |          2 |          4 |         27 |
+| c:\Repositories\npmrungame\app\composables\core\interfaces.ts                 | TypeScript         |        127 |          1 |         27 |        155 |
+| c:\Repositories\npmrungame\app\composables\data\handleData.ts                 | TypeScript         |        241 |          4 |         49 |        294 |
+| c:\Repositories\npmrungame\app\composables\data\headerTables.ts               | TypeScript         |         71 |          0 |          6 |         77 |
+| c:\Repositories\npmrungame\app\composables\data\useGameCollectionStatus.ts    | TypeScript         |         49 |          0 |         10 |         59 |
+| c:\Repositories\npmrungame\app\error.vue                                      | vue                |         17 |          0 |          4 |         21 |
+| c:\Repositories\npmrungame\app\layouts\Admin.vue                              | vue                |          7 |          0 |          1 |          8 |
+| c:\Repositories\npmrungame\app\layouts\Contact_Layout.vue                     | vue                |         18 |          0 |          5 |         23 |
+| c:\Repositories\npmrungame\app\layouts\Default.vue                            | vue                |         22 |          0 |          6 |         28 |
+| c:\Repositories\npmrungame\app\pages\about\index.vue                          | vue                |        110 |          5 |         15 |        130 |
+| c:\Repositories\npmrungame\app\pages\admin\index.vue                          | vue                |        456 |         10 |         53 |        519 |
+| c:\Repositories\npmrungame\app\pages\auth\steam\callback.vue                  | vue                |        122 |          0 |         21 |        143 |
+| c:\Repositories\npmrungame\app\pages\blogs\[_blog].vue                        | vue                |        184 |          0 |         41 |        225 |
+| c:\Repositories\npmrungame\app\pages\blogs\index.vue                          | vue                |        436 |          6 |         51 |        493 |
+| c:\Repositories\npmrungame\app\pages\completed-games\index.vue                | vue                |        451 |          8 |         54 |        513 |
+| c:\Repositories\npmrungame\app\pages\contact\index.vue                        | vue                |         13 |          0 |          3 |         16 |
+| c:\Repositories\npmrungame\app\pages\discover\[_game].vue                     | vue                |        167 |          1 |         31 |        199 |
+| c:\Repositories\npmrungame\app\pages\discover\index.vue                       | vue                |        295 |          8 |         57 |        360 |
+| c:\Repositories\npmrungame\app\pages\game-detail\[_game].vue                  | vue                |         16 |          0 |          2 |         18 |
+| c:\Repositories\npmrungame\app\pages\index.vue                                | vue                |        755 |         20 |         87 |        862 |
+| c:\Repositories\npmrungame\app\pages\profile\[id].vue                         | vue                |        596 |         10 |         63 |        669 |
+| c:\Repositories\npmrungame\app\pages\recommend-games\index.vue                | vue                |        417 |          6 |         72 |        495 |
+| c:\Repositories\npmrungame\app\pages\to-play-games\index.vue                  | vue                |        382 |          6 |         48 |        436 |
+| c:\Repositories\npmrungame\app\plugins\2.auth.client.ts                       | TypeScript         |         49 |          6 |          8 |         63 |
+| c:\Repositories\npmrungame\app\plugins\firebase.client.ts                     | TypeScript         |         25 |          0 |          6 |         31 |
+| c:\Repositories\npmrungame\app\plugins\persistedstate.client.ts               | TypeScript         |          5 |          1 |          2 |          8 |
+| c:\Repositories\npmrungame\app\plugins\supabase.client.ts                     | TypeScript         |         13 |          0 |          4 |         17 |
+| c:\Repositories\npmrungame\app\store\notifications.ts                         | TypeScript         |         89 |          2 |         16 |        107 |
+| c:\Repositories\npmrungame\app\store\queryStore.ts                            | TypeScript         |         15 |          0 |          4 |         19 |
+| c:\Repositories\npmrungame\app\store\store.ts                                 | TypeScript         |         93 |          1 |          4 |         98 |
+| c:\Repositories\npmrungame\app\store\votes.ts                                 | TypeScript         |         18 |          0 |          5 |         23 |
+| c:\Repositories\npmrungame\app\utils\Admin.ts                                 | TypeScript         |         43 |          0 |          2 |         45 |
+| c:\Repositories\npmrungame\app\utils\Feature_Card.ts                          | TypeScript         |         43 |          0 |          2 |         45 |
+| c:\Repositories\npmrungame\app\utils\Footer_Links.ts                          | TypeScript         |         63 |          0 |          3 |         66 |
+| c:\Repositories\npmrungame\app\utils\Game_Categories_List.ts                  | TypeScript         |          8 |          0 |          1 |          9 |
+| c:\Repositories\npmrungame\app\utils\Game_Genres.ts                           | TypeScript         |         59 |          0 |          2 |         61 |
+| c:\Repositories\npmrungame\app\utils\Navbar_List.ts                           | TypeScript         |         33 |          0 |          2 |         35 |
+| c:\Repositories\npmrungame\app\utils\UserDashboard.ts                         | TypeScript         |         22 |          0 |          2 |         24 |
+| c:\Repositories\npmrungame\nuxt.config.ts                                     | TypeScript         |         83 |          0 |          2 |         85 |
+| c:\Repositories\npmrungame\package-lock.json                                  | JSON               |     13,442 |          0 |          1 |     13,443 |
+| c:\Repositories\npmrungame\package.json                                       | JSON               |         35 |          0 |          1 |         36 |
+| c:\Repositories\npmrungame\server\api\admin\admin-credential.get.ts           | TypeScript         |          7 |          0 |          2 |          9 |
+| c:\Repositories\npmrungame\server\api\contact.post.ts                         | TypeScript         |         47 |          0 |         12 |         59 |
+| c:\Repositories\npmrungame\server\api\game-details.get.ts                     | TypeScript         |         16 |          0 |          4 |         20 |
+| c:\Repositories\npmrungame\server\api\game-screenshots.get.ts                 | TypeScript         |         21 |          0 |          4 |         25 |
+| c:\Repositories\npmrungame\server\api\games-by-filter.get.ts                  | TypeScript         |         47 |          0 |         12 |         59 |
+| c:\Repositories\npmrungame\server\api\games.get.ts                            | TypeScript         |         48 |          4 |         15 |         67 |
+| c:\Repositories\npmrungame\server\api\search-games.get.ts                     | TypeScript         |         22 |          0 |          6 |         28 |
+| c:\Repositories\npmrungame\server\api\steam\owned-games.get.ts                | TypeScript         |         30 |          0 |          7 |         37 |
+| c:\Repositories\npmrungame\server\api\steam\player-achievements.get.ts        | TypeScript         |         31 |          0 |          7 |         38 |
+| c:\Repositories\npmrungame\server\api\steam\player-summary.get.ts             | TypeScript         |         30 |          0 |          7 |         37 |
+| c:\Repositories\npmrungame\server\api\youtube-channel-infos.get.ts            | TypeScript         |         24 |          0 |          5 |         29 |
+| c:\Repositories\npmrungame\tsconfig.custom.json                               | JSON               |          8 |          0 |          0 |          8 |
+| c:\Repositories\npmrungame\tsconfig.json                                      | JSON with Comments |         20 |          0 |          1 |         21 |
+| c:\Repositories\npmrungame\types\vanta.d.ts                                   | TypeScript         |          5 |          0 |          1 |          6 |
+| Total                                                                         |                    |     32,699 |        359 |      2,594 |     35,652 |
++-------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

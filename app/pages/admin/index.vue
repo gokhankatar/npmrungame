@@ -23,7 +23,7 @@
             :key="index"
             @click="_store.setActiveAdminListItem(item.slug as any)"
             :ripple="false"
-            class="rounded-xl"
+            class="rounded-lg mx-2"
             :class="
               _store.active_admin_list_item === item.slug ? 'active-admin-list-item' : ''
             "
