@@ -476,14 +476,80 @@
   transform-origin: top center;
 }
 
-.input-container {
-  background-image: linear-gradient(to top, #09203f 0%, #537895 100%);
-  border-radius: 2rem;
-  padding: 2rem;
+.subs-newsletter-card {
+  max-width: 56rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
 }
 
-.subs-email-input {
-  position: relative;
+.subs-newsletter-card:hover {
+  border-color: rgba(105, 240, 174, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45),
+    0 0 28px rgba(105, 240, 174, 0.1);
+}
+
+.subs-newsletter-desc {
+  line-height: 1.65;
+  max-width: 22rem;
+}
+
+@media (min-width: 960px) {
+  .subs-newsletter-desc {
+    margin-inline: 0;
+  }
+}
+
+.subs-newsletter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .subs-newsletter-form {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.subs-email-field :deep(.v-field) {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.subs-email-field :deep(.v-field--focused) {
+  border-color: rgba(105, 240, 174, 0.45);
+  box-shadow: 0 0 0 1px rgba(105, 240, 174, 0.15);
+}
+
+.subs-email-field :deep(.v-field__input) {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.subs-email-field :deep(.v-field__input::placeholder) {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.subs-submit-btn {
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (min-width: 600px) {
+  .subs-submit-btn {
+    min-width: 7.5rem;
+    margin-top: 2px;
+  }
+}
+
+.subs-submit-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(105, 240, 174, 0.35);
 }
 
 .extra-xsmall-text {
@@ -496,15 +562,6 @@
 
 .small-text {
   font-size: 0.75rem !important;
-}
-
-.subs-email-btn {
-  position: absolute;
-  right: 0.2rem;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 95%;
-  z-index: 999;
 }
 
 .blog-bounce {

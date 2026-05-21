@@ -475,41 +475,63 @@
 
           <v-divider class="w-100 w-lg-50" color="white" />
 
-          <div
-            class="input-container w-100 w-lg-75 w-xl-50 d-flex flex-column align-center justify-center ga-2 ga-lg-4"
+          <v-card
+            class="subs-newsletter-card w-100 mx-auto"
+            elevation="0"
+            rounded="xl"
+            :ripple="false"
           >
-            <p
-              class="text-center text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1"
-            >
-              Yeni oyunlar, bloglar, ödüller ve önemli gelişmelerden haberdar olmak için
-              e-posta adresini bırakabilirsin.
-            </p>
+            <v-row align="center" class="pa-4 pa-sm-6 pa-lg-8">
+              <v-col cols="12" md="5" class="text-center text-md-start">
+                <p
+                  class="subs-newsletter-desc text-caption text-sm-subtitle-2 text-lg-subtitle-1 default-title-letter text-grey-lighten-1 mb-0"
+                >
+                  Yeni oyunlar, bloglar, ödüller ve önemli gelişmelerden haberdar olmak
+                  için e-posta adresini bırak.
+                </p>
+              </v-col>
 
-            <v-text-field
-              v-model="email"
-              variant="outlined"
-              label="Email"
-              rounded="xl"
-              prepend-inner-icon="mdi-email"
-              :rules="[emailRule]"
-              :density="smallScreen ? 'compact' : 'comfortable'"
-              class="subs-email-input text-caption text-lg-subtitle-2 text-grey-lighten-3 default-title-letter w-100 w-lg-50"
-            >
-              <template #append-inner>
-                <v-btn
-                  icon="mdi-send"
-                  size="small"
-                  color="blue-lighten-1"
-                  :loading="isAddingToDb"
-                  :disabled="!emailIsValid"
-                  :ripple="false"
-                  :variant="emailIsValid ? 'elevated' : 'text'"
-                  @click="addUserToDb"
-                  class="subs-email-btn"
-                />
-              </template>
-            </v-text-field>
-          </div>
+              <v-col cols="12" md="7">
+                <form
+                  class="subs-newsletter-form"
+                  @submit.prevent="addUserToDb"
+                >
+                  <v-text-field
+                    v-model="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="ornek@email.com"
+                    variant="solo-filled"
+                    flat
+                    hide-details="auto"
+                    rounded="lg"
+                    prepend-inner-icon="mdi-email-outline"
+                    :rules="[emailRule]"
+                    :density="smallScreen ? 'compact' : 'comfortable'"
+                    bg-color="rgba(255, 255, 255, 0.06)"
+                    color="green-accent-2"
+                    class="subs-email-field default-title-letter flex-grow-1"
+                    @keyup.enter="addUserToDb"
+                  />
+                  <v-btn
+                    type="submit"
+                    :size="smallScreen ? 'default' : 'large'"
+                    color="green-accent-2"
+                    variant="elevated"
+                    rounded="lg"
+                    :loading="isAddingToDb"
+                    :disabled="!emailIsValid"
+                    :ripple="false"
+                    class="subs-submit-btn default-title-letter text-black font-weight-bold"
+                    :block="smallScreen"
+                    append-icon="mdi-arrow-right"
+                  >
+                    Kaydol
+                  </v-btn>
+                </form>
+              </v-col>
+            </v-row>
+          </v-card>
         </div>
       </v-col>
     </v-row>

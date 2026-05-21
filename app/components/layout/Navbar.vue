@@ -64,8 +64,6 @@
     />
   </div>
 
-  <Back_To_Admin />
-
   <!-- ! Responsive Bar -->
   <transition name="slide-down">
     <div class="responsive-bar" v-if="isOpenResponsiveBar">
@@ -156,8 +154,6 @@
 <script lang="ts" setup>
 import logo from "@/assets/img/logo_fixed.webp";
 import store from "~/store/store";
-import Back_To_Admin from "../common/Back_To_Admin.vue";
-import Scroll_To_Top from "../common/Scroll_To_Top.vue";
 import Auth_Dialog from "../common/Auth_Dialog.vue";
 import { signOut } from "firebase/auth";
 

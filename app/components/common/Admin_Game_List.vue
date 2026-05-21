@@ -1,12 +1,13 @@
 <template>
   <div class="w-100">
-    <v-skeleton-loader
-      v-if="loading"
-      v-for="i in 5"
-      :key="i"
-      type="list-item-avatar-two-line"
-      class="mb-2 rounded-lg"
-    />
+    <template v-if="loading">
+      <v-skeleton-loader
+        v-for="i in 5"
+        :key="i"
+        type="list-item-avatar-two-line"
+        class="mb-2 rounded-lg"
+      />
+    </template>
 
     <v-list
       v-else
@@ -15,17 +16,33 @@
     >
       <v-list-item
         v-for="(item, index) in arr"
-        :key="index"
-        class="admin-game-list-item rounded-lg mb-2 cursor-pointer"
-        @click="onRowClick(item)"
+        :key="item.firestoreId ?? index"
+        class="admin-game-list-item rounded-lg mb-2"
+        :class="{
+          'cursor-pointer': !bulkDeleteMode,
+          'admin-bulk-list-selected': bulkDeleteMode && isItemSelected(item),
+        }"
+        @click="handleRowInteraction(item)"
       >
         <template #prepend>
-          <v-avatar :size="display.smAndDown.value ? 48 : 64" rounded="lg">
+          <v-checkbox-btn
+            v-if="bulkDeleteMode"
+            :model-value="isItemSelected(item)"
+            color="error"
+            density="compact"
+            hide-details
+            class="mr-1"
+            @click.stop
+            @update:model-value="onToggleSelect(item)"
+          />
+          <v-avatar v-else :size="display.smAndDown.value ? 48 : 64" rounded="lg">
             <v-img :src="item.background_image" cover />
           </v-avatar>
         </template>
 
-        <v-list-item-title class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter">
+        <v-list-item-title
+          class="text-caption text-lg-subtitle-2 text-grey-lighten-1 default-title-letter"
+        >
           {{ item.name }}
         </v-list-item-title>
 
@@ -34,8 +51,7 @@
         </v-list-item-subtitle>
 
         <template #append>
-          <div class="d-flex align-center ga-2 flex-wrap">
-            <!-- Genres -->
+          <div v-if="!bulkDeleteMode" class="d-flex align-center ga-2 flex-wrap">
             <div class="d-flex align-center ga-1 flex-wrap">
               <v-chip
                 v-for="(genre, idx) in item.genres?.slice(0, 2)"
@@ -58,14 +74,20 @@
               />
             </div>
 
-            <!-- Platforms -->
             <div class="d-flex align-center ga-1">
-              <template v-for="icon in getUniquePlatformIcons(item.platforms)?.slice(0, 3)" :key="icon">
-                <v-icon v-if="icon" :size="display.smAndDown.value ? 'x-small' : 'small'" color="grey-lighten-1" :icon="icon" />
+              <template
+                v-for="icon in getUniquePlatformIcons(item.platforms)?.slice(0, 3)"
+                :key="icon"
+              >
+                <v-icon
+                  v-if="icon"
+                  :size="display.smAndDown.value ? 'x-small' : 'small'"
+                  color="grey-lighten-1"
+                  :icon="icon"
+                />
               </template>
             </div>
 
-            <!-- Metacritic -->
             <v-chip
               v-if="item.metacritic"
               :size="display.smAndDown.value ? 'x-small' : 'small'"
@@ -76,7 +98,6 @@
               class="rounded-xl"
             />
 
-            <!-- Delete Button -->
             <v-btn
               v-if="onDeleteClick"
               @click.stop="onDeleteClick(item)"
@@ -102,14 +123,27 @@
 <script lang="ts" setup>
 import { getUniquePlatformIcons, useMetacriticStyle } from "~/composables/data/handleData";
 
-defineProps<{
+const props = defineProps<{
   arr: any[];
   loading: boolean;
   onDeleteClick?: (item: any) => void;
   onRowClick: (item: any) => void;
+  bulkDeleteMode?: boolean;
+  isSelected?: (item: any) => boolean;
+  onToggleSelect?: (item: any) => void;
 }>();
 
 const display = useDisplay();
+
+const isItemSelected = (item: any) => props.isSelected?.(item) ?? false;
+
+const handleRowInteraction = (item: any) => {
+  if (props.bulkDeleteMode) {
+    props.onToggleSelect?.(item);
+    return;
+  }
+  props.onRowClick(item);
+};
 </script>
 
 <style scoped>
@@ -123,5 +157,10 @@ const display = useDisplay();
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
   transform: translateX(4px);
+}
+
+.admin-bulk-list-selected {
+  background: rgba(244, 67, 54, 0.1) !important;
+  border-color: rgba(244, 67, 54, 0.35) !important;
 }
 </style>

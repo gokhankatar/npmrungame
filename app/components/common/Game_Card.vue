@@ -1,6 +1,13 @@
 <template>
   <v-row :dense="display.smAndDown.value">
-    <v-col v-for="(item, index) of arr" :key="index" cols="6" md="4" lg="3" xl="2">
+    <v-col
+      v-for="(item, index) of arr"
+      :key="item.firestoreId ?? index"
+      cols="6"
+      md="4"
+      lg="3"
+      xl="2"
+    >
       <v-skeleton-loader
         v-if="loading"
         type="image"
@@ -9,13 +16,27 @@
 
       <v-card
         v-if="!loading"
-        class="game-card bg-transparent rounded-lg cursor-pointer transition"
+        class="game-card bg-transparent rounded-lg transition"
+        :class="{
+          'cursor-pointer': !bulkDeleteMode,
+          'admin-bulk-card-selected': bulkDeleteMode && isItemSelected(item),
+        }"
         :style="{ animationDelay: `${index * 0.1}s` }"
         :ripple="false"
-        @click="onRowClick(item)"
+        @click="handleCardClick(item)"
       >
         <!-- Resim alanı - üstte sadece saat ve metacritic -->
         <div class="game-card-image-wrapper">
+          <v-checkbox-btn
+            v-if="bulkDeleteMode"
+            :model-value="isItemSelected(item)"
+            color="error"
+            density="compact"
+            hide-details
+            class="admin-bulk-card-checkbox"
+            @click.stop
+            @update:model-value="onToggleSelect?.(item)"
+          />
           <v-img
             :src="item.background_image ?? 'https://f4.bcbits.com/img/0016409163_71.jpg'"
             class="game-card-img rounded-t-lg"
@@ -130,16 +151,29 @@ import {
   useMetacriticStyle,
 } from "~/composables/data/handleData";
 
-defineProps<{
+const props = defineProps<{
   arr: any[];
   loading: boolean;
   onRowClick: (item: any) => void;
+  bulkDeleteMode?: boolean;
+  isSelected?: (item: any) => boolean;
+  onToggleSelect?: (item: any) => void;
 }>();
 
 const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
 
 const fireAnimation = fireAnimationSrc;
+
+const isItemSelected = (item: any) => props.isSelected?.(item) ?? false;
+
+const handleCardClick = (item: any) => {
+  if (props.bulkDeleteMode) {
+    props.onToggleSelect?.(item);
+    return;
+  }
+  props.onRowClick(item);
+};
 </script>
 
 <style scoped>
@@ -160,6 +194,20 @@ const fireAnimation = fireAnimationSrc;
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+}
+
+.admin-bulk-card-checkbox {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 8px;
+}
+
+.admin-bulk-card-selected {
+  outline: 2px solid rgba(244, 67, 54, 0.65);
+  outline-offset: 2px;
 }
 
 .game-card-image-wrapper::before {

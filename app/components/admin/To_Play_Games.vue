@@ -127,6 +127,17 @@
         />
 
         <v-btn
+          :icon="bulkDeleteMode ? 'mdi-close' : 'mdi-checkbox-multiple-marked-outline'"
+          class="rounded text-caption text-lg-subtitle-2"
+          :ripple="false"
+          variant="text"
+          rounded="xl"
+          :color="bulkDeleteMode ? 'error' : 'grey-lighten-1'"
+          :size="smallScreen ? 'x-small' : 'small'"
+          @click="toggleBulkMode"
+        />
+
+        <v-btn
           icon="mdi-plus"
           class="rounded text-caption text-lg-subtitle-2"
           :ripple="false"
@@ -274,12 +285,25 @@
         </p>
       </div>
 
+      <Admin_Bulk_Delete_Bar
+        :active="bulkDeleteMode"
+        :selected-count="selectedCount"
+        :total-count="toPlayGames.length"
+        @select-all="selectAll(toPlayGames)"
+        @clear="clearSelection"
+        @delete="openBulkDeleteDialog"
+        @cancel="exitBulkMode"
+      />
+
       <!-- Card View -->
       <Game_Card
         v-if="viewMode === 'card'"
         :loading="isGettingToPlayGames"
         :arr="toPlayGames"
         :onRowClick="handleRowClick"
+        :bulk-delete-mode="bulkDeleteMode"
+        :is-selected="isSelected"
+        :on-toggle-select="toggleSelect"
       />
 
       <!-- List View -->
@@ -287,8 +311,11 @@
         v-else-if="viewMode === 'list'"
         :loading="isGettingToPlayGames"
         :arr="toPlayGames"
-        :onDeleteClick="handleDeleteGame"
-        :onRowClick="handleRowClick"
+        :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
+        :on-row-click="handleRowClick"
+        :bulk-delete-mode="bulkDeleteMode"
+        :is-selected="isSelected"
+        :on-toggle-select="toggleSelect"
       />
 
       <!-- Table View -->
@@ -296,65 +323,72 @@
         v-else
         :loading="isGettingToPlayGames"
         :arr="toPlayGames"
-        :onDeleteClick="handleDeleteGame"
-        :onRowClick="handleRowClick"
-      />
-    </v-col>
-
-    <!-- 2026 Target Games Section -->
-    <v-col cols="12" lg="10">
-      <div class="d-flex align-center justify-space-between ga-2 mb-3">
-        <div class="d-flex align-center ga-2">
-          <v-icon icon="mdi-calendar-check" color="green-accent-2" />
-          <p
-            class="text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter"
-          >
-            2026'da Bitirmeyi Hedeflediğim Oyunlar ({{ target2026Games.length }})
-          </p>
-        </div>
-
-        <div class="d-flex align-center ga-1 ga-lg-2">
-          <v-btn
-            v-if="!display.xs.value"
-            icon="mdi-plus"
-            class="rounded text-caption text-lg-subtitle-2"
-            :ripple="false"
-            variant="text"
-            rounded="xl"
-            color="green-accent-2"
-            @click="isAddGame2026 = true"
-            :size="smallScreen ? 'x-small' : 'small'"
-          />
-        </div>
-      </div>
-
-      <!-- Card View -->
-      <Game_Card
-        v-if="viewMode === 'card'"
-        :loading="isGettingTarget2026Games"
-        :arr="target2026Games"
-        :onRowClick="handleRowClick"
-      />
-
-      <!-- List View -->
-      <Admin_Game_List
-        v-else-if="viewMode === 'list'"
-        :loading="isGettingTarget2026Games"
-        :arr="target2026Games"
-        :onDeleteClick="handleDeleteGame"
-        :onRowClick="handleRowClick"
-      />
-
-      <!-- Table View -->
-      <Admin_Game_Table
-        v-else
-        :loading="isGettingTarget2026Games"
-        :arr="target2026Games"
-        :onDeleteClick="handleDeleteGame"
-        :onRowClick="handleRowClick"
+        :on-delete-click="handleDeleteGame"
+        :on-row-click="handleRowClick"
+        :bulk-delete-mode="bulkDeleteMode"
+        :is-selected="isSelected"
+        :on-toggle-select="toggleSelect"
       />
     </v-col>
   </v-row>
+
+  <!-- Bulk Delete Confirmation -->
+  <v-dialog
+    v-model="isOpenBulkConfirmationDialog"
+    :max-width="600"
+    style="
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(0.1rem);
+      -webkit-backdrop-filter: blur(0.1rem);
+    "
+  >
+    <div
+      class="delete-game-pop-up d-flex flex-column align-start ga-2 ga-lg-4 rounded pa-2 pa-lg-5"
+    >
+      <p
+        class="text-subtitle-2 text-md-subtitle-1 text-xl-h5 default-title-letter text-grey-lighten-1"
+      >
+        {{ selectedCount }} oyunu veritabanından silmek istediğinden emin misin?
+      </p>
+
+      <v-divider color="white" class="w-100" />
+
+      <div class="w-100" style="max-height: 200px; overflow-y: auto">
+        <p
+          v-for="game in bulkDeletePreviewGames"
+          :key="game.firestoreId"
+          class="text-caption text-grey-lighten-2 default-title-letter mb-1"
+        >
+          • {{ game.name }}
+        </p>
+      </div>
+
+      <div class="w-100 d-flex align-center justify-end ga-1 mt-2">
+        <v-btn
+          @click="isOpenBulkConfirmationDialog = false"
+          :ripple="false"
+          class="rounded"
+          :size="isExtraLargeScreen ? 'default' : 'small'"
+          color="grey-lighten-2"
+          variant="text"
+          prepend-icon="mdi-close"
+          text="İptal"
+        />
+
+        <v-btn
+          @click="deleteSelectedGamesFromDb"
+          :loading="isDeletingGameFromDb"
+          :ripple="false"
+          class="rounded"
+          color="error"
+          :size="isExtraLargeScreen ? 'default' : 'small'"
+          variant="tonal"
+          prepend-icon="mdi-delete"
+          text="Evet, sil"
+        />
+      </div>
+    </div>
+  </v-dialog>
 
   <!-- Confirmation Pop Up -->
   <v-dialog
@@ -963,8 +997,13 @@ import {
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import Admin_Game_Table from "../common/Admin_Game_Table.vue";
 import Admin_Game_List from "../common/Admin_Game_List.vue";
+import Admin_Bulk_Delete_Bar from "../common/Admin_Bulk_Delete_Bar.vue";
 import Game_Card from "../common/Game_Card.vue";
 import Animated_Text from "../common/Animated_Text.vue";
+import {
+  useAdminBulkDelete,
+  batchDeleteFromFirestore,
+} from "~/composables/admin/useAdminBulkDelete";
 
 const { $firestore } = useNuxtApp();
 
@@ -972,8 +1011,23 @@ const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
 const isExtraLargeScreen = computed(() => display.xlAndUp.value);
 
+const TO_PLAY_COLLECTION = "to_play_games";
+
+const {
+  bulkDeleteMode,
+  selectedCount,
+  isSelected,
+  toggleBulkMode,
+  exitBulkMode,
+  toggleSelect,
+  selectAll,
+  clearSelection,
+  getSelectedFromList,
+} = useAdminBulkDelete();
+
 const isGettingToPlayGames = ref(false);
 const isOpenConfirmationDialog = ref(false);
+const isOpenBulkConfirmationDialog = ref(false);
 const isOpenGameDetail = ref(false);
 const isDeletingGameFromDb = ref(false);
 const notificationModels = ref({
@@ -1009,6 +1063,15 @@ const displayedDescription = computed(() => {
   if (showFullDescription.value) return activeGame.value?.description;
   return truncateText(activeGame.value?.description, 250);
 });
+
+const bulkDeletePreviewGames = computed(() =>
+  getSelectedFromList(toPlayGames.value).slice(0, 12)
+);
+
+const openBulkDeleteDialog = () => {
+  if (selectedCount.value === 0) return;
+  isOpenBulkConfirmationDialog.value = true;
+};
 
 const selectGameAfterSearch = (item: any) => {
   const exists = selectedGamesAfterResearch.value.some(
@@ -1113,7 +1176,26 @@ const deleteThisGameFromDb = async (
     isOpenConfirmationDialog.value = false;
     isDeletingGameFromDb.value = false;
 
-    // Update Lists
+    await getToPlayGames();
+    await getTarget2026Games();
+  }
+};
+
+const deleteSelectedGamesFromDb = async () => {
+  const selected = getSelectedFromList(toPlayGames.value);
+  if (!selected.length) return;
+
+  try {
+    isDeletingGameFromDb.value = true;
+    const ids = selected.map((g) => g.firestoreId);
+    await batchDeleteFromFirestore($firestore, TO_PLAY_COLLECTION, ids);
+    sendNotification(`${ids.length} oyun veritabanından silindi!`);
+  } catch (error) {
+    console.error("Toplu silme hatası:", error);
+  } finally {
+    isOpenBulkConfirmationDialog.value = false;
+    isDeletingGameFromDb.value = false;
+    exitBulkMode();
     await getToPlayGames();
     await getTarget2026Games();
   }

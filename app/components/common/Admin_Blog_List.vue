@@ -1,12 +1,13 @@
 <template>
   <div class="w-100">
-    <v-skeleton-loader
-      v-if="loading"
-      v-for="i in 5"
-      :key="i"
-      type="list-item-avatar-two-line"
-      class="mb-2 rounded-lg"
-    />
+    <template v-if="loading">
+      <v-skeleton-loader
+        v-for="i in 5"
+        :key="i"
+        type="list-item-avatar-two-line"
+        class="mb-2 rounded-lg"
+      />
+    </template>
 
     <v-list
       v-else

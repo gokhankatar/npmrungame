@@ -126,6 +126,17 @@
         />
 
         <v-btn
+          :icon="bulkDeleteMode ? 'mdi-close' : 'mdi-checkbox-multiple-marked-outline'"
+          class="rounded text-caption text-lg-subtitle-2"
+          :ripple="false"
+          variant="text"
+          rounded="xl"
+          :color="bulkDeleteMode ? 'error' : 'grey-lighten-1'"
+          :size="smallScreen ? 'x-small' : 'small'"
+          @click="toggleBulkMode"
+        />
+
+        <v-btn
           icon="mdi-plus"
           class="rounded text-caption text-lg-subtitle-2"
           :ripple="false"
@@ -247,12 +258,25 @@
     </v-col>
 
     <v-col cols="12" lg="10">
+      <Admin_Bulk_Delete_Bar
+        :active="bulkDeleteMode"
+        :selected-count="selectedCount"
+        :total-count="completedGames.length"
+        @select-all="selectAll(completedGames)"
+        @clear="clearSelection"
+        @delete="openBulkDeleteDialog"
+        @cancel="exitBulkMode"
+      />
+
       <!-- Card View -->
       <Game_Card
         v-if="viewMode === 'card'"
         :loading="isGettingCompletedGames"
         :arr="completedGames"
         :onRowClick="handleRowClick"
+        :bulk-delete-mode="bulkDeleteMode"
+        :is-selected="isSelected"
+        :on-toggle-select="toggleSelect"
       />
 
       <!-- List View -->
@@ -260,8 +284,11 @@
         v-else-if="viewMode === 'list'"
         :loading="isGettingCompletedGames"
         :arr="completedGames"
-        :onDeleteClick="handleDeleteGame"
-        :onRowClick="handleRowClick"
+        :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
+        :on-row-click="handleRowClick"
+        :bulk-delete-mode="bulkDeleteMode"
+        :is-selected="isSelected"
+        :on-toggle-select="toggleSelect"
       />
 
       <!-- Table View -->
@@ -269,11 +296,72 @@
         v-else
         :loading="isGettingCompletedGames"
         :arr="completedGames"
-        :onDeleteClick="handleDeleteGame"
-        :onRowClick="handleRowClick"
+        :on-delete-click="handleDeleteGame"
+        :on-row-click="handleRowClick"
+        :bulk-delete-mode="bulkDeleteMode"
+        :is-selected="isSelected"
+        :on-toggle-select="toggleSelect"
       />
     </v-col>
   </v-row>
+
+  <!-- Bulk Delete Confirmation -->
+  <v-dialog
+    v-model="isOpenBulkConfirmationDialog"
+    :max-width="600"
+    style="
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(0.7rem);
+      -webkit-backdrop-filter: blur(0.7rem);
+    "
+  >
+    <div
+      class="delete-game-pop-up d-flex flex-column align-start ga-2 ga-lg-4 rounded pa-2 pa-lg-5"
+    >
+      <p
+        class="text-subtitle-2 text-md-subtitle-1 text-xl-h5 default-title-letter text-grey-lighten-1"
+      >
+        {{ selectedCount }} oyunu veritabanından silmek istediğinden emin misin?
+      </p>
+
+      <v-divider color="white" class="w-100" />
+
+      <div class="w-100" style="max-height: 200px; overflow-y: auto">
+        <p
+          v-for="game in bulkDeletePreviewGames"
+          :key="game.firestoreId"
+          class="text-caption text-grey-lighten-2 default-title-letter mb-1"
+        >
+          • {{ game.name }}
+        </p>
+      </div>
+
+      <div class="w-100 d-flex align-center justify-end ga-1 mt-2">
+        <v-btn
+          @click="isOpenBulkConfirmationDialog = false"
+          :ripple="false"
+          class="rounded"
+          :size="isExtraLargeScreen ? 'default' : 'small'"
+          color="grey-lighten-2"
+          variant="text"
+          prepend-icon="mdi-close"
+          text="İptal"
+        />
+
+        <v-btn
+          @click="deleteSelectedGamesFromDb"
+          :loading="isDeletingGameFromDb"
+          :ripple="false"
+          class="rounded"
+          color="error"
+          :size="isExtraLargeScreen ? 'default' : 'small'"
+          variant="tonal"
+          prepend-icon="mdi-delete"
+          text="Evet, sil"
+        />
+      </div>
+    </div>
+  </v-dialog>
 
   <!-- Confirmation Pop Up -->
   <v-dialog
@@ -715,8 +803,13 @@ import {
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import Admin_Game_Table from "../common/Admin_Game_Table.vue";
 import Admin_Game_List from "../common/Admin_Game_List.vue";
+import Admin_Bulk_Delete_Bar from "../common/Admin_Bulk_Delete_Bar.vue";
 import Game_Card from "../common/Game_Card.vue";
 import Animated_Text from "../common/Animated_Text.vue";
+import {
+  useAdminBulkDelete,
+  batchDeleteFromFirestore,
+} from "~/composables/admin/useAdminBulkDelete";
 
 const { $firestore } = useNuxtApp();
 
@@ -724,8 +817,23 @@ const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
 const isExtraLargeScreen = computed(() => display.xlAndUp.value);
 
+const COLLECTION_NAME = "completed_games";
+
+const {
+  bulkDeleteMode,
+  selectedCount,
+  isSelected,
+  toggleBulkMode,
+  exitBulkMode,
+  toggleSelect,
+  selectAll,
+  clearSelection,
+  getSelectedFromList,
+} = useAdminBulkDelete();
+
 const isGettingCompletedGames = ref(false);
 const isOpenConfirmationDialog = ref(false);
+const isOpenBulkConfirmationDialog = ref(false);
 const isOpenGameDetail = ref(false);
 const isDeletingGameFromDb = ref(false);
 const notificationModels = ref({
@@ -751,6 +859,15 @@ const displayedDescription = computed(() => {
   if (showFullDescription.value) return activeGame.value?.description;
   return truncateText(activeGame.value?.description, 250);
 });
+
+const bulkDeletePreviewGames = computed(() =>
+  getSelectedFromList(completedGames.value).slice(0, 12)
+);
+
+const openBulkDeleteDialog = () => {
+  if (selectedCount.value === 0) return;
+  isOpenBulkConfirmationDialog.value = true;
+};
 
 const selectGameAfterSearch = (item: any) => {
   const exists = selectedGamesAfterResearch.value.some(
@@ -814,7 +931,7 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
   try {
     isDeletingGameFromDb.value = true;
 
-    await deleteDoc(doc($firestore, "completed_games", firestoreId));
+    await deleteDoc(doc($firestore, COLLECTION_NAME, firestoreId));
     sendNotification(`${activeGame.value?.name} adlı oyun veritabanından silindi!`);
   } catch (error) {
     console.error("Silme hatası:", error);
@@ -822,7 +939,25 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
     isOpenConfirmationDialog.value = false;
     isDeletingGameFromDb.value = false;
 
-    // Update List
+    await getCompletedGames();
+  }
+};
+
+const deleteSelectedGamesFromDb = async () => {
+  const selected = getSelectedFromList(completedGames.value);
+  if (!selected.length) return;
+
+  try {
+    isDeletingGameFromDb.value = true;
+    const ids = selected.map((g) => g.firestoreId);
+    await batchDeleteFromFirestore($firestore, COLLECTION_NAME, ids);
+    sendNotification(`${ids.length} oyun veritabanından silindi!`);
+  } catch (error) {
+    console.error("Toplu silme hatası:", error);
+  } finally {
+    isOpenBulkConfirmationDialog.value = false;
+    isDeletingGameFromDb.value = false;
+    exitBulkMode();
     await getCompletedGames();
   }
 };

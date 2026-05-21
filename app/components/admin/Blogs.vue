@@ -871,38 +871,6 @@
       </p>
     </div>
   </v-dialog>
-
-  <!-- ! Feature News Toast -->
-  <v-dialog
-    v-model="modelSeenFeatureNewsToast"
-    :max-width="600"
-    style="
-      background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(0.1rem);
-      -webkit-backdrop-filter: blur(0.1rem);
-    "
-  >
-    <div
-      class="successfully-done-container d-flex flex-column align-center justify-center pa-5 rounded-xl"
-    >
-      <v-btn
-        @click="_store.setTrueIsSeenFeatureNewsToast"
-        class="close-icon-in-successfully-done-container ma-1 ma-lg-2"
-        icon="mdi-close"
-        :ripple="false"
-        variant="text"
-        color="grey-darken-1"
-        size="small"
-      />
-      <v-avatar :image="featureImg" :size="display.smAndDown.value ? 70 : 100" />
-      <p
-        class="mt-2 text-center text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter"
-      >
-        Karıcım Yeni Özellik Geldi! <br />
-        Artık blog içeriklerini güncelleyebilirsin öpüyorum.
-      </p>
-    </div>
-  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -941,7 +909,6 @@ const _store = store()
 const isSmallScreen = computed(() => display.smAndDown.value);
 const isLargeScreen = computed(() => display.lgAndUp.value);
 
-const modelSeenFeatureNewsToast = computed(() => !_store.isSeenFeatureNewsToast);
 const isSubmitting = ref(false);
 const isAddBlog = ref(false);
 const isGettingBlogs = ref(false);
