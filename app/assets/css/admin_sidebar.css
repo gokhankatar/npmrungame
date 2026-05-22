@@ -1,0 +1,235 @@
+/* Admin sidebar — YouTube tarzı kategorili navigasyon */
+
+.admin-sidebar {
+  background: #0f0f0f !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.admin-sidebar :deep(.v-navigation-drawer__content) {
+  overflow: hidden;
+}
+
+.admin-sidebar__inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100dvh;
+}
+
+/* ─── Üst: marka + daralt ─── */
+
+.admin-sidebar__header {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0.65rem 0.5rem 0.5rem;
+}
+
+.admin-sidebar__rail-btn {
+  position: absolute !important;
+  top: 0.45rem;
+  right: 0.35rem;
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.admin-sidebar__rail-btn:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.admin-sidebar--rail .admin-sidebar__rail-btn {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+.admin-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  padding-right: 2.25rem;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.admin-sidebar__brand:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar__brand--rail {
+  justify-content: center;
+  padding: 0.5rem;
+  padding-right: 0.5rem;
+  margin-top: 1.75rem;
+}
+
+.admin-sidebar__brand-avatar {
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.admin-sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.1rem;
+}
+
+.admin-sidebar__brand-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.admin-sidebar__brand-sub {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ─── Kaydırılabilir menü ─── */
+
+.admin-sidebar__nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.25rem 0.5rem 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+}
+
+.admin-sidebar__divider {
+  margin: 0.5rem 0.65rem !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  opacity: 1;
+}
+
+.admin-sidebar__section-title {
+  margin: 0.65rem 0.75rem 0.35rem;
+  padding: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.3;
+}
+
+/* ─── Liste öğeleri (YouTube pill) ─── */
+
+.admin-sidebar__list {
+  padding: 0 !important;
+}
+
+.admin-sidebar__list :deep(.v-list-item) {
+  min-height: 40px !important;
+  padding-inline: 0.65rem !important;
+  margin-bottom: 2px;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.admin-sidebar__item--rail :deep(.v-list-item__prepend) {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-inline: 0 !important;
+}
+
+.admin-sidebar__item--rail :deep(.v-list-item__content) {
+  display: none !important;
+}
+
+.admin-sidebar__item--rail :deep(.v-list-item__spacer) {
+  display: none !important;
+}
+
+.admin-sidebar__icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  margin-inline-end: 0.35rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.admin-sidebar__item-title {
+  font-size: 0.84rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.01em;
+}
+
+.admin-sidebar__list :deep(.v-list-item:hover) {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-sidebar__item--active :deep(.v-list-item__overlay) {
+  opacity: 0 !important;
+}
+
+.admin-sidebar__item--active {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
+}
+
+.admin-sidebar__item--active .admin-sidebar__icon-wrap,
+.admin-sidebar__item--active :deep(.v-icon) {
+  color: #fff !important;
+}
+
+.admin-sidebar__item--active .admin-sidebar__item-title {
+  font-weight: 500 !important;
+}
+
+.admin-sidebar__item--logout:hover :deep(.v-icon) {
+  color: #ff8a80 !important;
+}
+
+/* ─── Alt blok ─── */
+
+.admin-sidebar__footer {
+  flex-shrink: 0;
+  padding: 0 0.5rem 0.75rem;
+}
+
+.admin-sidebar__list--footer {
+  padding-top: 0.15rem !important;
+}
+
+/* Rail genel */
+.admin-sidebar--rail .admin-sidebar__nav {
+  padding-inline: 0.35rem;
+}
+
+.admin-sidebar--rail .admin-sidebar__footer {
+  padding-inline: 0.35rem;
+}
+
+.admin-sidebar--rail .admin-sidebar__list--rail :deep(.v-list-item) {
+  padding-inline: 0 !important;
+  justify-content: center;
+}
+
+/* Eski sınıflarla uyumluluk (başka dosyalar) */
+.admin-nav-drawer {
+  background: #0f0f0f !important;
+}
+
+.active-admin-list-item {
+  background: rgba(255, 255, 255, 0.12) !important;
+}

@@ -19,23 +19,13 @@
         :key="item.firestoreId ?? index"
         class="admin-game-list-item rounded-lg mb-2"
         :class="{
-          'cursor-pointer': !bulkDeleteMode,
+          'cursor-pointer': true,
           'admin-bulk-list-selected': bulkDeleteMode && isItemSelected(item),
         }"
         @click="handleRowInteraction(item)"
       >
         <template #prepend>
-          <v-checkbox-btn
-            v-if="bulkDeleteMode"
-            :model-value="isItemSelected(item)"
-            color="error"
-            density="compact"
-            hide-details
-            class="mr-1"
-            @click.stop
-            @update:model-value="onToggleSelect(item)"
-          />
-          <v-avatar v-else :size="display.smAndDown.value ? 48 : 64" rounded="lg">
+          <v-avatar :size="display.smAndDown.value ? 48 : 64" rounded="lg">
             <v-img :src="item.background_image" cover />
           </v-avatar>
         </template>
@@ -160,7 +150,8 @@ const handleRowInteraction = (item: any) => {
 }
 
 .admin-bulk-list-selected {
-  background: rgba(244, 67, 54, 0.1) !important;
-  border-color: rgba(244, 67, 54, 0.35) !important;
+  background: rgba(105, 240, 174, 0.08) !important;
+  border-color: rgba(105, 240, 174, 0.45) !important;
+  box-shadow: inset 3px 0 0 #69f0ae;
 }
 </style>

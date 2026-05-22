@@ -49,6 +49,8 @@ export interface Feature_Card {
   title: string;
   icon: string;
   description: string;
+  path?: string;
+  external?: boolean;
 }
 
 export interface AdminListItem {

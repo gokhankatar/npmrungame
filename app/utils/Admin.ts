@@ -1,44 +1,82 @@
 import type { AdminListItem } from "~/composables/core/interfaces";
 
-export const adminListItems: AdminListItem[] = [
+export interface AdminNavSection {
+  id: string;
+  /** Bölüm başlığı; null = üst blok (YouTube ana menü gibi) */
+  title: string | null;
+  items: AdminListItem[];
+}
+
+export const adminNavSections: AdminNavSection[] = [
   {
-    title: "Özet",
-    slug: "dashboard",
-    icon: "mdi-view-dashboard-outline",
+    id: "overview",
+    title: null,
+    items: [
+      {
+        title: "Özet",
+        slug: "dashboard",
+        icon: "mdi-view-dashboard-outline",
+      },
+      {
+        title: "Bildirimler",
+        slug: "notifications",
+        icon: "mdi-bell-outline",
+      },
+    ],
   },
   {
-    title: "Bildirimler",
-    slug: "notifications",
-    icon: "mdi-bell",
-  },
-   {
-    title: "Kayıtlar ve Mesajlar",
-    slug: "messages",
-    icon: "mdi-email-outline",
-  },
-  {
-    title: "Şuan Oynananlar",
-    slug: "current_games",
-    icon: "mdi-progress-clock",
-  },
-  {
-    title: "Bitirdiğim Oyunlar",
-    slug: "completed_games",
-    icon: "mdi-check-circle-outline",
-  },
-  {
-    title: "Oynayacaklarım",
-    slug: "to_play_games",
-    icon: "mdi-gamepad-variant-outline",
-  },
-  {
-    title: "Önerilen Oyunlar",
-    slug: "recommended_games",
-    icon: "mdi-thumb-up",
+    id: "games",
+    title: "Oyun koleksiyonları",
+    items: [
+      {
+        title: "Şuan oynananlar",
+        slug: "current_games",
+        icon: "mdi-play-circle-outline",
+      },
+      {
+        title: "Bitirdiğim oyunlar",
+        slug: "completed_games",
+        icon: "mdi-check-circle-outline",
+      },
+      {
+        title: "Oynayacaklarım",
+        slug: "to_play_games",
+        icon: "mdi-gamepad-variant-outline",
+      },
+      {
+        title: "Önerilen oyunlar",
+        slug: "recommended_games",
+        icon: "mdi-thumb-up-outline",
+      },
+    ],
   },
   {
-    title: "Blog",
-    slug: "blog",
-    icon: "mdi-post-outline",
+    id: "content",
+    title: "İçerik ve iletişim",
+    items: [
+      {
+        title: "Blog",
+        slug: "blog",
+        icon: "mdi-post-outline",
+      },
+      {
+        title: "Kayıtlar ve mesajlar",
+        slug: "messages",
+        icon: "mdi-email-outline",
+      },
+    ],
+  },
+];
+
+/** Yatay mobil menü — tüm öğeler düz liste */
+export const adminListItems: AdminListItem[] = adminNavSections.flatMap(
+  (section) => section.items
+);
+
+export const adminNavFooterItems: AdminListItem[] = [
+  {
+    title: "Ayarlar",
+    slug: "settings",
+    icon: "mdi-cog-outline",
   },
 ];

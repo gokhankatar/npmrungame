@@ -1,56 +1,92 @@
-.delete-game-pop-up,
-.game-detail-pop-up,
-.add-game-pop-up {
-  position: relative;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(0.7rem);
-  -webkit-backdrop-filter: blur(0.7rem);
+/* Oynayacağım — cyan accent overrides (shared layout: completed_games.css) */
+
+.to-play-page {
+  --page-accent: #4fc3f7;
+  --page-accent-soft: rgba(79, 195, 247, 0.15);
+  --page-accent-border: rgba(79, 195, 247, 0.35);
 }
 
-.close-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 999;
+.to-play-page .completed-page-glow--left {
+  background: radial-gradient(circle, rgba(79, 195, 247, 0.22) 0%, transparent 70%);
 }
 
-.research-game {
-  background: rgba(255, 255, 255, .15);
-  border: none;
-  backdrop-filter: blur(.7rem);
-  -webkit-backdrop-filter: blur(.7rem);
+.to-play-page .completed-page-glow--right {
+  background: radial-gradient(circle, rgba(41, 182, 246, 0.18) 0%, transparent 70%);
 }
 
-.selected-research-game {
-  background: #69F0AE;
-  border: none;
-  backdrop-filter: blur(.7rem);
-  -webkit-backdrop-filter: blur(.7rem);
+.to-play-page .completed-hero {
+  border-color: var(--page-accent-border);
+  background: linear-gradient(
+    135deg,
+    rgba(79, 195, 247, 0.1) 0%,
+    rgba(0, 0, 0, 0.4) 45%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
 }
 
-.successfully-done-container {
-  position: relative;
-  background: rgba(0, 0, 0, .15);
-  border: 1px solid rgba(255, 255, 255, .15);
-  backdrop-filter: blur(.5rem);
-  -webkit-backdrop-filter: blur(.5rem);
+.to-play-page .completed-hero-badge {
+  color: var(--page-accent);
+  background: var(--page-accent-soft);
+  border-color: var(--page-accent-border);
 }
 
-.close-icon-in-successfully-done-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 999;
+.to-play-page .completed-hero-title {
+  background: linear-gradient(120deg, #ffffff 0%, #4fc3f7 55%, #81d4fa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.3s ease;
+.to-play-page .completed-hero-pill {
+  border-color: var(--page-accent-border);
 }
 
-.slide-up-enter-from,
-.slide-up-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
+.to-play-page .stat-card:hover {
+  border-color: var(--page-accent-border) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 0 24px rgba(79, 195, 247, 0.1);
+}
+
+.to-play-page .stat-card-value,
+.to-play-page .genre-percent,
+.to-play-page .genre-rank {
+  color: var(--page-accent);
+}
+
+.to-play-page .genre-rank {
+  background: var(--page-accent-soft);
+  border-color: var(--page-accent-border);
+}
+
+.to-play-page .genre-breakdown-card {
+  border-color: var(--page-accent-border) !important;
+}
+
+.to-play-page .toolbar-icon-ring {
+  border-color: var(--page-accent-border);
+  background: var(--page-accent-soft);
+}
+
+.to-play-page .search-box--focused,
+.to-play-page .search-box--active {
+  border-color: rgba(79, 195, 247, 0.55);
+  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.12), 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.to-play-page .search-box-icon,
+.to-play-page .search-box-badge {
+  color: var(--page-accent);
+}
+
+.to-play-page .search-box-badge {
+  background: var(--page-accent-soft);
+  border-color: var(--page-accent-border);
+}
+
+.to-play-page .search-box-clear:hover {
+  background: var(--page-accent-soft);
+  color: var(--page-accent);
+}
+
+.to-play-page .to-play-games-grid :deep(.game-card:hover) {
+  border-color: var(--page-accent-border);
+  box-shadow: 0 12px 36px rgba(79, 195, 247, 0.15), 0 0 24px rgba(79, 195, 247, 0.08);
 }

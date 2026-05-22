@@ -22,7 +22,8 @@
   overflow: hidden;
 }
 
-.banner-content {
+/* Eski banner layout — sadece .banner-container altında (anasayfa hero ile çakışmasın) */
+.banner-container .banner-content {
   position: absolute;
   top: 65%;
   width: 40%;

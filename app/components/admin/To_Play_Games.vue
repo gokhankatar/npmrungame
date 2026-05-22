@@ -1,290 +1,30 @@
 <template>
-  <v-row class="d-flex justify-center align-center mx-auto mt-5 mt-lg-10">
-    <v-col cols="12" lg="10" class="d-flex justify-space-between align-center">
-      <div
-        class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5"
-      >
-        <Animated_Text
-          text="Oynayacağım Oyunlar"
-          class="cursor-pointer"
-          :msPerChar="50"
-          :duration="550"
-          :loop="true"
-        />
-      </div>
-
-      <div class="d-flex align-center ga-1 ga-lg-2">
-        <!-- View Selector -->
-        <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
-          <template #activator="{ props }">
-            <v-btn
-              v-if="!display.xs.value"
-              v-bind="props"
-              icon="mdi-view-module"
-              class="rounded text-caption text-lg-subtitle-2"
-              :ripple="false"
-              variant="text"
-              rounded="xl"
-              color="grey-lighten-1"
-              :size="display.smAndDown.value ? 'x-small' : 'small'"
-            />
-          </template>
-
-          <v-card
-            class="pa-1 pa-sm-2"
-            :ripple="false"
-            style="
-              background: rgba(0, 0, 0, 0.2);
-              border: 1px solid rgba(255, 255, 255, 0.15);
-              backdrop-filter: blur(0.5rem);
-              -webkit-backdrop-filter: blur(0.5rem);
-            "
-            elevation="2"
-          >
-            <v-list density="compact" class="bg-transparent">
-              <v-list-item @click="viewMode = 'card'" prepend-icon="mdi-view-grid">
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Kart Görünümü</v-list-item-title
-                >
-              </v-list-item>
-
-              <v-list-item @click="viewMode = 'list'" prepend-icon="mdi-view-list">
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Liste Görünümü</v-list-item-title
-                >
-              </v-list-item>
-
-              <v-list-item @click="viewMode = 'table'" prepend-icon="mdi-table">
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Tablo Görünümü</v-list-item-title
-                >
-              </v-list-item>
-            </v-list>
-          </v-card>
-        </v-menu>
-
-        <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
-          <template #activator="{ props }">
-            <v-btn
-              v-if="!display.xs.value"
-              v-bind="props"
-              icon="mdi-sort"
-              class="rounded text-caption text-lg-subtitle-2"
-              :ripple="false"
-              variant="text"
-              rounded="xl"
-              color="grey-lighten-1"
-              :size="display.smAndDown.value ? 'x-small' : 'small'"
-            />
-          </template>
-
-          <v-card
-            class="pa-1 pa-sm-2"
-            :ripple="false"
-            style="
-              background: rgba(0, 0, 0, 0.2);
-              border: 1px solid rgba(255, 255, 255, 0.15);
-              backdrop-filter: blur(0.5rem);
-              -webkit-backdrop-filter: blur(0.5rem);
-            "
-            elevation="2"
-          >
-            <v-list density="compact" class="bg-transparent">
-              <v-list-item @click="sortBy('new')" prepend-icon="mdi-arrow-up">
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Tarihe Göre En Yeni</v-list-item-title
-                >
-              </v-list-item>
-
-              <v-list-item
-                @click="sortBy('old')"
-                :ripple="false"
-                prepend-icon="mdi-arrow-down"
-              >
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Tarihe Göre En Eski</v-list-item-title
-                >
-              </v-list-item>
-            </v-list>
-          </v-card>
-        </v-menu>
-
-        <v-btn
-          icon="mdi-refresh"
-          class="rounded text-caption text-lg-subtitle-2"
-          :ripple="false"
-          variant="text"
-          rounded="xl"
-          :color="isGettingToPlayGames ? 'green-accent-2' : 'grey-lighten-1'"
-          @click="getToPlayGames"
-          :size="smallScreen ? 'x-small' : 'small'"
-          :loading="isGettingToPlayGames"
-        />
-
-        <v-btn
-          :icon="bulkDeleteMode ? 'mdi-close' : 'mdi-checkbox-multiple-marked-outline'"
-          class="rounded text-caption text-lg-subtitle-2"
-          :ripple="false"
-          variant="text"
-          rounded="xl"
-          :color="bulkDeleteMode ? 'error' : 'grey-lighten-1'"
-          :size="smallScreen ? 'x-small' : 'small'"
-          @click="toggleBulkMode"
-        />
-
-        <v-btn
-          icon="mdi-plus"
-          class="rounded text-caption text-lg-subtitle-2"
-          :ripple="false"
-          variant="text"
-          rounded="xl"
-          color="green-accent-2"
-          @click="isAddGame = true"
-          :size="smallScreen ? 'x-small' : 'small'"
-        />
-      </div>
-    </v-col>
-
-    <v-col cols="12" v-if="display.xs.value">
-      <v-row dense>
-        <v-col cols="6">
-          <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
-            <template #activator="{ props }">
-              <v-btn
-                prepend-icon="mdi-view-module"
-                v-bind="props"
-                class="text-caption text-lg-subtitle-2"
-                :ripple="false"
-                text="Görünüm"
-                variant="tonal"
-                rounded="xl"
-                color="grey-lighten-1"
-                size="small"
-                block
-              />
-            </template>
-
-            <v-card
-              class="pa-1 pa-sm-2"
-              :ripple="false"
-              style="
-                background: rgba(0, 0, 0, 0.2);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                backdrop-filter: blur(0.5rem);
-                -webkit-backdrop-filter: blur(0.5rem);
-              "
-              elevation="2"
-            >
-              <v-list density="compact" class="bg-transparent">
-                <v-list-item @click="viewMode = 'card'" prepend-icon="mdi-view-grid">
-                  <v-list-item-title
-                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                    >Kart</v-list-item-title
-                  >
-                </v-list-item>
-
-                <v-list-item @click="viewMode = 'list'" prepend-icon="mdi-view-list">
-                  <v-list-item-title
-                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                    >Liste</v-list-item-title
-                  >
-                </v-list-item>
-
-                <v-list-item @click="viewMode = 'table'" prepend-icon="mdi-table">
-                  <v-list-item-title
-                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                    >Tablo</v-list-item-title
-                  >
-                </v-list-item>
-              </v-list>
-            </v-card>
-          </v-menu>
-        </v-col>
-        <v-col cols="6">
-          <v-menu :close-on-content-click="true" :offset="[5, 0]" location="bottom end">
-            <template #activator="{ props }">
-              <v-btn
-                prepend-icon="mdi-sort"
-                v-bind="props"
-                class="text-caption text-lg-subtitle-2"
-                :ripple="false"
-                text="Sırala"
-                variant="tonal"
-                rounded="xl"
-                color="grey-lighten-1"
-                size="small"
-                block
-              />
-            </template>
-
-            <v-card
-              class="pa-1 pa-sm-2"
-              :ripple="false"
-              style="
-                background: rgba(0, 0, 0, 0.2);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                backdrop-filter: blur(0.5rem);
-                -webkit-backdrop-filter: blur(0.5rem);
-              "
-              elevation="2"
-            >
-              <v-list density="compact" class="bg-transparent">
-                <v-list-item @click="sortBy('new')" prepend-icon="mdi-arrow-up">
-                  <v-list-item-title
-                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                    >Tarihe Göre En Yeni</v-list-item-title
-                  >
-                </v-list-item>
-
-                <v-list-item
-                  @click="sortBy('old')"
-                  :ripple="false"
-                  prepend-icon="mdi-arrow-down"
-                >
-                  <v-list-item-title
-                    class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                    >Tarihe Göre En Eski</v-list-item-title
-                  >
-                </v-list-item>
-              </v-list>
-            </v-card>
-          </v-menu>
-        </v-col>
-      </v-row>
-    </v-col>
-
-    <!-- 2026 Target Games Section - Mobile Add Button -->
-    <v-col cols="12" v-if="display.xs.value">
-      <v-btn
-        @click="isAddGame2026 = true"
-        class="rounded text-caption text-lg-subtitle-2"
-        :ripple="false"
-        variant="tonal"
-        rounded="xl"
-        color="green-accent-2"
-        size="small"
-        block
-        prepend-icon="mdi-plus"
-        text="2026 Hedef Oyunları Ekle"
-      />
-    </v-col>
-
-    <!-- All To Play Games Section -->
-    <v-col cols="12" lg="10">
-      <div class="d-flex align-center ga-2 mb-3">
-        <v-icon icon="mdi-gamepad-variant-outline" color="blue-grey-lighten-1" />
-        <p
-          class="text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter"
-        >
-          Tüm Oynayacaklarım ({{ toPlayGames.length }})
-        </p>
-      </div>
-
+  <Admin_Game_Collection_Shell
+    theme="cyan"
+    title="Oynayacağım Oyunlar"
+    subtitle="Listendeki oyunları ekle, ara, sırala ve yönet."
+    badge="Liste"
+    badge-icon="mdi-playlist-play"
+    accent-color="#4dd0e1"
+    :show-added-sort="false"
+    v-model:list-search-query="listSearchQuery"
+    v-model:view-mode="viewMode"
+    :total-games-count="totalGamesCount"
+    :filtered-games-count="filteredGamesCount"
+    :avg-playtime="avgPlaytime"
+    :avg-metacritic="avgMetacritic"
+    :sort-label="sortLabel"
+    :sort-menu-icon="sortMenuIcon"
+    :loading="isGettingToPlayGames"
+    :bulk-delete-mode="bulkDeleteMode"
+    @add="isAddGame = true"
+    @refresh="getToPlayGames"
+    @bulk-toggle="toggleBulkMode"
+    @search-input="onListSearchInput"
+    @clear-search="clearListSearch"
+    @sort="sortBy"
+  >
+    <template #bulk-bar>
       <Admin_Bulk_Delete_Bar
         :active="bulkDeleteMode"
         :selected-count="selectedCount"
@@ -294,45 +34,80 @@
         @delete="openBulkDeleteDialog"
         @cancel="exitBulkMode"
       />
+    </template>
 
-      <!-- Card View -->
-      <Game_Card
-        v-if="viewMode === 'card'"
-        :loading="isGettingToPlayGames"
-        :arr="toPlayGames"
-        :onRowClick="handleRowClick"
-        :bulk-delete-mode="bulkDeleteMode"
-        :is-selected="isSelected"
-        :on-toggle-select="toggleSelect"
+    <div
+      v-if="!isGettingToPlayGames && toPlayGames.length === 0"
+      class="admin-collection-empty"
+    >
+      <v-icon icon="mdi-playlist-play" size="48" color="rgba(77,208,225,0.45)" />
+      <p class="admin-collection-empty-title default-title-letter">
+        {{ listSearchQuery ? "Sonuç bulunamadı" : "Henüz oyun yok" }}
+      </p>
+      <p class="admin-collection-empty-desc">
+        {{
+          listSearchQuery
+            ? "Farklı bir arama dene veya filtreyi temizle."
+            : "Oynayacağın ilk oyunu eklemek için Oyun Ekle butonunu kullan."
+        }}
+      </p>
+      <v-btn
+        v-if="!listSearchQuery"
+        color="#4dd0e1"
+        variant="tonal"
+        rounded="lg"
+        prepend-icon="mdi-plus"
+        class="text-capitalize"
+        text="Oyun ekle"
+        @click="isAddGame = true"
       />
-
-      <!-- List View -->
-      <Admin_Game_List
-        v-else-if="viewMode === 'list'"
-        :loading="isGettingToPlayGames"
-        :arr="toPlayGames"
-        :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
-        :on-row-click="handleRowClick"
-        :bulk-delete-mode="bulkDeleteMode"
-        :is-selected="isSelected"
-        :on-toggle-select="toggleSelect"
-      />
-
-      <!-- Table View -->
-      <Admin_Game_Table
+      <v-btn
         v-else
-        :loading="isGettingToPlayGames"
-        :arr="toPlayGames"
-        :on-delete-click="handleDeleteGame"
-        :on-row-click="handleRowClick"
-        :bulk-delete-mode="bulkDeleteMode"
-        :is-selected="isSelected"
-        :on-toggle-select="toggleSelect"
+        variant="text"
+        rounded="lg"
+        class="text-capitalize"
+        text="Aramayı temizle"
+        @click="clearListSearch"
       />
-    </v-col>
-  </v-row>
+    </div>
 
-  <!-- Bulk Delete Confirmation -->
+    <Game_Card
+      v-else-if="viewMode === 'card'"
+      :loading="isGettingToPlayGames"
+      :arr="toPlayGames"
+        density="admin-grid"
+      :on-row-click="handleRowClick"
+      :bulk-delete-mode="bulkDeleteMode"
+      :is-selected="isSelected"
+      :on-toggle-select="toggleSelect"
+    />
+
+    <Admin_Game_List
+      v-else-if="viewMode === 'list'"
+      :loading="isGettingToPlayGames"
+      :arr="toPlayGames"
+      :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
+      :on-row-click="handleRowClick"
+      :bulk-delete-mode="bulkDeleteMode"
+      :is-selected="isSelected"
+      :on-toggle-select="toggleSelect"
+    />
+
+    <Admin_Game_Table
+      v-else-if="viewMode === 'table'"
+      :loading="isGettingToPlayGames"
+      :arr="toPlayGames"
+      :on-delete-click="handleDeleteGame"
+      :on-row-click="handleRowClick"
+      :bulk-delete-mode="bulkDeleteMode"
+      :is-selected="isSelected"
+      :on-toggle-select="toggleSelect"
+    />
+
+  </Admin_Game_Collection_Shell>
+
+
+    <!-- Bulk Delete Confirmation -->
   <v-dialog
     v-model="isOpenBulkConfirmationDialog"
     :max-width="600"
@@ -438,12 +213,7 @@
         />
 
         <v-btn
-          @click="
-            deleteThisGameFromDb(
-              activeGame?.firestoreId,
-              activeGame?.collectionName || 'to_play_games'
-            )
-          "
+          @click="deleteThisGameFromDb(activeGame?.firestoreId)"
           :loading="isDeletingGameFromDb"
           :ripple="false"
           class="rounded"
@@ -624,327 +394,23 @@
     </div>
   </v-dialog>
 
-  <!-- Add Game -->
-  <v-dialog
+  <Admin_Add_Game_Dialog
     v-model="isAddGame"
-    :max-width="600"
-    style="
-      background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(0.1rem);
-      -webkit-backdrop-filter: blur(0.1rem);
-    "
-  >
-    <div
-      class="add-game-pop-up d-flex flex-column align-center ga-2 ga-lg-4 rounded pa-2 pa-lg-5"
-    >
-      <v-btn
-        @click="isAddGame = false"
-        icon="mdi-close"
-        color="grey-darken-1"
-        class="close-btn ma-1"
-        variant="text"
-        size="small"
-        :ripple="false"
-      />
-
-      <div class="d-flex justify-center align-center ga-2">
-        <p
-          class="text-center text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-grey-darken-1 default-title-letter"
-        >
-          Oyun Ekle
-        </p>
-        <v-icon icon="mdi-plus" color="grey-darken-1" />
-      </div>
-
-      <v-text-field
-        v-model="searchGameText"
-        @input="searchGame"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        class="w-100 text-grey-lighten-1"
-        color="grey-lighten-1"
-        rounded="xl"
-        label="Oyun Ara"
-        placeholder="Black Myth Wukong..."
-        :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
-        clearable
-      />
-
-      <!-- 🔥 Arama sonuç alanı -->
-      <div class="w-100" style="max-height: 350px; overflow-y: auto">
-        <!-- Loading -->
-        <div v-if="isSearchingGameLoading" class="d-flex justify-start py-2 py-lg-4">
-          <v-progress-circular indeterminate size="24" color="grey-lighten-1" />
-        </div>
-
-        <!-- Search Results -->
-        <template v-else>
-          <p
-            v-if="searchResults?.length"
-            class="text-caption text-grey-darken-1 text-start default-title-letter"
-          >
-            {{ `${searchResults?.length} oyun bulundu` }}
-          </p>
-          <v-card
-            v-for="game in searchResults"
-            :key="game.id"
-            :ripple="false"
-            class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer"
-            @click="selectGameAfterSearch(game)"
-            :class="{
-              'selected-research-game': selectedGamesAfterResearch.some(
-                (i) => i.id === game.id
-              ),
-            }"
-          >
-            <v-avatar :size="smallScreen ? 30 : 48" rounded>
-              <v-img :src="game.background_image" :alt="game.name" cover />
-            </v-avatar>
-
-            <div class="d-flex flex-column">
-              <p
-                class="text-caption text-lg-subtitle-2 default-title-letter"
-                :class="
-                  selectedGamesAfterResearch.some((i) => i.id === game.id)
-                    ? 'text-black'
-                    : 'text-grey-lighten-1'
-                "
-              >
-                {{ `${game.name}` }}
-                <span v-if="game.released"
-                  >({{ new Date(game.released).getFullYear() }})</span
-                >
-              </p>
-
-              <p
-                class="text-caption"
-                :class="`text-${useMetacriticStyle(game?.metacritic).color}`"
-              >
-                Metacritic: {{ game.metacritic ?? "N/A" }}
-              </p>
-            </div>
-          </v-card>
-
-          <!-- No Result -->
-          <p
-            v-if="searchResults?.length === 0 && searchGameText?.length > 2"
-            class="text-center text-grey-darken-1 mt-3"
-          >
-            Sonuç bulunamadı
-          </p>
-        </template>
-      </div>
-
-      <transition name="slide-up">
-        <v-row
-          v-if="selectedGamesAfterResearch?.length > 0"
-          class="w-100 mx-auto d-flex align-center"
-          dense
-        >
-          <v-col cols="12" sm="6">
-            <v-btn
-              @click="addGameToDb('to_play_games')"
-              :loading="isAddingToDb"
-              :text="`Oynayacaklarım'a Ekle (${selectedGamesAfterResearch?.length})`"
-              size="small"
-              :ripple="false"
-              prepend-icon="mdi-plus"
-              class="text-capitalize"
-              block
-              color="blue-grey-lighten-1"
-            />
-          </v-col>
-
-          <v-col cols="12" sm="6">
-            <v-btn
-              @click="selectedGamesAfterResearch = []"
-              text="Tüm Seçimleri Kaldır"
-              size="small"
-              :ripple="false"
-              class="text-capitalize"
-              prepend-icon="mdi-broom"
-              block
-            />
-          </v-col>
-        </v-row>
-      </transition>
-
-      <transition name="slide-up">
-        <v-row class="w-100" v-if="isAddedToDb">
-          <v-col cols="12">
-            <v-alert
-              class="w-100 text-caption text-lg-subtitle-2"
-              density="compact"
-              color="success"
-              variant="text"
-              :text="`${addedGameToDbCount} oyun eklendi`"
-            />
-          </v-col>
-        </v-row>
-      </transition>
-    </div>
-  </v-dialog>
-
-  <!-- Add Game 2026 -->
-  <v-dialog
-    v-model="isAddGame2026"
-    :max-width="600"
-    style="
-      background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(0.1rem);
-      -webkit-backdrop-filter: blur(0.1rem);
-    "
-  >
-    <div
-      class="add-game-pop-up d-flex flex-column align-center ga-2 ga-lg-4 rounded pa-2 pa-lg-5"
-    >
-      <v-btn
-        @click="isAddGame2026 = false"
-        icon="mdi-close"
-        color="grey-darken-1"
-        class="close-btn ma-1"
-        variant="text"
-        size="small"
-        :ripple="false"
-      />
-
-      <div class="d-flex justify-center align-center ga-2">
-        <p
-          class="text-center text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-grey-darken-1 default-title-letter"
-        >
-          2026 Hedef Oyunları Ekle
-        </p>
-        <v-icon icon="mdi-calendar-check" color="green-accent-2" />
-      </div>
-
-      <v-text-field
-        v-model="searchGameText2026"
-        @input="searchGame2026"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        class="w-100 text-grey-lighten-1"
-        color="grey-lighten-1"
-        rounded="xl"
-        label="Oyun Ara"
-        placeholder="Black Myth Wukong..."
-        :density="isExtraLargeScreen ? 'comfortable' : 'compact'"
-        clearable
-      />
-
-      <!-- 🔥 Arama sonuç alanı -->
-      <div class="w-100" style="max-height: 350px; overflow-y: auto">
-        <!-- Loading -->
-        <div v-if="isSearchingGameLoading2026" class="d-flex justify-start py-2 py-lg-4">
-          <v-progress-circular indeterminate size="24" color="grey-lighten-1" />
-        </div>
-
-        <!-- Search Results -->
-        <template v-else>
-          <p
-            v-if="searchResults2026?.length"
-            class="text-caption text-grey-darken-1 text-start default-title-letter"
-          >
-            {{ `${searchResults2026?.length} oyun bulundu` }}
-          </p>
-          <v-card
-            v-for="game in searchResults2026"
-            :key="game.id"
-            :ripple="false"
-            class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer"
-            @click="selectGameAfterSearch2026(game)"
-            :class="{
-              'selected-research-game': selectedGamesAfterResearch2026.some(
-                (i) => i.id === game.id
-              ),
-            }"
-          >
-            <v-avatar :size="smallScreen ? 30 : 48" rounded>
-              <v-img :src="game.background_image" :alt="game.name" cover />
-            </v-avatar>
-
-            <div class="d-flex flex-column">
-              <p
-                class="text-caption text-lg-subtitle-2 default-title-letter"
-                :class="
-                  selectedGamesAfterResearch2026.some((i) => i.id === game.id)
-                    ? 'text-black'
-                    : 'text-grey-lighten-1'
-                "
-              >
-                {{ `${game.name}` }}
-                <span v-if="game.released"
-                  >({{ new Date(game.released).getFullYear() }})</span
-                >
-              </p>
-
-              <p
-                class="text-caption"
-                :class="`text-${useMetacriticStyle(game?.metacritic).color}`"
-              >
-                Metacritic: {{ game.metacritic ?? "N/A" }}
-              </p>
-            </div>
-          </v-card>
-
-          <!-- No Result -->
-          <p
-            v-if="searchResults2026?.length === 0 && searchGameText2026?.length > 2"
-            class="text-center text-grey-darken-1 mt-3"
-          >
-            Sonuç bulunamadı
-          </p>
-        </template>
-      </div>
-
-      <transition name="slide-up">
-        <v-row
-          v-if="selectedGamesAfterResearch2026?.length > 0"
-          class="w-100 mx-auto d-flex align-center"
-          dense
-        >
-          <v-col cols="12" sm="6">
-            <v-btn
-              @click="addGameToDb2026"
-              :loading="isAddingToDb2026"
-              :text="`2026 Hedef'e Ekle (${selectedGamesAfterResearch2026?.length})`"
-              size="small"
-              :ripple="false"
-              prepend-icon="mdi-calendar-check"
-              class="text-capitalize"
-              block
-              color="green-accent-2"
-            />
-          </v-col>
-
-          <v-col cols="12" sm="6">
-            <v-btn
-              @click="selectedGamesAfterResearch2026 = []"
-              text="Tüm Seçimleri Kaldır"
-              size="small"
-              :ripple="false"
-              class="text-capitalize"
-              prepend-icon="mdi-broom"
-              block
-            />
-          </v-col>
-        </v-row>
-      </transition>
-
-      <transition name="slide-up">
-        <v-row class="w-100" v-if="isAddedToDb2026">
-          <v-col cols="12">
-            <v-alert
-              class="w-100 text-caption text-lg-subtitle-2"
-              density="compact"
-              color="success"
-              variant="text"
-              :text="`${addedGameToDbCount2026} oyun eklendi`"
-            />
-          </v-col>
-        </v-row>
-      </transition>
-    </div>
-  </v-dialog>
+    v-model:search="searchGameText"
+    theme="cyan"
+    subtitle="Oynayacağın oyunları ara, seç ve listene ekle"
+    submit-text="Oynayacaklarım'a ekle"
+    :search-results="searchResults"
+    :selected="selectedGamesAfterResearch"
+    :loading="isSearchingGameLoading"
+    :adding="isAddingToDb"
+    :added="isAddedToDb"
+    :added-count="addedGameToDbCount"
+    @search="searchGame"
+    @toggle-select="selectGameAfterSearch"
+    @submit="addGameToDb('to_play_games')"
+    @clear-selection="selectedGamesAfterResearch = []"
+  />
 
   <!-- Toast -->
   <v-dialog
@@ -998,12 +464,14 @@ import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import Admin_Game_Table from "../common/Admin_Game_Table.vue";
 import Admin_Game_List from "../common/Admin_Game_List.vue";
 import Admin_Bulk_Delete_Bar from "../common/Admin_Bulk_Delete_Bar.vue";
+import Admin_Game_Collection_Shell from "./Admin_Game_Collection_Shell.vue";
+import Admin_Add_Game_Dialog from "./Admin_Add_Game_Dialog.vue";
 import Game_Card from "../common/Game_Card.vue";
-import Animated_Text from "../common/Animated_Text.vue";
 import {
   useAdminBulkDelete,
   batchDeleteFromFirestore,
 } from "~/composables/admin/useAdminBulkDelete";
+import { useAdminCollectionList } from "~/composables/admin/useAdminCollectionList";
 
 const { $firestore } = useNuxtApp();
 
@@ -1037,27 +505,30 @@ const notificationModels = ref({
 
 const showFullDescription = ref(false);
 const isAddGame = ref(false);
-const isAddGame2026 = ref(false);
 const isAddedToDb = ref(false);
-const isAddedToDb2026 = ref(false);
 const isSearchingGameLoading = ref(false);
-const isSearchingGameLoading2026 = ref(false);
 const isAddingToDb = ref(false);
-const isAddingToDb2026 = ref(false);
 
 const addedGameToDbCount = ref(0);
-const addedGameToDbCount2026 = ref(0);
-const toPlayGames = ref<any[]>([]);
-const target2026Games = ref<any[]>([]);
+const {
+  games: toPlayGames,
+  listSearchQuery,
+  totalGamesCount,
+  filteredGamesCount,
+  avgPlaytime,
+  avgMetacritic,
+  sortLabel,
+  sortMenuIcon,
+  onListSearchInput,
+  clearListSearch,
+  sortBy,
+  setAllGames,
+} = useAdminCollectionList("new");
 const viewMode = ref<"card" | "list" | "table">("card");
 const activeGame = ref<any | null>(null);
 const selectedGamesAfterResearch = ref<any[]>([]);
-const selectedGamesAfterResearch2026 = ref<any[]>([]);
 const searchGameText = ref<string>("");
-const searchGameText2026 = ref<string>("");
 const searchResults = ref<any[]>([]);
-const searchResults2026 = ref<any[]>([]);
-const isGettingTarget2026Games = ref(false);
 
 const displayedDescription = computed(() => {
   if (showFullDescription.value) return activeGame.value?.description;
@@ -1099,7 +570,7 @@ const getToPlayGames = async () => {
       ...doc.data(),
     }));
 
-    toPlayGames.value = gamesList;
+    setAllGames(gamesList, "new");
   } catch (error) {
     console.error("Error getting games :", error);
     return [];
@@ -1110,43 +581,13 @@ const getToPlayGames = async () => {
   }
 };
 
-const getTarget2026Games = async () => {
-  try {
-    isGettingTarget2026Games.value = true;
-
-    const gamesCol = collection($firestore, "target_2026_games");
-    const gamesSnapshot = await getDocs(gamesCol);
-
-    const gamesList = gamesSnapshot.docs.map((doc) => ({
-      firestoreId: doc.id,
-      ...doc.data(),
-    }));
-
-    target2026Games.value = gamesList;
-  } catch (error) {
-    console.error("Error getting target 2026 games :", error);
-    return [];
-  } finally {
-    setTimeout(() => {
-      isGettingTarget2026Games.value = false;
-    }, 250);
-  }
-};
-
 const handleRowClick = (item: any) => {
   activeGame.value = item;
   isOpenGameDetail.value = true;
 };
 
 const handleDeleteGame = (game: any) => {
-  // Determine which collection the game belongs to
-  const isTarget2026 = target2026Games.value.some(
-    (g) => g.firestoreId === game.firestoreId
-  );
-  activeGame.value = {
-    ...game,
-    collectionName: isTarget2026 ? "target_2026_games" : "to_play_games",
-  };
+  activeGame.value = game;
   isOpenConfirmationDialog.value = true;
 };
 
@@ -1177,7 +618,6 @@ const deleteThisGameFromDb = async (
     isDeletingGameFromDb.value = false;
 
     await getToPlayGames();
-    await getTarget2026Games();
   }
 };
 
@@ -1197,7 +637,6 @@ const deleteSelectedGamesFromDb = async () => {
     isDeletingGameFromDb.value = false;
     exitBulkMode();
     await getToPlayGames();
-    await getTarget2026Games();
   }
 };
 
@@ -1220,90 +659,6 @@ const searchGame = async () => {
     console.log(error.message);
   } finally {
     isSearchingGameLoading.value = false;
-  }
-};
-
-const searchGame2026 = async () => {
-  try {
-    if (searchGameText2026.value.length > 2) {
-      isSearchingGameLoading2026.value = true;
-
-      const { data } = await axios.get("/api/search-games", {
-        params: {
-          search: searchGameText2026.value,
-        },
-      });
-
-      searchResults2026.value = data?.results ?? [];
-    } else {
-      searchResults2026.value = [];
-    }
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isSearchingGameLoading2026.value = false;
-  }
-};
-
-const selectGameAfterSearch2026 = (item: any) => {
-  const exists = selectedGamesAfterResearch2026.value.some(
-    (game: any) => game.id === item.id
-  );
-
-  if (exists) {
-    selectedGamesAfterResearch2026.value = selectedGamesAfterResearch2026.value.filter(
-      (game: any) => game.id !== item.id
-    );
-  } else {
-    selectedGamesAfterResearch2026.value.push(item);
-  }
-};
-
-const addGameToDb2026 = async () => {
-  const games = selectedGamesAfterResearch2026.value;
-
-  if (!games || games.length === 0) return;
-
-  try {
-    isAddingToDb2026.value = true;
-
-    addedGameToDbCount2026.value = games.length;
-
-    // 🔥 Single
-    if (games.length === 1) {
-      await addDoc(collection($firestore, "target_2026_games"), games[0]);
-      console.log("Tek oyun eklendi:", games[0].name);
-      isAddedToDb2026.value = true;
-
-      setTimeout(() => {
-        isAddedToDb2026.value = false;
-      }, 2500);
-    } else {
-      // 🔥 Multiple
-      const batch = writeBatch($firestore);
-
-      games.forEach((g) => {
-        const ref = doc(collection($firestore, "target_2026_games"));
-        batch.set(ref, g);
-      });
-
-      await batch.commit();
-
-      console.log(`${games.length} oyun toplu olarak eklendi`);
-      isAddedToDb2026.value = true;
-
-      setTimeout(() => {
-        isAddedToDb2026.value = false;
-      }, 2500);
-    }
-  } catch (error: any) {
-    console.error("Error while add to db : ", error.message);
-  } finally {
-    await getTarget2026Games();
-    isAddingToDb2026.value = false;
-    selectedGamesAfterResearch2026.value = [];
-    searchGameText2026.value = "";
-    searchResults2026.value = [];
   }
 };
 
@@ -1348,23 +703,9 @@ const addGameToDb = async (collectionName: string = "to_play_games") => {
     console.error("Error while add to db : ", error.message);
   } finally {
     await getToPlayGames();
-    await getTarget2026Games();
     isAddingToDb.value = false;
     selectedGamesAfterResearch.value = [];
   }
-};
-
-const sortGames = (games: any[], type: "new" | "old") => {
-  if (!toPlayGames.value || toPlayGames.value?.length === 0) return [];
-
-  const sorted = _.sortBy(toPlayGames.value, (game: any) => game?.released ?? 0);
-
-  return type === "new" ? sorted.reverse() : sorted;
-};
-
-const sortBy = (mode: string) => {
-  if (mode === "new") toPlayGames.value = sortGames(toPlayGames.value, "new");
-  if (mode === "old") toPlayGames.value = sortGames(toPlayGames.value, "old");
 };
 
 watch(
@@ -1379,25 +720,13 @@ watch(
   { immediate: true }
 );
 
-watch(
-  () => searchGameText2026.value,
-  (val) => {
-    if (!val || val.length < 2) {
-      searchResults2026.value = [];
-      isSearchingGameLoading2026.value = false;
-      return;
-    }
-  },
-  { immediate: true }
-);
-
 onMounted(() => {
   getToPlayGames();
-  getTarget2026Games();
 });
 </script>
 <style scoped>
 @import "~/assets/css/main.css";
 @import "~/assets/css/admin.css";
+@import "~/assets/css/admin_collection_page.css";
 @import "~/assets/css/to_play_games.css";
 </style>

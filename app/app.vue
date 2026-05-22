@@ -2,6 +2,11 @@
 import store from "./store/store";
 
 const _store = store();
+const route = useRoute();
+
+const isAdminLayout = computed(
+  () => route.meta.layout === "admin" || route.path.startsWith("/admin")
+);
 
 useHead({
   title: "npmrungame – 800,000'den fazla oyunları keşfet ve favori oyunlarını öner",
@@ -38,8 +43,10 @@ useHead({
 
 <template>
   <v-app :theme="_store.theme">
-    <v-main class="root-main">
-      <v-container class="root-container">
+    <!-- Admin: drawer + v-main doğrudan v-app altında (Vuetify app prop) -->
+    <NuxtLayout v-if="isAdminLayout" />
+    <v-main v-else class="root-main">
+      <v-container fluid class="root-container pa-0">
         <NuxtLayout />
       </v-container>
     </v-main>
@@ -47,21 +54,13 @@ useHead({
 </template>
 
 <style scoped>
-@media screen and (min-width: 2000px) {
-  .root-container {
-    padding: 0 15rem;
-  }
+.root-main {
+  padding: 0;
+  overflow-x: hidden;
 }
 
-@media screen and (min-width: 1400px) and (max-width: 1999px) {
-  .root-container {
-    padding: 0 10rem;
-  }
-}
-
-@media screen and (min-width: 1200px) and (max-width: 1399px) {
-  .root-container {
-    padding: 0 5rem;
-  }
+.root-container {
+  max-width: 100%;
+  margin: 0;
 }
 </style>

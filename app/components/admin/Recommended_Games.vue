@@ -269,40 +269,55 @@
         @cancel="exitBulkMode"
       />
 
-      <!-- Card View -->
-      <Game_Card
-        v-if="viewMode === 'card'"
-        :loading="isGettingRecommendedGames"
-        :arr="recommendedGames"
-        :onRowClick="handleRowClick"
-        :bulk-delete-mode="bulkDeleteMode"
-        :is-selected="isSelected"
-        :on-toggle-select="toggleSelect"
+      <Admin_Collection_Empty
+        v-if="!isGettingRecommendedGames && recommendedGames.length === 0"
+        icon="mdi-thumb-up-outline"
+        accent-color="#81c784"
+        accent-rgb="129, 199, 132"
+        title="Henüz önerilen oyun yok"
+        description="Ziyaretçilerin önerdiği oyunları burada toplayabilir, sıralayabilir ve sitede öne çıkarabilirsin."
+        :tips="recommendedEmptyTips"
+        primary-action-text="İlk oyunu ekle"
+        primary-action-icon="mdi-plus"
+        secondary-action-text="Listeyi yenile"
+        @primary-action="isAddGame = true"
+        @secondary-action="getRecommendedGames"
       />
 
-      <!-- List View -->
-      <Admin_Game_List
-        v-else-if="viewMode === 'list'"
-        :loading="isGettingRecommendedGames"
-        :arr="recommendedGames"
-        :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
-        :on-row-click="handleRowClick"
-        :bulk-delete-mode="bulkDeleteMode"
-        :is-selected="isSelected"
-        :on-toggle-select="toggleSelect"
-      />
+      <template v-else>
+        <Game_Card
+          v-if="viewMode === 'card'"
+          :loading="isGettingRecommendedGames"
+          :arr="recommendedGames"
+          density="admin-grid"
+          :on-row-click="handleRowClick"
+          :bulk-delete-mode="bulkDeleteMode"
+          :is-selected="isSelected"
+          :on-toggle-select="toggleSelect"
+        />
 
-      <!-- Table View -->
-      <Admin_Game_Table
-        v-else
-        :loading="isGettingRecommendedGames"
-        :arr="recommendedGames"
-        :on-delete-click="handleDeleteGame"
-        :on-row-click="handleRowClick"
-        :bulk-delete-mode="bulkDeleteMode"
-        :is-selected="isSelected"
-        :on-toggle-select="toggleSelect"
-      />
+        <Admin_Game_List
+          v-else-if="viewMode === 'list'"
+          :loading="isGettingRecommendedGames"
+          :arr="recommendedGames"
+          :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
+          :on-row-click="handleRowClick"
+          :bulk-delete-mode="bulkDeleteMode"
+          :is-selected="isSelected"
+          :on-toggle-select="toggleSelect"
+        />
+
+        <Admin_Game_Table
+          v-else
+          :loading="isGettingRecommendedGames"
+          :arr="recommendedGames"
+          :on-delete-click="handleDeleteGame"
+          :on-row-click="handleRowClick"
+          :bulk-delete-mode="bulkDeleteMode"
+          :is-selected="isSelected"
+          :on-toggle-select="toggleSelect"
+        />
+      </template>
     </v-col>
   </v-row>
 
@@ -799,6 +814,7 @@ import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import Admin_Game_Table from "../common/Admin_Game_Table.vue";
 import Admin_Game_List from "../common/Admin_Game_List.vue";
 import Admin_Bulk_Delete_Bar from "../common/Admin_Bulk_Delete_Bar.vue";
+import Admin_Collection_Empty from "./Admin_Collection_Empty.vue";
 import Game_Card from "../common/Game_Card.vue";
 import Animated_Text from "../common/Animated_Text.vue";
 import {
@@ -858,6 +874,12 @@ const displayedDescription = computed(() => {
 const bulkDeletePreviewGames = computed(() =>
   getSelectedFromList(recommendedGames.value).slice(0, 12)
 );
+
+const recommendedEmptyTips = [
+  { icon: "mdi-magnify", text: "RAWG üzerinden oyun ara ve koleksiyona ekle" },
+  { icon: "mdi-view-grid", text: "Kart, liste veya tablo görünümüyle yönet" },
+  { icon: "mdi-earth", text: "Öneriler sitede ziyaretçilere gösterilebilir" },
+];
 
 const openBulkDeleteDialog = () => {
   if (selectedCount.value === 0) return;
@@ -1055,5 +1077,5 @@ onMounted(() => {
 <style scoped>
 @import "~/assets/css/main.css";
 @import "~/assets/css/admin.css";
-@import "~/assets/css/completed_games.css";
+@import "~/assets/css/admin_collection_page.css";
 </style>

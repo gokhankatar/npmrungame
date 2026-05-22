@@ -1,417 +1,244 @@
 <template>
-  <v-row class="mt-5 mt-lg-0">
-    <v-col cols="12">
-      <div class="d-flex flex-column align-start ga-1 ga-lg-3">
-        <!-- Title -->
-        <div class="d-flex align-center ga-2">
-          <v-avatar :image="adminLogoImg" />
-          <p
-            class="default-title-letter text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-xl-h4"
-          >
-            Admin
-          </p>
+  <div class="admin-dashboard">
+    <section class="admin-overview">
+      <div class="admin-overview-hero">
+        <div class="admin-overview-hero-text">
+          <v-avatar :image="adminLogoImg" size="52" rounded="lg" class="admin-overview-avatar" />
+          <div>
+            <h1 class="admin-dash-title default-title-letter">Panel Özeti</h1>
+            <p class="admin-dash-subtitle mb-0">npmrungame yönetim merkezi</p>
+          </div>
         </div>
+        <div class="admin-overview-hero-badges">
+          <span class="admin-hero-badge">
+            <v-icon icon="mdi-check-circle" size="14" />
+            {{ completedGames.length }} bitirilen
+          </span>
+          <span class="admin-hero-badge admin-hero-badge--current">
+            <v-icon icon="mdi-play-circle" size="14" />
+            {{ currentGames.length }} oynanan
+          </span>
+          <span class="admin-hero-badge admin-hero-badge--cyan">
+            <v-icon icon="mdi-playlist-play" size="14" />
+            {{ toPlayGames.length }} oynanacak
+          </span>
+        </div>
+      </div>
 
-        <v-divider color="white" class="w-100 mb-5" />
+      <div class="admin-quick-actions">
+        <div class="d-flex flex-wrap ga-3">
+          <button
+            type="button"
+            class="admin-quick-btn admin-quick-btn--completed"
+            @click="goToAdminSection('completed_games')"
+          >
+            <span class="admin-quick-btn-icon">
+              <v-icon icon="mdi-trophy" size="22" />
+            </span>
+            <span class="admin-quick-btn-body">
+              <span class="admin-quick-btn-title default-title-letter">Bitirdiğim Oyunlar</span>
+              <span class="admin-quick-btn-desc">Oyun ekle / çıkar</span>
+            </span>
+            <span class="admin-quick-btn-count">{{ completedGames.length }}</span>
+            <v-icon class="admin-quick-btn-arrow" icon="mdi-chevron-right" size="20" />
+          </button>
 
-        <v-row class="mx-auto w-100" :dense="isSmallScreen">
-          <!-- Account Informations -->
-          <v-col cols="12" lg="4">
-            <v-card
-              class="card-admin-panel-info d-flex flex-column align-start justify-center ga-1 ga-lg-2 pa-3 pa-xl-5 rounded-xl w-100"
-              :elevation="0"
-              :ripple="false"
-              :height="isMediumScreen ? 350 : 'auto'"
-            >
-              <!-- Email -->
-              <div class="d-flex flex-wrap align-center ga-2">
-                <v-chip
-                  :ripple="false"
-                  text="Email"
-                  color="grey"
-                  variant="tonal"
-                  rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'default'"
-                  prepend-icon="mdi-email"
-                />
-                <p class="text-grey-lighten-1 text-caption text-lg-subtitle-2">
-                  npmrungame@gmail.com
-                </p>
+          <button
+            type="button"
+            class="admin-quick-btn admin-quick-btn--current"
+            @click="goToAdminSection('current_games')"
+          >
+            <span class="admin-quick-btn-icon">
+              <v-icon icon="mdi-play-circle" size="22" />
+            </span>
+            <span class="admin-quick-btn-body">
+              <span class="admin-quick-btn-title default-title-letter">Şuan Oynananlar</span>
+              <span class="admin-quick-btn-desc">Oyun ekle / çıkar</span>
+            </span>
+            <span class="admin-quick-btn-count">{{ currentGames.length }}</span>
+            <v-icon class="admin-quick-btn-arrow" icon="mdi-chevron-right" size="20" />
+          </button>
+
+          <button
+            type="button"
+            class="admin-quick-btn admin-quick-btn--toplay"
+            @click="goToAdminSection('to_play_games')"
+          >
+            <span class="admin-quick-btn-icon">
+              <v-icon icon="mdi-playlist-play" size="22" />
+            </span>
+            <span class="admin-quick-btn-body">
+              <span class="admin-quick-btn-title default-title-letter">Oynayacaklarım</span>
+              <span class="admin-quick-btn-desc">Oyun ekle / çıkar</span>
+            </span>
+            <span class="admin-quick-btn-count">{{ toPlayGames.length }}</span>
+            <v-icon class="admin-quick-btn-arrow" icon="mdi-chevron-right" size="20" />
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-overview-layout">
+        <aside class="admin-profile-card admin-profile-card--strip">
+          <div class="admin-profile-strip-head">
+            <div class="admin-profile-strip-icon">
+              <v-icon icon="mdi-shield-account" size="26" color="#69f0ae" />
+            </div>
+            <div class="admin-profile-strip-titles">
+              <span class="admin-profile-strip-title default-title-letter">Hesap</span>
+              <span class="admin-profile-strip-sub">npmrungame yönetimi</span>
+            </div>
+          </div>
+          <ul class="admin-profile-list admin-profile-list--strip">
+            <li class="admin-profile-field">
+              <v-icon icon="mdi-email-outline" size="20" class="admin-profile-field-icon" />
+              <div>
+                <span class="admin-profile-key">E-posta</span>
+                <span class="admin-profile-val">npmrungame@gmail.com</span>
               </div>
-
-              <!-- Last Login -->
-              <div class="d-flex flex-wrap align-center ga-2">
-                <v-chip
-                  :ripple="false"
-                  text="Son Giriş"
-                  color="grey"
-                  variant="tonal"
-                  rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'default'"
-                  prepend-icon="mdi-update"
-                />
-                <p class="text-grey-lighten-1 text-caption text-lg-subtitle-2">
-                  {{
-                    formatTR(_store.admin_user?.lastLoginAt as string) }}
-                </p>
+            </li>
+            <li class="admin-profile-field">
+              <v-icon icon="mdi-clock-outline" size="20" class="admin-profile-field-icon" />
+              <div>
+                <span class="admin-profile-key">Son giriş</span>
+                <span class="admin-profile-val">{{ formatTR(_store.admin_user?.lastLoginAt as string) }}</span>
               </div>
-
-              <!-- Created Time -->
-              <div class="d-flex flex-wrap align-center ga-2">
-                <v-chip
-                  :ripple="false"
-                  text="Hesabın Oluşturulduğu Tarih"
-                  color="grey"
-                  variant="tonal"
-                  rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'default'"
-                  prepend-icon="mdi-calendar-range"
-                />
-                <p class="text-grey-lighten-1 text-caption text-lg-subtitle-2">
-                  {{
-                    formatTR(_store.admin_user?.createdAt as string) }}
-                </p>
+            </li>
+            <li class="admin-profile-field">
+              <v-icon icon="mdi-calendar-check" size="20" class="admin-profile-field-icon" />
+              <div>
+                <span class="admin-profile-key">Kayıt tarihi</span>
+                <span class="admin-profile-val">{{ formatTR(_store.admin_user?.createdAt as string) }}</span>
               </div>
+            </li>
+          </ul>
+          <div class="admin-profile-strip-team">
+            <span class="admin-profile-team-label">Yetkililer</span>
+            <div class="admin-profile-team">
+              <v-tooltip text="Zeynep Cansu Katar" location="top">
+                <template #activator="{ props }">
+                  <v-avatar
+                    v-bind="props"
+                    :image="adminZeynepCansuKatarImg"
+                    size="44"
+                    class="admin-profile-avatar"
+                  />
+                </template>
+              </v-tooltip>
+              <v-tooltip text="Gökhan Katar" location="top">
+                <template #activator="{ props }">
+                  <v-avatar
+                    v-bind="props"
+                    :image="adminGokhanKatarImg"
+                    size="44"
+                    class="admin-profile-avatar"
+                  />
+                </template>
+              </v-tooltip>
+            </div>
+          </div>
+        </aside>
 
-              <!-- Admin Authority -->
-              <div class="d-flex flex-wrap align-center ga-2">
-                <v-chip
-                  :ripple="false"
-                  text="Admin Yetkili Kişiler"
-                  color="grey"
-                  variant="tonal"
-                  rounded="xl"
-                  :size="isSmallScreen ? 'small' : 'default'"
-                  prepend-icon="mdi-key"
-                />
-                <div class="d-flex align-center ga-1">
-                  <v-tooltip text="Zeynep Cansu Katar" location="top">
-                    <template #activator="{ props }">
-                      <v-avatar v-bind="props" :image="adminZeynepCansuKatarImg" />
-                    </template>
-                  </v-tooltip>
-
-                  <v-tooltip text="Gökhan Katar" location="top">
-                    <template #activator="{ props }">
-                      <v-avatar v-bind="props" :image="adminGokhanKatarImg" />
-                    </template>
-                  </v-tooltip>
-                </div>
-              </div>
-            </v-card>
-          </v-col>
-
-          <!-- Messages & Registered Users -->
-          <v-col cols="12" md="6" lg="4">
-            <v-card
-              class="card-admin-panel-info d-flex flex-column align-center justify-center pa-2 pa-xl-5 rounded-xl w-100"
-              :elevation="0"
-              :height="isMediumScreen ? 350 : 'auto'"
-            >
-              <v-row class="w-100 mx-auto" dense>
-                <!-- Registered Users Count -->
-                <v-col cols="6">
-                  <v-card
-                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-account"
-                      color="green-accent-2"
-                    />
-                    <p
-                      class="default-title-letter text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1"
-                    >
-                      Kayıtlı Kullanıcı
-                    </p>
-                    <v-progress-circular
-                      v-if="isGettingRegisteredUsers"
-                      color="green-accent-2"
-                      size="16"
-                      width="2"
-                      indeterminate
-                    />
-                    <p
-                      v-else
-                      class="text-green-accent-2 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
-                      {{ registeredUsersCount }}
-                    </p>
-                  </v-card>
-                </v-col>
-
-                <!-- Messages Count -->
-                <v-col cols="6">
-                  <v-card
-                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-email-outline"
-                      color="green-accent-2"
-                    />
-                    <p
-                      class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
-                    >
-                      Gelen Mesaj
-                    </p>
-
-                    <v-progress-circular
-                      v-if="isGettingMessages"
-                      color="green-accent-2"
-                      size="16"
-                      width="2"
-                      indeterminate
-                    />
-                    <p
-                      v-else
-                      class="text-green-accent-2 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
-                      {{ messagesCount }}
-                    </p>
-                  </v-card>
-                </v-col>
-
-                <!-- Recommend Games Count -->
-                <v-col cols="6">
-                  <v-card
-                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-gamepad-up"
-                      color="green-accent-2"
-                    />
-                    <p
-                      class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
-                    >
-                      Önerilen Oyun
-                    </p>
-
-                    <v-progress-circular
-                      v-if="isGettingRecommendedGames"
-                      color="green-accent-2"
-                      size="16"
-                      width="2"
-                      indeterminate
-                    />
-                    <p
-                      v-else
-                      class="text-green-accent-2 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
-                      {{ recommendedGamesCount }}
-                    </p>
-                  </v-card>
-                </v-col>
-
-                <!-- Total Blog Count -->
-                <v-col cols="6">
-                  <v-card
-                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-post"
-                      color="green-accent-2"
-                    />
-                    <p
-                      class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
-                    >
-                      Toplam Blog
-                    </p>
-                    <v-progress-circular
-                      v-if="isGettingBlogs"
-                      color="green-accent-2"
-                      size="16"
-                      width="2"
-                      indeterminate
-                    />
-                    <p
-                      v-else
-                      class="text-green-accent-2 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
-                      {{ totalBlogCount }}
-                    </p>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-card>
-          </v-col>
-
-          <!-- Youtube Stats Cards -->
-          <v-col cols="12" md="6" lg="4">
-            <v-card
-              class="card-admin-panel-info d-flex flex-column align-center justify-center pa-2 pa-xl-5 rounded-xl w-100"
-              :elevation="0"
-              :height="isMediumScreen ? 350 : 'auto'"
-            >
-              <v-row class="w-100 mx-auto" dense>
-                <v-col cols="6">
-                  <v-card
-                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-xl-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <p
-                      class="default-title-letter text-center text-caption text-lg-subtitle-2 text-xl-subtitle-1"
-                    >
-                      Abone Gizlik
-                    </p>
-                    <v-icon
-                      :icon="
-                        youtubeChannelStats?.hiddenSubscriberCount
-                          ? 'mdi-eye'
-                          : 'mdi-eye-off'
-                      "
-                      :size="isSmallScreen ? 'small' : 'large'"
-                      color="blue-lighten-1"
-                    />
-                  </v-card>
-                </v-col>
-
-                <v-col cols="6">
-                  <v-card
-                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-youtube-subscription"
-                      color="blue-lighten-1"
-                    />
-                    <p
-                      class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
-                    >
-                      Abone Sayısı
-                    </p>
-                    <p
-                      class="text-blue-lighten-1 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
-                      {{ youtubeChannelStats?.subscriberCount }}
-                    </p>
-                  </v-card>
-                </v-col>
-
-                <v-col cols="6">
-                  <v-card
-                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-eye"
-                      color="blue-lighten-1"
-                    />
-                    <p
-                      class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
-                    >
-                      Toplam İzlenme
-                    </p>
-                    <p
-                      class="text-blue-lighten-1 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
-                      {{ youtubeChannelStats?.viewCount }}
-                    </p>
-                  </v-card>
-                </v-col>
-
-                <v-col cols="6">
-                  <v-card
-                    class="card-yt-stats d-flex flex-column justify-center align-center ga-1 ga-lg-2 pa-2 pa-lg-5 rounded-xl w-100 h-100"
-                    :elevation="0"
-                  >
-                    <v-icon
-                      v-if="!isSmallScreen"
-                      :size="isMediumScreen ? 'small' : 'large'"
-                      icon="mdi-monitor"
-                      color="blue-lighten-1"
-                    />
-                    <p
-                      class="default-title-letter text-caption text-lg-subtitle-2 text-xl-subtitle-1 text-center"
-                    >
-                      Toplam Video
-                    </p>
-                    <p
-                      class="text-blue-lighten-1 text-subtitle-2 text-lg-subtitle-1 text-xl-h5 font-weight-bold default-title-letter"
-                    >
-                      {{ youtubeChannelStats?.videoCount }}
-                    </p>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-card>
-          </v-col>
-
-          <!-- custom wishlists -->
-          <v-row class="w-100 mx-auto my-3" :dense="isSmallScreen">
-            <v-col cols="12" md="6" lg="6" xl="4">
-              <v-card
-                class="whishlist-card bg-transparent"
-                :elevation="5"
-                :ripple="false"
-                height="800"
-              >
-                <img
-                  :src="christmasTreeAnim"
-                  class="ma-1 ma-lg-2 whishlist-card-anim rounded-xl"
-                  alt="christmas tree"
-                  :width="display.xl.value ? 75 : 50"
-                />
-                <v-img
-                  class="rounded-lg h-100"
-                  src="https://gbfhkvefbnlgkqaqqwxp.supabase.co/storage/v1/object/public/gokhan_katar_profile/npmrungame_2026_whislist_Card.png"
-                  cover
-                />
-              </v-card>
-            </v-col>
-
-            <v-col cols="12" md="6" lg="6" xl="4">
-              <v-card
-                class="whishlist-card bg-transparent"
-                :elevation="5"
-                :ripple="false"
-                height="800"
-              >
-                <img
-                  :src="christmasBallonAnim"
-                  :width="display.xl.value ? 75 : 50"
-                  class="ma-1 ma-lg-2 whishlist-card-anim rounded-xl"
-                  alt="christmas balloon"
-                />
-                <v-img
-                  class="rounded-lg h-100"
-                  src="https://gbfhkvefbnlgkqaqqwxp.supabase.co/storage/v1/object/public/gokhan_katar_profile/movie_game_list.png"
-                  cover
-                />
-              </v-card>
-            </v-col>
-          </v-row>
-
-          <!-- Game Cards -->
-          <v-row class="w-100 mx-auto my-3" :dense="isSmallScreen">
-            <v-col cols="12">
-              <Animated_Text
-                text="Oyun Bilgileri"
-                class="cursor-pointer"
-                :msPerChar="50"
-                :duration="550"
-                :loop="true"
+        <div class="admin-metrics-wrap">
+          <section class="admin-metrics-panel">
+            <h3 class="admin-metrics-panel-title">
+              <v-icon icon="mdi-web" size="16" color="#69f0ae" />
+              Site
+            </h3>
+            <div class="admin-goal-rings-grid">
+              <Admin_Goal_Ring_Metric
+                variant="site"
+                label="Kayıtlı kullanıcı"
+                icon="mdi-account-multiple"
+                :value="registeredUsersCount"
+                :goal="100"
+                :loading="isGettingRegisteredUsers"
               />
-            </v-col>
+              <Admin_Goal_Ring_Metric
+                variant="site"
+                label="Gelen mesaj"
+                icon="mdi-email-outline"
+                :value="messagesCount"
+                :goal="100"
+                :loading="isGettingMessages"
+              />
+              <Admin_Goal_Ring_Metric
+                variant="site"
+                label="Önerilen oyun"
+                icon="mdi-thumb-up-outline"
+                :value="recommendedGamesCount"
+                :goal="100"
+                :loading="isGettingRecommendedGames"
+              />
+              <Admin_Goal_Ring_Metric
+                variant="site"
+                label="Toplam blog"
+                icon="mdi-post-outline"
+                :value="totalBlogCount"
+                :goal="50"
+                :loading="isGettingBlogs"
+              />
+            </div>
+          </section>
 
+          <section class="admin-metrics-panel admin-metrics-panel--yt">
+            <div class="admin-metrics-panel-head">
+              <h3 class="admin-metrics-panel-title admin-metrics-panel-title--yt">
+                <v-icon icon="mdi-youtube" size="16" color="#ff5252" />
+                YouTube
+              </h3>
+              <span class="admin-yt-privacy-chip">
+                <v-icon
+                  :icon="youtubeChannelStats?.hiddenSubscriberCount ? 'mdi-eye-off' : 'mdi-eye'"
+                  size="14"
+                />
+                Abone {{ youtubeChannelStats?.hiddenSubscriberCount ? "gizli" : "açık" }}
+              </span>
+            </div>
+            <div class="admin-goal-rings-grid admin-goal-rings-grid--yt">
+              <Admin_Goal_Ring_Metric
+                variant="youtube"
+                label="Abone sayısı"
+                icon="mdi-youtube"
+                :value="youtubeChannelStats?.subscriberCount"
+                :goal="1000"
+                compact
+              />
+              <Admin_Goal_Ring_Metric
+                variant="youtube"
+                label="Toplam izlenme"
+                icon="mdi-eye"
+                :value="youtubeChannelStats?.viewCount"
+                :goal="1_000_000"
+                compact
+              />
+              <Admin_Goal_Ring_Metric
+                variant="youtube"
+                label="Toplam video"
+                icon="mdi-video"
+                :value="youtubeChannelStats?.videoCount"
+                :goal="1000"
+                compact
+              />
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+    <header class="admin-dash-section-header mt-6 mb-4">
+      <div class="admin-dash-section-icon admin-dash-section-icon--games">
+        <v-icon icon="mdi-gamepad-variant" size="22" color="#69f0ae" />
+      </div>
+      <div class="admin-dash-section-text">
+        <h2 class="admin-dash-section-title default-title-letter">Oyun Koleksiyonları</h2>
+        <p class="admin-dash-section-sub">Tamamlanan, sıradaki ve aktif oyunların özeti</p>
+      </div>
+      <div class="admin-dash-section-line" aria-hidden="true" />
+    </header>
+    <v-row class="w-100 mx-auto mb-3" :dense="isSmallScreen">
             <!-- Completed Game Card -->
             <v-col cols="12" sm="6" lg="4">
               <v-card
-                class="bg-transparent rounded-lg"
+                class="admin-game-stat-card bg-transparent rounded-lg"
                 :ripple="false"
                 :height="display.xs.value ? 'auto' : 315"
               >
@@ -445,10 +272,9 @@
               </v-card>
             </v-col>
 
-            <!-- To Play Game Card -->
             <v-col cols="12" sm="6" lg="4">
               <v-card
-                class="bg-transparent rounded-lg"
+                class="admin-game-stat-card bg-transparent rounded-lg"
                 :ripple="false"
                 :height="display.xs.value ? 'auto' : 315"
               >
@@ -482,10 +308,9 @@
               </v-card>
             </v-col>
 
-            <!-- Current Game Card -->
             <v-col cols="12" lg="4">
               <v-card
-                class="bg-transparent rounded-lg"
+                class="admin-game-stat-card bg-transparent rounded-lg"
                 :ripple="false"
                 :height="!isLargeScreen ? 'auto' : 315"
               >
@@ -523,21 +348,20 @@
             </v-col>
           </v-row>
 
-          <!-- Last Blogs -->
-          <v-row class="w-100 mx-auto my-3" :dense="isSmallScreen">
-            <v-col cols="12">
-              <Animated_Text
-                text="Son Blog Yazıları"
-                class="cursor-pointer"
-                :msPerChar="50"
-                :duration="1100"
-                :loop="true"
-              />
-            </v-col>
-
+    <header class="admin-dash-section-header mt-4 mb-4">
+      <div class="admin-dash-section-icon admin-dash-section-icon--blog">
+        <v-icon icon="mdi-post-outline" size="22" color="#81c784" />
+      </div>
+      <div class="admin-dash-section-text">
+        <h2 class="admin-dash-section-title default-title-letter">Son Blog Yazıları</h2>
+        <p class="admin-dash-section-sub">En son eklenen 3 yazı</p>
+      </div>
+      <div class="admin-dash-section-line" aria-hidden="true" />
+    </header>
+    <v-row class="w-100 mx-auto mb-3" :dense="isSmallScreen">
             <v-col cols="12" lg="4" v-for="(item, index) of lastBlogs" :key="index">
               <v-card
-                class="bg-transparent rounded-lg"
+                class="admin-game-stat-card admin-blog-stat-card bg-transparent rounded-lg"
                 :ripple="false"
                 :height="!isLargeScreen ? 'auto' : 315"
               >
@@ -570,11 +394,8 @@
                 </div>
               </v-card>
             </v-col>
-          </v-row>
-        </v-row>
-      </div>
-    </v-col>
-  </v-row>
+    </v-row>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -583,7 +404,7 @@ import {
   useFirestoreDateFormatted,
   useTRFormat,
 } from "~/composables/data/handleData";
-import type { Youtube_Channel_Stats } from "~/composables/core/interfaces";
+import type { AdminListItemSlug, Youtube_Channel_Stats } from "~/composables/core/interfaces";
 import { truncateText } from "~/composables/core/basicFunc";
 import { collection, getDocs } from "firebase/firestore";
 import axios from "axios";
@@ -594,17 +415,19 @@ import adminZeynepCansuKatarImg from "~/assets/img/admin_zeynep_cansu_katar.jpg"
 import adminGokhanKatarImg from "~/assets/img/admin_gokhan_katar.jpg";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import toPlayAnimImg from "~/assets/img/progress_anim.gif";
-import Animated_Text from "../common/Animated_Text.vue";
 import blogAnimImg from "~/assets/img/blog_anim.gif";
-import christmasTreeAnim from "~/assets/img/christmas_tree_anim.gif";
-import christmasBallonAnim from "~/assets/img/christmas_ballon_anim.gif";
+import Admin_Goal_Ring_Metric from "./Admin_Goal_Ring_Metric.vue";
 
 const { $firestore } = useNuxtApp();
 const { formatTR } = useTRFormat();
 const { formatDateTR } = useFirestoreDateFormatted();
 
-const router = useRouter();
 const _store = store();
+
+const goToAdminSection = (slug: AdminListItemSlug) => {
+  _store.setActiveAdminListItem(slug as any);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
 const display = useDisplay();
 const isSmallScreen = computed(() => display.smAndDown.value);

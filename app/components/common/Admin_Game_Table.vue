@@ -15,30 +15,13 @@
                 <tr
                     class="table-row"
                     :class="{
-                        'cursor-pointer': !bulkDeleteMode,
+                        'cursor-pointer': true,
                         'admin-bulk-row-selected': bulkDeleteMode && isItemSelected(item),
                     }"
                     @click="handleRowInteraction(item)"
                 >
                     <td>
                         <div class="d-flex flex-column align-start ga-1 ga-sm-2 py-1">
-                            <div
-                                v-if="bulkDeleteMode"
-                                class="d-flex align-center ga-2 w-100"
-                                @click.stop
-                            >
-                                <v-checkbox-btn
-                                    :model-value="isItemSelected(item)"
-                                    color="error"
-                                    density="compact"
-                                    hide-details
-                                    @update:model-value="onToggleSelect(item)"
-                                />
-                                <span
-                                    class="text-caption text-grey-lighten-2 default-title-letter"
-                                    >Seç</span
-                                >
-                            </div>
                             <img
                                 :src="item.background_image"
                                 :width="display.smAndDown.value ? 30 : 60"
@@ -117,21 +100,11 @@
                 <tr
                     class="table-row"
                     :class="{
-                        'cursor-pointer': !bulkDeleteMode,
+                        'cursor-pointer': true,
                         'admin-bulk-row-selected': bulkDeleteMode && isItemSelected(item),
                     }"
                     @click="handleRowInteraction(item)"
                 >
-                    <td v-if="bulkDeleteMode" @click.stop>
-                        <v-checkbox-btn
-                            :model-value="isItemSelected(item)"
-                            color="error"
-                            density="compact"
-                            hide-details
-                            @update:model-value="onToggleSelect(item)"
-                        />
-                    </td>
-
                     <td>
                         <div class="d-flex align-center ga-1 ga-lg-2 py-2">
                             <img
@@ -242,10 +215,7 @@ const display = useDisplay();
 
 const tableHeaders = computed(() => {
     if (props.bulkDeleteMode) {
-        return [
-            { title: "", key: "select", align: "center" as const, sortable: false },
-            ...header_games.filter((h) => h.key !== "delete"),
-        ];
+        return header_games.filter((h) => h.key !== "delete");
     }
     return [...header_games];
 });
@@ -267,6 +237,7 @@ const handleRowInteraction = (item: any) => {
 @import "~/assets/css/completed_games.css";
 
 .admin-bulk-row-selected {
-    background: rgba(244, 67, 54, 0.08);
+    background: rgba(105, 240, 174, 0.08) !important;
+    box-shadow: inset 3px 0 0 #69f0ae;
 }
 </style>

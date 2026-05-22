@@ -1,0 +1,199 @@
+/* Admin — Bitirdiğim Oyunlar */
+
+.admin-completed-page {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding: 0.5rem 0 2rem;
+}
+
+.admin-completed-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 1.25rem;
+  padding: 1.25rem 1.35rem;
+  margin-bottom: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(105, 240, 174, 0.22);
+  background: linear-gradient(
+    135deg,
+    rgba(105, 240, 174, 0.1) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.3);
+}
+
+.admin-completed-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #69f0ae;
+  background: rgba(105, 240, 174, 0.12);
+  border: 1px solid rgba(105, 240, 174, 0.3);
+  margin-bottom: 0.5rem;
+}
+
+.admin-completed-hero-title {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 800;
+  margin: 0 0 0.35rem;
+  line-height: 1.15;
+  background: linear-gradient(120deg, #fff 0%, #69f0ae 60%, #b9f6ca 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-completed-hero-sub {
+  margin: 0;
+  max-width: 480px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.admin-completed-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.admin-completed-add-btn {
+  font-weight: 700 !important;
+  letter-spacing: 0.03em;
+}
+
+.admin-completed-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 600px) {
+  .admin-completed-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.admin-completed-stat {
+  padding: 0.85rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.admin-completed-stat:hover {
+  border-color: rgba(105, 240, 174, 0.25);
+}
+
+.admin-completed-stat-value {
+  font-size: clamp(1.15rem, 2.5vw, 1.5rem);
+  font-weight: 800;
+  color: #69f0ae;
+  line-height: 1;
+  margin: 0 0 0.25rem;
+}
+
+.admin-completed-stat-label {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.admin-completed-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-completed-search {
+  flex: 1 1 200px;
+  min-width: min(100%, 220px);
+  max-width: 100%;
+}
+
+.admin-completed-search :deep(.v-field) {
+  border-radius: 12px !important;
+}
+
+.admin-completed-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.admin-completed-view-toggle {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.admin-completed-view-toggle :deep(.v-btn) {
+  min-width: 40px;
+}
+
+.admin-completed-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  border-radius: 14px;
+  border: 1px dashed rgba(105, 240, 174, 0.25);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.admin-completed-empty-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0.75rem 0 0.35rem;
+}
+
+.admin-completed-empty-desc {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 1rem;
+  max-width: 360px;
+  margin-inline: auto;
+}
+
+.admin-completed-body {
+  position: relative;
+}
+
+.admin-completed-result-hint {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 0.75rem;
+}
+
+.admin-completed-page .game-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px !important;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.admin-completed-page .game-card:hover {
+  border-color: rgba(105, 240, 174, 0.35);
+}

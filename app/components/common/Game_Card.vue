@@ -3,10 +3,11 @@
     <v-col
       v-for="(item, index) of arr"
       :key="item.firestoreId ?? index"
-      cols="6"
-      md="4"
-      lg="3"
-      xl="2"
+      :cols="gridCols"
+      :sm="gridSm"
+      :md="gridMd"
+      :lg="gridLg"
+      :xl="gridXl"
     >
       <v-skeleton-loader
         v-if="loading"
@@ -18,7 +19,7 @@
         v-if="!loading"
         class="game-card bg-transparent rounded-lg transition"
         :class="{
-          'cursor-pointer': !bulkDeleteMode,
+          'cursor-pointer': true,
           'admin-bulk-card-selected': bulkDeleteMode && isItemSelected(item),
         }"
         :style="{ animationDelay: `${index * 0.1}s` }"
@@ -27,16 +28,6 @@
       >
         <!-- Resim alanı - üstte sadece saat ve metacritic -->
         <div class="game-card-image-wrapper">
-          <v-checkbox-btn
-            v-if="bulkDeleteMode"
-            :model-value="isItemSelected(item)"
-            color="error"
-            density="compact"
-            hide-details
-            class="admin-bulk-card-checkbox"
-            @click.stop
-            @update:model-value="onToggleSelect?.(item)"
-          />
           <v-img
             :src="item.background_image ?? 'https://f4.bcbits.com/img/0016409163_71.jpg'"
             class="game-card-img rounded-t-lg"
@@ -107,8 +98,15 @@
             {{ truncateText(item.name, 30) }}
           </p>
           <div class="d-flex align-center ga-2 flex-wrap">
-            <p class="text-caption text-grey-darken-1">
-              {{ new Date(item.released).getFullYear() }}
+            <p
+              class="text-caption text-grey-darken-1 game-card-meta"
+              :class="{ 'game-card-meta--genres': props.metaFormat === 'year-genres' }"
+            >
+              {{
+                props.metaFormat === "year-genres"
+                  ? formatGameYearAndGenres(item)
+                  : new Date(item.released).getFullYear()
+              }}
             </p>
             <!-- xs ekranda sadece metacritic altta -->
             <template v-if="display.xs.value">
@@ -128,14 +126,16 @@
             <template v-for="icon in getUniquePlatformIcons(item.platforms)" :key="icon">
               <v-icon v-if="icon" size="x-small" color="grey-darken-1" :icon="icon" />
             </template>
-            <v-chip
-              v-for="(genre, index) in item.genres?.slice(0, 2)"
-              :key="index"
-              size="x-small"
-              variant="tonal"
-              :ripple="false"
-              :text="truncateText(genre.name, 10)"
-            />
+            <template v-if="props.metaFormat !== 'year-genres'">
+              <v-chip
+                v-for="(genre, index) in item.genres?.slice(0, 2)"
+                :key="index"
+                size="x-small"
+                variant="tonal"
+                :ripple="false"
+                :text="truncateText(genre.name, 10)"
+              />
+            </template>
           </div>
         </div>
       </v-card>
@@ -146,19 +146,52 @@
 import fireAnimationSrc from "~/assets/img/fire_anim.gif";
 import { truncateText } from "~/composables/core/basicFunc";
 import {
+  formatGameYearAndGenres,
   getUniquePlatformIcons,
   useLimitedTags,
   useMetacriticStyle,
 } from "~/composables/data/handleData";
 
-const props = defineProps<{
-  arr: any[];
-  loading: boolean;
-  onRowClick: (item: any) => void;
-  bulkDeleteMode?: boolean;
-  isSelected?: (item: any) => boolean;
-  onToggleSelect?: (item: any) => void;
-}>();
+const props = withDefaults(
+  defineProps<{
+    arr: any[];
+    loading: boolean;
+    onRowClick: (item: any) => void;
+    bulkDeleteMode?: boolean;
+    isSelected?: (item: any) => boolean;
+    onToggleSelect?: (item: any) => void;
+    /** default | comfortable | admin-grid: geniş panelde daha çok sütun */
+    density?: "default" | "comfortable" | "admin-grid";
+    /** year: sadece yıl | year-genres: "2026 · aksiyon - nişancı - indie" */
+    metaFormat?: "year" | "year-genres";
+  }>(),
+  { density: "default", metaFormat: "year" }
+);
+
+const gridCols = computed(() => {
+  if (props.density === "admin-grid") return 6;
+  return 6;
+});
+const gridSm = computed(() => {
+  if (props.density === "admin-grid") return 6;
+  if (props.density === "comfortable") return 6;
+  return undefined;
+});
+const gridMd = computed(() => {
+  if (props.density === "admin-grid") return 4;
+  if (props.density === "comfortable") return 4;
+  return 4;
+});
+const gridLg = computed(() => {
+  if (props.density === "admin-grid") return 2;
+  if (props.density === "comfortable") return 3;
+  return 3;
+});
+const gridXl = computed(() => {
+  if (props.density === "admin-grid") return 2;
+  if (props.density === "comfortable") return 3;
+  return 2;
+});
 
 const display = useDisplay();
 const smallScreen = computed(() => display.smAndDown.value);
@@ -196,18 +229,10 @@ const handleCardClick = (item: any) => {
   overflow: hidden;
 }
 
-.admin-bulk-card-checkbox {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  z-index: 5;
-  background: rgba(0, 0, 0, 0.55);
-  border-radius: 8px;
-}
-
 .admin-bulk-card-selected {
-  outline: 2px solid rgba(244, 67, 54, 0.65);
+  outline: 2px solid rgba(105, 240, 174, 0.85);
   outline-offset: 2px;
+  box-shadow: 0 0 20px rgba(105, 240, 174, 0.15);
 }
 
 .game-card-image-wrapper::before {
@@ -244,6 +269,11 @@ const handleCardClick = (item: any) => {
   border-radius: 0 0 8px 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.game-card-meta--genres {
+  line-height: 1.35;
+  text-transform: lowercase;
 }
 
 .game-card-hover-details {

@@ -10,11 +10,29 @@ export default defineEventHandler(async (event) => {
     ? String(query.platform)
     : undefined;
 
+  const dates =
+    query.dates && String(query.dates).trim() !== ""
+      ? String(query.dates)
+      : undefined;
+
+  const ordering =
+    query.ordering && String(query.ordering).trim() !== ""
+      ? String(query.ordering)
+      : undefined;
+
   const params: any = {
     key: config.rawg_api_key,
     page,
     page_size,
   };
+
+  if (dates) {
+    params.dates = dates;
+  }
+
+  if (ordering) {
+    params.ordering = ordering;
+  }
 
   // ⭐ STAR: Metacritic ordering
   if (platform === "star") {
@@ -46,8 +64,15 @@ export default defineEventHandler(async (event) => {
 
     const nextPage = url.searchParams.get("page");
 
-    return `/api/games?page=${nextPage}&page_size=${page_size}${platform ? `&platform=${platform}` : ""
-      }`;
+    const extra = [
+      platform ? `platform=${platform}` : "",
+      dates ? `dates=${encodeURIComponent(dates)}` : "",
+      ordering ? `ordering=${ordering}` : "",
+    ]
+      .filter(Boolean)
+      .join("&");
+
+    return `/api/games?page=${nextPage}&page_size=${page_size}${extra ? `&${extra}` : ""}`;
   };
 
 

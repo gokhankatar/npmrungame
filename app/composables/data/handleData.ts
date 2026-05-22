@@ -1,4 +1,62 @@
 import type { Existed_Game_Collection } from "../core/interfaces";
+import { game_genres } from "~/utils/Game_Genres";
+
+const GENRE_LABEL_BY_SLUG = Object.fromEntries(
+  game_genres.map((genre) => [genre.slug, genre.name])
+) as Record<string, string>;
+
+/** RAWG genre adı → sitedeki Türkçe tür etiketi */
+const GENRE_LABEL_BY_RAWG_NAME: Record<string, string> = {
+  Action: "Aksiyon",
+  Adventure: "Macera",
+  RPG: "Rol Yapma",
+  "Role-playing": "Rol Yapma",
+  Shooter: "Nişancı",
+  Strategy: "Strateji",
+  Indie: "Indie",
+  Puzzle: "Bulmaca",
+  Racing: "Yarış",
+  Sports: "Spor",
+  Simulation: "Simülasyon",
+  Platformer: "Platform",
+  Fighting: "Dövüş",
+  Casual: "Gündelik",
+  Arcade: "Arcade",
+};
+
+type GameGenreRef = { slug?: string; name?: string };
+
+export const formatGameGenreLabels = (
+  genres: GameGenreRef[] | null | undefined,
+  max = 3
+): string => {
+  if (!genres?.length) return "";
+
+  return genres
+    .slice(0, max)
+    .map((genre) => {
+      if (genre.slug && GENRE_LABEL_BY_SLUG[genre.slug]) {
+        return GENRE_LABEL_BY_SLUG[genre.slug].toLowerCase();
+      }
+      if (genre.name && GENRE_LABEL_BY_RAWG_NAME[genre.name]) {
+        return GENRE_LABEL_BY_RAWG_NAME[genre.name].toLowerCase();
+      }
+      return (genre.name ?? "").toLowerCase();
+    })
+    .filter(Boolean)
+    .join(" - ");
+};
+
+export const formatGameYearAndGenres = (item: {
+  released?: string;
+  genres?: GameGenreRef[];
+}): string => {
+  const year = item.released
+    ? new Date(item.released).getFullYear()
+    : new Date().getFullYear();
+  const genres = formatGameGenreLabels(item.genres);
+  return genres ? `${year} · ${genres}` : String(year);
+};
 
 export const useLimitedTags = (tags: any[] | null | undefined, limit = 3) => {
   const safeTags = tags ?? [];
