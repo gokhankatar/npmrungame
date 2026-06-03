@@ -117,16 +117,6 @@
 <script lang="ts" setup>
 import { getDocs, collection } from "firebase/firestore";
 
-useHead({
-  title: "Ben Kimim | npmrungame",
-  meta: [
-    {
-      name: "description",
-      content: "npmrungame kurucusu Gökhan Katar hakkında — oyun içerikleri ve kanal hikâyesi.",
-    },
-  ],
-});
-
 const { $firestore } = useNuxtApp();
 const display = useDisplay();
 

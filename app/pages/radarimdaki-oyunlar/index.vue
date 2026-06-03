@@ -179,27 +179,6 @@ import {
 } from "~/utils/upcomingGames";
 import store from "~/store/store";
 
-const requestURL = useRequestURL();
-
-useHead({
-  title: "Radarımdaki Oyunlar | npmrungame",
-  meta: [
-    {
-      name: "description",
-      content:
-        "npmrungame radarındaki oyunlar — çıkış tarihleri ve geri sayım.",
-    },
-    { property: "og:title", content: "Radarımdaki Oyunlar | npmrungame" },
-    {
-      property: "og:description",
-      content: "Kanal radarındaki oyunlar ve en yakın çıkışlar.",
-    },
-    { property: "og:type", content: "website" },
-    { property: "og:url", content: `${requestURL.origin}/radarimdaki-oyunlar` },
-  ],
-  link: [{ rel: "canonical", href: `${requestURL.origin}/radarimdaki-oyunlar` }],
-});
-
 const router = useRouter();
 const display = useDisplay();
 const _store = store();

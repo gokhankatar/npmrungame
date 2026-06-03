@@ -53,13 +53,14 @@
                 {{ item.title }}
               </p>
               <div class="d-flex flex-column align-start ga-1">
-                <p
-                  @click="router.push(subItem.path)"
-                  class="footer-link transition cursor-pointer text-caption text-grey-darken-1 text-lg-subtitle-2 default-title-letter"
+                <NuxtLink
                   v-for="subItem of item.items"
+                  :key="subItem.path"
+                  :to="subItem.path"
+                  class="footer-link transition text-caption text-grey-darken-1 text-lg-subtitle-2 default-title-letter text-decoration-none"
                 >
                   {{ subItem.subtitle }}
-                </p>
+                </NuxtLink>
               </div>
             </div>
           </v-col>

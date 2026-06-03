@@ -100,6 +100,8 @@
 <script lang="ts" setup>
 import { doc, getDoc, increment, setDoc, updateDoc } from "firebase/firestore";
 import { getRatingColor, useFirestoreDateFormatted } from "~/composables/data/handleData";
+import { setPageSeo } from "~/composables/useSiteSeo";
+import { stripHtmlForSeo } from "~/utils/siteSeo";
 import store from "~/store/store";
 import { useVotesStore } from "~/store/votes";
 import successfullImg from "~/assets/img/successfully_done_anim.gif";
@@ -195,22 +197,23 @@ const voteBlog = async (firestoreId: string, rating: number) => {
   }, 3000);
 };
 
-const defaultTitle = "npmrungame - Blog Detayı";
-
-useHead({
-  title: defaultTitle,
-});
+const route = useRoute();
 
 watch(blog, (newBlog) => {
-  if (newBlog?.title) {
-    useHead({
-      title: `${newBlog.title} - NPM Run Game`,
-    });
-  } else {
-    useHead({
-      title: defaultTitle,
-    });
-  }
+  if (!newBlog?.title) return;
+
+  const excerpt =
+    stripHtmlForSeo(newBlog.content_raw ?? newBlog.content) ||
+    `${newBlog.title} — npmrungame blog yazısı.`;
+
+  setPageSeo({
+    title: `${newBlog.title} | npmrungame Blog`,
+    description: excerpt,
+    path: route.path,
+    image: newBlog.imageUrl || undefined,
+    imageAlt: `${newBlog.title} — npmrungame`,
+    type: "article",
+  });
 });
 
 onMounted(() => {

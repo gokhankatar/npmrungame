@@ -519,31 +519,6 @@ import fireAnimation from "~/assets/img/fire_anim.gif";
 import successFullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import warningImg from "~/assets/img/warning_anim.gif";
 
-const requestURL = useRequestURL();
-const OG_IMAGE =
-  "https://yt3.ggpht.com/f-Wk3V3N7KtLUXiRTs5ukoRBzLcILBVyt0_z3i_32xup1qg83dxlciDvComml_cJuL71c0ilWBo=s176-c-k-c0x00ffffff-no-rj";
-
-useHead({
-  title: "npmrungame | 4K Oyun Kanalı & Oyun Kütüphanesi",
-  meta: [
-    {
-      name: "description",
-      content:
-        "npmrungame — 4K oyun içerikleri, bitirdiğim oyunlar, radarımdaki oyunlar, blog ve keşfet. Türkçe oyun kanalı ve kişisel oyun kütüphanesi.",
-    },
-    { property: "og:title", content: "npmrungame | 4K Oyun Kanalı" },
-    {
-      property: "og:description",
-      content: "4K oyun dünyasının nabzı — videolar, kütüphane, blog ve keşfet.",
-    },
-    { property: "og:type", content: "website" },
-    { property: "og:image", content: OG_IMAGE },
-    { property: "og:url", content: requestURL.origin },
-    { name: "twitter:card", content: "summary_large_image" },
-  ],
-  link: [{ rel: "canonical", href: requestURL.href }],
-});
-
 const { $firestore } = useNuxtApp();
 const { formatDateTR } = useFirestoreDateFormatted();
 
