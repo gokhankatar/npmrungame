@@ -34,9 +34,233 @@
 .completed-container {
   position: relative;
   z-index: 1;
+  margin-top: -2.5rem;
 }
 
-/* Hero */
+/* Netflix tarzı — son bitirilen oyun */
+.completed-featured {
+  position: relative;
+  min-height: min(88vh, 780px);
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: -2.5rem;
+}
+
+.completed-featured--loading {
+  align-items: stretch;
+  background: #08080c;
+}
+
+.completed-featured__loader {
+  width: 100%;
+  min-height: min(88vh, 780px);
+  border-radius: 0 !important;
+}
+
+.completed-featured__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.completed-featured__bg--empty,
+.completed-featured__bg--fallback {
+  background: linear-gradient(
+    135deg,
+    rgb(12, 48, 32) 0%,
+    rgb(8, 16, 14) 45%,
+    rgb(8, 8, 12) 100%
+  );
+}
+
+.completed-featured__bg--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.completed-featured__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.97) 0%,
+    rgba(0, 0, 0, 0.88) 38%,
+    rgba(0, 0, 0, 0.45) 68%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+  pointer-events: none;
+}
+
+.completed-featured__vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,
+    rgba(8, 12, 10, 1) 0%,
+    rgba(8, 12, 10, 0.55) 18%,
+    transparent 42%,
+    transparent 70%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  pointer-events: none;
+}
+
+.completed-featured--empty .completed-featured__shade {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(8, 12, 10, 0.92) 75%,
+    rgba(8, 12, 10, 1) 100%
+  );
+}
+
+.completed-featured__inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1320px;
+  margin-inline: auto;
+  padding: 2rem clamp(16px, 3vw, 48px) 5rem;
+  box-sizing: border-box;
+}
+
+.completed-featured__inner--center {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 40rem;
+}
+
+.completed-featured__brand {
+  margin: 0 0 0.85rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(105, 240, 174, 0.85);
+}
+
+.completed-featured__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: min(100%, 640px);
+}
+
+.completed-featured__labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+}
+
+.completed-featured__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  max-width: max-content;
+}
+
+.completed-featured__label--hot {
+  color: #0d1f17;
+  background: linear-gradient(135deg, #69f0ae 0%, #43e97b 100%);
+  box-shadow: 0 4px 16px rgba(105, 240, 174, 0.45);
+}
+
+.completed-featured__label--count {
+  color: #c8f7d8;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(105, 240, 174, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+.completed-featured__title {
+  margin: 0;
+  font-size: clamp(1.85rem, 6vw, 3.35rem);
+  font-weight: 800;
+  line-height: 1.05;
+  color: #fff;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.85);
+}
+
+.completed-featured__sub {
+  margin: 0.55rem 0 0;
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: rgba(255, 255, 255, 0.62);
+  text-transform: capitalize;
+}
+
+.completed-featured__lead {
+  margin: 0.75rem 0 0;
+  font-size: clamp(0.88rem, 2vw, 1.05rem);
+  color: rgba(255, 255, 255, 0.58);
+  line-height: 1.55;
+  max-width: 32rem;
+}
+
+.completed-featured__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.85rem;
+  margin-top: 1rem;
+}
+
+.completed-featured__meta-chip {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: max-content;
+}
+
+.completed-featured__date {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.completed-featured__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.35rem;
+}
+
+.completed-featured__actions :deep(.completed-featured__btn) {
+  flex: 0 0 auto;
+  min-height: 50px !important;
+  padding-inline: 1.5rem 1.65rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+}
+
+.completed-featured__actions :deep(.completed-featured__btn--primary) {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25) inset,
+    0 8px 28px rgba(105, 240, 174, 0.4) !important;
+}
+
+.completed-featured__actions :deep(.completed-featured__btn--secondary) {
+  border-width: 2px !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Eski küçük hero (artık kullanılmıyor — geriye dönük) */
 .completed-hero {
   display: flex;
   flex-wrap: wrap;
@@ -716,6 +940,39 @@
 .slide-up-leave-to {
   opacity: 0;
   transform: translateY(20px);
+}
+
+@media (max-width: 599px) {
+  .completed-featured {
+    min-height: 78vh;
+    margin-bottom: -2rem;
+  }
+
+  .completed-featured__inner {
+    padding-bottom: 4rem;
+  }
+
+  .completed-featured__shade {
+    background: linear-gradient(
+      0deg,
+      rgba(8, 12, 10, 1) 0%,
+      rgba(0, 0, 0, 0.75) 35%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+  }
+
+  .completed-featured__actions {
+    width: 100%;
+  }
+
+  .completed-featured__actions :deep(.completed-featured__btn) {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .completed-container {
+    margin-top: -2rem;
+  }
 }
 
 @media (max-width: 600px) {

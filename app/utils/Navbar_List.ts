@@ -13,18 +13,21 @@ export const navbarListItems: NavbarList[] = [
     },
     {
         title: "Bitirdiğim Oyunlar",
+        shortTitle: "Bitirdiklerim",
         path: "/completed-games",
         icon: "mdi-trophy-outline",
     },
     {
         title: "Oyun Öner",
+        shortTitle: "Öner",
         path: "/recommend-games",
-        icon: "mdi-microsoft-xbox-controller",
+        icon: "mdi-hand-heart-outline",
     },
     {
-        title: "Oynayacaklarım",
-        path: "/to-play-games",
-        icon: "mdi-controller-classic-outline",
+        title: "Radarımdaki Oyunlar",
+        shortTitle: "Radar",
+        path: "/radarimdaki-oyunlar",
+        icon: "mdi-radar",
     },
     {
         title: "Blog",

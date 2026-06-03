@@ -348,5 +348,10 @@ export const getGameStatusTextByGameCollectionStatus = (status: Existed_Game_Col
       slug_msg: "Bu Oyunu Oynanacaklarda",
       btn_text: "Şuan Oynanlara Ekle"
     }
+  } else if (status == "upcoming_games") {
+    return {
+      slug_msg: "Bu Oyun Radarında",
+      btn_text: "Radardan Çıkar"
+    }
   }
 }

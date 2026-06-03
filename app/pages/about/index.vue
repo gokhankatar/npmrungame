@@ -1,121 +1,154 @@
 <template>
-  <v-responsive height="100" v-if="!display.smAndDown.value" />
-  <v-responsive height="70" v-else />
+  <div class="about-page">
+    <div class="about-page-glow about-page-glow--left" aria-hidden="true" />
+    <div class="about-page-glow about-page-glow--right" aria-hidden="true" />
 
-  <v-container class="pa-2 pa-md-5 pa-lg-10 pa-xl-15">
-    <v-row class="w-100 mx-auto d-flex justify-center align-center">
-      <v-col cols="12" class="d-flex flex-column align-center align-sm-start ga-6">
-        <!-- Avatar -->
-        <template v-if="isGettingMyInfos">
-          <v-skeleton-loader
-            type="avatar"
-            :loading="true"
-            :elevation="0"
-            :width="display.smAndDown.value ? 120 : 200"
-            :height="display.smAndDown.value ? 120 : 200"
-            class="rounded-circle"
-          />
-        </template>
-        <template v-else>
-          <v-avatar
-            :image="myInfos?.profile_img"
-            :size="display.smAndDown.value ? 120 : 200"
-          />
-        </template>
+    <v-responsive :height="display.smAndDown.value ? 70 : 100" />
 
-        <!-- Info Section -->
-        <div
-          class="d-flex flex-column align-center align-sm-start ga-2 ga-lg-5"
-          style="width: 100%"
-        >
-          <!-- Email -->
-          <template v-if="isGettingMyInfos">
-            <v-skeleton-loader type="text" width="70%" />
-          </template>
-          <template v-else>
-            <a
-              href="mailto:katar_gokhan@hotmail.com"
-              class="text-decoration-none"
-              target="_blank"
-            >
-              <div class="d-flex align-center ga-2 cursor-pointer">
-                <v-icon
-                  icon="mdi-email"
-                  :size="display.smAndDown.value ? 'small' : 'large'"
-                  color="grey-lighten-1"
-                />
-                <p
-                  class="text-subtitle-2 text-sm-subtitle-1 text-lg-h5 text-grey-lighten-1"
-                >
-                  {{ myInfos?.email }}
-                </p>
-              </div>
-            </a>
-          </template>
+    <v-container class="about-container pa-3 pa-md-6 pa-lg-10 pa-xl-15">
+      <header class="about-hero">
+        <div class="about-hero-badge default-title-letter">
+          <v-icon icon="mdi-account-circle" size="16" color="#69f0ae" />
+          <span>Hakkımda</span>
+        </div>
+        <h1 class="about-hero-title default-title-letter">Ben Kimim?</h1>
+        <p class="about-hero-sub default-title-letter">
+          npmrungame’in arkasındaki isim — oyun, içerik ve topluluk hakkında kısa bir özet.
+        </p>
+      </header>
 
-          <!-- Name -->
-          <template v-if="isGettingMyInfos">
-            <v-skeleton-loader type="text" width="50%" height="28px" />
-          </template>
-          <template v-else>
-            <p
-              class="text-blue-grey-darken-1 text-h5 text-sm-h4 text-lg-h3 font-weight-medium"
-            >
-              {{ myInfos?.full_name }}
-            </p>
-          </template>
-
-          <!-- Summary HTML (Description) -->
+      <div class="about-layout">
+        <!-- Profil kartı -->
+        <aside class="about-profile-card">
           <template v-if="isGettingMyInfos">
             <v-skeleton-loader
-              type="paragraph"
-              width="100%"
-              max-width="100%"
-              class="mt-2"
+              type="avatar"
+              class="mx-auto mb-4 rounded-circle"
+              :width="display.smAndDown.value ? 120 : 168"
+              :height="display.smAndDown.value ? 120 : 168"
             />
+            <v-skeleton-loader type="heading" class="mb-2" />
+            <v-skeleton-loader type="text" width="80%" class="mx-auto mb-4" />
+            <v-skeleton-loader type="button" class="mb-2" />
+            <v-skeleton-loader type="button" />
           </template>
-          <template v-else>
-            <div v-html="myInfos?.summary_html"></div>
+
+          <template v-else-if="myInfos">
+            <div class="about-avatar-wrap">
+              <v-avatar
+                :image="myInfos.profile_img"
+                :size="display.smAndDown.value ? 112 : 160"
+              />
+            </div>
+
+            <h2 class="about-profile-name default-title-letter">
+              {{ myInfos.full_name }}
+            </h2>
+            <p class="about-profile-role default-title-letter">İçerik üretici · npmrungame</p>
+
+            <a
+              v-if="myInfos.email"
+              :href="`mailto:${myInfos.email}`"
+              class="about-email-link default-title-letter"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <v-icon icon="mdi-email-outline" size="20" color="#69f0ae" />
+              <span>{{ myInfos.email }}</span>
+            </a>
+
+            <div class="about-quick-links">
+              <v-btn
+                href="https://www.youtube.com/@npmrungame"
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="tonal"
+                color="red-lighten-1"
+                rounded="pill"
+                size="small"
+                class="text-capitalize default-title-letter"
+                prepend-icon="mdi-youtube"
+                text="YouTube"
+                :ripple="false"
+              />
+              <v-btn
+                to="/discover"
+                variant="tonal"
+                color="green-accent-2"
+                rounded="pill"
+                size="small"
+                class="text-capitalize default-title-letter"
+                prepend-icon="mdi-compass-outline"
+                text="Keşfet"
+                :ripple="false"
+              />
+            </div>
           </template>
-        </div>
-      </v-col>
-    </v-row>
-  </v-container>
+        </aside>
+
+        <!-- Biyografi -->
+        <section class="about-bio-card">
+          <div class="about-bio-card__head">
+            <v-icon icon="mdi-text-box-outline" size="20" color="#69f0ae" />
+            <h3 class="about-bio-card__head-title default-title-letter">Hikâye</h3>
+          </div>
+
+          <template v-if="isGettingMyInfos">
+            <v-skeleton-loader type="paragraph" class="mb-3" />
+            <v-skeleton-loader type="paragraph" class="mb-3" />
+            <v-skeleton-loader type="paragraph" width="85%" />
+          </template>
+
+          <div
+            v-else-if="myInfos?.summary_html"
+            class="about-bio default-title-letter"
+            v-html="myInfos.summary_html"
+          />
+
+          <p v-else class="about-bio mb-0 default-title-letter text-grey-darken-1">
+            Profil metni yakında eklenecek.
+          </p>
+        </section>
+      </div>
+    </v-container>
+  </div>
 </template>
+
 <script lang="ts" setup>
 import { getDocs, collection } from "firebase/firestore";
 
 useHead({
-  title: "npmrungame | Hakkımda",
+  title: "Ben Kimim | npmrungame",
+  meta: [
+    {
+      name: "description",
+      content: "npmrungame kurucusu Gökhan Katar hakkında — oyun içerikleri ve kanal hikâyesi.",
+    },
+  ],
 });
 
 const { $firestore } = useNuxtApp();
-
 const display = useDisplay();
 
 const isGettingMyInfos = ref(false);
-const myInfos = ref<any | null>(null);
+const myInfos = ref<Record<string, string> | null>(null);
 
 const getMyInfos = async () => {
   try {
     isGettingMyInfos.value = true;
 
-    const myInfoCol = collection($firestore, "my_profile_infos");
-    const myInfoSnapshot = await getDocs(myInfoCol);
-
-    const myInfo = myInfoSnapshot.docs.map((doc) => ({
+    const snapshot = await getDocs(collection($firestore, "my_profile_infos"));
+    const rows = snapshot.docs.map((doc) => ({
       firestoreId: doc.id,
       ...doc.data(),
-    }));
+    })) as Record<string, string>[];
 
-    myInfos.value = myInfo[0];
+    myInfos.value = rows[0] ?? null;
   } catch (error) {
-    console.error("Error getting my infos :", error);
-    return [];
+    console.error("Error getting my infos:", error);
+    myInfos.value = null;
   } finally {
-    setTimeout(() => {
-      isGettingMyInfos.value = false;
-    }, 250);
+    isGettingMyInfos.value = false;
   }
 };
 
@@ -126,4 +159,5 @@ onMounted(() => {
 
 <style scoped>
 @import "~/assets/css/main.css";
+@import "~/assets/css/about_page.css";
 </style>

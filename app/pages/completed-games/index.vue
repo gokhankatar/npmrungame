@@ -5,26 +5,122 @@
 
     <v-responsive height="70" />
 
-    <v-container class="completed-container pa-3 pa-md-6 pa-lg-10 pa-xl-15">
-      <!-- Hero -->
-      <header class="completed-hero mb-6 mb-lg-10">
-        <div class="completed-hero-badge">
-          <v-icon icon="mdi-trophy" size="18" color="#69f0ae" />
-          <span>Koleksiyon</span>
+    <!-- Netflix tarzı — en son bitirilen oyun -->
+    <section
+      class="completed-featured"
+      :class="{
+        'completed-featured--empty': !isGettingCompletedGames && !latestCompletedGame,
+        'completed-featured--loading': isGettingCompletedGames,
+      }"
+    >
+      <template v-if="isGettingCompletedGames">
+        <v-skeleton-loader type="image" class="completed-featured__loader" />
+      </template>
+
+      <template v-else-if="latestCompletedGame">
+        <v-img
+          v-if="latestCompletedGame.background_image"
+          :src="latestCompletedGame.background_image"
+          :alt="latestCompletedGame.name"
+          cover
+          class="completed-featured__bg"
+        />
+        <div v-else class="completed-featured__bg completed-featured__bg--empty">
+          <v-icon icon="mdi-gamepad-variant-outline" size="72" color="rgba(255,255,255,0.2)" />
         </div>
-        <div class="completed-hero-main">
-          <h1 class="completed-hero-title default-title-letter">Bitirdiğim Oyunlar</h1>
-          <p class="completed-hero-subtitle">
-            Tamamladığım her oyunun hikayesi burada — süre, tür ve puanlarla birlikte.
+        <div class="completed-featured__shade" aria-hidden="true" />
+        <div class="completed-featured__vignette" aria-hidden="true" />
+
+        <div class="completed-featured__inner">
+          <p class="completed-featured__brand default-title-letter">npmrungame · koleksiyon</p>
+          <div class="completed-featured__body">
+            <div class="completed-featured__labels">
+              <span class="completed-featured__label completed-featured__label--hot">
+                <v-icon icon="mdi-trophy" size="14" />
+                Son bitirdiğim
+              </span>
+              <span
+                v-if="totalGamesCount"
+                class="completed-featured__label completed-featured__label--count"
+              >
+                {{ totalGamesCount }} oyun kütüphanede
+              </span>
+            </div>
+
+            <h1 class="completed-featured__title default-title-letter">
+              {{ latestCompletedGame.name }}
+            </h1>
+
+            <p v-if="featuredSubtitle" class="completed-featured__sub default-title-letter">
+              {{ featuredSubtitle }}
+            </p>
+
+            <div class="completed-featured__meta">
+              <v-chip
+                v-if="latestCompletedGame.metacritic"
+                size="small"
+                variant="elevated"
+                class="completed-featured__meta-chip"
+                :color="useMetacriticStyle(latestCompletedGame.metacritic).color"
+                prepend-icon="mdi-star"
+                :text="String(latestCompletedGame.metacritic)"
+              />
+              <v-chip
+                v-if="latestCompletedGame.playtime"
+                size="small"
+                variant="tonal"
+                color="grey-darken-3"
+                class="completed-featured__meta-chip"
+                prepend-icon="mdi-timer-outline"
+                :text="`${latestCompletedGame.playtime} saat`"
+              />
+              <span v-if="featuredCompletedLabel" class="completed-featured__date default-title-letter">
+                {{ featuredCompletedLabel }}
+              </span>
+            </div>
+
+            <div class="completed-featured__actions">
+              <v-btn
+                color="green-accent-2"
+                variant="flat"
+                rounded="pill"
+                size="large"
+                class="completed-featured__btn completed-featured__btn--primary text-black font-weight-bold text-capitalize default-title-letter"
+                prepend-icon="mdi-information-outline"
+                text="Oyun detayı"
+                :ripple="false"
+                @click="handleRowClick(latestCompletedGame)"
+              />
+              <v-btn
+                variant="outlined"
+                color="grey-lighten-1"
+                rounded="pill"
+                size="large"
+                class="completed-featured__btn completed-featured__btn--secondary text-capitalize default-title-letter"
+                prepend-icon="mdi-bookshelf"
+                text="Kütüphaneyi gör"
+                :ripple="false"
+                @click="scrollToLibrary"
+              />
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template v-else>
+        <div class="completed-featured__bg completed-featured__bg--fallback" aria-hidden="true" />
+        <div class="completed-featured__shade" aria-hidden="true" />
+        <div class="completed-featured__inner completed-featured__inner--center">
+          <p class="completed-featured__brand default-title-letter">npmrungame · koleksiyon</p>
+          <h1 class="completed-featured__title default-title-letter">Bitirdiğim Oyunlar</h1>
+          <p class="completed-featured__lead default-title-letter">
+            Tamamladığın oyunlar burada vitrinde yer alacak — süre, tür ve puanlarla birlikte.
           </p>
         </div>
-        <div v-if="!isGettingCompletedGames" class="completed-hero-pill">
-          <v-icon icon="mdi-check-circle-outline" size="small" color="#69f0ae" />
-          <span>{{ totalGamesCount }} oyun kütüphanede</span>
-        </div>
-        <v-skeleton-loader v-else type="chip" width="160" class="completed-hero-pill-skeleton" />
-      </header>
+      </template>
+    </section>
 
+    <v-container class="completed-container pa-3 pa-md-6 pa-lg-10 pa-xl-15">
       <v-row class="completed-stats-row" :dense="display.smAndDown.value">
         <v-col cols="12" sm="6" md="3" class="d-flex">
           <v-card class="stat-card stat-card--games rounded-xl pa-4 h-100 w-100" :ripple="false">
@@ -249,7 +345,7 @@
       </section>
 
       <!-- Main library -->
-      <section class="games-library-panel">
+      <section id="completed-library" class="games-library-panel">
         <div class="games-library-toolbar">
           <div class="games-library-toolbar-title">
             <div class="toolbar-icon-ring">
@@ -440,6 +536,10 @@ import store from "~/store/store";
 import _ from "lodash";
 import Game_Card from "~/components/common/Game_Card.vue";
 import { slugify } from "~/composables/core/basicFunc";
+import {
+  formatGameYearAndGenres,
+  useMetacriticStyle,
+} from "~/composables/data/handleData";
 
 useHead({
   title: "npmrungame | Bitirdiğim Oyunlar",
@@ -469,6 +569,44 @@ const searchInputRef = ref<HTMLInputElement | null>(null);
 const searchInputMobileRef = ref<HTMLInputElement | null>(null);
 
 const totalGamesCount = computed(() => allCompletedGames.value.length);
+
+const getCompletedSortTime = (game: { completed_at?: string; released?: string }) => {
+  if (game.completed_at) return new Date(game.completed_at).getTime();
+  if (game.released) return new Date(game.released).getTime();
+  return 0;
+};
+
+const latestCompletedGame = computed(() => {
+  if (!allCompletedGames.value.length) return null;
+  return [...allCompletedGames.value].sort(
+    (a, b) => getCompletedSortTime(b) - getCompletedSortTime(a)
+  )[0];
+});
+
+const featuredSubtitle = computed(() => {
+  const game = latestCompletedGame.value;
+  if (!game) return "";
+  return formatGameYearAndGenres(game);
+});
+
+const featuredCompletedLabel = computed(() => {
+  const iso = latestCompletedGame.value?.completed_at;
+  if (!iso) return "";
+  try {
+    return `Tamamlandı · ${new Intl.DateTimeFormat("tr-TR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(new Date(iso))}`;
+  } catch {
+    return "";
+  }
+});
+
+const scrollToLibrary = () => {
+  if (!import.meta.client) return;
+  document.getElementById("completed-library")?.scrollIntoView({ behavior: "smooth" });
+};
 
 const totalPlaytime = computed(() =>
   sumBy(allCompletedGames.value, (g: any) => Number(g.playtime) || 0)
@@ -613,8 +751,9 @@ const getCompletedGames = async () => {
       ...doc.data(),
     }));
 
-    const sorted = _.sortBy(gamesList, (g: any) => g.released).reverse();
-    allCompletedGames.value = sorted;
+    allCompletedGames.value = [...gamesList].sort(
+      (a, b) => getCompletedSortTime(b) - getCompletedSortTime(a)
+    );
     applySearch();
   } catch (error) {
     console.error("Error getting games :", error);

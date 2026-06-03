@@ -1,41 +1,557 @@
+/* Keşfet sayfası */
+
+.discover-page {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #08080c;
+}
+
+.discover-page-glow {
+  position: fixed;
+  width: min(480px, 65vw);
+  height: min(480px, 65vw);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(90px);
+  opacity: 0.3;
+}
+
+.discover-page-glow--left {
+  top: 12%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(105, 240, 174, 0.22) 0%, transparent 70%);
+}
+
+.discover-page-glow--right {
+  bottom: 10%;
+  right: -8%;
+  background: radial-gradient(circle, rgba(67, 160, 71, 0.15) 0%, transparent 70%);
+}
+
+.discover-container {
+  position: relative;
+  z-index: 1;
+}
+
+.discover-hero {
+  margin-bottom: 1.75rem;
+  padding: 1.15rem 1.2rem;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(105, 240, 174, 0.1) 0%,
+    rgba(0, 0, 0, 0.42) 50%,
+    rgba(0, 0, 0, 0.52) 100%
+  );
+  border: 1px solid rgba(105, 240, 174, 0.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.discover-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #69f0ae;
+  background: rgba(105, 240, 174, 0.12);
+  border: 1px solid rgba(105, 240, 174, 0.32);
+  margin-bottom: 0.65rem;
+}
+
+.discover-hero-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 4vw, 1.9rem);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.discover-hero-sub {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+  max-width: 36rem;
+}
+
+/* Tür kartları */
+.discover-genres {
+  margin-bottom: 2rem;
+}
+
+.discover-genres__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.discover-genres__title {
+  margin: 0;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.discover-genres__hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.discover-genres__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 960px) {
+  .discover-genres__grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+}
+
 .game-genre-card {
   position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition:
+    transform 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.game-genre-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(105, 240, 174, 0.45);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(105, 240, 174, 0.12);
 }
 
 .game-genre-card:hover .game-genre-card-img {
-  filter: brightness(0.5);
+  filter: brightness(0.75);
+  transform: scale(1.06);
+}
+
+.game-genre-card-img {
+  width: 100%;
+  height: 100%;
+  transition:
+    filter 0.3s ease,
+    transform 0.45s ease;
+}
+
+.game-genre-card__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.2) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
 }
 
 .game-genre-title {
   position: absolute;
-  height: 25%;
-  bottom: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
+  inset: auto 0 0 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  background: transparent;
+  height: auto;
 }
 
+.game-genre-title p {
+  margin: 0;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.game-genre-card__arrow {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+  color: #69f0ae;
+}
+
+.game-genre-card:hover .game-genre-card__arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Katalog — filtre + liste */
+.discover-catalog {
+  padding: 1.25rem 1.1rem 1.5rem;
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+@media (min-width: 600px) {
+  .discover-catalog {
+    padding: 1.35rem 1.4rem 1.75rem;
+  }
+}
+
+.discover-catalog__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 1.25rem;
+  padding-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.discover-catalog__info {
+  min-width: 0;
+  flex: 1 1 200px;
+}
+
+.discover-catalog__heading {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.discover-catalog__heading:hover {
+  color: #69f0ae;
+}
+
+.discover-catalog__count {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.4;
+}
+
+.discover-catalog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex: 1 1 280px;
+}
+
+.discover-search-btn {
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(105, 240, 174, 0.35) !important;
+  background: rgba(105, 240, 174, 0.08) !important;
+}
+
+.discover-search-btn:hover {
+  background: rgba(105, 240, 174, 0.18) !important;
+  box-shadow: 0 6px 20px rgba(105, 240, 174, 0.15);
+}
+
+.discover-platform-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+.discover-platform-chips :deep(.category-chip) {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.discover-platform-chips :deep(.category-chip:hover) {
+  transform: translateY(-1px);
+  border-color: rgba(105, 240, 174, 0.4) !important;
+}
+
+.discover-pagination {
+  padding-top: 0.5rem;
+}
+
+.discover-games-grid :deep(.game-card) {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.discover-games-grid :deep(.game-card:hover) {
+  border-color: rgba(105, 240, 174, 0.38);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Oyun ara — modal */
+.discover-search-dialog :deep(.v-overlay__content) {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.discover-search-card {
+  background: linear-gradient(
+    165deg,
+    rgba(14, 28, 22, 0.98) 0%,
+    rgba(8, 10, 12, 0.98) 100%
+  ) !important;
+  border: 1px solid rgba(105, 240, 174, 0.28);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 24px 64px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.discover-search-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem clamp(1.15rem, 4vw, 1.75rem) 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(105, 240, 174, 0.06) 0%, transparent 100%);
+}
+
+.discover-search-card__title-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.discover-search-card__icon-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 14px;
+  background: rgba(105, 240, 174, 0.12);
+  border: 1px solid rgba(105, 240, 174, 0.35);
+  box-shadow: 0 4px 16px rgba(105, 240, 174, 0.12);
+}
+
+.discover-search-card__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.discover-search-card__sub {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.48);
+  line-height: 1.4;
+}
+
+.discover-search-card__body {
+  padding: 1.15rem clamp(1.15rem, 4vw, 1.75rem) 1.35rem !important;
+}
+
+.discover-search-field :deep(.v-field) {
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  font-size: 0.95rem;
+}
+
+.discover-search-field :deep(.v-field__outline) {
+  --v-field-border-opacity: 0.3;
+}
+
+.discover-search-field :deep(.v-field--focused .v-field__outline) {
+  color: #69f0ae;
+}
+
+.discover-search-field :deep(.v-field--focused) {
+  box-shadow: 0 0 0 3px rgba(105, 240, 174, 0.15);
+}
+
+.discover-search-hint {
+  display: flex;
+  align-items: center;
+  margin-top: 0.65rem;
+  font-size: 0.75rem;
+  color: rgba(255, 183, 77, 0.85);
+}
+
+.discover-search-results {
+  margin-top: 1rem;
+  max-height: min(52vh, 380px);
+  overflow-y: auto;
+  padding-right: 0.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(105, 240, 174, 0.35) transparent;
+}
+
+.discover-search-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.discover-search-results::-webkit-scrollbar-thumb {
+  background: rgba(105, 240, 174, 0.35);
+  border-radius: 999px;
+}
+
+.discover-search-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.discover-search-state--idle {
+  border: 1px dashed rgba(105, 240, 174, 0.2);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.discover-search-state--empty .discover-search-state__sub {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.discover-search-count {
+  margin: 0 0 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(105, 240, 174, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.discover-search-pick {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.discover-search-pick:hover {
+  background: rgba(105, 240, 174, 0.1);
+  border-color: rgba(105, 240, 174, 0.35);
+  transform: translateX(4px);
+}
+
+.discover-search-pick:hover .discover-search-pick__arrow {
+  color: #69f0ae !important;
+}
+
+.discover-search-pick__avatar {
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.discover-search-pick__info {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.discover-search-pick__name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  width: 100%;
+}
+
+.discover-search-pick__year {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 0.25rem;
+}
+
+.discover-search-pick__score {
+  align-self: flex-start;
+  width: auto !important;
+  max-width: max-content;
+}
+
+.discover-search-pick__na {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.discover-search-pick__arrow {
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+/* Eski sınıflar (genre alt sayfaları vb.) */
 .search-game-pop-up {
   position: relative;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(0.5rem);
-  -webkit-backdrop-filter: blur(0.5rem);
+  padding: 1.5rem 1.35rem 1.35rem !important;
+  background: linear-gradient(165deg, rgba(12, 20, 16, 0.98) 0%, rgba(8, 8, 12, 0.98) 100%);
+  border: 1px solid rgba(105, 240, 174, 0.22);
 }
 
 .close-icon-in-search-game-pop-up {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 0.5rem;
+  right: 0.5rem;
   z-index: 9999;
+}
+
+.research-game {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.research-game:hover {
+  background: rgba(105, 240, 174, 0.1);
+  border-color: rgba(105, 240, 174, 0.3);
 }
 
 .back-to-games-btn {
   border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(0, 0, 0, .2);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .back-to-games-btn:hover {
-  background: rgba(0, 0, 0, .4);
+  background: rgba(0, 0, 0, 0.4);
   border-color: transparent;
 }

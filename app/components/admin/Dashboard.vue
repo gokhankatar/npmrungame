@@ -18,9 +18,9 @@
             <v-icon icon="mdi-play-circle" size="14" />
             {{ currentGames.length }} oynanan
           </span>
-          <span class="admin-hero-badge admin-hero-badge--cyan">
-            <v-icon icon="mdi-playlist-play" size="14" />
-            {{ toPlayGames.length }} oynanacak
+          <span class="admin-hero-badge admin-hero-badge--amber">
+            <v-icon icon="mdi-radar" size="14" />
+            {{ radarGames.length }} radarda
           </span>
         </div>
       </div>
@@ -61,19 +61,110 @@
 
           <button
             type="button"
-            class="admin-quick-btn admin-quick-btn--toplay"
-            @click="goToAdminSection('to_play_games')"
+            class="admin-quick-btn admin-quick-btn--radar"
+            @click="goToAdminSection('upcoming_games')"
           >
             <span class="admin-quick-btn-icon">
-              <v-icon icon="mdi-playlist-play" size="22" />
+              <v-icon icon="mdi-radar" size="22" />
             </span>
             <span class="admin-quick-btn-body">
-              <span class="admin-quick-btn-title default-title-letter">Oynayacaklarım</span>
-              <span class="admin-quick-btn-desc">Oyun ekle / çıkar</span>
+              <span class="admin-quick-btn-title default-title-letter">Radarımdaki oyunlar</span>
+              <span class="admin-quick-btn-desc">Çıkış takvimi</span>
             </span>
-            <span class="admin-quick-btn-count">{{ toPlayGames.length }}</span>
+            <span class="admin-quick-btn-count">{{ radarGames.length }}</span>
             <v-icon class="admin-quick-btn-arrow" icon="mdi-chevron-right" size="20" />
           </button>
+        </div>
+      </div>
+
+      <!-- Radarda en yakın çıkış — kompakt Netflix kartı -->
+      <div
+        v-if="isGettingRadarGames"
+        class="admin-radar-spotlight admin-radar-spotlight--loading mb-4"
+      >
+        <v-skeleton-loader type="image" height="148" class="admin-radar-spotlight__skeleton" />
+      </div>
+
+      <button
+        v-else-if="nextRadarGame"
+        type="button"
+        class="admin-radar-spotlight mb-4"
+        :aria-label="`${nextRadarGame.name}, ${radarCountdown.value} ${radarCountdown.unit}`"
+        @click="goToAdminSection('upcoming_games')"
+      >
+        <v-img
+          v-if="nextRadarGame.background_image"
+          :src="nextRadarGame.background_image"
+          :alt="nextRadarGame.name"
+          cover
+          class="admin-radar-spotlight__bg"
+        />
+        <div v-else class="admin-radar-spotlight__bg admin-radar-spotlight__bg--empty">
+          <v-icon icon="mdi-radar" size="40" color="rgba(255,183,77,0.35)" />
+        </div>
+        <div class="admin-radar-spotlight__shade" aria-hidden="true" />
+        <div class="admin-radar-spotlight__inner">
+          <div class="admin-radar-spotlight__main">
+            <span class="admin-radar-spotlight__badge default-title-letter">
+              <v-icon icon="mdi-radar" size="14" />
+              En yakın çıkış
+            </span>
+            <h3 class="admin-radar-spotlight__title default-title-letter">
+              {{ nextRadarGame.name }}
+            </h3>
+            <p class="admin-radar-spotlight__date default-title-letter">
+              {{ radarReleaseFormatted }}
+            </p>
+            <div class="admin-radar-spotlight__countdown default-title-letter">
+              <span class="admin-radar-spotlight__countdown-value">{{ radarCountdown.value }}</span>
+              <span class="admin-radar-spotlight__countdown-unit">{{ radarCountdown.unit }}</span>
+              <v-chip
+                size="x-small"
+                variant="flat"
+                class="admin-radar-spotlight__chip"
+                :color="radarCountdownChip.color"
+                :prepend-icon="radarCountdownChip.icon"
+                :text="radarCountdownChip.text"
+              />
+            </div>
+          </div>
+          <div class="admin-radar-spotlight__aside">
+            <div class="admin-radar-spotlight__date-pill" aria-hidden="true">
+              <span class="admin-radar-spotlight__date-pill-day">{{ radarDateParts.day }}</span>
+              <span class="admin-radar-spotlight__date-pill-month">{{ radarDateParts.month }}</span>
+              <span class="admin-radar-spotlight__date-pill-year">{{ radarDateParts.year }}</span>
+            </div>
+            <span class="admin-radar-spotlight__cta default-title-letter">
+              Radarı aç
+              <v-icon icon="mdi-chevron-right" size="18" />
+            </span>
+          </div>
+        </div>
+      </button>
+
+      <div
+        v-else
+        class="admin-radar-spotlight admin-radar-spotlight--empty mb-4"
+        role="status"
+      >
+        <div class="admin-radar-spotlight__empty-inner">
+          <v-icon icon="mdi-radar" size="28" color="#ffb74d" />
+          <div>
+            <p class="admin-radar-spotlight__empty-title default-title-letter">Radarda oyun yok</p>
+            <p class="admin-radar-spotlight__empty-sub default-title-letter">
+              Çıkış takvimine oyun ekleyince burada en yakın tarih görünür.
+            </p>
+          </div>
+          <v-btn
+            size="small"
+            variant="tonal"
+            color="warning"
+            rounded="pill"
+            class="text-capitalize default-title-letter"
+            text="Radara git"
+            :ripple="false"
+            @click="goToAdminSection('upcoming_games')"
+          />
         </div>
       </div>
 
@@ -280,7 +371,7 @@
               >
                 <v-img
                   class="card-img-in-card-dashboard-game-stats"
-                  :src="randomGameBackgroundForToPlayGames"
+                  :src="randomGameBackgroundForRadarGames"
                   height="100%"
                   cover
                 />
@@ -295,14 +386,14 @@
                   <p
                     class="text-subtitle-2 text-md-subtitle-1 text-lg-h5 text-center default-title-letter text-grey-lighten-1"
                   >
-                    Oynanacak Oyun
+                    Radardaki Oyun
                   </p>
 
                   <p
                     class="text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter"
-                    style="color: #86ddfd"
+                    style="color: #ffb74d"
                   >
-                    {{ toPlayGames?.length }}
+                    {{ radarGames?.length }}
                   </p>
                 </div>
               </v-card>
@@ -417,6 +508,14 @@ import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import toPlayAnimImg from "~/assets/img/progress_anim.gif";
 import blogAnimImg from "~/assets/img/blog_anim.gif";
 import Admin_Goal_Ring_Metric from "./Admin_Goal_Ring_Metric.vue";
+import {
+  findNextUpcoming,
+  formatReleaseDate,
+  getCountdownChip,
+  getCountdownHeadline,
+  getDateParts,
+  type UpcomingGame,
+} from "~/utils/upcomingGames";
 
 const { $firestore } = useNuxtApp();
 const { formatTR } = useTRFormat();
@@ -435,7 +534,7 @@ const isMediumScreen = computed(() => display.mdAndUp.value);
 const isLargeScreen = computed(() => display.lgAndUp.value);
 
 const isGettingCompletedGames = ref(false);
-const isGettingToPlayGames = ref(false);
+const isGettingRadarGames = ref(false);
 const isGettingCurrentGame = ref(false);
 const isGettingBlogs = ref(false);
 const isGettingRegisteredUsers = ref(false);
@@ -443,7 +542,7 @@ const isGettingMessages = ref(false);
 const isGettingRecommendedGames = ref(false);
 
 const completedGames = ref<any[]>([]);
-const toPlayGames = ref<any[]>([]);
+const radarGames = ref<any[]>([]);
 const currentGames = ref<any[]>([]);
 const lastBlogs = ref<any[]>([]);
 const totalBlogCount = ref<number>(0);
@@ -475,12 +574,38 @@ const randomGameBackgroundForCompletedGames = computed(() => {
   return completedGames.value[randomIndex].background_image;
 });
 
-const randomGameBackgroundForToPlayGames = computed(() => {
-  if (!toPlayGames.value.length) return null;
+const randomGameBackgroundForRadarGames = computed(() => {
+  if (!radarGames.value.length) return null;
 
-  const randomIndex = Math.floor(Math.random() * toPlayGames.value.length);
-  return toPlayGames.value[randomIndex].background_image;
+  const randomIndex = Math.floor(Math.random() * radarGames.value.length);
+  return radarGames.value[randomIndex].background_image;
 });
+
+const radarGamesTyped = computed(
+  () => radarGames.value as UpcomingGame[]
+);
+
+const nextRadarGame = computed(() => findNextUpcoming(radarGamesTyped.value));
+
+const radarCountdown = computed(() =>
+  nextRadarGame.value
+    ? getCountdownHeadline(nextRadarGame.value.releaseDate)
+    : { value: "—", unit: "" }
+);
+
+const radarReleaseFormatted = computed(() =>
+  nextRadarGame.value ? formatReleaseDate(nextRadarGame.value.releaseDate) : ""
+);
+
+const radarDateParts = computed(() =>
+  nextRadarGame.value ? getDateParts(nextRadarGame.value.releaseDate) : { day: "—", month: "—", year: "—" }
+);
+
+const radarCountdownChip = computed(() =>
+  nextRadarGame.value
+    ? getCountdownChip(nextRadarGame.value.releaseDate)
+    : { text: "", color: "grey", icon: "mdi-calendar" }
+);
 
 const randomGameBackgroundForCurrentGames = computed(() => {
   if (!currentGames.value || !currentGames.value.length) return null;
@@ -512,11 +637,11 @@ const getCompletedGames = async () => {
   }
 };
 
-const getToPlayGames = async () => {
+const getRadarGames = async () => {
   try {
-    isGettingToPlayGames.value = true;
+    isGettingRadarGames.value = true;
 
-    const gamesCol = collection($firestore, "to_play_games");
+    const gamesCol = collection($firestore, "upcoming_games");
     const gamesSnapshot = await getDocs(gamesCol);
 
     const gamesList = gamesSnapshot.docs.map((doc) => ({
@@ -524,13 +649,13 @@ const getToPlayGames = async () => {
       ...doc.data(),
     }));
 
-    toPlayGames.value = gamesList;
+    radarGames.value = gamesList;
   } catch (error) {
     console.error("Error getting games :", error);
     return [];
   } finally {
     setTimeout(() => {
-      isGettingToPlayGames.value = false;
+      isGettingRadarGames.value = false;
     }, 250);
   }
 };
@@ -663,7 +788,7 @@ const getMessages = async () => {
 onMounted(() => {
   getYoutubeChannelInfos();
   getCompletedGames();
-  getToPlayGames();
+  getRadarGames();
   getCurrentGames();
   getBlogsFromDb();
   getRegisteredUsers();

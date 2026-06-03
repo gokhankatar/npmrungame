@@ -21,6 +21,7 @@ export const useGameCollectionStatus = ($firestore: any) => {
             }[] = [
                     { key: "completed_games", name: "completed_games" },
                     { key: "current_games", name: "current_games" },
+                    { key: "upcoming_games", name: "upcoming_games" },
                     { key: "to_play_games", name: "to_play_games" },
                     { key: "recommended_games", name: "recommended_games" },
                 ];
@@ -29,9 +30,13 @@ export const useGameCollectionStatus = ($firestore: any) => {
                 const colRef = collection($firestore, col.name);
                 const snapshot = await getDocs(colRef);
 
-                const exists = snapshot.docs.some(
-                    (doc) => doc.data()?.id === gameId
-                );
+                const exists = snapshot.docs.some((doc) => {
+                    const data = doc.data();
+                    if (col.key === "upcoming_games") {
+                        return data?.rawgId === gameId || data?.rawgId === Number(gameId);
+                    }
+                    return data?.id === gameId || data?.id === Number(gameId);
+                });
 
                 if (exists) {
                     gameCollectionStatus.value = col.key;

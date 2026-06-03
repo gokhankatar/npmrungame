@@ -1,180 +1,495 @@
 <template>
-  <Anim_Recommend_Game />
+  <div class="recommend-page">
+    <!-- Netflix tarzı hero — en son önerilen oyun -->
+    <section
+      class="recommend-hero"
+      :class="{
+        'recommend-hero--empty': !isGettingRecommendedGames && !featuredGame,
+        'recommend-hero--loading': isGettingRecommendedGames,
+      }"
+    >
+      <template v-if="isGettingRecommendedGames">
+        <v-skeleton-loader type="image" class="recommend-hero__loader" />
+      </template>
 
-  <v-container class="pa-2 pa-md-5 pa-lg-10 pa-xl-15">
-    <v-row class="w-100 mx-auto" v-if="recommendedGames?.length > 0">
-      <v-col cols="12">
-        <div class="d-flex justify-space-between align-center w-100">
-          <p class="text-subtitle-2 text-sm-subtitle-1 text-xl-h5 default-title-letter text-deep-purple-lighten-1">
-            Daha Önce Önerilen Oyunlar
+      <template v-else-if="featuredGame">
+        <v-img
+          v-if="featuredGame.background_image"
+          :src="featuredGame.background_image"
+          :alt="featuredGame.name"
+          cover
+          class="recommend-hero__bg"
+        />
+        <div v-else class="recommend-hero__bg recommend-hero__bg--empty">
+          <v-icon icon="mdi-gamepad-variant-outline" size="72" color="rgba(255,255,255,0.2)" />
+        </div>
+        <div class="recommend-hero__shade" aria-hidden="true" />
+        <div class="recommend-hero__vignette" aria-hidden="true" />
+
+        <div class="recommend-hero__inner">
+          <p class="recommend-hero__brand default-title-letter">npmrungame · topluluk</p>
+          <div class="recommend-hero__body">
+            <div class="recommend-hero__labels">
+              <span class="recommend-hero__label recommend-hero__label--hot">
+                Son öneri
+              </span>
+              <span
+                v-if="featuredGame.recommender_name"
+                class="recommend-hero__label recommend-hero__label--who"
+              >
+                <v-icon icon="mdi-account-heart" size="14" />
+                {{ featuredGame.recommender_name }} önerdi
+              </span>
+            </div>
+
+            <h1 class="recommend-hero__title default-title-letter">
+              {{ featuredGame.name }}
+            </h1>
+
+            <p
+              v-if="featuredSuggestionExcerpt"
+              class="recommend-hero__quote default-title-letter"
+            >
+              “{{ featuredSuggestionExcerpt }}”
+            </p>
+
+            <div class="recommend-hero__meta">
+              <v-chip
+                v-if="featuredGame.metacritic"
+                size="small"
+                variant="elevated"
+                class="recommend-hero__meta-chip"
+                :color="useMetacriticStyle(featuredGame.metacritic).color"
+                prepend-icon="mdi-star"
+                :text="String(featuredGame.metacritic)"
+              />
+              <span v-if="featuredDateLabel" class="recommend-hero__date default-title-letter">
+                {{ featuredDateLabel }}
+              </span>
+            </div>
+
+            <div class="recommend-hero__actions">
+              <v-btn
+                color="deep-purple-accent-2"
+                variant="flat"
+                rounded="pill"
+                size="large"
+                class="recommend-hero__btn recommend-hero__btn--primary text-white font-weight-bold text-capitalize default-title-letter"
+                prepend-icon="mdi-hand-heart"
+                text="Sen de öner"
+                :ripple="false"
+                @click="openRecommendDialog"
+              />
+              <v-btn
+                variant="outlined"
+                color="grey-lighten-1"
+                rounded="pill"
+                size="large"
+                class="recommend-hero__btn recommend-hero__btn--secondary text-capitalize default-title-letter"
+                prepend-icon="mdi-information-outline"
+                text="Oyun detayı"
+                :ripple="false"
+                @click="openGameDetail(featuredGame)"
+              />
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template v-else>
+        <div class="recommend-hero__bg recommend-hero__bg--fallback" aria-hidden="true" />
+        <div class="recommend-hero__shade" aria-hidden="true" />
+        <div class="recommend-hero__inner recommend-hero__inner--center">
+          <p class="recommend-hero__brand default-title-letter">npmrungame · topluluk</p>
+          <h1 class="recommend-hero__title default-title-letter">
+            Hangi oyunu görmek istersin?
+          </h1>
+          <p class="recommend-hero__lead default-title-letter">
+            İlk öneriyi sen yap — ekibimiz inceleyip listeye ekleyebilir. Onaylanan öneriler burada
+            Netflix tarzı vitrinde yer alır.
           </p>
-          <v-btn @click="getRecommendedGames" :loading="isGettingRecommendedGames" variant="text" :ripple="false"
-            :color="isGettingRecommendedGames ? 'deep-purple' : 'grey-lighten-1'" icon="mdi-refresh"
-            :size="display.smAndDown.value ? 'small' : 'default'" />
+          <v-btn
+            color="deep-purple-accent-2"
+            variant="flat"
+            rounded="pill"
+            size="x-large"
+            class="recommend-hero__btn recommend-hero__btn--primary text-white font-weight-bold text-capitalize default-title-letter mt-4"
+            prepend-icon="mdi-gamepad-variant"
+            text="İlk öneriyi gönder"
+            :ripple="false"
+            @click="openRecommendDialog"
+          />
+        </div>
+      </template>
+    </section>
+
+    <!-- İçerik -->
+    <div class="recommend-main">
+      <div class="recommend-main__toolbar">
+        <div class="recommend-pills">
+          <div class="recommend-pill">
+            <span class="recommend-pill__value default-title-letter">{{ recommendedCount }}</span>
+            <span class="recommend-pill__label default-title-letter">Toplam öneri</span>
+          </div>
+          <div class="recommend-pill">
+            <span class="recommend-pill__value default-title-letter">3</span>
+            <span class="recommend-pill__label default-title-letter">Max / gönderim</span>
+          </div>
+        </div>
+        <v-btn
+          v-if="display.mdAndUp.value"
+          color="deep-purple-accent-2"
+          variant="flat"
+          rounded="pill"
+          class="text-capitalize default-title-letter text-white font-weight-bold"
+          prepend-icon="mdi-plus"
+          text="Oyun öner"
+          :ripple="false"
+          @click="openRecommendDialog"
+        />
+        <v-btn
+          icon="mdi-refresh"
+          variant="text"
+          color="grey-lighten-1"
+          :loading="isGettingRecommendedGames"
+          :ripple="false"
+          aria-label="Listeyi yenile"
+          @click="getRecommendedGames"
+        />
+      </div>
+
+      <section v-if="!isGettingRecommendedGames && recommendedGames.length" class="recommend-catalog">
+        <div class="recommend-catalog__head">
+          <h2 class="recommend-catalog__title default-title-letter">Topluluktan öneriler</h2>
+          <p class="recommend-catalog__count default-title-letter mb-0">
+            {{ recommendedCount }} oyun · kaydırarak keşfet
+          </p>
         </div>
 
-        <v-divider class="mt-2 mb-3 mb-lg-6" />
-      </v-col>
+        <div class="recommend-catalog__track" role="list">
+          <article
+            v-for="(game, index) in recommendedGames"
+            :key="game.firestoreId ?? `${game.id}-${index}`"
+            role="listitem"
+            class="recommend-poster"
+            :class="{ 'recommend-poster--featured': index === 0 }"
+            tabindex="0"
+            @click="openGameDetail(game)"
+            @keydown.enter="openGameDetail(game)"
+          >
+            <div class="recommend-poster__frame">
+              <v-img
+                v-if="game.background_image"
+                :src="game.background_image"
+                :alt="game.name"
+                cover
+                class="recommend-poster__img"
+              />
+              <div v-else class="recommend-poster__img recommend-poster__img--empty">
+                <v-icon icon="mdi-gamepad-variant-outline" size="32" color="rgba(255,255,255,0.25)" />
+              </div>
+              <div class="recommend-poster__shade" />
+              <span v-if="index === 0" class="recommend-poster__badge default-title-letter">
+                Son
+              </span>
+              <v-chip
+                v-if="game.metacritic"
+                size="x-small"
+                variant="elevated"
+                class="recommend-poster__score"
+                :color="useMetacriticStyle(game.metacritic).color"
+                :text="String(game.metacritic)"
+              />
+            </div>
+            <p class="recommend-poster__name default-title-letter">{{ game.name }}</p>
+            <p
+              v-if="game.recommender_name"
+              class="recommend-poster__who default-title-letter mb-0"
+            >
+              {{ game.recommender_name }}
+            </p>
+          </article>
+        </div>
+      </section>
 
-      <Game_Card :arr="recommendedGames" :loading="isGettingRecommendedGames" :onRowClick="handleRowClick" />
-    </v-row>
+      <section class="recommend-how">
+        <h2 class="recommend-how__title default-title-letter">Nasıl çalışır?</h2>
+        <ol class="recommend-how__steps default-title-letter">
+          <li>
+            <span class="recommend-how__num">1</span>
+            <span>RAWG’den oyun ara ve en fazla 3 tanesini seç</span>
+          </li>
+          <li>
+            <span class="recommend-how__num">2</span>
+            <span>Neden önerdiğini kısaca yaz — ekip okuyacak</span>
+          </li>
+          <li>
+            <span class="recommend-how__num">3</span>
+            <span>Onaylanan öneriler bu sayfada vitrinde görünür</span>
+          </li>
+        </ol>
+      </section>
+    </div>
 
-    <!-- Recommend Game Section -->
-    <v-row class="my-5 my-lg-8 w-100 mx-auto d-flex flex-column justify-center align-center">
-      <v-col cols="12" sm="8" lg="6" xl="4">
-        <v-btn v-if="!isOpenRecommendGame" @click="isOpenRecommendGame = true" class="default-title-letter"
-          text="Oyun Öner" variant="elevated" :size="display.smAndDown.value ? 'default' : 'x-large'" rounded="xl"
-          :ripple="false" :elevation="0" block prepend-icon="mdi-microsoft-xbox-controller" color="deep-purple" />
-        <v-btn v-else @click="isOpenRecommendGame = false" class="default-title-letter" text="Iptal" variant="elevated"
-          :size="display.smAndDown.value ? 'default' : 'x-large'" rounded="xl" :ripple="false" :elevation="0" block
-          prepend-icon="mdi-close" />
-      </v-col>
+    <v-btn
+      v-if="display.smAndDown.value"
+      class="recommend-fab"
+      color="deep-purple-accent-2"
+      icon="mdi-plus"
+      size="large"
+      elevation="8"
+      :ripple="false"
+      aria-label="Oyun öner"
+      @click="openRecommendDialog"
+    />
 
-      <!-- Recommend Game Form -->
-      <transition name="slide-down">
-        <v-col cols="12" lg="8" xl="6" v-if="isOpenRecommendGame">
-          <v-form class="recommend-game-form-container pa-5 pa-lg-10 rounded-lg" ref="recommendGameForm"
-            @submit.prevent="handleRecommendGame">
-            <v-text-field v-model="models.name" :rules="rules.name" rounded="xl" label="Ad" type="text"
-              variant="outlined" class="default-title-letter text-grey-lighten-2" prepend-inner-icon="mdi-account"
-              :density="display.smAndDown.value ? 'compact' : 'comfortable'" clearable />
-            <v-text-field v-model="models.email" :rules="rules.email" rounded="xl" label="Email" type="email"
-              variant="outlined" class="default-title-letter text-grey-lighten-2" prepend-inner-icon="mdi-email"
-              :density="display.smAndDown.value ? 'compact' : 'comfortable'" clearable />
-            <v-textarea rounded="xl" label="Neden Bu Oyun/Oyunlar" variant="outlined" counter
-              class="default-title-letter text-grey-lighten-2" prepend-inner-icon="mdi-email"
-              :density="display.smAndDown.value ? 'compact' : 'comfortable'" clearable />
+    <!-- Öneri formu -->
+    <v-dialog
+      v-model="isRecommendDialogOpen"
+      max-width="640"
+      scrollable
+      class="recommend-dialog"
+      scrim="rgba(0,0,0,0.88)"
+      @after-leave="onDialogClosed"
+    >
+      <v-card class="recommend-dialog-card rounded-xl" :ripple="false">
+        <div class="recommend-dialog-header">
+          <div>
+            <h2 class="recommend-dialog-title default-title-letter">Oyun öner</h2>
+            <p class="recommend-dialog-sub default-title-letter">
+              Bilgilerini gir, oyunları seç ve gönder.
+            </p>
+          </div>
+          <v-btn
+            icon="mdi-close"
+            variant="text"
+            color="grey-lighten-1"
+            :ripple="false"
+            @click="isRecommendDialogOpen = false"
+          />
+        </div>
 
-            <div class="add-game-container d-flex flex-column align-center ga-2 ga-lg-4 rounded">
-              <v-text-field v-model="searchGameText" @input="searchGame" prepend-inner-icon="mdi-magnify"
-                variant="outlined" class="w-100 text-grey-lighten-1" color="grey-lighten-1" rounded="xl"
-                label="Oyun Ara" placeholder="Black Myth Wukong..."
-                :density="display.xl.value ? 'comfortable' : 'compact'" clearable />
+        <v-card-text class="recommend-dialog-body">
+          <v-form ref="recommendGameForm" @submit.prevent="handleRecommendGame">
+            <v-text-field
+              v-model="models.name"
+              :rules="rules.name"
+              rounded="xl"
+              label="Adın"
+              variant="outlined"
+              class="default-title-letter mb-3"
+              prepend-inner-icon="mdi-account-outline"
+              :density="display.smAndDown.value ? 'compact' : 'comfortable'"
+              hide-details="auto"
+              clearable
+            />
+            <v-text-field
+              v-model="models.email"
+              :rules="rules.email"
+              rounded="xl"
+              label="E-posta"
+              type="email"
+              variant="outlined"
+              class="default-title-letter mb-3"
+              prepend-inner-icon="mdi-email-outline"
+              :density="display.smAndDown.value ? 'compact' : 'comfortable'"
+              hide-details="auto"
+              clearable
+            />
+            <v-textarea
+              v-model="models.suggestionText"
+              rounded="xl"
+              label="Neden bu oyun(lar)?"
+              variant="outlined"
+              rows="3"
+              counter
+              maxlength="500"
+              class="default-title-letter mb-4"
+              prepend-inner-icon="mdi-comment-text-outline"
+              :density="display.smAndDown.value ? 'compact' : 'comfortable'"
+              hide-details="auto"
+              clearable
+            />
 
-              <transition name="slide-up">
-                <v-alert v-if="showNoGameSelectedWarning" type="warning" variant="tonal" density="compact"
-                  class="text-caption w-100" text="Lütfen en az 1 oyun seç." />
-              </transition>
+            <div class="recommend-search-block">
+              <v-text-field
+                v-model="searchGameText"
+                prepend-inner-icon="mdi-magnify"
+                variant="outlined"
+                rounded="xl"
+                label="Oyun ara"
+                placeholder="En az 3 karakter — örn. Elden Ring"
+                color="deep-purple-accent-1"
+                class="default-title-letter"
+                :density="display.smAndDown.value ? 'compact' : 'comfortable'"
+                hide-details
+                clearable
+                @update:model-value="onSearchInput"
+              />
 
-              <transition name="slide-up">
-                <v-alert v-if="showMaxLimitWarning" type="warning" variant="tonal" density="compact"
-                  class="text-caption w-100" text="En fazla 3 oyun önerebilirsin." />
-              </transition>
+              <v-alert
+                v-if="showNoGameSelectedWarning"
+                type="warning"
+                variant="tonal"
+                density="compact"
+                class="text-caption mt-2 mb-0"
+                text="En az 1 oyun seçmelisin."
+              />
+              <v-alert
+                v-if="showMaxLimitWarning"
+                type="warning"
+                variant="tonal"
+                density="compact"
+                class="text-caption mt-2 mb-0"
+                text="En fazla 3 oyun önerebilirsin."
+              />
 
-              <!-- 🔥 Arama sonuç alanı -->
-              <div v-if="searchGameText?.length" class="w-100" style="max-height: 350px; overflow-y: auto">
-                <!-- Loading -->
-                <div v-if="isSearchingGameLoading" class="d-flex justify-start py-2 py-lg-4">
-                  <v-progress-circular indeterminate size="24" color="grey-lighten-1" />
+              <div v-if="selectedGamesAfterResearch.length" class="recommend-selected-chips">
+                <v-chip
+                  v-for="game in selectedGamesAfterResearch"
+                  :key="game.id"
+                  closable
+                  size="small"
+                  color="deep-purple-accent-2"
+                  variant="tonal"
+                  class="default-title-letter"
+                  @click:close="removeSelectedGame(game.id)"
+                >
+                  {{ game.name }}
+                </v-chip>
+              </div>
+
+              <div v-if="searchGameText.length >= 3" class="recommend-search-results">
+                <div v-if="isSearchingGameLoading" class="d-flex justify-center py-4">
+                  <v-progress-circular indeterminate size="28" color="#b39ddb" />
                 </div>
-
-                <!-- Search Results -->
                 <template v-else>
-                  <p v-if="searchResults?.length"
-                    class="text-caption text-grey-darken-1 text-start default-title-letter">
-                    {{ `${searchResults?.length} oyun bulundu` }}
+                  <p
+                    v-if="searchResults.length"
+                    class="text-caption text-grey-darken-1 mb-2 default-title-letter"
+                  >
+                    {{ searchResults.length }} sonuç
                   </p>
-                  <v-card v-for="game in searchResults" :key="game.id" :ripple="false"
-                    class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer"
-                    @click="selectGameAfterSearch(game)" :class="{
-                      'selected-research-game': selectedGamesAfterResearch.some(
-                        (i) => i.id === game.id
-                      ),
-                    }">
-                    <v-avatar :size="display.smAndDown.value ? 30 : 48" rounded>
+                  <button
+                    v-for="game in searchResults"
+                    :key="game.id"
+                    type="button"
+                    class="recommend-search-pick"
+                    :class="{
+                      'recommend-search-pick--selected': isGameSelected(game.id),
+                    }"
+                    @click="selectGameAfterSearch(game)"
+                  >
+                    <v-avatar :size="44" rounded="lg">
                       <v-img :src="game.background_image" :alt="game.name" cover />
                     </v-avatar>
-
-                    <div class="d-flex flex-column">
-                      <p class="text-caption text-lg-subtitle-2 default-title-letter" :class="selectedGamesAfterResearch.some((i) => i.id === game.id)
-                        ? 'text-grey-lighten-3'
-                        : 'text-grey-lighten-1'
-                        ">
-                        {{ `${game.name}` }}
-                        <span v-if="game.released">({{ new Date(game.released).getFullYear() }})</span>
+                    <div class="min-w-0 flex-grow-1 text-start">
+                      <p class="text-subtitle-2 text-grey-lighten-1 mb-0 text-truncate default-title-letter">
+                        {{ game.name }}
+                        <span v-if="game.released" class="text-grey-darken-1">
+                          ({{ new Date(game.released).getFullYear() }})
+                        </span>
                       </p>
-
-                      <p class="text-caption" :class="`text-${useMetacriticStyle(game?.metacritic).color}`">
-                        Metacritic: {{ game.metacritic ?? "N/A" }}
+                      <p
+                        class="text-caption mb-0"
+                        :class="`text-${useMetacriticStyle(game.metacritic).color}`"
+                      >
+                        Metacritic: {{ game.metacritic ?? "—" }}
                       </p>
                     </div>
-                  </v-card>
-
-                  <!-- No Result -->
-                  <p v-if="searchResults?.length === 0 && searchGameText?.length > 2"
-                    class="text-center text-grey-darken-1 mt-3">
+                    <v-icon
+                      :icon="isGameSelected(game.id) ? 'mdi-check-circle' : 'mdi-plus-circle-outline'"
+                      :color="isGameSelected(game.id) ? '#b39ddb' : 'grey'"
+                    />
+                  </button>
+                  <p
+                    v-if="!searchResults.length"
+                    class="text-caption text-grey-darken-1 text-center py-3 mb-0"
+                  >
                     Sonuç bulunamadı
                   </p>
                 </template>
               </div>
-
-              <v-row class="w-100 mx-auto d-flex align-center" :class="selectedGamesAfterResearch.length == 0
-                ? 'justify-end'
-                : 'justify-center'
-                " dense>
-                <v-col cols="12" sm="6">
-                  <v-btn @click="handleRecommendGame" :loading="isAddingToDb" :text="selectedGamesAfterResearch.length > 0
-                    ? `Öner (${selectedGamesAfterResearch?.length})`
-                    : 'Öner'
-                    " :size="display.smAndDown.value ? 'small' : 'large'" :ripple="false" prepend-icon="mdi-plus"
-                    variant="elevated" color="deep-purple" rounded="xl" class="text-capitalize" block />
-                </v-col>
-
-                <v-col cols="12" sm="6" v-if="selectedGamesAfterResearch?.length > 0">
-                  <v-btn @click="selectedGamesAfterResearch = []" text="Tüm Seçimleri Kaldır" variant="tonal"
-                    color="warning" :size="display.smAndDown.value ? 'small' : 'large'" rounded="xl" :ripple="false"
-                    class="text-capitalize" prepend-icon="mdi-broom" block />
-                </v-col>
-              </v-row>
-
-              <transition name="slide-up">
-                <v-row class="w-100" v-if="isAddedToDb">
-                  <v-col cols="12">
-                    <v-alert class="w-100 text-caption text-lg-subtitle-2" density="compact" color="success"
-                      variant="text" :text="`${addedGameToDbCount} oyun eklendi`" />
-                  </v-col>
-                </v-row>
-              </transition>
             </div>
           </v-form>
-        </v-col>
-      </transition>
-    </v-row>
-  </v-container>
-  <v-dialog v-model="isAddedToDb" :max-width="600" style="
-      background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(0.2rem);
-      -webkit-backdrop-filter: blur(0.2rem);
-    ">
-    <div
-      class="successfull-recommended-pop-up-container d-flex flex-column align-center ga-1 ga-lg-3 pa-2 pa-md-5 pa-lg-10 rounded-lg w-100">
-      <v-btn class="successfull-recommended-pop-up-container-close-btn ma-1 ma-lg-2" variant="text" size="small"
-        icon="mdi-close" color="grey" :ripple="false" @click="isAddedToDb = false" />
+        </v-card-text>
 
-      <v-img v-if="msgGenre == 'successfull'" :src="successfullyDoneImg" :width="display.smAndDown.value ? 50 : 75" />
-      <p class="text-center text-subtitle-2 text-lg-subtitle-1 text-grey-lighten-1 default-title-letter">
-        {{ dialogMsg }}
-      </p>
-    </div>
-  </v-dialog>
+        <div class="recommend-dialog-actions">
+          <v-btn
+            variant="tonal"
+            color="grey-lighten-1"
+            rounded="pill"
+            class="text-capitalize default-title-letter"
+            text="Vazgeç"
+            :ripple="false"
+            @click="isRecommendDialogOpen = false"
+          />
+          <v-btn
+            color="deep-purple-accent-2"
+            variant="flat"
+            rounded="pill"
+            class="text-capitalize default-title-letter text-white font-weight-bold"
+            :prepend-icon="selectedGamesAfterResearch.length ? 'mdi-send' : 'mdi-plus'"
+            :text="
+              selectedGamesAfterResearch.length
+                ? `Gönder (${selectedGamesAfterResearch.length})`
+                : 'Gönder'
+            "
+            :loading="isAddingToDb"
+            :ripple="false"
+            @click="handleRecommendGame"
+          />
+        </div>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="isSuccessDialogOpen" max-width="480" scrim="rgba(0,0,0,0.9)">
+      <div class="recommend-success-dialog">
+        <v-btn
+          class="position-absolute"
+          style="top: 8px; right: 8px"
+          variant="text"
+          icon="mdi-close"
+          size="small"
+          color="grey"
+          :ripple="false"
+          @click="isSuccessDialogOpen = false"
+        />
+        <v-img
+          v-if="msgGenre === 'successfull'"
+          :src="successfullyDoneImg"
+          :width="display.smAndDown.value ? 56 : 80"
+          class="mx-auto mb-3"
+        />
+        <p class="text-subtitle-1 text-grey-lighten-1 default-title-letter mb-0">
+          {{ dialogMsg }}
+        </p>
+      </div>
+    </v-dialog>
+  </div>
 </template>
+
 <script lang="ts" setup>
 import axios from "axios";
 import { VForm } from "vuetify/components";
 import { getDocs, collection, addDoc, writeBatch, doc } from "firebase/firestore";
-import Game_Card from "~/components/common/Game_Card.vue";
 import { useMetacriticStyle } from "~/composables/data/handleData";
+import { slugify } from "~/composables/core/basicFunc";
 import store from "~/store/store";
 import _ from "lodash";
-import Anim_Recommend_Game from "~/components/layout/Anim_Recommend_Game.vue";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 
 useHead({
-  title: "npmrungame | Oyun Öner",
+  title: "Oyun Öner | npmrungame",
+  meta: [
+    {
+      name: "description",
+      content: "npmrungame için oyun öner — topluluk listesine katkıda bulun.",
+    },
+  ],
 });
 
 const { $firestore } = useNuxtApp();
-
 const _store = store();
 const router = useRouter();
 const display = useDisplay();
@@ -184,20 +499,20 @@ const recommendGameForm = ref<InstanceType<typeof VForm> | null>(null);
 const isGettingRecommendedGames = ref(false);
 const isSearchingGameLoading = ref(false);
 const isAddingToDb = ref(false);
-const isAddedToDb = ref(false);
+const isRecommendDialogOpen = ref(false);
+const isSuccessDialogOpen = ref(false);
 const showMaxLimitWarning = ref(false);
 const showNoGameSelectedWarning = ref(false);
-const isOpenRecommendGame = ref(false);
 const isGettingCompletedGames = ref(false);
-const isGettingToPlayGames = ref(false);
+const isGettingRadarGames = ref(false);
 
 const addedGameToDbCount = ref(0);
 const msgGenre = ref<"successfull" | "warning">("successfull");
-const dialogMsg = ref<string>("");
-const searchGameText = ref<string>("");
+const dialogMsg = ref("");
+const searchGameText = ref("");
 const recommendedGames = ref<any[]>([]);
 const completedGames = ref<any[]>([]);
-const toPlayGames = ref<any[]>([]);
+const radarGames = ref<any[]>([]);
 const selectedGamesAfterResearch = ref<any[]>([]);
 const searchResults = ref<any[]>([]);
 
@@ -209,15 +524,67 @@ const models = ref({
 
 const rules = ref({
   name: [
-    (v: string) => !!v || "Adınız Gerekli",
-    (v: string) => (v && v.length >= 3) || "Adnınız en az 3 karakter olmalı",
+    (v: string) => !!v || "Ad gerekli",
+    (v: string) => (v && v.length >= 3) || "En az 3 karakter",
   ],
   email: [
-    (v: string) => !!v || "Email Gerekli!",
+    (v: string) => !!v || "E-posta gerekli",
     (v: string) =>
-      (v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) || "Geçerli mail adresi giriniz",
+      (v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) || "Geçerli e-posta gir",
   ],
 });
+
+const recommendedCount = computed(() => recommendedGames.value.length);
+const featuredGame = computed(() => recommendedGames.value[0] ?? null);
+
+const featuredSuggestionExcerpt = computed(() => {
+  const msg = featuredGame.value?.recommender_suggestion_msg;
+  if (!msg?.trim()) return "";
+  const t = msg.trim();
+  return t.length > 160 ? `${t.slice(0, 160)}…` : t;
+});
+
+const featuredDateLabel = computed(() => {
+  const iso = featuredGame.value?.recommended_at;
+  if (!iso) return "";
+  try {
+    return new Intl.DateTimeFormat("tr-TR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(new Date(iso));
+  } catch {
+    return "";
+  }
+});
+
+let searchDebounce: ReturnType<typeof setTimeout> | null = null;
+
+const isGameSelected = (id: number) =>
+  selectedGamesAfterResearch.value.some((g) => g.id === id);
+
+const removeSelectedGame = (id: number) => {
+  const idx = selectedGamesAfterResearch.value.findIndex((g) => g.id === id);
+  if (idx !== -1) selectedGamesAfterResearch.value.splice(idx, 1);
+};
+
+const openRecommendDialog = () => {
+  isRecommendDialogOpen.value = true;
+};
+
+const openGameDetail = (item: any) => {
+  if (!item?.id) return;
+  _store.setActiveDetailedGame(item.id, item.name);
+  router.push(`/game-detail/${slugify(item.name)}`);
+};
+
+const onDialogClosed = () => {
+  searchResults.value = [];
+  searchGameText.value = "";
+  showMaxLimitWarning.value = false;
+  showNoGameSelectedWarning.value = false;
+  resetForm();
+};
 
 const selectGameAfterSearch = (game: any) => {
   const idx = selectedGamesAfterResearch.value.findIndex((g) => g.id === game.id);
@@ -226,10 +593,9 @@ const selectGameAfterSearch = (game: any) => {
     return;
   }
 
-  // ❗ Max 3 Game
   if (selectedGamesAfterResearch.value.length >= 3) {
     showMaxLimitWarning.value = true;
-    setTimeout(() => (showMaxLimitWarning.value = false), 2000);
+    setTimeout(() => (showMaxLimitWarning.value = false), 2500);
     return;
   }
 
@@ -237,43 +603,47 @@ const selectGameAfterSearch = (game: any) => {
 };
 
 const searchGame = async () => {
+  if (searchGameText.value.length < 3) {
+    searchResults.value = [];
+    isSearchingGameLoading.value = false;
+    return;
+  }
+
   try {
-    if (searchGameText.value.length > 2) {
-      isSearchingGameLoading.value = true;
+    isSearchingGameLoading.value = true;
+    const { data } = await axios.get("/api/search-games", {
+      params: { search: searchGameText.value },
+    });
 
-      const { data } = await axios.get("/api/search-games", {
-        params: {
-          search: searchGameText.value,
-        },
-      });
+    const results = data?.results ?? [];
+    const excludedIds = new Set([
+      ...recommendedGames.value.map((g: any) => g.id),
+      ...completedGames.value.map((g: any) => g.id),
+      ...radarGames.value.map((g: any) => g.rawgId ?? g.id),
+    ]);
 
-      const results = data?.results ?? [];
-
-      const excludedIds = new Set([
-        ...recommendedGames.value?.map((g: any) => g.id),
-        ...completedGames.value?.map((g: any) => g.id),
-        ...toPlayGames.value?.map((g: any) => g.id),
-      ]);
-
-      searchResults.value = results.filter((game: any) => !excludedIds.has(game.id));
-    } else {
-      searchResults.value = [];
-    }
+    searchResults.value = results.filter((game: any) => !excludedIds.has(game.id));
   } catch (error: any) {
-    console.log(error.message);
+    console.error(error.message);
+    searchResults.value = [];
   } finally {
     isSearchingGameLoading.value = false;
   }
 };
 
+const onSearchInput = () => {
+  if (searchDebounce) clearTimeout(searchDebounce);
+  if (searchGameText.value.length < 3) {
+    searchResults.value = [];
+    isSearchingGameLoading.value = false;
+    return;
+  }
+  searchDebounce = setTimeout(searchGame, 400);
+};
+
 const resetForm = async () => {
-  searchGameText.value = "";
-
-  models.value.name = "";
-  models.value.email = "";
-  models.value.suggestionText = "";
+  models.value = { name: "", email: "", suggestionText: "" };
   selectedGamesAfterResearch.value = [];
-
   await nextTick();
   recommendGameForm.value?.reset();
   recommendGameForm.value?.resetValidation();
@@ -281,208 +651,135 @@ const resetForm = async () => {
 
 const addGameToRecommendedGames = async () => {
   const games = selectedGamesAfterResearch.value;
-
-  if (!games || games.length === 0) return;
+  if (!games.length) return;
 
   try {
     isAddingToDb.value = true;
     addedGameToDbCount.value = games.length;
 
     const metadata = {
-      recommender_name: models.value?.name || null,
-      recommender_email: models.value?.email || null,
-      recommender_suggestion_msg: models.value?.suggestionText || null,
+      recommender_name: models.value.name || null,
+      recommender_email: models.value.email || null,
+      recommender_suggestion_msg: models.value.suggestionText || null,
       recommended_at: new Date().toISOString(),
     };
 
-    // ---------------------------
-    // 🔥 SINGLE GAME
-    // ---------------------------
     if (games.length === 1) {
       const game = games[0];
-
-      const finalGameData = { ...game, ...metadata };
-      await addDoc(collection($firestore, "recommended_games"), finalGameData);
-
+      await addDoc(collection($firestore, "recommended_games"), { ...game, ...metadata });
       await addDoc(collection($firestore, "notifications"), {
-        game_name: game?.name || game?.title || null,
+        game_name: game?.name || null,
         recommender_name: metadata.recommender_name,
         recommender_email: metadata.recommender_email,
         status: "recommended_game",
         read_status: false,
         created_at: new Date().toISOString(),
       });
-
-      resetForm();
-      msgGenre.value = "successfull";
-      dialogMsg.value = "Oyun öneriniz başarıyla iletildi! 🎉";
-      isAddedToDb.value = true;
-      setTimeout(() => (isAddedToDb.value = false), 2500);
-
-      return;
+    } else {
+      const batch = writeBatch($firestore);
+      games.forEach((g) => {
+        const ref = doc(collection($firestore, "recommended_games"));
+        batch.set(ref, { ...g, ...metadata });
+        batch.set(doc(collection($firestore, "notifications")), {
+          game_name: g?.name || null,
+          recommender_name: metadata.recommender_name,
+          recommender_email: metadata.recommender_email,
+          status: "recommended_game",
+          read_status: false,
+          created_at: new Date().toISOString(),
+        });
+      });
+      await batch.commit();
     }
 
-    // ---------------------------
-    // 🔥 MULTIPLE GAME — (Batch)
-    // ---------------------------
-    const batch = writeBatch($firestore);
-
-    games.forEach((g) => {
-      const ref = doc(collection($firestore, "recommended_games"));
-      const finalGameData = { ...g, ...metadata };
-      batch.set(ref, finalGameData);
-
-      // notifications
-      const notificationRef = doc(collection($firestore, "notifications"));
-      batch.set(notificationRef, {
-        game_name: g?.name || g?.title || null,
-        recommender_name: metadata.recommender_name,
-        recommender_email: metadata.recommender_email,
-        status: "recommended_game",
-        read_status: false,
-        created_at: new Date().toISOString(),
-      });
-    });
-
-    await batch.commit();
-
-    resetForm();
+    isRecommendDialogOpen.value = false;
     msgGenre.value = "successfull";
-    dialogMsg.value = "Tüm oyun önerileriniz başarıyla iletildi! 🎉";
-    isAddedToDb.value = true;
-    setTimeout(() => (isAddedToDb.value = false), 3500);
+    dialogMsg.value =
+      games.length === 1
+        ? "Oyun önerin başarıyla iletildi!"
+        : `${games.length} oyun önerin başarıyla iletildi!`;
+    isSuccessDialogOpen.value = true;
+    setTimeout(() => {
+      isSuccessDialogOpen.value = false;
+    }, 3500);
+
+    await resetForm();
+    await getRecommendedGames();
   } catch (error: any) {
     console.error("DB Add Error:", error.message);
+    msgGenre.value = "warning";
+    dialogMsg.value = "Gönderilirken bir hata oluştu. Tekrar dene.";
+    isSuccessDialogOpen.value = true;
   } finally {
-    await getRecommendedGames();
     isAddingToDb.value = false;
-    selectedGamesAfterResearch.value = [];
   }
 };
 
 const getCompletedGames = async () => {
   try {
     isGettingCompletedGames.value = true;
-
-    const gamesCol = collection($firestore, "completed_games");
-    const gamesSnapshot = await getDocs(gamesCol);
-
-    const gamesList = gamesSnapshot.docs.map((doc) => ({
-      firestoreId: doc.id,
-      ...doc.data(),
+    const snapshot = await getDocs(collection($firestore, "completed_games"));
+    completedGames.value = snapshot.docs.map((d) => ({
+      firestoreId: d.id,
+      ...d.data(),
     }));
-
-    completedGames.value = gamesList;
   } catch (error) {
-    console.error("Error getting games :", error);
-    return [];
+    console.error(error);
   } finally {
-    setTimeout(() => {
-      isGettingCompletedGames.value = false;
-    }, 250);
+    isGettingCompletedGames.value = false;
   }
 };
 
-const getToPlayGames = async () => {
+const getRadarGames = async () => {
   try {
-    isGettingToPlayGames.value = true;
-
-    const gamesCol = collection($firestore, "to_play_games");
-    const gamesSnapshot = await getDocs(gamesCol);
-
-    const gamesList = gamesSnapshot.docs.map((doc) => ({
-      firestoreId: doc.id,
-      ...doc.data(),
+    isGettingRadarGames.value = true;
+    const snapshot = await getDocs(collection($firestore, "upcoming_games"));
+    radarGames.value = snapshot.docs.map((d) => ({
+      firestoreId: d.id,
+      ...d.data(),
     }));
-
-    toPlayGames.value = gamesList;
   } catch (error) {
-    console.error("Error getting games :", error);
-    return [];
+    console.error(error);
   } finally {
-    setTimeout(() => {
-      isGettingToPlayGames.value = false;
-    }, 250);
+    isGettingRadarGames.value = false;
   }
 };
 
 const getRecommendedGames = async () => {
   try {
     isGettingRecommendedGames.value = true;
-    const gamesCol = collection($firestore, "recommended_games");
-    const gamesSnapshot = await getDocs(gamesCol);
-    const gamesList = gamesSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+    const snapshot = await getDocs(collection($firestore, "recommended_games"));
+    const games = snapshot.docs.map((d) => ({
+      firestoreId: d.id,
+      ...d.data(),
     }));
-
-    recommendedGames.value = _.uniqBy(gamesList, "id");
+    recommendedGames.value = _.orderBy(
+      _.uniqBy(games, (g) => g.id ?? g.firestoreId),
+      [(g) => (g.recommended_at ? new Date(g.recommended_at).getTime() : 0)],
+      ["desc"]
+    );
   } catch (error) {
-    console.error("Error getting games :", error);
-    return [];
+    console.error(error);
   } finally {
     isGettingRecommendedGames.value = false;
   }
 };
 
-const handleRowClick = (item: any) => {
-  _store.setActiveDetailedGame(item.id, item.name);
-  router.push(`/game-detail/${item.name}`);
-};
-
 const handleRecommendGame = async () => {
-  if (
-    !selectedGamesAfterResearch.value ||
-    selectedGamesAfterResearch.value.length === 0
-  ) {
+  if (!selectedGamesAfterResearch.value.length) {
     showNoGameSelectedWarning.value = true;
-
-    setTimeout(() => {
-      showNoGameSelectedWarning.value = false;
-    }, 2000);
-
+    setTimeout(() => (showNoGameSelectedWarning.value = false), 2500);
     return;
   }
 
   const result = await recommendGameForm.value?.validate();
-  if (!result || !result.valid) return;
+  if (!result?.valid) return;
 
-  try {
-    addGameToRecommendedGames();
-  } catch (error: any) {
-    console.error("Error while recommend game", error.message);
-  } finally {
-    recommendGameForm.value?.reset;
-    recommendGameForm.value?.resetValidation();
-  }
+  await addGameToRecommendedGames();
 };
 
-watch(
-  () => searchGameText.value,
-  (val) => {
-    if (!val || val.length < 2) {
-      searchResults.value = [];
-      isSearchingGameLoading.value = false;
-      return;
-    }
-  },
-  { immediate: true }
-);
-
-watch(
-  () => isOpenRecommendGame.value,
-  async (val) => {
-    if (!val) {
-      searchResults.value = [];
-      isSearchingGameLoading.value = false;
-
-      resetForm();
-    }
-  }
-);
-
 onMounted(() => {
-  getToPlayGames();
+  getRadarGames();
   getCompletedGames();
   getRecommendedGames();
 });
@@ -490,5 +787,5 @@ onMounted(() => {
 
 <style scoped>
 @import "~/assets/css/main.css";
-@import "~/assets/css/recommended_games.css";
+@import "~/assets/css/recommend_games_page.css";
 </style>

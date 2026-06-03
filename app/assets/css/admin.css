@@ -193,10 +193,259 @@
   border-color: rgba(77, 208, 225, 0.3);
 }
 
+.admin-hero-badge--amber {
+  color: #ffb74d;
+  background: rgba(255, 183, 77, 0.1);
+  border-color: rgba(255, 183, 77, 0.3);
+}
+
 .admin-quick-actions {
   margin-bottom: 1.25rem;
   padding-bottom: 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Radarda en yakın çıkış — özet Netflix kartı */
+.admin-radar-spotlight {
+  display: block;
+  width: 100%;
+  position: relative;
+  min-height: 148px;
+  padding: 0;
+  border: 1px solid rgba(255, 183, 77, 0.35);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 10px 32px rgba(0, 0, 0, 0.35);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.admin-radar-spotlight:hover,
+.admin-radar-spotlight:focus-visible {
+  border-color: rgba(255, 183, 77, 0.55);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.admin-radar-spotlight--loading {
+  cursor: default;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.admin-radar-spotlight__skeleton {
+  border-radius: 18px !important;
+}
+
+.admin-radar-spotlight__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.admin-radar-spotlight__bg--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(255, 183, 77, 0.14), rgba(0, 0, 0, 0.6));
+}
+
+.admin-radar-spotlight__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.72) 38%,
+    rgba(0, 0, 0, 0.35) 72%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  pointer-events: none;
+}
+
+.admin-radar-spotlight__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 148px;
+  padding: 0.9rem 1rem 0.9rem 1.1rem;
+  box-sizing: border-box;
+}
+
+.admin-radar-spotlight__main {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-radar-spotlight__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  align-self: flex-start;
+  margin-bottom: 0.45rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1a1208;
+  background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+  box-shadow: 0 4px 14px rgba(255, 183, 77, 0.4);
+}
+
+.admin-radar-spotlight__title {
+  margin: 0;
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.admin-radar-spotlight__date {
+  margin: 0.3rem 0 0;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.admin-radar-spotlight__countdown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.55rem;
+  margin-top: 0.45rem;
+}
+
+.admin-radar-spotlight__countdown-value {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #ffb74d;
+  line-height: 1;
+}
+
+.admin-radar-spotlight__countdown-unit {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.admin-radar-spotlight__chip {
+  flex: 0 0 auto;
+}
+
+.admin-radar-spotlight__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 0.65rem;
+}
+
+.admin-radar-spotlight__date-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.45rem 0.55rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 183, 77, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  min-width: 3.25rem;
+}
+
+.admin-radar-spotlight__date-pill-day {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffb74d;
+  line-height: 1;
+}
+
+.admin-radar-spotlight__date-pill-month {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.admin-radar-spotlight__date-pill-year {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.admin-radar-spotlight__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.admin-radar-spotlight--empty {
+  cursor: default;
+  border-color: rgba(255, 183, 77, 0.2);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 183, 77, 0.08) 0%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+}
+
+.admin-radar-spotlight__empty-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1rem;
+  padding: 1rem 1.1rem;
+  min-height: 148px;
+}
+
+.admin-radar-spotlight__empty-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-radar-spotlight__empty-sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+@media (max-width: 599px) {
+  .admin-radar-spotlight__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-radar-spotlight__aside {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .admin-quick-actions-label {
@@ -265,6 +514,26 @@
 .admin-quick-btn--toplay .admin-quick-btn-count {
   color: #4dd0e1;
   background: rgba(77, 208, 225, 0.12);
+}
+
+.admin-quick-btn--radar {
+  border-color: rgba(255, 183, 77, 0.35);
+  box-shadow: 0 4px 20px rgba(255, 183, 77, 0.08);
+}
+
+.admin-quick-btn--radar:hover {
+  border-color: rgba(255, 183, 77, 0.55);
+  box-shadow: 0 8px 28px rgba(255, 183, 77, 0.18);
+}
+
+.admin-quick-btn--radar .admin-quick-btn-icon {
+  background: rgba(255, 183, 77, 0.15);
+  color: #ffb74d;
+}
+
+.admin-quick-btn--radar .admin-quick-btn-count {
+  color: #ffb74d;
+  background: rgba(255, 183, 77, 0.12);
 }
 
 .admin-quick-btn-icon {

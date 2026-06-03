@@ -72,6 +72,14 @@
   border-color: rgba(79, 195, 247, 0.4) !important;
 }
 
+.home-dash-card--radar .home-dash-value {
+  color: #ffb74d;
+}
+
+.home-dash-card--radar:hover {
+  border-color: rgba(255, 183, 77, 0.45) !important;
+}
+
 .home-dash-value {
   font-size: clamp(1.25rem, 3vw, 1.65rem);
   font-weight: 800;
@@ -123,6 +131,11 @@
 .home-library-card--toplay {
   background: linear-gradient(135deg, rgba(79, 195, 247, 0.12) 0%, rgba(0, 0, 0, 0.45) 100%);
   border: 1px solid rgba(79, 195, 247, 0.28);
+}
+
+.home-library-card--radar {
+  background: linear-gradient(135deg, rgba(255, 183, 77, 0.12) 0%, rgba(0, 0, 0, 0.45) 100%);
+  border: 1px solid rgba(255, 183, 77, 0.28);
 }
 
 .home-library-card:hover {

@@ -1,0 +1,335 @@
+/* Ben Kimim — profil vitrin */
+
+.about-page {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #08080c;
+}
+
+.about-page-glow {
+  position: fixed;
+  width: min(480px, 65vw);
+  height: min(480px, 65vw);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(90px);
+  opacity: 0.32;
+}
+
+.about-page-glow--left {
+  top: 18%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(105, 240, 174, 0.28) 0%, transparent 70%);
+}
+
+.about-page-glow--right {
+  bottom: 8%;
+  right: -8%;
+  background: radial-gradient(circle, rgba(67, 233, 123, 0.18) 0%, transparent 70%);
+}
+
+.about-container {
+  position: relative;
+  z-index: 1;
+}
+
+.about-hero {
+  margin-bottom: 1.75rem;
+  padding: 1.15rem 1.2rem;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(105, 240, 174, 0.1) 0%,
+    rgba(0, 0, 0, 0.42) 50%,
+    rgba(0, 0, 0, 0.52) 100%
+  );
+  border: 1px solid rgba(105, 240, 174, 0.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: about-fade-up 0.55s ease backwards;
+}
+
+.about-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #69f0ae;
+  background: rgba(105, 240, 174, 0.12);
+  border: 1px solid rgba(105, 240, 174, 0.32);
+  margin-bottom: 0.65rem;
+}
+
+.about-hero-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 4vw, 1.85rem);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.about-hero-sub {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+  max-width: 36rem;
+}
+
+.about-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .about-layout {
+    grid-template-columns: minmax(260px, 320px) 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.about-profile-card {
+  padding: 1.5rem 1.25rem;
+  border-radius: 22px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  animation: about-fade-up 0.6s 0.08s ease backwards;
+}
+
+@media (min-width: 960px) {
+  .about-profile-card {
+    position: sticky;
+    top: 5.5rem;
+    text-align: center;
+  }
+}
+
+.about-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+  margin: 0 auto 1.15rem;
+  padding: 4px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    #69f0ae 0%,
+    #43e97b 35%,
+    #1de9b6 65%,
+    #69f0ae 100%
+  );
+  background-size: 200% 200%;
+  animation: about-ring-shift 6s ease infinite;
+  box-shadow: 0 0 32px rgba(105, 240, 174, 0.35);
+}
+
+.about-avatar-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(105, 240, 174, 0.25) 0%, transparent 70%);
+  animation: about-pulse 3s ease-in-out infinite;
+  z-index: -1;
+}
+
+.about-avatar-wrap :deep(.v-avatar) {
+  border: 3px solid rgba(8, 8, 12, 0.9);
+}
+
+.about-profile-name {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.25rem, 3vw, 1.55rem);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.96);
+  line-height: 1.2;
+}
+
+.about-profile-role {
+  margin: 0 0 1.1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(105, 240, 174, 0.85);
+}
+
+.about-email-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 14px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.22s ease,
+    color 0.22s ease;
+}
+
+.about-email-link:hover {
+  background: rgba(105, 240, 174, 0.12);
+  border-color: rgba(105, 240, 174, 0.35);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.about-email-link span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.about-quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.about-quick-links :deep(.v-btn) {
+  flex: 1 1 auto;
+  min-width: 7.5rem;
+}
+
+.about-bio-card {
+  padding: 1.35rem 1.2rem 1.5rem;
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.3);
+  animation: about-fade-up 0.65s 0.16s ease backwards;
+}
+
+@media (min-width: 600px) {
+  .about-bio-card {
+    padding: 1.5rem 1.65rem 1.75rem;
+  }
+}
+
+.about-bio-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.15rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.about-bio-card__head-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.about-bio {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.about-bio :deep(p) {
+  margin: 0 0 1.1rem;
+}
+
+.about-bio :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.about-bio :deep(p:first-of-type) {
+  font-size: 1.02rem;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.65;
+}
+
+.about-bio :deep(strong),
+.about-bio :deep(b) {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 700;
+}
+
+.about-bio :deep(a) {
+  color: #69f0ae;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.about-bio :deep(a:hover) {
+  color: #b9f6ca;
+}
+
+.about-bio :deep(ul),
+.about-bio :deep(ol) {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+}
+
+.about-bio :deep(li) {
+  margin-bottom: 0.4rem;
+}
+
+.about-skeleton-profile {
+  border-radius: 22px !important;
+}
+
+@keyframes about-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes about-ring-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes about-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-hero,
+  .about-profile-card,
+  .about-bio-card,
+  .about-avatar-wrap,
+  .about-avatar-wrap::before {
+    animation: none;
+  }
+}

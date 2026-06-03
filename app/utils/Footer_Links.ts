@@ -13,8 +13,8 @@ export const footer_links: Footer_Link[] = [
                 path: "/completed-games"
             },
             {
-                subtitle: "Oynayacaklarım",
-                path: "/to-play-games"
+                subtitle: "Radarımdaki Oyunlar",
+                path: "/radarimdaki-oyunlar"
             },
             {
                 subtitle: "Bloglar",

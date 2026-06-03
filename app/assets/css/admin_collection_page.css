@@ -24,6 +24,383 @@
   --ac-soft: #ffab91;
 }
 
+.admin-collection-page--amber {
+  --ac-rgb: 255, 183, 77;
+  --ac-hex: #ffb74d;
+  --ac-soft: #ffcc80;
+}
+
+/* Çıkacak oyunlar — form + liste */
+.upcoming-form-panel {
+  padding: 1.25rem 1.35rem;
+  border-radius: 16px;
+  border: 1px solid rgba(var(--ac-rgb), 0.22);
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+
+/* Radarımdaki oyunlar — v-row stat (sm=4) + spotlight */
+.admin-upcoming-summary .admin-stat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 6.25rem;
+  height: 100%;
+}
+
+.upcoming-admin-spotlight {
+  display: grid;
+  grid-template-columns: minmax(120px, 160px) 1fr auto;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  padding: 1rem 1.15rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 183, 77, 0.32);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 183, 77, 0.1) 0%,
+    rgba(0, 0, 0, 0.42) 55%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+}
+
+.upcoming-admin-spotlight--empty {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-style: dashed;
+  border-color: rgba(255, 183, 77, 0.22);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.upcoming-admin-spotlight__empty-title {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.upcoming-admin-spotlight__empty-desc {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.upcoming-admin-spotlight__media {
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 100px;
+}
+
+.upcoming-admin-spotlight__img {
+  width: 100%;
+  height: 100%;
+  min-height: 100px;
+}
+
+.upcoming-admin-spotlight__img--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 183, 77, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.upcoming-admin-spotlight__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.upcoming-admin-spotlight__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ffb74d;
+  background: rgba(255, 183, 77, 0.12);
+  border: 1px solid rgba(255, 183, 77, 0.28);
+  margin-bottom: 0.5rem;
+}
+
+.upcoming-admin-spotlight__title {
+  margin: 0;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.25;
+}
+
+.upcoming-admin-spotlight__date {
+  margin: 0.3rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.upcoming-admin-spotlight__actions {
+  align-self: center;
+}
+
+@media (max-width: 599px) {
+  .upcoming-admin-spotlight {
+    grid-template-columns: 1fr;
+  }
+
+  .upcoming-admin-spotlight__media {
+    min-height: 140px;
+  }
+
+  .upcoming-admin-spotlight__img,
+  .upcoming-admin-spotlight__img--empty {
+    min-height: 140px;
+  }
+
+  .upcoming-admin-spotlight__actions {
+    width: 100%;
+  }
+
+  .upcoming-admin-spotlight__actions .v-btn {
+    width: 100%;
+  }
+}
+
+/* Çıkacak oyun — tam genişlik kart */
+.upcoming-game-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.38);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+  animation: upcomingRowIn 0.4s ease forwards;
+  opacity: 0;
+}
+
+@media (min-width: 960px) {
+  .upcoming-game-card {
+    grid-template-columns: minmax(280px, 380px) 1fr;
+  }
+
+  .upcoming-game-card__media {
+    min-height: 160px;
+  }
+
+  .upcoming-game-card__img,
+  .upcoming-game-card__img--empty {
+    min-height: 160px;
+  }
+}
+
+.upcoming-game-card:hover {
+  border-color: rgba(var(--ac-rgb), 0.4);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.upcoming-game-card__media {
+  position: relative;
+  min-height: 140px;
+  overflow: hidden;
+}
+
+.upcoming-game-card__img {
+  width: 100%;
+  height: 100%;
+  min-height: 140px;
+}
+
+.upcoming-game-card__img--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ac-rgb), 0.15) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+.upcoming-game-card__media-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+}
+
+.upcoming-game-card__body {
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.upcoming-game-card__title {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.upcoming-game-card__date {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.4;
+}
+
+.upcoming-game-card__body .upcoming-countdown-chip {
+  align-self: flex-start;
+  width: auto;
+  max-width: max-content;
+  flex: 0 0 auto;
+}
+
+.upcoming-game-card-skeleton {
+  min-height: 160px;
+}
+
+@media (max-width: 599px) {
+  .upcoming-game-card {
+    grid-template-columns: 1fr;
+  }
+
+  .upcoming-game-card__media {
+    min-height: 180px;
+  }
+
+  .upcoming-game-card__img,
+  .upcoming-game-card__img--empty {
+    min-height: 180px;
+  }
+
+  .upcoming-game-card__media-overlay {
+    background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.7) 100%);
+  }
+}
+
+.upcoming-date-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.25rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 12px;
+  background: rgba(var(--ac-rgb), 0.12);
+  border: 1px solid rgba(var(--ac-rgb), 0.28);
+  flex-shrink: 0;
+}
+
+.upcoming-date-pill__day {
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ac-hex);
+}
+
+.upcoming-date-pill__month {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 0.15rem;
+}
+
+.upcoming-date-pill__year {
+  font-size: 0.55rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.1rem;
+}
+
+@keyframes upcomingRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.upcoming-search-results {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+  padding-right: 0.15rem;
+}
+
+.upcoming-search-results::-webkit-scrollbar {
+  width: 4px;
+}
+
+.upcoming-search-results::-webkit-scrollbar-thumb {
+  background: rgba(var(--ac-rgb), 0.35);
+  border-radius: 4px;
+}
+
+.upcoming-pick-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  margin-bottom: 0.4rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.28);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.upcoming-pick-btn:hover,
+.upcoming-pick-btn--active {
+  border-color: rgba(var(--ac-rgb), 0.45);
+  background: rgba(var(--ac-rgb), 0.1);
+  transform: translateX(2px);
+}
+
+.upcoming-selected-game {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(var(--ac-rgb), 0.35);
+  background: rgba(var(--ac-rgb), 0.08);
+}
+
+.upcoming-date-picker-card {
+  overflow: hidden;
+  border-radius: 14px !important;
+  border: 1px solid rgba(var(--ac-rgb), 0.25);
+  background: rgba(12, 16, 24, 0.98) !important;
+}
+
 /* Eski sınıf adları (bitirdiğim) */
 .admin-completed-page {
   --ac-rgb: 105, 240, 174;

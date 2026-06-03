@@ -39,14 +39,14 @@ export const adminNavSections: AdminNavSection[] = [
         icon: "mdi-check-circle-outline",
       },
       {
-        title: "Oynayacaklarım",
-        slug: "to_play_games",
-        icon: "mdi-gamepad-variant-outline",
-      },
-      {
         title: "Önerilen oyunlar",
         slug: "recommended_games",
         icon: "mdi-thumb-up-outline",
+      },
+      {
+        title: "Radarımdaki oyunlar",
+        slug: "upcoming_games",
+        icon: "mdi-radar",
       },
     ],
   },

@@ -1,7 +1,7 @@
 <template>
   <!-- All Blogs Skeleton -->
-  <v-row class="mt-5 mt-lg-10 w-100 mx-auto" v-if="loading">
-    <v-col cols="12" sm="6" lg="3" v-for="i in skeleton_number" :key="i">
+  <v-row class="blogs-card-row w-100 mx-auto" v-if="loading">
+    <v-col cols="12" sm="6" lg="4" v-for="i in skeleton_number" :key="i">
       <v-card class="rounded-lg d-flex flex-column" :elevation="0">
         <!-- Skeleton Image -->
         <div class="w-100" style="aspect-ratio: 16/9">
@@ -24,8 +24,8 @@
   </v-row>
 
   <!-- All Blogs -->
-  <v-row class="mt-5 mt-lg-10" :density="isSmallScreen ? 'compact' : 'comfortable'">
-    <v-col cols="12" sm="6" lg="3" v-for="(item, index) of arr" :key="index">
+  <v-row class="blogs-card-row" :dense="isSmallScreen">
+    <v-col cols="12" sm="6" lg="4" v-for="(item, index) of arr" :key="item.firestoreId ?? index">
       <v-card 
         class="blog-card cursor-pointer" 
         :ripple="false" 

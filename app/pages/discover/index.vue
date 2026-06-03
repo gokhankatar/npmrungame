@@ -1,156 +1,286 @@
 <template>
-  <v-responsive height="100" v-if="!smallScreen" />
-  <v-responsive height="70" v-else />
+  <div class="discover-page">
+    <div class="discover-page-glow discover-page-glow--left" aria-hidden="true" />
+    <div class="discover-page-glow discover-page-glow--right" aria-hidden="true" />
 
-  <v-container class="pa-0 pa-lg-10 pa-xl-15">
-    <Game_Genres />
+    <v-responsive :height="smallScreen ? 70 : 100" />
 
-    <v-divider color="transparent" class="w-100 my-5 my-lg-10" />
-
-    <!-- Game Platform Chips -->
-    <v-row class="d-flex align-center mt-5 mt-lg-10">
-      <v-col cols="12" sm="6" lg="4">
-        <template v-if="isLoading">
-          <v-skeleton-loader type="text" width="190" height="12px" style="
-              background-color: transparent;
-              --v-skeleton-loader-bg-color: transparent;
-            " />
-          <v-skeleton-loader type="text" width="300" height="12px" class="my-2" style="
-              background-color: transparent;
-              --v-skeleton-loader-bg-color: transparent;
-            " />
-        </template>
-        <template v-else>
-          <Animated_Text @click="resetAllFilter" text="Tüm Oyunlar"
-            class="cursor-pointer d-flex justify-center justify-sm-start align-center" :msPerChar="50" :duration="550"
-            :loop="true" />
-          <p
-            class="text-center text-sm-start text-caption text-lg-subtitle-2 text-blue-grey-darken-2 default-title-letter">
-            {{ formatNumber(total_count) }} oyun bulundu, yaklaşık
-            {{ formatNumber(totalPagesDisplay) }} sayfa.
-          </p>
-        </template>
-      </v-col>
-
-      <v-col cols="12" sm="6" lg="8">
-        <div class="d-flex flex-wrap align-center justify-center justify-sm-end ga-1 ga-md-2 ga-lg-4">
-          <v-btn @click="isOpenSearchGame = true" prepend-icon="mdi-magnify" :ripple="false" :size="getCategoryChipSize"
-            class="rounded-xl text-capitalize my-2 my-sm-0" text="Oyun Ara..."
-            :variant="display.xs.value ? 'outlined' : 'text'" color="green-accent-2" :elevation="0"
-            :block="display.xs.value" />
-
-          <v-chip v-for="(item, index) of game_category_list" :key="item.name" @click="handleGamePlatform(item.slug)"
-            class="cursor-pointer transition category-chip" :class="_store.active_game_platform == item.slug
-                ? `active-game-platform-${item.slug}`
-                : ''
-              " color="grey" variant="outlined" :size="getCategoryChipSize" :text="item.name" :prepend-icon="item.icon"
-            :ripple="false" />
+    <v-container class="discover-container pa-3 pa-md-6 pa-lg-10 pa-xl-15">
+      <header class="discover-hero">
+        <div class="discover-hero-badge default-title-letter">
+          <v-icon icon="mdi-compass-outline" size="16" color="#69f0ae" />
+          <span>Keşfet</span>
         </div>
-      </v-col>
-    </v-row>
-
-    <!-- Games List -->
-    <v-row class="d-flex justify-start align-center mx-auto" :dense="display.smAndDown.value">
-      <Game_Card :loading="isLoading" :arr="gamesArr" :onRowClick="handleRowClick" />
-
-      <v-row class="d-flex justify-space-evenly align-center w-100 mx-auto my-3 my-lg-6"
-        :dense="display.smAndDown.value">
-        <!-- prev -->
-        <v-col cols="12">
-          <div class="d-flex justify-center align-center ga-2 ga-lg-4 w-100">
-            <v-btn :disabled="!_store.prevPage" @click="goPrev" variant="tonal" rounded="xl"
-              prepend-icon="mdi-chevron-left" class="text-capitalize" text="Geri"
-              :size="display.smAndDown.value ? 'small' : 'default'" :ripple="false" />
-
-            <div class="d-flex align-center ga-1 ga-lg-2">
-              <v-progress-circular v-if="isLoading" color="grey-darken-1" size="12" width="2" indeterminate />
-              <p v-else class="text-caption text-xl-subtitle-2 defaul-title-letter text-grey-darken-1">
-                {{ _store.currentPage }} / {{ totalPagesDisplay }}
-              </p>
-            </div>
-
-            <v-btn :disabled="!_store.nextPage" @click="goNext" variant="tonal" rounded="xl"
-              append-icon="mdi-chevron-right" class="text-capitalize" text="İleri"
-              :size="display.smAndDown.value ? 'small' : 'default'" :ripple="false" />
-          </div>
-        </v-col>
-      </v-row>
-    </v-row>
-  </v-container>
-
-  <!-- Search Game Pop Up -->
-  <v-dialog v-model="isOpenSearchGame" :max-width="600" style="
-      background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(0.1rem);
-      -webkit-backdrop-filter: blur(0.1rem);
-    ">
-    <div class="search-game-pop-up pa-2 pa-lg-5 rounded-lg">
-      <v-btn class="close-icon-in-search-game-pop-up ma-1 ma-lg-2" @click="isOpenSearchGame = false" icon="mdi-close"
-        variant="text" color="grey-darken-1" :ripple="false" :size="smallScreen ? 'small' : 'default'" />
-
-      <div class="mt-5 mt-lg-10 mb-3 mb-lg-5 d-flex justify-center align-center ga-2">
-        <p class="text-subtitle-2 text-lg-h5 default-title-letter text-blue-grey-lighten-1">
-          Hangi Oyunu Arıyorsun ?
+        <h1 class="discover-hero-title default-title-letter">Oyun dünyasını tara</h1>
+        <p class="discover-hero-sub default-title-letter">
+          Türlerden başla veya platforma göre filtrele — binlerce oyuna tek tıkla ulaş.
         </p>
-      </div>
+      </header>
 
-      <v-text-field v-model="searchGameText" @input="searchGame" prepend-inner-icon="mdi-magnify" variant="outlined"
-        class="w-100 text-grey-lighten-1" color="grey-lighten-1" rounded="xl" label="Oyun Ara"
-        placeholder="Black Myth Wukong..." :density="extraLgScreen ? 'comfortable' : 'compact'" clearable />
+      <Game_Genres />
 
-      <!-- 🔥 Arama sonuç alanı -->
-      <div class="w-100" style="max-height: 350px; overflow-y: auto">
-        <!-- Loading -->
-        <div v-if="isSearchingGameLoading" class="d-flex justify-start py-2 py-lg-4">
-          <v-progress-circular indeterminate size="24" color="grey-lighten-1" />
+      <section class="discover-catalog">
+        <div class="discover-catalog__toolbar">
+          <div class="discover-catalog__info">
+            <template v-if="isLoading">
+              <v-skeleton-loader type="heading" width="140" class="mb-2" />
+              <v-skeleton-loader type="text" width="220" />
+            </template>
+            <template v-else>
+              <h2
+                class="discover-catalog__heading default-title-letter"
+                role="button"
+                tabindex="0"
+                @click="resetAllFilter"
+                @keydown.enter="resetAllFilter"
+              >
+                Tüm oyunlar
+              </h2>
+              <p class="discover-catalog__count default-title-letter">
+                {{ formatNumber(total_count) }} oyun · yaklaşık
+                {{ formatNumber(totalPagesDisplay) }} sayfa
+              </p>
+            </template>
+          </div>
+
+          <div class="discover-catalog__actions">
+            <v-btn
+              prepend-icon="mdi-magnify"
+              :ripple="false"
+              :size="getCategoryChipSize"
+              class="discover-search-btn rounded-pill text-capitalize default-title-letter"
+              text="Oyun ara"
+              variant="tonal"
+              color="green-accent-2"
+              @click="isOpenSearchGame = true"
+            />
+
+            <div class="discover-platform-chips">
+              <v-chip
+                v-for="item in game_category_list"
+                :key="item.name"
+                class="cursor-pointer transition category-chip"
+                :class="
+                  _store.active_game_platform === item.slug
+                    ? `active-game-platform-${item.slug}`
+                    : ''
+                "
+                color="grey"
+                variant="outlined"
+                :size="getCategoryChipSize"
+                :text="item.name"
+                :prepend-icon="item.icon"
+                :ripple="false"
+                @click="handleGamePlatform(item.slug)"
+              />
+            </div>
+          </div>
         </div>
 
-        <!-- Search Results -->
-        <template v-else>
-          <p v-if="searchResults?.length" class="text-caption text-grey-darken-1 text-start default-title-letter">
-            {{ `${searchResults?.length} oyun bulundu` }}
-          </p>
-          <v-card @click="handleRowClick(game)" v-for="game in searchResults" :key="game.id" :ripple="false"
-            class="research-game pa-2 mb-2 d-flex align-center ga-3 rounded-lg cursor-pointer">
-            <v-avatar :size="smallScreen ? 30 : 48" rounded>
-              <v-img :src="game.background_image" :alt="game.name" cover />
-            </v-avatar>
+        <v-row class="discover-games-grid d-flex justify-start align-center mx-auto" :dense="display.smAndDown.value">
+          <Game_Card :loading="isLoading" :arr="gamesArr" :on-row-click="handleRowClick" />
 
-            <div class="d-flex flex-column">
-              <p class="text-caption text-lg-subtitle-2 default-title-letter">
-                {{ `${game.name}` }}
-                <span v-if="game.released">({{ new Date(game.released).getFullYear() }})</span>
-              </p>
+          <v-col cols="12" class="discover-pagination">
+            <div class="d-flex justify-center align-center ga-2 ga-lg-4 w-100">
+              <v-btn
+                :disabled="!_store.prevPage"
+                variant="tonal"
+                rounded="pill"
+                prepend-icon="mdi-chevron-left"
+                class="text-capitalize default-title-letter"
+                text="Geri"
+                :size="display.smAndDown.value ? 'small' : 'default'"
+                :ripple="false"
+                @click="goPrev"
+              />
 
-              <p class="text-caption" :class="`text-${useMetacriticStyle(game?.metacritic).color}`">
-                Metacritic: {{ game.metacritic ?? "N/A" }}
+              <div class="d-flex align-center ga-1 ga-lg-2">
+                <v-progress-circular
+                  v-if="isLoading"
+                  color="grey-darken-1"
+                  size="12"
+                  width="2"
+                  indeterminate
+                />
+                <p v-else class="text-caption text-xl-subtitle-2 default-title-letter text-grey-darken-1 mb-0">
+                  {{ _store.currentPage }} / {{ totalPagesDisplay }}
+                </p>
+              </div>
+
+              <v-btn
+                :disabled="!_store.nextPage"
+                variant="tonal"
+                rounded="pill"
+                append-icon="mdi-chevron-right"
+                class="text-capitalize default-title-letter"
+                text="İleri"
+                :size="display.smAndDown.value ? 'small' : 'default'"
+                :ripple="false"
+                @click="goNext"
+              />
+            </div>
+          </v-col>
+        </v-row>
+      </section>
+    </v-container>
+
+    <v-dialog
+      v-model="isOpenSearchGame"
+      max-width="560"
+      scrollable
+      class="discover-search-dialog"
+      scrim="rgba(0,0,0,0.9)"
+      @after-leave="onSearchDialogClosed"
+    >
+      <v-card class="discover-search-card rounded-xl" :ripple="false">
+        <div class="discover-search-card__header">
+          <div class="discover-search-card__title-block">
+            <div class="discover-search-card__icon-wrap" aria-hidden="true">
+              <v-icon icon="mdi-magnify" size="22" color="#69f0ae" />
+            </div>
+            <div>
+              <h2 class="discover-search-card__title default-title-letter">Oyun ara</h2>
+              <p class="discover-search-card__sub default-title-letter mb-0">
+                Hangi oyunu arıyorsun? En az 3 karakter yaz.
               </p>
             </div>
-          </v-card>
+          </div>
+          <v-btn
+            icon="mdi-close"
+            variant="text"
+            color="grey-lighten-1"
+            :ripple="false"
+            aria-label="Kapat"
+            @click="isOpenSearchGame = false"
+          />
+        </div>
 
-          <!-- No Result -->
-          <p v-if="searchResults?.length === 0 && searchGameText?.length > 2"
-            class="text-center text-grey-darken-1 mt-3">
-            Sonuç bulunamadı
+        <v-card-text class="discover-search-card__body">
+          <v-text-field
+            v-model="searchGameText"
+            autofocus
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
+            class="discover-search-field default-title-letter"
+            color="green-accent-2"
+            rounded="pill"
+            placeholder="Örn. Elden Ring, GTA V…"
+            hide-details
+            clearable
+            :density="extraLgScreen ? 'comfortable' : 'default'"
+            @update:model-value="onSearchInput"
+            @keydown.esc="isOpenSearchGame = false"
+          />
+
+          <p
+            v-if="searchGameText.length > 0 && searchGameText.length < 3"
+            class="discover-search-hint default-title-letter mb-0"
+          >
+            <v-icon icon="mdi-keyboard" size="16" class="mr-1" />
+            {{ 3 - searchGameText.length }} karakter daha…
           </p>
-        </template>
-      </div>
-    </div>
-  </v-dialog>
+
+          <div class="discover-search-results">
+            <div v-if="isSearchingGameLoading" class="discover-search-state">
+              <v-progress-circular indeterminate size="32" color="#69f0ae" />
+              <span class="default-title-letter">Aranıyor…</span>
+            </div>
+
+            <div
+              v-else-if="!searchGameText.length"
+              class="discover-search-state discover-search-state--idle"
+            >
+              <v-icon icon="mdi-gamepad-variant-outline" size="40" color="rgba(105,240,174,0.35)" />
+              <span class="default-title-letter">Oyun adı yazmaya başla</span>
+            </div>
+
+            <template v-else-if="searchGameText.length >= 3">
+              <p
+                v-if="searchResults.length"
+                class="discover-search-count default-title-letter"
+              >
+                {{ searchResults.length }} sonuç
+              </p>
+
+              <button
+                v-for="game in searchResults"
+                :key="game.id"
+                type="button"
+                class="discover-search-pick"
+                @click="selectSearchGame(game)"
+              >
+                <v-avatar :size="52" rounded="lg" class="discover-search-pick__avatar">
+                  <v-img
+                    v-if="game.background_image"
+                    :src="game.background_image"
+                    :alt="game.name"
+                    cover
+                  />
+                  <v-icon v-else icon="mdi-gamepad-variant-outline" color="grey" />
+                </v-avatar>
+                <div class="discover-search-pick__info min-w-0">
+                  <p class="discover-search-pick__name default-title-letter mb-0 text-truncate">
+                    {{ game.name }}
+                    <span v-if="game.released" class="discover-search-pick__year">
+                      {{ new Date(game.released).getFullYear() }}
+                    </span>
+                  </p>
+                  <v-chip
+                    v-if="game.metacritic"
+                    size="x-small"
+                    variant="elevated"
+                    class="discover-search-pick__score mt-1"
+                    :color="useMetacriticStyle(game.metacritic).color"
+                    prepend-icon="mdi-star"
+                    :text="String(game.metacritic)"
+                  />
+                  <span v-else class="discover-search-pick__na text-caption">Metacritic yok</span>
+                </div>
+                <v-icon
+                  icon="mdi-chevron-right"
+                  size="22"
+                  color="rgba(255,255,255,0.35)"
+                  class="discover-search-pick__arrow"
+                />
+              </button>
+
+              <div
+                v-if="!searchResults.length"
+                class="discover-search-state discover-search-state--empty"
+              >
+                <v-icon icon="mdi-magnify-close" size="36" color="rgba(255,255,255,0.25)" />
+                <span class="default-title-letter">Sonuç bulunamadı</span>
+                <span class="discover-search-state__sub default-title-letter">
+                  Farklı bir isim dene
+                </span>
+              </div>
+            </template>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { formatNumber, useMetacriticStyle } from "~/composables/data/handleData";
 import store from "~/store/store";
 import axios from "axios";
+import _ from "lodash";
 import Game_Genres from "~/components/common/Game_Genres.vue";
 import Game_Card from "~/components/common/Game_Card.vue";
 import { useDiscoverStore } from "~/store/queryStore";
-import Animated_Text from "~/components/common/Animated_Text.vue";
 import { slugify } from "~/composables/core/basicFunc";
+import { game_category_list } from "~/utils/Game_Categories_List";
 
 useHead({
-  title: "npmrungame | Keşfet",
+  title: "Keşfet | npmrungame",
+  meta: [
+    {
+      name: "description",
+      content: "npmrungame keşfet — türlere ve platformlara göre oyun ara.",
+    },
+  ],
 });
 
 const _store = store();
@@ -170,109 +300,91 @@ const isSearchingGameLoading = ref(false);
 
 const gamesArr = ref<any[]>([]);
 const searchResults = ref<any[]>([]);
-const searchGameText = ref<string>("");
-const total_count = ref<number>(0);
-const total_pages = ref<number>(0);
+const searchGameText = ref("");
+const total_count = ref(0);
+const total_pages = ref(0);
+
+let searchDebounce: ReturnType<typeof setTimeout> | null = null;
 
 const searchGame = async () => {
+  if (searchGameText.value.length <= 2) {
+    searchResults.value = [];
+    isSearchingGameLoading.value = false;
+    return;
+  }
+
   try {
-    if (searchGameText.value.length > 2) {
-      isSearchingGameLoading.value = true;
-
-      const { data } = await axios.get("/api/search-games", {
-        params: {
-          search: searchGameText.value,
-        },
-      });
-
-      searchResults.value = data?.results ?? [];
-    } else {
-      searchResults.value = [];
-    }
+    isSearchingGameLoading.value = true;
+    const { data } = await axios.get("/api/search-games", {
+      params: { search: searchGameText.value },
+    });
+    searchResults.value = data?.results ?? [];
   } catch (error: any) {
-    console.log(error.message);
+    console.error(error.message);
+    searchResults.value = [];
   } finally {
     isSearchingGameLoading.value = false;
   }
 };
 
-const getCategoryChipSize = computed(() => {
-  if (display.xlAndUp.value) {
-    return "large";
-  } else if (display.mdAndUp.value) {
-    return "small";
-  } else {
-    return "x-small";
+const onSearchInput = () => {
+  if (searchDebounce) clearTimeout(searchDebounce);
+  if (searchGameText.value.length <= 2) {
+    searchResults.value = [];
+    isSearchingGameLoading.value = false;
+    return;
   }
+  searchDebounce = setTimeout(searchGame, 400);
+};
+
+const getCategoryChipSize = computed(() => {
+  if (display.xlAndUp.value) return "default";
+  if (display.mdAndUp.value) return "small";
+  return "x-small";
 });
 
-const handleGamePlatform = (platform: any) => {
+const handleGamePlatform = (platform: string) => {
   const current = route.query.platform;
 
   if (current === platform) {
     _store.clearActiveGamePlatform();
-
     router.push({
-      query: {
-        ...route.query,
-        platform: undefined,
-        page: 1,
-      },
+      query: { ...route.query, platform: undefined, page: 1 },
     });
   } else {
     _store.changeGamePlatform(platform);
-
     router.push({
-      query: {
-        ...route.query,
-        platform,
-        page: 1,
-      },
+      query: { ...route.query, platform, page: 1 },
     });
   }
 };
 
 const resetAllFilter = () => {
   _store.clearActiveGamePlatform();
-
-  router.push({
-    query: {
-      page: 1,
-    },
-  });
+  router.push({ query: { page: 1 } });
 };
 
 const handleRowClick = (item: any) => {
   discover_store.setQuery(route.query);
-
   _store.setActiveDetailedGame(item.id, item.name);
   router.push(`/game-detail/${slugify(item.name)}`);
 };
 
-// const onPageChange = () => {
-//   let page = currentPageInput.value;
+const selectSearchGame = (game: any) => {
+  isOpenSearchGame.value = false;
+  handleRowClick(game);
+};
 
-//   if (page < 1) page = 1;
-//   if (page > totalPagesDisplay.value) page = totalPagesDisplay.value;
-
-//   currentPageInput.value = page;
-
-//   router.push({
-//     query: {
-//       ...route.query,
-//       page: page.toString(),
-//     },
-//   });
-
-//   getGames();
-// };
+const onSearchDialogClosed = () => {
+  searchGameText.value = "";
+  searchResults.value = [];
+  isSearchingGameLoading.value = false;
+};
 
 const getGames = async (url?: string) => {
   try {
     isLoading.value = true;
-
     const requestUrl = url || "/api/games?page=1&page_size=40";
-
     const { data } = await axios.get(requestUrl);
 
     gamesArr.value = data?.results ?? [];
@@ -281,7 +393,6 @@ const getGames = async (url?: string) => {
 
     const parsedUrl = new URL(requestUrl, window.location.origin);
     const current = Number(parsedUrl.searchParams.get("page")) || 1;
-
     _store.setPagination(current, data?.next, data?.previous);
   } finally {
     isLoading.value = false;
@@ -289,45 +400,25 @@ const getGames = async (url?: string) => {
 };
 
 const goNext = () => {
-  if (_store.nextPage) {
-    const nextPage = new URL(_store.nextPage, window.location.origin).searchParams.get(
-      "page"
-    );
-
-    router.push({
-      query: {
-        ...route.query,
-        page: nextPage,
-      },
-    });
-  }
+  if (!_store.nextPage) return;
+  const nextPage = new URL(_store.nextPage, window.location.origin).searchParams.get("page");
+  router.push({ query: { ...route.query, page: nextPage } });
 };
 
 const goPrev = () => {
-  if (_store.prevPage) {
-    const prevPage = new URL(_store.prevPage, window.location.origin).searchParams.get(
-      "page"
-    );
+  if (!_store.prevPage) return;
+  const prevPage = new URL(_store.prevPage, window.location.origin).searchParams.get("page");
+  router.push({ query: { ...route.query, page: prevPage } });
+};
 
-    router.push({
-      query: {
-        ...route.query,
-        page: prevPage,
-      },
-    });
-  }
+const buildGamesUrl = () => {
+  const qPlatform = route.query.platform ? `&platform=${route.query.platform}` : "";
+  return `/api/games?page=${page.value}&page_size=40${qPlatform}`;
 };
 
 watch(
   () => [route.query.page, route.query.platform],
-  () => {
-    const qPlatform = route.query.platform ? route.query.platform : undefined;
-
-    getGames(
-      `/api/games?page=${page.value}&page_size=40${qPlatform ? `&platform=${qPlatform}` : ""
-      }`
-    );
-  },
+  () => getGames(buildGamesUrl()),
   { immediate: true }
 );
 
@@ -337,19 +428,12 @@ watch(
     if (!val || val.length < 2) {
       searchResults.value = [];
       isSearchingGameLoading.value = false;
-      return;
     }
-  },
-  { immediate: true }
+  }
 );
 
-onMounted(() => {
-  const qPlatform = route.query.platform ? route.query.platform : undefined;
-
-  getGames(
-    `/api/games?page=${page.value}&page_size=40${qPlatform ? `&platform=${qPlatform}` : ""
-    }`
-  );
+onUnmounted(() => {
+  if (searchDebounce) clearTimeout(searchDebounce);
 });
 </script>
 

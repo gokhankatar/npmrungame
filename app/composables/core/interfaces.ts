@@ -16,6 +16,7 @@ export type AdminListItemSlug =
   | "messages"
   | "current_games"
   | "recommended_games"
+  | "upcoming_games"
   | "notifications"
   | "settings"
   | string;
@@ -35,6 +36,7 @@ export interface FeedbackMessageOnContact {
 
 export interface NavbarList {
   title: string;
+  shortTitle?: string;
   path: string;
   icon: string;
 }
@@ -118,7 +120,13 @@ export type Game_Genre_Slug =
   | "horror"
   | "souls-like";
 
-export type Existed_Game_Collection = "completed_games" | "current_games" | "to_play_games" | "recommended_games" | null
+export type Existed_Game_Collection =
+  | "completed_games"
+  | "current_games"
+  | "to_play_games"
+  | "upcoming_games"
+  | "recommended_games"
+  | null
 
 export interface Active_Game_Genre {
   title: Game_Genre_Name | null;

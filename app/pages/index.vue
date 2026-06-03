@@ -1,7 +1,8 @@
 <template>
   <div class="home-page">
     <Bg_Anim
-      :random-to-play-game="randomToPlayGame"
+      :next-upcoming-game="nextUpcomingGame"
+      :is-loading-upcoming="isLoadingUpcoming"
       :loading-stats="isLoadingHomeStats"
     />
 
@@ -19,13 +20,13 @@
           <p class="home-dash-label">Bitirilen</p>
         </v-card>
         <v-card
-          class="home-dash-card home-dash-card--blue rounded-xl pa-3 pa-sm-4"
+          class="home-dash-card home-dash-card--radar rounded-xl pa-3 pa-sm-4"
           :ripple="false"
-          @click="router.push('/to-play-games')"
+          @click="router.push('/radarimdaki-oyunlar')"
         >
-          <v-icon icon="mdi-playlist-play" color="#4fc3f7" size="small" class="mb-2" />
-          <p class="home-dash-value">{{ isLoadingHomeStats ? "—" : toPlayCount }}</p>
-          <p class="home-dash-label">Kuyruk</p>
+          <v-icon icon="mdi-radar" color="#ffb74d" size="small" class="mb-2" />
+          <p class="home-dash-value">{{ isLoadingUpcoming ? "—" : radarCount }}</p>
+          <p class="home-dash-label">Radar</p>
         </v-card>
         <v-card class="home-dash-card rounded-xl pa-3 pa-sm-4" :ripple="false" @click="router.push('/blogs')">
           <v-icon icon="mdi-post-outline" color="#69f0ae" size="small" class="mb-2" />
@@ -40,7 +41,7 @@
       </div>
 
       <!-- Library strip -->
-      <div v-if="!isLoadingHomeStats && (completedCount || toPlayCount)" class="home-library-strip">
+      <div v-if="!isLoadingHomeStats && (completedCount || radarCount)" class="home-library-strip">
         <div
           class="home-library-card home-library-card--completed"
           @click="router.push('/completed-games')"
@@ -67,22 +68,22 @@
           />
         </div>
         <div
-          class="home-library-card home-library-card--toplay"
-          @click="router.push('/to-play-games')"
+          class="home-library-card home-library-card--radar"
+          @click="router.push('/radarimdaki-oyunlar')"
         >
           <v-progress-circular
-            :model-value="toPlayProgress"
+            :model-value="radarProgress"
             :size="52"
             :width="4"
-            color="#4fc3f7"
+            color="#ffb74d"
             bg-color="rgba(255,255,255,0.08)"
             class="home-library-ring"
           >
-            <span class="text-caption font-weight-bold">{{ toPlayProgress }}%</span>
+            <span class="text-caption font-weight-bold">{{ radarProgress }}%</span>
           </v-progress-circular>
           <div class="home-library-text">
-            <h3>Oynayacağım</h3>
-            <p>{{ toPlayCount }} / 50 kuyruk</p>
+            <h3>Radarımdaki Oyunlar</h3>
+            <p>{{ radarCount }} oyun takipte</p>
           </div>
           <v-icon
             class="home-library-arrow"
@@ -512,6 +513,7 @@ import {
   useMetacriticStyle,
 } from "~/composables/data/handleData";
 import { feature_cards } from "~/utils/Feature_Card";
+import { useUpcomingGames } from "~/composables/data/useUpcomingGames";
 import store from "~/store/store";
 import fireAnimation from "~/assets/img/fire_anim.gif";
 import successFullyDoneImg from "~/assets/img/successfully_done_anim.gif";
@@ -527,7 +529,7 @@ useHead({
     {
       name: "description",
       content:
-        "npmrungame — 4K oyun içerikleri, bitirdiğim oyunlar, oynayacağım listesi, blog ve keşfet. Türkçe oyun kanalı ve kişisel oyun kütüphanesi.",
+        "npmrungame — 4K oyun içerikleri, bitirdiğim oyunlar, radarımdaki oyunlar, blog ve keşfet. Türkçe oyun kanalı ve kişisel oyun kütüphanesi.",
     },
     { property: "og:title", content: "npmrungame | 4K Oyun Kanalı" },
     {
@@ -568,15 +570,25 @@ const videos = ref<any[]>([]);
 const featuredBlogs = ref<any[]>([]);
 const discoverPreview = ref<any[]>([]);
 const completedCount = ref(0);
-const toPlayCount = ref(0);
-const randomToPlayGame = ref<any | null>(null);
 const blogCount = ref(0);
 const videoCount = computed(() => videos.value.length);
 const carouselVideos = computed(() => videos.value.slice(0, 3));
 const completedProgress = computed(() =>
   Math.min(100, Math.round((completedCount.value / 100) * 100))
 );
-const toPlayProgress = computed(() => Math.min(100, Math.round((toPlayCount.value / 50) * 100)));
+const radarMilestone = 30;
+const radarProgress = computed(() =>
+  Math.min(100, Math.round((radarCount.value / radarMilestone) * 100))
+);
+
+const {
+  games: radarGames,
+  nextGame: nextUpcomingGame,
+  isLoading: isLoadingUpcoming,
+  fetchUpcomingGames,
+} = useUpcomingGames();
+
+const radarCount = computed(() => radarGames.value.length);
 
 const blogCreatedTime = (blog: any) => {
   const c = blog.createdAt;
@@ -586,29 +598,11 @@ const blogCreatedTime = (blog: any) => {
   return new Date(c).getTime() || 0;
 };
 
-const mapGameDoc = (doc: { id: string; data: () => Record<string, unknown> }) => ({
-  id: doc.id,
-  ...doc.data(),
-});
-
-const pickRandomToPlayGame = (docs: { id: string; data: () => Record<string, unknown> }[]) => {
-  if (!docs.length) return null;
-  const index = Math.floor(Math.random() * docs.length);
-  return mapGameDoc(docs[index] as any);
-};
-
 const getHomeStats = async () => {
   try {
     isLoadingHomeStats.value = true;
-
-    const [completedSnap, toPlaySnap] = await Promise.all([
-      getDocs(collection($firestore, "completed_games")),
-      getDocs(collection($firestore, "to_play_games")),
-    ]);
-
+    const completedSnap = await getDocs(collection($firestore, "completed_games"));
     completedCount.value = completedSnap.size;
-    toPlayCount.value = toPlaySnap.size;
-    randomToPlayGame.value = pickRandomToPlayGame(toPlaySnap.docs);
   } catch (e) {
     console.error("Home stats:", e);
   } finally {
@@ -809,12 +803,13 @@ watch(isSendMail, (newVal) => {
   if (newVal === false) handleCloseSendMailPopUp();
 });
 
-onMounted(() => {
+onMounted(async () => {
   getHomeStats();
   getVideosFromDb();
   getCurrentGames();
   getBlogsFromDb();
   getDiscoverPreview();
+  fetchUpcomingGames();
 });
 </script>
 

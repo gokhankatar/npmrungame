@@ -1,363 +1,388 @@
 <template>
-  <v-responsive height="90" v-if="!display.xs.value" />
-  <v-responsive height="70" v-else />
+  <div class="blogs-page">
+    <div class="blogs-page-glow blogs-page-glow--left" aria-hidden="true" />
+    <div class="blogs-page-glow blogs-page-glow--right" aria-hidden="true" />
 
-  <v-container class="py-2 py-lg-5 px-md-5 px-lg-10 px-xl-15">
-    <v-row
-      class="d-flex justify-space-between align-center mx-auto"
-      :dense="isSmallScreen"
-    >
-      <!-- Total Blogs -->
-      <v-col cols="12" md="6" xl="7">
-        <div
-          class="d-flex flex-wrap justify-center justify-sm-start align-center ga-2 w-100"
-        >
-          <img :src="blogAnimImg" width="50" />
-          <p
-            class="text-center text-sm-start text-subtitle-1 text-lg-h5 text-xl-h4 default-title-letter text-grey-lighten-1"
-          >
-            Oyun Dünyasından En Son Haberler
-          </p>
-          <p
-            class="text-center text-sm-start text-caption text-md-subtitle-2 text-lg-subtitle-1 text-grey-darken-1 default-title-letter"
-          >
-            Güncel çıkışlar, stüdyo gelişmeleri ve toplulukta öne çıkan detaylarla oyun
-            dünyasının nabzını burada tutuyoruz. Yeni çıkan oyunlar, oyun
-            değerlendirmeleri, oyun dünyasından haberler ve birçok blog yazısı...
+    <v-responsive :height="display.xs.value ? 70 : 90" />
+
+    <v-container class="blogs-container pa-3 pa-md-6 pa-lg-10 pa-xl-15">
+      <header class="blogs-hero">
+        <div class="blogs-hero-badge default-title-letter">
+          <v-icon icon="mdi-post-outline" size="16" color="#69f0ae" />
+          <span>Blog</span>
+        </div>
+        <div class="blogs-hero-main">
+          <h1 class="blogs-hero-title default-title-letter">Oyun dünyasından haberler</h1>
+          <p class="blogs-hero-sub default-title-letter">
+            Çıkışlar, incelemeler ve stüdyo gelişmeleri — güncel yazılar ve topluluk oyları.
           </p>
         </div>
-      </v-col>
+        <div v-if="!isGettingBlogs" class="blogs-hero-pill default-title-letter">
+          <v-icon icon="mdi-file-document-multiple-outline" size="small" color="#69f0ae" />
+          <span>{{ allBlogs.length }} yazı</span>
+        </div>
+        <v-skeleton-loader v-else type="chip" width="100" class="blogs-hero-pill-skeleton" />
+      </header>
 
-      <v-col
-        cols="12"
-        md="6"
-        xl="4"
-        class="d-flex flex-column justify-center justify-sm-start align-center align-sm-end w-100"
-      >
+      <section class="blogs-toolbar">
         <v-text-field
           v-model="searchText"
-          @input="searchBlog"
-          variant="solo"
-          label="Blog Ara"
+          variant="outlined"
+          label="Blog ara"
+          placeholder="Başlıkta ara…"
           :density="isSmallScreen ? 'compact' : 'comfortable'"
           clearable
-          rounded="lg"
-          :elevation="0"
+          rounded="pill"
           prepend-inner-icon="mdi-magnify"
-          class="text-grey-lighten-1"
-          width="100%"
+          color="green-accent-2"
+          class="blogs-search default-title-letter"
+          hide-details
+          @update:model-value="onSearchInput"
         />
-        <v-row no-gutters class="d-flex ga-1">
+
+        <div class="blogs-toolbar__chips">
           <v-chip
-            v-for="(kw, index) in keywords.slice(0, 4)"
-            :key="kw"
-            :size="isSmallScreen ? 'x-small' : 'small'"
-            :variant="selectedKeyword === kw ? 'elevated' : 'tonal'"
-            color="blue-lighten-1"
+            :size="isSmallScreen ? 'small' : 'default'"
+            variant="tonal"
+            color="green-accent-2"
             :ripple="false"
-            @click="filterByKeyword(kw)"
-            :prepend-icon="selectedKeyword === kw ? 'mdi-check' : ''"
-            :text="kw"
+            class="default-title-letter"
+            :prepend-icon="sortOrder === 'desc' ? 'mdi-arrow-down' : 'mdi-arrow-up'"
+            text="Puana göre"
+            @click="sortByAverage"
           />
-
-          <v-menu
-            v-if="keywords.length > 4"
-            :close-on-content-click="true"
-            :offset="[5, 0]"
-            location="bottom end"
-          >
-            <template #activator="{ props }">
+          <v-chip
+            v-for="kw in visibleKeywords"
+            :key="kw"
+            :size="isSmallScreen ? 'small' : 'default'"
+            :variant="selectedKeyword === kw ? 'flat' : 'tonal'"
+            :color="selectedKeyword === kw ? 'green-accent-2' : 'grey-darken-1'"
+            :ripple="false"
+            class="default-title-letter"
+            :prepend-icon="selectedKeyword === kw ? 'mdi-check' : undefined"
+            :text="kw"
+            @click="filterByKeyword(kw)"
+          />
+          <v-menu v-if="keywords.length > maxVisibleKeywords" location="bottom end">
+            <template #activator="{ props: menuProps }">
               <v-chip
-                v-bind="props"
-                :size="isSmallScreen ? 'x-small' : 'small'"
-                color="blue-lighten-1"
-                variant="tonal"
+                v-bind="menuProps"
+                size="small"
+                variant="outlined"
+                color="grey-lighten-1"
                 :ripple="false"
-              >
-                {{ keywords.length - 4 }} tane daha var
-                <v-icon right>mdi-menu-down</v-icon>
-              </v-chip>
+                prepend-icon="mdi-dots-horizontal"
+                :text="`+${keywords.length - maxVisibleKeywords}`"
+              />
             </template>
-
-            <div
-              class="d-flex flex-wrap pa-1 pa-lg-2 ga-1 ga-lg-2"
-              :ripple="false"
-              style="
-                width: 300px;
-                background: rgba(0, 0, 0, 0.2);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                backdrop-filter: blur(0.5rem);
-                -webkit-backdrop-filter: blur(0.5rem);
-              "
-            >
+            <v-card class="blogs-keywords-menu pa-2 rounded-xl" :ripple="false">
               <v-chip
-                v-for="(kw, index) in keywords.slice(4)"
+                v-for="kw in overflowKeywords"
                 :key="kw"
-                :size="isSmallScreen ? 'x-small' : 'small'"
-                variant="elevated"
-                color="blue-lighten-1"
+                size="small"
+                class="ma-1 default-title-letter"
+                :variant="selectedKeyword === kw ? 'flat' : 'tonal'"
+                :color="selectedKeyword === kw ? 'green-accent-2' : 'grey-darken-1'"
+                :text="kw"
                 :ripple="false"
                 @click="filterByKeyword(kw)"
-                :prepend-icon="selectedKeyword === kw ? 'mdi-check' : ''"
-                :text="kw"
+              />
+            </v-card>
+          </v-menu>
+          <v-chip
+            v-if="selectedKeyword || searchText.length >= 3"
+            size="small"
+            variant="outlined"
+            color="grey-lighten-1"
+            prepend-icon="mdi-close"
+            text="Temizle"
+            :ripple="false"
+            class="default-title-letter"
+            @click="clearFilters"
+          />
+        </div>
+      </section>
+
+      <!-- Netflix hero — en son yazı -->
+      <section
+        v-if="showFeaturedLayout"
+        class="blogs-featured"
+        :class="{ 'blogs-featured--loading': isGettingBlogs }"
+      >
+        <template v-if="isGettingBlogs">
+          <v-skeleton-loader type="image" class="blogs-featured__loader" />
+        </template>
+
+        <template v-else-if="featuredBlog">
+          <v-img
+            v-if="featuredBlog.imageUrl"
+            :src="featuredBlog.imageUrl"
+            :alt="featuredBlog.title"
+            cover
+            class="blogs-featured__bg"
+          />
+          <div v-else class="blogs-featured__bg blogs-featured__bg--empty">
+            <v-icon icon="mdi-post-outline" size="64" color="rgba(255,255,255,0.2)" />
+          </div>
+          <div class="blogs-featured__shade" aria-hidden="true" />
+          <div class="blogs-featured__vignette" aria-hidden="true" />
+
+          <div class="blogs-featured__inner">
+            <div class="blogs-featured__labels">
+              <span class="blogs-featured__label blogs-featured__label--hot">
+                <v-icon icon="mdi-star-shooting" size="14" />
+                Son yazı
+              </span>
+              <v-chip
+                v-if="featuredBlog.average_votes > 0"
+                size="small"
+                variant="elevated"
+                :color="getRatingColor(featuredBlog.average_votes)"
+                class="blogs-featured__rating"
+                prepend-icon="mdi-thumb-up"
+                :text="`${featuredBlog.average_votes.toFixed(1)} / 5`"
               />
             </div>
-          </v-menu>
 
-          <v-chip
-            :size="isSmallScreen ? 'x-small' : 'small'"
-            variant="tonal"
-            color="blue-lighten-1"
-            :ripple="false"
-            @click="sortByAverage"
-            :prepend-icon="sortOrder === 'desc' ? 'mdi-arrow-down' : 'mdi-arrow-up'"
-            text="Puana Göre"
-          />
+            <h2 class="blogs-featured__title default-title-letter">
+              {{ featuredBlog.title }}
+            </h2>
 
-          <v-chip
-            v-if="selectedKeyword"
-            prepend-icon="mdi-broom"
-            variant="outlined"
-            :size="isSmallScreen ? 'x-small' : 'small'"
-            @click="resetKeyword"
-            :ripple="false"
-            text="Filtreyi temizle"
-          />
-        </v-row>
-      </v-col>
+            <p class="blogs-featured__excerpt default-title-letter">
+              {{ truncateText(stripHtml(featuredBlog.content_raw), 220) }}
+            </p>
 
-      <v-divider class="w-100 mt-1 mb-3 mb-lg-5" color="white" />
-
-      <!-- Featured Blog Hero Section -->
-      <v-row
-        v-if="searchText?.length < 3 && !selectedKeyword"
-        class="featured-blog-section"
-        :density="isSmallScreen ? 'compact' : 'comfortable'"
-      >
-        <!-- Featured Hero Blog -->
-        <v-col cols="12" lg="8" class="featured-hero-col">
-          <template v-if="isGettingBlogs">
-            <v-card class="featured-hero-blog skeleton-card" height="100%">
-              <v-skeleton-loader type="image" class="w-100" height="400" />
-              <v-card-actions class="px-4 py-5 d-flex flex-column align-start ga-3">
-                <v-skeleton-loader type="text" width="80%" />
-                <v-skeleton-loader type="text" width="100%" />
-                <v-skeleton-loader type="text" width="60%" />
-                <v-skeleton-loader type="chip" />
-              </v-card-actions>
-            </v-card>
-          </template>
-
-          <v-card
-            v-else
-            class="featured-hero-blog cursor-pointer"
-            @click="handleBlogClick(randomInitialBlog)"
-            :ripple="false"
-            :elevation="0"
-          >
-            <div class="featured-hero-overlay"></div>
-            <v-img
-              :src="randomInitialBlog?.imageUrl"
-              class="featured-hero-img"
-              cover
-              height="450"
-            >
-              <div class="featured-hero-content">
-                <div class="featured-hero-badge">
-                  <v-icon icon="mdi-star" size="small" />
-                  <span>Öne Çıkan Blog</span>
-                </div>
-                <h2 class="featured-hero-title">
-                  {{ randomInitialBlog?.title }}
-                </h2>
-                <p class="featured-hero-description">
-                  {{ truncateText(randomInitialBlog?.content_raw, 200) }}
-                </p>
-                <div class="featured-hero-footer">
-                  <div class="d-flex align-center ga-2">
-                    <v-icon icon="mdi-calendar" size="small" color="grey-lighten-1" />
-                    <span class="text-body-2 text-grey-lighten-1">
-                      {{ formatDateTR(randomInitialBlog?.createdAt) }}
-                    </span>
-                  </div>
-                  <div class="d-flex flex-wrap ga-1">
-                    <v-chip
-                      v-for="(tag, idx) of randomInitialBlog?.keywords?.slice(0, 3)"
-                      :key="idx"
-                      size="small"
-                      variant="outlined"
-                      color="grey-lighten-1"
-                      class="featured-tag-chip"
-                      :ripple="false"
-                    >
-                      {{ tag }}
-                    </v-chip>
-                  </div>
-                </div>
-              </div>
-            </v-img>
-          </v-card>
-        </v-col>
-
-        <!-- Sidebar Featured Blogs -->
-        <v-col cols="12" lg="4" class="sidebar-blogs-col">
-          <template v-if="isGettingBlogs">
-            <div
-              class="sidebar-blog-card skeleton-card"
-              v-for="i in 2"
-              :key="i"
-            >
-              <v-skeleton-loader type="image" height="180" />
-              <div class="px-3 py-3">
-                <v-skeleton-loader type="text" width="80%" />
-                <v-skeleton-loader type="text" width="100%" class="mt-2" />
-                <v-skeleton-loader type="text" width="60%" class="mt-2" />
+            <div class="blogs-featured__meta">
+              <span class="blogs-featured__date default-title-letter">
+                <v-icon icon="mdi-calendar-outline" size="16" />
+                {{ formatDateTR(featuredBlog.createdAt) }}
+              </span>
+              <div v-if="featuredBlog.keywords?.length" class="blogs-featured__tags">
+                <v-chip
+                  v-for="(tag, idx) in featuredBlog.keywords.slice(0, 4)"
+                  :key="idx"
+                  size="x-small"
+                  variant="tonal"
+                  color="green-accent-2"
+                  class="default-title-letter"
+                  :text="tag"
+                />
               </div>
             </div>
-          </template>
 
-          <div
-            v-else
-            class="sidebar-blog-card cursor-pointer"
-            v-for="(item, index) of randomTwoBlogs"
-            :key="index"
-            @click="handleBlogClick(item)"
-            :style="{ animationDelay: `${index * 0.15}s` }"
-          >
-            <div class="sidebar-blog-overlay"></div>
-            <v-img
-              :src="item.imageUrl"
-              class="sidebar-blog-img"
-              cover
-              height="200"
-            >
-              <div class="sidebar-blog-content">
-                <h3 class="sidebar-blog-title">
-                  {{ item.title }}
-                </h3>
-                <p class="sidebar-blog-description">
-                  {{ truncateText(item.content_raw, 120) }}
-                </p>
-                <div class="sidebar-blog-footer">
-                  <div class="d-flex align-center ga-1">
-                    <v-icon icon="mdi-calendar" size="x-small" color="grey-lighten-1" />
-                    <span class="text-caption text-grey-lighten-1">
-                      {{ formatDateTR(item.createdAt) }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </v-img>
+            <div class="blogs-featured__actions">
+              <v-btn
+                color="green-accent-2"
+                variant="flat"
+                rounded="pill"
+                size="large"
+                class="blogs-featured__btn text-black font-weight-bold text-capitalize default-title-letter"
+                prepend-icon="mdi-book-open-page-variant"
+                text="Yazıyı oku"
+                :ripple="false"
+                @click="handleBlogClick(featuredBlog)"
+              />
+            </div>
           </div>
-        </v-col>
-      </v-row>
+        </template>
+      </section>
 
-      <!-- Searching Blogs -->
-      <v-col cols="12" v-if="isLoadingSearchBlog">
-        <div class="d-flex align-center ga-2 w-100">
-          <v-progress-circular
-            indeterminate
-            color="blue-grey-lighten-1"
-            size="16"
-            width="2"
-          />
-          <Animated_Text
-            text="Blog Aranıyor..."
-            :msPerChar="50"
-            :duration="550"
-            :loop="true"
-          />
+      <!-- Öne çıkanlar — yatay şerit -->
+      <section v-if="showFeaturedLayout && !isGettingBlogs && spotlightBlogs.length" class="blogs-spotlight">
+        <div class="blogs-spotlight__head">
+          <h3 class="blogs-spotlight__title default-title-letter">Öne çıkanlar</h3>
         </div>
-      </v-col>
+        <v-row class="blogs-spotlight__row" :dense="isSmallScreen" role="list">
+          <v-col
+            v-for="(item, index) in spotlightBlogs"
+            :key="item.firestoreId"
+            cols="12"
+            sm="4"
+            role="listitem"
+          >
+            <article
+              class="blogs-spotlight-card"
+              :style="{ animationDelay: `${index * 0.06}s` }"
+              tabindex="0"
+              @click="handleBlogClick(item)"
+              @keydown.enter="handleBlogClick(item)"
+            >
+              <v-img
+                v-if="item.imageUrl"
+                :src="item.imageUrl"
+                :alt="item.title"
+                cover
+                class="blogs-spotlight-card__img"
+              />
+              <div v-else class="blogs-spotlight-card__img blogs-spotlight-card__img--empty">
+                <v-icon icon="mdi-post-outline" size="40" color="rgba(255,255,255,0.2)" />
+              </div>
+              <div class="blogs-spotlight-card__shade" />
+              <div class="blogs-spotlight-card__body">
+                <h4 class="blogs-spotlight-card__title default-title-letter">{{ item.title }}</h4>
+                <p class="blogs-spotlight-card__date default-title-letter mb-0">
+                  {{ formatDateTR(item.createdAt) }}
+                </p>
+              </div>
+            </article>
+          </v-col>
+        </v-row>
+      </section>
 
-      <!-- No Result -->
-      <v-col cols="12" v-if="searchText?.length > 2 && blogs?.length == 0">
-        <div class="d-flex align-center ga-2 w-100">
-          <Animated_Text
-            text="Eşleşen Blog Yok 🔍"
-            :msPerChar="50"
-            :duration="550"
-            :loop="true"
-          />
+      <!-- Liste -->
+      <section class="blogs-feed">
+        <div class="blogs-feed__head">
+          <h3 class="blogs-feed__title default-title-letter">
+            {{ feedTitle }}
+          </h3>
+          <div v-if="isLoadingSearchBlog" class="d-flex align-center ga-2">
+            <v-progress-circular indeterminate size="16" width="2" color="#69f0ae" />
+            <span class="text-caption text-grey-lighten-1 default-title-letter">Aranıyor…</span>
+          </div>
         </div>
-      </v-col>
 
-      <Blog_Card
-        :loading="isGettingBlogs"
-        :skeleton_number="blogs.length ?? 8"
-        :arr="blogs"
-        :onRowClick="handleBlogClick"
-      />
-    </v-row>
-  </v-container>
+        <p
+          v-if="!isGettingBlogs && !isLoadingSearchBlog && !blogs.length"
+          class="blogs-feed__empty default-title-letter"
+        >
+          <v-icon icon="mdi-magnify-close" size="20" class="mr-1" />
+          Eşleşen blog bulunamadı.
+        </p>
+
+        <Blog_Card
+          v-else
+          class="blogs-feed-grid"
+          :loading="isGettingBlogs"
+          :skeleton_number="8"
+          :arr="blogs"
+          :on-row-click="handleBlogClick"
+        />
+      </section>
+    </v-container>
+  </div>
 </template>
+
 <script lang="ts" setup>
 import { collection, getDocs } from "firebase/firestore";
 import { slugify, truncateText } from "~/composables/core/basicFunc";
-import { normalizeText, useFirestoreDateFormatted } from "~/composables/data/handleData";
+import {
+  getRatingColor,
+  normalizeText,
+  useFirestoreDateFormatted,
+} from "~/composables/data/handleData";
 import store from "~/store/store";
-import blogAnimImg from "~/assets/img/blog_anim.gif";
-import Animated_Text from "~/components/common/Animated_Text.vue";
 import Blog_Card from "~/components/common/Blog_Card.vue";
 import _ from "lodash";
 
 useHead({
-  title: "npmrungame | Bloglar",
+  title: "Blog | npmrungame",
+  meta: [
+    {
+      name: "description",
+      content: "npmrungame blog — oyun haberleri, incelemeler ve güncel yazılar.",
+    },
+  ],
 });
 
 const { $firestore } = useNuxtApp();
-
 const _store = store();
 const router = useRouter();
 const display = useDisplay();
 const isSmallScreen = computed(() => display.smAndDown.value);
-
 const { formatDateTR } = useFirestoreDateFormatted();
+
+const maxVisibleKeywords = 5;
 
 const isGettingBlogs = ref(false);
 const isLoadingSearchBlog = ref(false);
-
 const sortOrder = ref<"asc" | "desc">("desc");
 const allBlogs = ref<any[]>([]);
 const blogs = ref<any[]>([]);
-const randomInitialBlog = ref<any | null>(null);
-const randomTwoBlogs = ref<any[]>([]);
 const keywords = ref<string[]>([]);
 const selectedKeyword = ref<string | null>(null);
-const searchText = ref<string>("");
+const searchText = ref("");
 
-const pickRandomBlogs = () => {
-  if (!allBlogs.value?.length) return;
+let searchDebounce: ReturnType<typeof setTimeout> | null = null;
 
-  const shuffled = [...allBlogs.value].sort(() => Math.random() - 0.5);
+const stripHtml = (html?: string) => {
+  if (!html) return "";
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+};
 
-  randomInitialBlog.value = shuffled[0];
-  randomTwoBlogs.value = shuffled.slice(1, 3);
+const getCreatedTime = (blog: { createdAt?: unknown }) => {
+  const raw = blog.createdAt;
+  if (!raw) return 0;
+  if (typeof raw === "object" && raw !== null && "seconds" in raw) {
+    return (raw as { seconds: number }).seconds * 1000;
+  }
+  return new Date(raw as string | number).getTime() || 0;
+};
+
+const sortedAllBlogs = computed(() =>
+  [...allBlogs.value].sort((a, b) => getCreatedTime(b) - getCreatedTime(a))
+);
+
+const featuredBlog = computed(() => sortedAllBlogs.value[0] ?? null);
+
+const spotlightBlogs = computed(() => sortedAllBlogs.value.slice(1, 4));
+
+const featuredIds = computed(() => {
+  const ids = new Set<string>();
+  if (featuredBlog.value?.firestoreId) ids.add(featuredBlog.value.firestoreId);
+  spotlightBlogs.value.forEach((b) => ids.add(b.firestoreId));
+  return ids;
+});
+
+const showFeaturedLayout = computed(
+  () => !selectedKeyword.value && searchText.value.trim().length < 3
+);
+
+const visibleKeywords = computed(() => keywords.value.slice(0, maxVisibleKeywords));
+const overflowKeywords = computed(() => keywords.value.slice(maxVisibleKeywords));
+
+const feedTitle = computed(() => {
+  if (selectedKeyword.value) return `“${selectedKeyword.value}” etiketli yazılar`;
+  if (searchText.value.trim().length >= 3) return "Arama sonuçları";
+  if (showFeaturedLayout.value) return "Diğer yazılar";
+  return "Tüm yazılar";
+});
+
+const applyListFilters = () => {
+  const q = searchText.value.trim().toLowerCase();
+  let list = [...allBlogs.value];
+
+  if (selectedKeyword.value) {
+    list = list.filter((blog) => blog.keywords?.includes(selectedKeyword.value));
+  } else if (q.length >= 3) {
+    list = list.filter((blog) => blog.title?.toLowerCase().includes(q));
+  }
+
+  if (showFeaturedLayout.value) {
+    list = list.filter((blog) => !featuredIds.value.has(blog.firestoreId));
+  }
+
+  blogs.value = list;
 };
 
 const extractKeywords = () => {
   const set = new Set<string>();
-
   allBlogs.value.forEach((blog) => {
     blog.keywords?.forEach((kw: string) => set.add(kw));
   });
-
-  keywords.value = [...set];
+  keywords.value = [...set].sort();
 };
 
-const resetKeyword = () => {
+const clearFilters = () => {
   selectedKeyword.value = null;
-  blogs.value = allBlogs.value;
+  searchText.value = "";
+  applyListFilters();
 };
 
 const getBlogsFromDb = async () => {
   try {
     isGettingBlogs.value = true;
 
-    // 1️⃣ Blogs
-    const blogsCol = collection($firestore, "blogs");
-    const blogsSnapshot = await getDocs(blogsCol);
-
+    const blogsSnapshot = await getDocs(collection($firestore, "blogs"));
     const blogsList = blogsSnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
@@ -367,125 +392,71 @@ const getBlogsFromDb = async () => {
       };
     });
 
-    // 2️⃣ Votes
-    const votesCol = collection($firestore, "blog_votes");
-    const votesSnapshot = await getDocs(votesCol);
-
-    const blogVotes: Record<
-      string,
-      { total: number; count: number; average_votes?: number }
-    > = {};
-
+    const votesSnapshot = await getDocs(collection($firestore, "blog_votes"));
+    const blogVotes: Record<string, { total: number; count: number }> = {};
     votesSnapshot.docs.forEach((doc) => {
       const data = doc.data();
-      const total = data.total ?? 0;
-      const count = data.count ?? 0;
-      blogVotes[doc.id] = {
-        total,
-        count,
-        average_votes: count > 0 ? total / count : 0,
-      };
+      blogVotes[doc.id] = { total: data.total ?? 0, count: data.count ?? 0 };
     });
 
-    // Finally with votes
-    const blogsWithVotes = blogsList.map((blog) => {
+    allBlogs.value = blogsList.map((blog) => {
       const votes = blogVotes[blog.firestoreId];
+      const count = votes?.count ?? 0;
       return {
         ...blog,
-        average_votes: votes?.average_votes ?? 0,
+        average_votes: count > 0 ? (votes?.total ?? 0) / count : 0,
         total_votes: votes?.total ?? 0,
-        total_voters: votes?.count ?? 0,
+        total_voters: count,
       };
     });
 
-    allBlogs.value = blogsWithVotes;
-
-    pickRandomBlogs();
     extractKeywords();
-
-    const existedBlogsIdArr: string[] = [];
-
-    if (randomInitialBlog.value) {
-      existedBlogsIdArr.push(randomInitialBlog.value.firestoreId);
-    }
-
-    if (randomTwoBlogs.value?.length) {
-      randomTwoBlogs.value.forEach((rb: any) => {
-        existedBlogsIdArr.push(rb.firestoreId);
-      });
-    }
-
-    const filteredBlogs = blogsWithVotes.filter(
-      (blog) => !existedBlogsIdArr.includes(blog.firestoreId)
-    );
-
-    blogs.value = filteredBlogs;
-  } catch (error: any) {
-    console.error("Error while getting blogs : ", error.message);
+    applyListFilters();
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Error while getting blogs:", msg);
   } finally {
     isGettingBlogs.value = false;
   }
 };
 
 const filterByKeyword = (kw: string) => {
-  if (selectedKeyword.value !== kw) {
-    selectedKeyword.value = kw;
-    blogs.value = allBlogs.value.filter((blog) => blog.keywords?.includes(kw));
-  } else {
-    resetKeyword();
-  }
+  selectedKeyword.value = selectedKeyword.value === kw ? null : kw;
+  applyListFilters();
 };
 
 const handleBlogClick = (blog: any) => {
-  const prefixedTitle = slugify(blog?.title);
-  _store.setActiveBlogId(blog?.firestoreId);
-  router.push(`/blogs/${prefixedTitle}`);
+  if (!blog?.title) return;
+  _store.setActiveBlogId(blog.firestoreId);
+  router.push(`/blogs/${slugify(blog.title)}`);
 };
 
-const searchBlog = async () => {
-  try {
-    isLoadingSearchBlog.value = true;
-
-    const q = searchText.value?.trim().toLowerCase();
-
-    await new Promise((r) => setTimeout(r, 800));
-
-    if (q.length > 2) {
-      blogs.value = allBlogs.value.filter((blog: any) =>
-        blog.title.toLowerCase().includes(q)
-      );
-    } else {
-      blogs.value = allBlogs.value;
-    }
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
+const onSearchInput = () => {
+  if (searchDebounce) clearTimeout(searchDebounce);
+  isLoadingSearchBlog.value = true;
+  searchDebounce = setTimeout(() => {
+    applyListFilters();
     isLoadingSearchBlog.value = false;
-  }
+  }, 350);
 };
 
 const sortByAverage = () => {
-  blogs.value = _.orderBy(allBlogs.value, ["average_votes"], [sortOrder.value]);
+  allBlogs.value = _.orderBy(allBlogs.value, ["average_votes"], [sortOrder.value]);
   sortOrder.value = sortOrder.value === "desc" ? "asc" : "desc";
+  applyListFilters();
 };
 
-watch(
-  () => searchText.value,
-  (val) => {
-    if (!val || val.length < 2) {
-      isLoadingSearchBlog.value = false;
-      blogs.value = allBlogs.value;
-      selectedKeyword.value = null;
-      return;
-    }
-  },
-  { immediate: true }
-);
+watch(selectedKeyword, () => applyListFilters());
 
 onMounted(() => {
   getBlogsFromDb();
 });
+
+onUnmounted(() => {
+  if (searchDebounce) clearTimeout(searchDebounce);
+});
 </script>
+
 <style scoped>
 @import "~/assets/css/main.css";
 @import "~/assets/css/blogs.css";

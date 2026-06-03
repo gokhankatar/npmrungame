@@ -1,77 +1,80 @@
 <template>
-  <div
-    class="navbar d-flex justify-space-between align-center mx-auto rounded py-1 py-lg-3 px-3 px-md-5 px-lg-7 px-xl-12"
-    :class="isScrolledToBottom ? 'scrolled-navbar' : ''"
-  >
-    <div class="d-flex align-center ga-1 ga-lg-2">
-      <img
-        :src="logo"
-        :width="display.smAndDown.value ? 70 : 90"
-        class="cursor-pointer"
-        @click="router.push('/')"
-      />
-      <v-chip
-        :size="display.smAndDown.value ? 'x-small' : 'small'"
-        variant="tonal"
-        class="rounded"
-        text="v1.2"
-        color="green-accent-2"
-      />
-    </div>
-
-    <div class="d-none d-lg-flex justify-center align-center ga-2 ga-lg-5">
-      <div
-        v-for="(item, index) of navbarListItems"
-        :key="item.path"
-        @click="goTo(item)"
-        class="navbar-item transition d-flex align-center ga-1 pa-2 rounded cursor-pointer"
-        :class="route.fullPath.includes(item.path) ? 'active-navbar-item-link' : ''"
-      >
-        <p
-          class="default-title-letter transition text-caption text-lg-subtitle-2"
-          :class="route.fullPath.includes(item.path) ? 'active-navbar-item-title' : ''"
-        >
-          {{ item.title }}
-        </p>
-        <template v-if="loadingItem === item.path">
-          <v-progress-circular
-            indeterminate
-            size="14"
-            width="1"
-            :color="route.fullPath.includes(item.path) ? 'black' : 'grey-lighten-1'"
-          />
-        </template>
-        <v-icon
-          v-else
-          :icon="item.icon"
-          :color="route.fullPath.includes(item.path) ? 'black' : 'grey-lighten-1'"
-          class="navbar-item-icon transition"
-          size="small"
+  <header class="navbar" :class="{ 'navbar--scrolled': isScrolledToBottom }">
+    <div
+      class="navbar-inner d-flex justify-space-between align-center w-100"
+    >
+      <div class="navbar-brand d-flex align-center ga-1 ga-lg-2">
+        <img
+          :src="logo"
+          :width="display.smAndDown.value ? 70 : 90"
+          class="cursor-pointer navbar-logo"
+          alt="npmrungame"
+          @click="router.push('/')"
         />
+        <span class="navbar-version default-title-letter">v1.2</span>
       </div>
+
+      <nav
+        class="navbar-nav d-none d-lg-flex justify-end align-center ga-1 ms-auto"
+        aria-label="Ana menü"
+      >
+        <button
+          v-for="item in navbarListItems"
+          :key="item.path"
+          type="button"
+          class="navbar-item d-flex align-center ga-2 cursor-pointer"
+          :class="navItemClasses(item)"
+          @click="goTo(item)"
+        >
+          <span class="navbar-item-icon-wrap" aria-hidden="true">
+            <v-progress-circular
+              v-if="loadingItem === item.path"
+              indeterminate
+              size="16"
+              width="2"
+              :color="navLoadingColor(item.path)"
+            />
+            <v-icon v-else :icon="item.icon" class="navbar-item-icon" size="18" />
+          </span>
+          <span class="navbar-item-label default-title-letter">
+            {{ navLabel(item) }}
+          </span>
+        </button>
+      </nav>
+
+      <v-btn
+        v-if="isSmallScreen"
+        :icon="isOpenResponsiveBar ? 'mdi-close' : 'mdi-menu'"
+        size="small"
+        :ripple="false"
+        variant="outlined"
+        rounded="pill"
+        class="d-lg-none menu-toggle-btn navbar-menu-btn"
+        :class="{ 'menu-toggle-btn-open': isOpenResponsiveBar }"
+        @click="isOpenResponsiveBar = !isOpenResponsiveBar"
+      />
+      <v-btn
+        v-else
+        :prepend-icon="isOpenResponsiveBar ? 'mdi-close' : 'mdi-menu'"
+        text="Menü"
+        :ripple="false"
+        variant="outlined"
+        rounded="pill"
+        class="d-none d-sm-flex d-lg-none text-capitalize default-title-letter menu-toggle-btn navbar-menu-btn"
+        :class="{ 'menu-toggle-btn-open': isOpenResponsiveBar }"
+        @click="isOpenResponsiveBar = !isOpenResponsiveBar"
+      />
     </div>
+  </header>
 
-    <v-btn
-      :size="isSmallScreen ? 'small' : 'default'"
-      :ripple="false"
-      :prepend-icon="isOpenResponsiveBar ? 'mdi-close' : 'mdi-menu'"
-      text="Menu"
-      variant="outlined"
-      class="d-flex d-lg-none text-capitalize default-title-letter menu-toggle-btn"
-      :class="{ 'menu-toggle-btn-open': isOpenResponsiveBar }"
-      color="white"
-      @click="isOpenResponsiveBar = !isOpenResponsiveBar"
-    />
-  </div>
-
-  <!-- ! Responsive Bar -->
   <transition name="slide-down">
-    <div class="responsive-bar" v-if="isOpenResponsiveBar">
-      <div class="d-flex justify-space-between align-center pa-3">
+    <div v-if="isOpenResponsiveBar" class="responsive-bar">
+      <div class="responsive-bar-header d-flex justify-space-between align-center pa-3">
         <img
           :src="logo"
           :width="display.smAndDown.value ? 70 : 90"
           class="cursor-pointer logo-in-responsive-bar"
+          alt="npmrungame"
           @click="handleRouteForResponsive('/')"
         />
         <v-btn
@@ -79,80 +82,90 @@
           icon="mdi-close"
           class="close-icon-in-responsive-bar"
           size="large"
+          :ripple="false"
           @click="isOpenResponsiveBar = false"
         />
       </div>
 
-      <div class="d-flex flex-column align-start ga-2 pa-5 mt-4">
-        <div
-          class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg"
+      <nav class="responsive-bar-nav d-flex flex-column align-start ga-2 pa-4 mt-2">
+        <button
+          type="button"
+          class="responsive-nav-item d-flex align-center ga-4"
+          :class="{ 'responsive-nav-item--active': route.path === '/' }"
           @click="handleRouteForResponsive('/')"
         >
-          <template v-if="loadingItem === '/'">
-            <v-progress-circular
-              indeterminate
-              size="20"
-              width="2"
-              color="grey-darken-1"
-            />
-          </template>
-          <v-icon v-else icon="mdi-home" size="large" color="grey-darken-1" />
-          <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
-            Anasayfa
-          </p>
-        </div>
+          <v-progress-circular
+            v-if="loadingItem === '/'"
+            indeterminate
+            size="20"
+            width="2"
+            color="#69f0ae"
+          />
+          <v-icon v-else icon="mdi-home" size="large" />
+          <p class="responsive-nav-label text-h6 text-sm-h5 default-title-letter">Anasayfa</p>
+        </button>
 
-        <div
-          class="responsive-text cursor-pointer transition d-flex align-center ga-5 pa-1 rounded-lg w-100"
-          v-for="(item, index) of navbarListItems"
-          :key="item.title"
+        <button
+          v-for="item in navbarListItems"
+          :key="item.path"
+          type="button"
+          class="responsive-nav-item d-flex align-center ga-4"
+          :class="responsiveNavClasses(item.path)"
           @click="handleRouteForResponsive(item.path)"
         >
-          <template v-if="loadingItem === item.path">
-            <v-progress-circular indeterminate size="20" color="grey-darken-1" />
-          </template>
-          <v-icon v-else :icon="item.icon" size="large" color="grey-darken-1" />
-          <p class="text-h5 text-sm-h4 default-title-letter text-grey-darken-1">
+          <v-progress-circular
+            v-if="loadingItem === item.path"
+            indeterminate
+            size="20"
+            width="2"
+            :color="navLoadingColor(item.path)"
+          />
+          <v-icon v-else :icon="item.icon" size="large" />
+          <p class="responsive-nav-label text-h6 text-sm-h5 default-title-letter">
             {{ item.title }}
           </p>
-        </div>
-      </div>
+        </button>
+      </nav>
 
       <v-row class="action-buttons-in-responsive-bar w-100 mx-auto" dense>
         <v-col :cols="_store.isAdmin ? 6 : 12">
           <v-btn
-            @click="handleRouteForResponsive('/contact')"
-            variant="outlined"
+            variant="tonal"
+            color="grey-lighten-1"
             text="İletişim"
             class="text-capitalize"
             :size="display.xs.value ? 'small' : 'default'"
             :ripple="false"
-            prepend-icon="mdi-email"
+            prepend-icon="mdi-email-outline"
             block
+            rounded="lg"
+            @click="handleRouteForResponsive('/contact')"
           />
         </v-col>
-        <v-col cols="6" v-if="_store.isAdmin">
+        <v-col v-if="_store.isAdmin" cols="6">
           <v-btn
-            @click="handleRouteForResponsive('/admin')"
-            variant="outlined"
-            text="Admin Paneli"
+            variant="tonal"
+            color="warning"
+            text="Admin"
             class="text-capitalize"
             :size="display.xs.value ? 'small' : 'default'"
             :ripple="false"
-            prepend-icon="mdi-security"
+            prepend-icon="mdi-shield-outline"
             block
+            rounded="lg"
+            @click="handleRouteForResponsive('/admin')"
           />
         </v-col>
       </v-row>
     </div>
   </transition>
 
-  <!-- Auth Dialog -->
   <Auth_Dialog v-model="isAuthDialogOpen" @success="handleAuthSuccess" />
 </template>
 
 <script lang="ts" setup>
 import logo from "@/assets/img/logo_fixed.webp";
+import { navbarListItems } from "~/utils/Navbar_List";
 import store from "~/store/store";
 import Auth_Dialog from "../common/Auth_Dialog.vue";
 import { signOut } from "firebase/auth";
@@ -164,12 +177,53 @@ const display = useDisplay();
 const { $auth } = useNuxtApp();
 
 const isSmallScreen = computed(() => display.smAndDown.value);
-
 const isScrolledToBottom = ref(false);
 const isOpenResponsiveBar = ref(false);
 const isAuthDialogOpen = ref(false);
-
 const loadingItem = ref<string | null>(null);
+
+const isRadarPath = (path: string) => path.includes("radarimdaki-oyunlar");
+const isRecommendPath = (path: string) => path.includes("recommend-games");
+
+const isNavActive = (path: string) => {
+  if (path === "/") return route.path === "/";
+  return route.path === path || route.path.startsWith(`${path}/`);
+};
+
+const navLabel = (item: (typeof navbarListItems)[number]) =>
+  display.xlAndUp.value ? item.title : (item.shortTitle ?? item.title);
+
+const navItemTone = (path: string) => {
+  if (isRadarPath(path)) return "navbar-item--tone-radar";
+  if (isRecommendPath(path)) return "navbar-item--tone-recommend";
+  return "navbar-item--tone-default";
+};
+
+const navItemClasses = (item: (typeof navbarListItems)[number]) => {
+  const classes = [navItemTone(item.path)];
+  if (!isNavActive(item.path)) return classes;
+  if (isRadarPath(item.path)) classes.push("navbar-item--active-radar");
+  else if (isRecommendPath(item.path)) classes.push("navbar-item--active-recommend");
+  else classes.push("navbar-item--active");
+  return classes;
+};
+
+const navLoadingColor = (path: string) => {
+  if (isRadarPath(path)) return "#ffb74d";
+  if (isRecommendPath(path)) return "#ce93d8";
+  return "#69f0ae";
+};
+
+const responsiveNavClasses = (path: string) => {
+  const classes: string[] = [];
+  if (isRadarPath(path)) classes.push("responsive-nav-item--tone-radar");
+  else if (isRecommendPath(path)) classes.push("responsive-nav-item--tone-recommend");
+  if (!isNavActive(path)) return classes;
+  if (isRadarPath(path)) classes.push("responsive-nav-item--active-radar");
+  else if (isRecommendPath(path)) classes.push("responsive-nav-item--active-recommend");
+  else classes.push("responsive-nav-item--active");
+  return classes;
+};
 
 const goTo = async (item: { path: string; title: string }) => {
   loadingItem.value = item.path;
@@ -178,13 +232,8 @@ const goTo = async (item: { path: string; title: string }) => {
 };
 
 const handleScroll = () => {
-  //@ts-ignore
-  if (process.client) {
-    if (window.scrollY > 0) {
-      isScrolledToBottom.value = true;
-    } else {
-      isScrolledToBottom.value = false;
-    }
+  if (import.meta.client) {
+    isScrolledToBottom.value = window.scrollY > 8;
   }
 };
 
@@ -195,39 +244,21 @@ const handleRouteForResponsive = async (path: string) => {
   isOpenResponsiveBar.value = false;
 };
 
-const goToDashboard = () => {
-  router.push("/dashboard");
+const handleAuthSuccess = () => {
   isOpenResponsiveBar.value = false;
 };
 
-const goToProfile = () => {
-  if (_store.user?.uid) {
-    router.push(`/profile/${_store.user.uid}`);
-    isOpenResponsiveBar.value = false;
-  }
-};
-
-const handleLogout = async () => {
-  try {
-    await signOut($auth);
-    _store.clearUser();
-    isOpenResponsiveBar.value = false;
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
-};
-
-const handleAuthSuccess = (user: any) => {
-  isOpenResponsiveBar.value = false;
-};
-
-// 🖱️ DOM Events: Scroll
 onMounted(() => {
-  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  handleScroll();
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
 });
 </script>
 
 <style scoped>
-@import "~/assets/css/main.css";
-@import "~/assets/css/navbar.css";
+@import url("~/assets/css/main.css");
+@import url("~/assets/css/navbar.css");
 </style>

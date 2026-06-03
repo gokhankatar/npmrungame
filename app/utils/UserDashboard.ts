@@ -11,9 +11,9 @@ export const userDashboardItems: UserDashboardItem[] = [
     icon: "mdi-check-circle-outline",
   },
   {
-    title: "Oynayacaklarım",
-    slug: "to_play_games",
-    icon: "mdi-gamepad-variant-outline",
+    title: "Radarımdaki Oyunlar",
+    slug: "upcoming_games",
+    icon: "mdi-radar",
   },
   {
     title: "2026 Hedef Oyunlar",
