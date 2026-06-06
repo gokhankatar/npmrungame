@@ -286,30 +286,18 @@
             </div>
 
             <div v-if="isGettingCompletedGames" class="genre-breakdown-loading mt-4">
-              <v-skeleton-loader type="list-item@4" class="bg-transparent" />
+              <v-skeleton-loader type="image" class="genre-pie-fallback-chart bg-transparent" />
             </div>
 
-            <div v-else-if="genreBreakdown.length" class="genre-breakdown-list mt-4">
-              <div
-                v-for="(item, index) in genreBreakdown"
-                :key="item.name"
-                class="genre-breakdown-row"
-              >
-                <div class="genre-row-top">
-                  <span class="genre-rank">{{ index + 1 }}</span>
-                  <span class="genre-name text-truncate">{{ item.name }}</span>
-                  <span class="genre-count">{{ item.count }} oyun</span>
-                  <span class="genre-percent">{{ item.shareOfLibrary }}%</span>
-                </div>
-                <div class="genre-bar-track">
-                  <div
-                    class="genre-bar-fill"
-                    :style="{ width: `${item.barWidth}%` }"
-                    :class="`genre-bar-fill--${index % 4}`"
-                  />
-                </div>
-              </div>
-            </div>
+            <Genre_Distribution_Chart
+              v-else-if="genreBreakdown.length"
+              class="mt-3"
+              :genres="genreBreakdown"
+              :top-genre="mostCommonGenre"
+              :top-share="topGenreShare"
+              :total-games="totalGamesCount"
+              :unique-genres="uniqueGenreCount"
+            />
 
             <p v-else class="genre-breakdown-empty mt-4 text-caption text-grey-darken-1">
               Henüz tür verisi yok.
@@ -355,10 +343,15 @@
               <h2 class="library-title default-title-letter">Tüm Kütüphane</h2>
               <p class="library-subtitle text-grey-darken-1">
                 <template v-if="isGettingCompletedGames">Yükleniyor...</template>
+                <template v-else-if="!filteredGamesCount">Oyun bulunamadı</template>
                 <template v-else-if="searchText.length >= 2">
-                  {{ completedGames.length }} / {{ totalGamesCount }} oyun gösteriliyor
+                  {{ libraryRangeStart }}–{{ libraryRangeEnd }} / {{ filteredGamesCount }} sonuç
+                  <span v-if="totalLibraryPages > 1"> · sayfa {{ libraryPage }}/{{ totalLibraryPages }}</span>
                 </template>
-                <template v-else>{{ totalGamesCount }} oyun listeleniyor</template>
+                <template v-else>
+                  {{ libraryRangeStart }}–{{ libraryRangeEnd }} / {{ totalGamesCount }} oyun
+                  <span v-if="totalLibraryPages > 1"> · sayfa {{ libraryPage }}/{{ totalLibraryPages }}</span>
+                </template>
               </p>
             </div>
           </div>
@@ -520,9 +513,29 @@
           <Game_Card
             density="comfortable"
             :loading="isGettingCompletedGames"
-            :arr="completedGames"
+            :arr="paginatedCompletedGames"
             :on-row-click="handleRowClick"
           />
+        </div>
+
+        <div
+          v-if="!isGettingCompletedGames && filteredGamesCount > LIBRARY_PAGE_SIZE"
+          class="library-pagination-wrap"
+        >
+          <v-pagination
+            v-model="libraryPage"
+            :length="totalLibraryPages"
+            :total-visible="smallScreen ? 5 : 7"
+            rounded="circle"
+            color="green-accent-2"
+            active-color="green-accent-2"
+            :density="smallScreen ? 'compact' : 'comfortable'"
+            :ripple="false"
+            @update:model-value="scrollToLibrary"
+          />
+          <p class="library-pagination-hint mb-0">
+            {{ libraryRangeStart }}–{{ libraryRangeEnd }} / {{ filteredGamesCount }} oyun gösteriliyor
+          </p>
         </div>
       </section>
     </v-container>
@@ -535,6 +548,7 @@ import pkg from "lodash";
 import store from "~/store/store";
 import _ from "lodash";
 import Game_Card from "~/components/common/Game_Card.vue";
+import Genre_Distribution_Chart from "~/components/completed-games/Genre_Distribution_Chart.vue";
 import { slugify } from "~/composables/core/basicFunc";
 import {
   formatGameYearAndGenres,
@@ -568,7 +582,34 @@ const searchText = ref("");
 const searchInputRef = ref<HTMLInputElement | null>(null);
 const searchInputMobileRef = ref<HTMLInputElement | null>(null);
 
+const LIBRARY_PAGE_SIZE = 24;
+
 const totalGamesCount = computed(() => allCompletedGames.value.length);
+const libraryPage = ref(1);
+
+const filteredGamesCount = computed(() => completedGames.value.length);
+
+const totalLibraryPages = computed(() =>
+  Math.max(1, Math.ceil(filteredGamesCount.value / LIBRARY_PAGE_SIZE))
+);
+
+const paginatedCompletedGames = computed(() => {
+  const start = (libraryPage.value - 1) * LIBRARY_PAGE_SIZE;
+  return completedGames.value.slice(start, start + LIBRARY_PAGE_SIZE);
+});
+
+const libraryRangeStart = computed(() => {
+  if (!filteredGamesCount.value) return 0;
+  return (libraryPage.value - 1) * LIBRARY_PAGE_SIZE + 1;
+});
+
+const libraryRangeEnd = computed(() =>
+  Math.min(libraryPage.value * LIBRARY_PAGE_SIZE, filteredGamesCount.value)
+);
+
+const resetLibraryPage = () => {
+  libraryPage.value = 1;
+};
 
 const getCompletedSortTime = (game: { completed_at?: string; released?: string }) => {
   if (game.completed_at) return new Date(game.completed_at).getTime();
@@ -707,6 +748,7 @@ const applySearch = () => {
     completedGames.value = [...allCompletedGames.value];
     noGameFound.value = false;
     isLoadingSearchGame.value = false;
+    resetLibraryPage();
     return;
   }
 
@@ -717,6 +759,7 @@ const applySearch = () => {
   completedGames.value = filtered;
   noGameFound.value = filtered.length === 0;
   isLoadingSearchGame.value = false;
+  resetLibraryPage();
 };
 
 const debouncedSearch = _.debounce(() => {
@@ -812,7 +855,12 @@ const sortGames = (games: any[], type: "new" | "old" | "meta") => {
 const sortBy = (mode: "new" | "old" | "meta") => {
   allCompletedGames.value = sortGames(allCompletedGames.value, mode);
   applySearch();
+  resetLibraryPage();
 };
+
+watch(totalLibraryPages, (total) => {
+  if (libraryPage.value > total) libraryPage.value = total;
+});
 
 watch(searchText, () => debouncedSearch());
 

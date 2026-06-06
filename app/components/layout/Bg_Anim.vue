@@ -52,6 +52,7 @@
                 variant="flat"
                 rounded="pill"
                 size="large"
+                :block="heroBtnBlock"
                 class="home-hero-featured-btn home-hero-featured-btn--primary text-black font-weight-bold text-capitalize default-title-letter"
                 prepend-icon="mdi-radar"
                 text="Radarı aç"
@@ -64,6 +65,7 @@
                 color="grey-lighten-1"
                 rounded="pill"
                 size="large"
+                :block="heroBtnBlock"
                 class="home-hero-featured-btn home-hero-featured-btn--secondary text-capitalize default-title-letter"
                 prepend-icon="mdi-information-outline"
                 text="Oyun detayı"
@@ -184,6 +186,7 @@ const props = withDefaults(
 const router = useRouter();
 const display = useDisplay();
 const showHeroDesktopExtras = computed(() => display.mdAndUp.value);
+const heroBtnBlock = computed(() => display.smAndDown.value);
 
 const loadingItem = ref<string | null>(null);
 const titleRef = ref<HTMLElement | null>(null);
@@ -670,12 +673,29 @@ watch(showFeaturedRadar, (featured) => {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
-    max-width: 300px;
+    max-width: none;
+    gap: 0.65rem;
   }
 
   .home-hero-featured-actions :deep(.home-hero-featured-btn) {
+    flex: 1 1 100%;
     width: 100%;
     min-height: 48px !important;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 100%;
+    gap: 0.65rem;
+  }
+
+  .hero-cta {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
   }
 }
 </style>

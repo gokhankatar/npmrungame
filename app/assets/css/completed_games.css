@@ -458,88 +458,327 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
-.genre-breakdown-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.genre-breakdown-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.genre-row-top {
+/* Genre donut chart panel */
+.genre-chart-layout {
   display: grid;
-  grid-template-columns: 1.5rem 1fr auto auto;
-  align-items: center;
-  gap: 0.5rem 0.75rem;
-  font-size: 0.8rem;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-top: 0.25rem;
+  padding: 1.15rem 1.2rem 1.25rem;
+  border-radius: 16px;
+  background: linear-gradient(
+    145deg,
+    rgba(105, 240, 174, 0.07) 0%,
+    rgba(0, 0, 0, 0.32) 45%,
+    rgba(0, 0, 0, 0.48) 100%
+  );
+  border: 1px solid rgba(105, 240, 174, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.genre-rank {
-  width: 1.5rem;
-  height: 1.5rem;
+@media (min-width: 960px) {
+  .genre-chart-layout {
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 1.5rem;
+    padding: 1.35rem 1.5rem;
+  }
+}
+
+.genre-chart-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.genre-chart-aside-title {
+  margin: 0 0 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(105, 240, 174, 0.75);
+}
+
+.genre-chart-rank-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.2s ease;
+}
+
+.genre-chart-rank-card--0 {
+  border-color: rgba(105, 240, 174, 0.28);
+  background: rgba(105, 240, 174, 0.06);
+}
+
+.genre-chart-rank-card:hover {
+  border-color: rgba(105, 240, 174, 0.22);
+}
+
+.genre-chart-rank-badge {
+  flex-shrink: 0;
+  width: 1.65rem;
+  height: 1.65rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #69f0ae;
-  background: rgba(105, 240, 174, 0.12);
-  border: 1px solid rgba(105, 240, 174, 0.25);
-}
-
-.genre-name {
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.genre-count {
-  color: rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
   font-size: 0.72rem;
-  white-space: nowrap;
-}
-
-.genre-percent {
-  font-weight: 700;
+  font-weight: 800;
   color: #69f0ae;
-  font-size: 0.75rem;
-  min-width: 2.5rem;
-  text-align: right;
+  background: rgba(105, 240, 174, 0.14);
+  border: 1px solid rgba(105, 240, 174, 0.3);
 }
 
-.genre-bar-track {
-  height: 6px;
+.genre-chart-rank-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.genre-chart-rank-name {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.genre-chart-rank-meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.genre-chart-rank-track {
+  height: 4px;
+  margin-top: 0.45rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
-  margin-left: 2.25rem;
 }
 
-.genre-bar-fill {
+.genre-chart-rank-fill {
   height: 100%;
   border-radius: inherit;
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg, #69f0ae, #b9f6ca);
   min-width: 4px;
 }
 
-.genre-bar-fill--0 {
-  background: linear-gradient(90deg, #69f0ae, #b9f6ca);
+.genre-chart-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.genre-bar-fill--1 {
-  background: linear-gradient(90deg, #4dd0e1, #80deea);
+.genre-chart-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
 }
 
-.genre-bar-fill--2 {
-  background: linear-gradient(90deg, #81c784, #a5d6a7);
+.genre-chart-main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  padding: 0.5rem 0;
 }
 
-.genre-bar-fill--3 {
-  background: linear-gradient(90deg, #ffb74d, #ffcc80);
+.genre-chart-glow {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  width: min(320px, 80%);
+  height: min(320px, 80%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(105, 240, 174, 0.16) 0%,
+    rgba(105, 240, 174, 0.04) 45%,
+    transparent 70%
+  );
+}
+
+.genre-pie-chart {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.genre-pie-chart :deep(.v-pie) {
+  width: 100%;
+}
+
+.genre-pie-center {
+  max-width: 7.5rem;
+  margin: 0 auto;
+}
+
+.genre-pie-center-pct {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #69f0ae;
+  text-shadow: 0 0 24px rgba(105, 240, 174, 0.35);
+}
+
+.genre-pie-center-label {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 6.5rem;
+  margin-inline: auto;
+}
+
+.genre-pie-center-hint {
+  margin-top: 0.2rem;
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.42);
+  letter-spacing: 0.03em;
+}
+
+.genre-chart-legend-wrap {
+  width: 100%;
+  max-width: 300px;
+}
+
+.genre-chart-legend-title {
+  margin: 0 0 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.genre-chart-legend-hint {
+  margin: 0 0 0.65rem;
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.genre-chart-legend-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .genre-chart-legend-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.genre-chart-legend-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.1rem 0.5rem;
+  align-items: center;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.3);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+}
+
+.genre-chart-legend-card:hover {
+  border-color: rgba(105, 240, 174, 0.25);
+  background: rgba(105, 240, 174, 0.06);
+}
+
+.genre-chart-legend-card--muted {
+  opacity: 0.35;
+}
+
+.genre-chart-legend-dot {
+  grid-row: 1 / 3;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.genre-chart-legend-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.genre-chart-legend-pct {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #69f0ae;
+}
+
+.genre-chart-legend-count {
+  grid-column: 2;
+  font-size: 0.64rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.genre-chart-fallback,
+.genre-pie-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  grid-column: 1 / -1;
+}
+
+.genre-pie-fallback-chart {
+  width: 240px;
+  max-width: 100%;
+  height: 240px;
+  border-radius: 50%;
+}
+
+@media (max-width: 959px) {
+  .genre-chart-aside {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .genre-chart-aside-title,
+  .genre-chart-summary {
+    grid-column: 1 / -1;
+  }
+
+  .genre-chart-summary {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 0;
+    padding-top: 0.65rem;
+  }
+
+  .genre-chart-rank-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.55rem;
+  }
+
+  .genre-chart-rank-badge {
+    width: 1.45rem;
+    height: 1.45rem;
+    font-size: 0.65rem;
+  }
 }
 
 .genre-breakdown-empty {
@@ -850,6 +1089,25 @@
 
 .library-status {
   min-height: 1.5rem;
+}
+
+.library-pagination-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1.75rem;
+  padding-top: 0.5rem;
+}
+
+.library-pagination-wrap :deep(.v-pagination__item--is-active) {
+  font-weight: 700;
+}
+
+.library-pagination-hint {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
 }
 
 .library-empty-msg {
