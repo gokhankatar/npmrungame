@@ -269,6 +269,290 @@
   }
 }
 
+/* Şu sıralar ne oynuyor — ara hero (üst hero'dan küçük) */
+.home-current-section {
+  padding-bottom: 0.25rem;
+}
+
+.home-current-midhero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  min-height: clamp(280px, 40vh, 400px);
+  border: 1px solid rgba(255, 82, 82, 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.home-current-midhero--loading {
+  min-height: clamp(240px, 34vh, 340px);
+}
+
+.home-current-midhero__loader {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+}
+
+.home-current-midhero__media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.home-current-midhero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.home-current-midhero__bg--blur :deep(.v-img__img),
+.home-current-midhero__bg--blur :deep(img) {
+  object-fit: cover;
+  object-position: top center;
+  transform: scale(1.12);
+  filter: blur(18px) brightness(0.45) saturate(1.1);
+}
+
+.home-current-midhero__bg--main :deep(.v-img__img),
+.home-current-midhero__bg--main :deep(img) {
+  object-fit: cover;
+  object-position: top center;
+  transform: scale(0.94);
+  transform-origin: top center;
+}
+
+.home-current-midhero__bg--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1010 0%, #0d1421 100%);
+}
+
+.home-current-midhero__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.55) 42%,
+    rgba(0, 0, 0, 0.12) 72%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+  pointer-events: none;
+}
+
+.home-current-midhero__vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,
+    rgba(13, 20, 33, 0.95) 0%,
+    transparent 38%,
+    transparent 72%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  pointer-events: none;
+}
+
+.home-current-midhero__inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  min-height: inherit;
+  padding: 1.35rem clamp(14px, 3vw, 28px) 1.25rem;
+  padding-bottom: 1.35rem;
+}
+
+.home-current-midhero__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: min(100%, 520px);
+}
+
+.home-current-midhero__labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.65rem;
+}
+
+.home-current-midhero__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-current-midhero__label--live {
+  color: #fff;
+  background: linear-gradient(135deg, #ff5252 0%, #e53935 100%);
+  box-shadow: 0 4px 16px rgba(255, 82, 82, 0.4);
+}
+
+.home-current-midhero__live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+  animation: livePulse 1.2s ease-in-out infinite;
+}
+
+.home-current-midhero__label--count {
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+  font-size: 0.68rem;
+}
+
+.home-current-midhero__title {
+  margin: 0;
+  font-size: clamp(1.45rem, 4.5vw, 2.35rem);
+  font-weight: 800;
+  line-height: 1.08;
+  color: #fff;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.85);
+}
+
+.home-current-midhero__sub {
+  margin: 0.45rem 0 0;
+  font-size: clamp(0.78rem, 2vw, 0.9rem);
+  color: rgba(255, 255, 255, 0.62);
+  text-transform: capitalize;
+}
+
+.home-current-midhero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.home-current-midhero__meta-chip {
+  flex: 0 0 auto;
+}
+
+.home-current-midhero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 280px;
+}
+
+.home-current-midhero__actions :deep(.home-current-midhero__btn) {
+  min-height: 46px !important;
+  font-weight: 700 !important;
+}
+
+.home-current-midhero__actions :deep(.home-current-midhero__btn--primary) {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2) inset,
+    0 8px 24px rgba(105, 240, 174, 0.35);
+}
+
+.home-current-midhero__rail {
+  position: absolute;
+  right: clamp(10px, 2vw, 20px);
+  bottom: 1rem;
+  z-index: 3;
+  display: flex;
+  gap: 0.5rem;
+  max-width: min(48%, 320px);
+  overflow-x: auto;
+  padding: 0.15rem;
+  scrollbar-width: none;
+}
+
+.home-current-midhero__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.home-current-midhero__thumb {
+  flex: 0 0 72px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.home-current-midhero__thumb:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 82, 82, 0.45);
+}
+
+.home-current-midhero__thumb--active {
+  border-color: #ff5252;
+  box-shadow: 0 0 16px rgba(255, 82, 82, 0.35);
+}
+
+.home-current-midhero__thumb :deep(.v-img) {
+  aspect-ratio: 16 / 10;
+}
+
+.home-current-midhero__thumb-name {
+  display: block;
+  padding: 0.2rem 0.25rem;
+  font-size: 0.52rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(0, 0, 0, 0.75);
+}
+
+@media (max-width: 599px) {
+  .home-current-midhero__inner {
+    padding-bottom: 1.1rem;
+  }
+
+  .home-current-midhero__actions {
+    max-width: 100%;
+  }
+
+  .home-current-midhero__rail {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    max-width: 100%;
+    margin: 0 clamp(14px, 3vw, 28px) 0.85rem;
+    padding-top: 0.35rem;
+  }
+
+  .home-current-midhero__shade {
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.55) 45%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+  }
+}
+
+@media (min-width: 960px) {
+  .home-current-midhero__inner {
+    padding-bottom: 1.5rem;
+  }
+
+  .home-current-midhero__thumb {
+    flex: 0 0 84px;
+  }
+}
+
 /* Neden npmrungame — feature cards */
 .home-feature-col {
   display: flex;

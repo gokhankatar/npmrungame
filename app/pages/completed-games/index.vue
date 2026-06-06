@@ -3,9 +3,7 @@
     <div class="completed-page-glow completed-page-glow--left" aria-hidden="true" />
     <div class="completed-page-glow completed-page-glow--right" aria-hidden="true" />
 
-    <v-responsive height="70" />
-
-    <!-- Netflix tarzı — en son bitirilen oyun -->
+    <!-- Netflix tarzı — en son bitirilen oyun (navbar altında, üstten sıfır) -->
     <section
       class="completed-featured"
       :class="{

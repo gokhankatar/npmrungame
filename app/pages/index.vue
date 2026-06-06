@@ -242,8 +242,8 @@
           </v-card>
         </v-col>
 
-        <!-- Current games -->
-        <v-col v-if="currentGames?.length" cols="12">
+        <!-- Current games — Netflix tarzı yatay şerit -->
+        <v-col v-if="currentGames?.length || isGettingCurrentGame" cols="12" class="home-current-section">
           <Home_Section_Header anchor-id="current-games" title="Şu Sıralar Ne Oynuyor?" subtitle="Aktif oynanan oyunlar">
             <template #badge>
               <span class="live-badge">
@@ -252,89 +252,12 @@
               </span>
             </template>
           </Home_Section_Header>
+          <Home_Current_Games_Row
+            :games="currentGames"
+            :loading="isGettingCurrentGame"
+            :on-row-click="handleRowClick"
+          />
         </v-col>
-
-        <template v-if="currentGames?.length">
-          <v-col
-            v-for="(item, index) of currentGames"
-            :key="item.firestoreId ?? index"
-            cols="6"
-            md="4"
-            lg="3"
-          >
-            <v-skeleton-loader v-if="isGettingCurrentGame" type="card" class="rounded-lg h-100" />
-            <v-card
-              v-else
-              class="game-card bg-transparent rounded-lg cursor-pointer transition"
-              :style="{ animationDelay: `${index * 0.1}s` }"
-              :height="display.xs.value ? 170 : smallScreen ? 250 : 375"
-              :ripple="false"
-              @click="handleRowClick(item)"
-            >
-              <v-img :src="item.background_image" class="game-card-img h-100 rounded-lg" cover />
-              <div class="game-card-overlay" />
-              <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">
-                <template #activator="{ props: tipProps }">
-                  <v-chip
-                    v-if="item.playtime"
-                    v-bind="tipProps"
-                    class="playtime-icon rounded-xl ma-1 ma-lg-2"
-                    :ripple="false"
-                    size="small"
-                    variant="elevated"
-                    prepend-icon="mdi-timer-outline"
-                    color="black"
-                    :text="`${item.playtime} saat`"
-                  />
-                </template>
-              </v-tooltip>
-              <v-tooltip text="Metacritic puanı" location="top">
-                <template #activator="{ props: tipProps }">
-                  <v-chip
-                    v-if="item.metacritic && !display.xs.value"
-                    v-bind="tipProps"
-                    class="metacritic-point rounded-xl ma-1 ma-lg-2"
-                    :ripple="false"
-                    size="small"
-                    :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
-                    :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
-                    variant="elevated"
-                    :color="useMetacriticStyle(item.metacritic).color"
-                    :text="String(item.metacritic)"
-                  />
-                </template>
-              </v-tooltip>
-              <div class="game-card-info d-flex flex-column align-start ga-1 ga-lg-2 pa-1 pa-lg-2">
-                <div class="d-flex flex-column align-start">
-                  <p
-                    class="default-title-letter text-white"
-                    :class="display.xs.value ? 'extra-small-text' : 'text-caption text-lg-subtitle-2'"
-                  >
-                    {{ item.name }}
-                  </p>
-                  <p class="text-white" :class="display.xs.value ? 'extra-xsmall-text' : 'text-caption'">
-                    {{ new Date(item.released).getFullYear() }}
-                  </p>
-                  <div v-if="!display.xs.value" class="d-flex align-center flex-wrap ga-1">
-                    <template v-for="icon in getUniquePlatformIcons(item.platforms)" :key="icon">
-                      <v-icon v-if="icon" size="x-small" color="grey-lighten-1" :icon="icon" />
-                    </template>
-                  </div>
-                </div>
-                <div v-if="!display.xs.value" class="d-flex flex-wrap ga-1">
-                  <v-chip
-                    v-for="(genre, gi) in item.genres"
-                    :key="gi"
-                    :size="smallScreen ? 'x-small' : 'small'"
-                    variant="outlined"
-                    :ripple="false"
-                    :text="genre.name"
-                  />
-                </div>
-              </div>
-            </v-card>
-          </v-col>
-        </template>
 
         <!-- Blogs -->
         <v-col cols="12">
@@ -501,21 +424,19 @@ import Animated_Text from "~/components/common/Animated_Text.vue";
 import Game_Card from "~/components/common/Game_Card.vue";
 import Home_Newsletter_Block from "~/components/home/Home_Newsletter_Block.vue";
 import Home_Section_Header from "~/components/home/Home_Section_Header.vue";
+import Home_Current_Games_Row from "~/components/home/Home_Current_Games_Row.vue";
 import Bg_Anim from "~/components/layout/Bg_Anim.vue";
 import { slugify, truncateText } from "~/composables/core/basicFunc";
 import type { Feature_Card } from "~/composables/core/interfaces";
 import {
   extractNameFromEmail,
   getRatingColor,
-  getUniquePlatformIcons,
   normalizeText,
   useFirestoreDateFormatted,
-  useMetacriticStyle,
 } from "~/composables/data/handleData";
 import { feature_cards } from "~/utils/Feature_Card";
 import { useUpcomingGames } from "~/composables/data/useUpcomingGames";
 import store from "~/store/store";
-import fireAnimation from "~/assets/img/fire_anim.gif";
 import successFullyDoneImg from "~/assets/img/successfully_done_anim.gif";
 import warningImg from "~/assets/img/warning_anim.gif";
 
