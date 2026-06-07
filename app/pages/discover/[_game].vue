@@ -1,87 +1,140 @@
 <template>
-  <v-responsive height="90" v-if="!isSmallScreen" />
-  <v-responsive height="70" v-else />
+  <div class="discover-page discover-genre-page">
+    <div class="discover-page-glow discover-page-glow--left" aria-hidden="true" />
+    <div class="discover-page-glow discover-page-glow--right" aria-hidden="true" />
 
-  <v-container class="pa-0 pa-lg-10 pa-xl-15">
-    <v-row>
-      <v-row class="d-flex justify-space-between align-center w-100 mx-auto" :dense="display.smAndDown.value">
-        <v-col cols="12" sm="8" xl="10">
-          <template v-if="isGettingGames">
-            <v-skeleton-loader type="text" width="190" height="12px" style="
-              background-color: transparent;
-              --v-skeleton-loader-bg-color: transparent;
-            " />
-            <v-skeleton-loader type="text" width="300" height="12px" class="mt-2 mb-5" style="
-              background-color: transparent;
-              --v-skeleton-loader-bg-color: transparent;
-            " />
-          </template>
+    <v-responsive :height="isSmallScreen ? 70 : 100" />
 
-          <template v-else>
-            <Animated_Text :text="`${_store.active_game_genre?.title} Oyunları`"
-              class="cursor-pointer d-flex justify-center justify-sm-start align-center" :msPerChar="50" :duration="550"
-              :loop="true" />
-            <p
-              class="text-center text-sm-start text-caption text-lg-subtitle-2 text-blue-grey-darken-2 default-title-letter">
-              {{ formatNumber(total_count) }} oyun bulundu, yaklaşık
-              {{ formatNumber(totalPagesDisplay) }} sayfa.
-            </p>
-          </template>
-        </v-col>
+    <v-container class="discover-container pa-3 pa-md-6 pa-lg-10 pa-xl-15">
+      <header class="discover-genre-hero">
+        <div v-if="currentGenre?.background_img" class="discover-genre-hero__bg" aria-hidden="true">
+          <img :src="currentGenre.background_img" alt="" loading="lazy" />
+        </div>
+        <div class="discover-genre-hero__shade" aria-hidden="true" />
+        <div class="discover-genre-hero__vignette" aria-hidden="true" />
 
-        <v-col cols="12" sm="4" xl="2">
-          <div @click="handleToBack"
-            class="w-100 w-sm-auto back-to-games-btn transition d-flex justify-center float-none float-sm-right justify-sm-end align-center cursor-pointer text-caption text-sm-subtitle-2 ga-1 ga-lg-3 pa-1 pa-lg-2 rounded-xl"
-            style="width: fit-content">
-            <v-icon :size="display.smAndDown.value ? 'small' : 'default'" color="grey-lighten-1"
-              icon="mdi-arrow-left" />
-            <p class="text-caption text-sm-subtitle-2 text-xl-subtitle-1 default-title-letter text-grey-lighten-1">
-              Oyunlara Dön
-            </p>
-          </div>
-        </v-col>
-      </v-row>
+        <div class="discover-genre-hero__content">
+          <button
+            type="button"
+            class="discover-genre-back default-title-letter"
+            @click="handleToBack"
+          >
+            <v-icon icon="mdi-arrow-left" size="18" />
+            <span>Oyunlara dön</span>
+          </button>
 
-      <v-divider class="w-100 mt-2 mb-5" color="white" />
-
-      <Game_Card :arr="gamesList" :loading="isGettingGames" :onRowClick="handleRowClick" />
-
-      <v-row class="d-flex justify-space-evenly align-center w-100 mx-auto my-3 my-lg-6"
-        :dense="display.smAndDown.value">
-        <!-- prev -->
-        <v-col cols="12">
-          <div class="d-flex justify-center align-center ga-2 ga-lg-4 w-100">
-            <v-btn :disabled="!_store.prevPage" @click="goPrev" variant="tonal" rounded="xl"
-              prepend-icon="mdi-chevron-left" class="text-capitalize" text="Geri"
-              :size="display.smAndDown.value ? 'small' : 'default'" :ripple="false" />
-
-            <div class="d-flex align-center ga-1 ga-lg-2">
-              <v-progress-circular v-if="isGettingGames" color="grey-darken-1" size="12" width="2" indeterminate />
-              <p v-else class="text-caption text-xl-subtitle-2 defaul-title-letter text-grey-darken-1">
-                {{ _store.currentPage }} / {{ totalPagesDisplay }}
+          <div class="discover-genre-hero__main">
+            <template v-if="isGettingGames && !genreTitle">
+              <v-skeleton-loader type="chip" width="100" class="mb-3 bg-transparent" />
+              <v-skeleton-loader type="heading" width="220" class="mb-2 bg-transparent" />
+              <v-skeleton-loader type="text" width="180" class="bg-transparent" />
+            </template>
+            <template v-else>
+              <div class="discover-hero-badge default-title-letter">
+                <v-icon icon="mdi-gamepad-variant-outline" size="16" color="#69f0ae" />
+                <span>{{ genreTypeLabel }}</span>
+              </div>
+              <h1 class="discover-genre-hero__title default-title-letter">
+                {{ genreTitle }} Oyunları
+              </h1>
+              <p class="discover-genre-hero__meta default-title-letter">
+                <span class="discover-genre-hero__stat">
+                  <v-icon icon="mdi-database-outline" size="15" />
+                  {{ formatNumber(total_count) }} oyun
+                </span>
+                <span class="discover-genre-hero__dot" aria-hidden="true">·</span>
+                <span class="discover-genre-hero__stat">
+                  <v-icon icon="mdi-book-open-page-variant-outline" size="15" />
+                  {{ formatNumber(totalPagesDisplay) }} sayfa
+                </span>
               </p>
-            </div>
-
-            <v-btn :disabled="!_store.nextPage" @click="goNext" variant="tonal" rounded="xl"
-              append-icon="mdi-chevron-right" class="text-capitalize" text="İleri"
-              :size="display.smAndDown.value ? 'small' : 'default'" :ripple="false" />
+            </template>
           </div>
-        </v-col>
-      </v-row>
-    </v-row>
-  </v-container>
+        </div>
+      </header>
+
+      <section class="discover-catalog discover-catalog--genre">
+        <div class="discover-catalog__toolbar discover-catalog__toolbar--compact">
+          <div class="discover-catalog__info">
+            <h2 class="discover-catalog__heading default-title-letter">
+              {{ genreTitle || "Oyun" }} listesi
+            </h2>
+            <p class="discover-catalog__count default-title-letter mb-0">
+              Sayfa {{ _store.currentPage }} / {{ totalPagesDisplay }}
+            </p>
+          </div>
+        </div>
+
+        <v-row
+          class="discover-games-grid d-flex justify-start align-center mx-auto ma-0"
+          :dense="display.smAndDown.value"
+        >
+          <Game_Card
+            :arr="gamesList"
+            :loading="isGettingGames"
+            :on-row-click="handleRowClick"
+          />
+
+          <v-col cols="12" class="discover-pagination">
+            <div class="d-flex justify-center align-center ga-2 ga-lg-4 w-100">
+              <v-btn
+                :disabled="!_store.prevPage"
+                variant="tonal"
+                rounded="pill"
+                prepend-icon="mdi-chevron-left"
+                class="text-capitalize default-title-letter"
+                text="Geri"
+                :size="display.smAndDown.value ? 'small' : 'default'"
+                :ripple="false"
+                @click="goPrev"
+              />
+
+              <div class="d-flex align-center ga-1 ga-lg-2">
+                <v-progress-circular
+                  v-if="isGettingGames"
+                  color="grey-darken-1"
+                  size="12"
+                  width="2"
+                  indeterminate
+                />
+                <p
+                  v-else
+                  class="text-caption text-xl-subtitle-2 default-title-letter text-grey-darken-1 mb-0"
+                >
+                  {{ _store.currentPage }} / {{ totalPagesDisplay }}
+                </p>
+              </div>
+
+              <v-btn
+                :disabled="!_store.nextPage"
+                variant="tonal"
+                rounded="pill"
+                append-icon="mdi-chevron-right"
+                class="text-capitalize default-title-letter"
+                text="İleri"
+                :size="display.smAndDown.value ? 'small' : 'default'"
+                :ripple="false"
+                @click="goNext"
+              />
+            </div>
+          </v-col>
+        </v-row>
+      </section>
+    </v-container>
+  </div>
 </template>
+
 <script lang="ts" setup>
 import axios from "axios";
 import store from "~/store/store";
 import { useDiscoverStore } from "~/store/queryStore";
 import Game_Card from "~/components/common/Game_Card.vue";
 import { formatNumber } from "~/composables/data/handleData";
-import Animated_Text from "~/components/common/Animated_Text.vue";
 import { slugify } from "~/composables/core/basicFunc";
+import { game_genres } from "~/utils/Game_Genres";
 
 const router = useRouter();
-const route = useRoute()
+const route = useRoute();
 const discover_store = useDiscoverStore();
 const _store = store();
 const display = useDisplay();
@@ -96,6 +149,16 @@ const total_pages = ref<number>(0);
 const totalPagesDisplay = computed(() => Math.max(total_pages.value, 1));
 
 const gamesList = ref<any[]>([]);
+
+const genreTitle = computed(() => _store.active_game_genre?.title ?? "");
+
+const currentGenre = computed(() =>
+  game_genres.find((g) => g.slug === _store.active_game_genre?.slug)
+);
+
+const genreTypeLabel = computed(() =>
+  _store.active_game_genre?.type === "tag" ? "Etiket" : "Tür"
+);
 
 const getGamesByTagOrGenre = async () => {
   try {
@@ -137,22 +200,24 @@ const handleRowClick = (item: any) => {
 
 const goNext = () => {
   if (_store.nextPage) {
-    const page = new URL(_store.nextPage, window.location.origin)
-      .searchParams.get("page");
+    const nextPage = new URL(_store.nextPage, window.location.origin).searchParams.get(
+      "page"
+    );
 
     router.push({
-      query: { ...route.query, page },
+      query: { ...route.query, page: nextPage },
     });
   }
 };
 
 const goPrev = () => {
   if (_store.prevPage) {
-    const page = new URL(_store.prevPage, window.location.origin)
-      .searchParams.get("page");
+    const prevPage = new URL(_store.prevPage, window.location.origin).searchParams.get(
+      "page"
+    );
 
     router.push({
-      query: { ...route.query, page },
+      query: { ...route.query, page: prevPage },
     });
   }
 };
@@ -176,7 +241,7 @@ watch(
   (newTitle) => {
     if (newTitle) {
       useHead({
-        title: `${newTitle} Oyunları`,
+        title: `${newTitle} Oyunları | npmrungame`,
       });
     } else {
       useHead({

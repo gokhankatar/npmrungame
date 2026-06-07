@@ -1,5 +1,3 @@
-import { overlay } from "three/tsl";
-
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   modules: [
@@ -120,6 +118,15 @@ export default defineNuxtConfig({
   devServer: {
     host: "0.0.0.0",
     port: 4000,
+    cors: { origin: "*" },
+  },
+  vite: {
+    server: {
+      allowedHosts: true,
+      hmr: {
+        clientPort: 4000,
+      },
+    },
   },
   routeRules: {
     "/profile/**": { ssr: false },

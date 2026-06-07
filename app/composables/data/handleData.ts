@@ -355,3 +355,57 @@ export const getGameStatusTextByGameCollectionStatus = (status: Existed_Game_Col
     }
   }
 }
+
+export interface GameCollectionPublicInfo {
+  icon: string;
+  color: string;
+  title: string;
+  message: string;
+  path?: string;
+}
+
+export const getGameCollectionPublicInfo = (
+  status: Existed_Game_Collection
+): GameCollectionPublicInfo | null => {
+  if (status == null) return null;
+
+  const map: Record<NonNullable<Existed_Game_Collection>, GameCollectionPublicInfo> = {
+    completed_games: {
+      icon: "mdi-trophy",
+      color: "#69f0ae",
+      title: "Bitirilen oyunlar arasında",
+      message: "Bu oyun npmrungame'de tamamlanan koleksiyonda yer alıyor.",
+      path: "/completed-games",
+    },
+    current_games: {
+      icon: "mdi-gamepad-variant",
+      color: "#64b5f6",
+      title: "Şu an oynanıyor",
+      message: "Gökhan şu an bu oyunu oynuyor — kanaldan takip edebilirsin.",
+      path: "/",
+    },
+    recommended_games: {
+      icon: "mdi-heart-plus",
+      color: "#b39ddb",
+      title: "Önerilenler listesinde",
+      message: "Bu oyun topluluk veya kanal tarafından önerildi.",
+      path: "/recommend-games",
+    },
+    to_play_games: {
+      icon: "mdi-playlist-play",
+      color: "#ffb74d",
+      title: "Oynanacaklar listesinde",
+      message: "Bu oyun oynanmayı bekleyenler arasında.",
+      path: "/radarimdaki-oyunlar",
+    },
+    upcoming_games: {
+      icon: "mdi-radar",
+      color: "#ffb74d",
+      title: "Radarımdaki oyunlar",
+      message: "Bu oyun npmrungame radarında — çıkışını veya fırsatını takip ediyor.",
+      path: "/radarimdaki-oyunlar",
+    },
+  };
+
+  return map[status];
+};

@@ -129,52 +129,61 @@
 
           <div class="video-carousel-wrap">
             <div class="video-carousel">
-              <div
-                v-for="item in carouselVideos"
+              <article
+                v-for="(item, index) in carouselVideos"
                 :key="item.video_src"
-                class="video-carousel-slide video-container"
+                class="video-carousel-slide home-video-card"
+                :style="{ animationDelay: `${index * 0.1}s` }"
               >
-                <v-skeleton-loader v-if="isLoadedVideos" class="rounded-xl" :height="280" type="image" />
-                <v-video
-                  v-else
-                  class="align-self-center"
-                  :image="item.video_img"
-                  rounded="xl"
-                  :autoplay="false"
-                  :density="display.lgAndUp.value ? 'comfortable' : 'compact'"
-                  :controls-variant="smallScreen ? 'mini' : 'tube'"
-                  :src="item.video_src"
-                  color="green-accent-2"
-                  controls
-                  volume="0"
-                  loop
-                >
-                  <template v-if="!display.xs.value" #header>
-                    <div class="d-flex pa-2 pointer-pass-through">
-                      <v-chip
-                        class="video-header-element"
-                        prepend-avatar="https://yt3.ggpht.com/f-Wk3V3N7KtLUXiRTs5ukoRBzLcILBVyt0_z3i_32xup1qg83dxlciDvComml_cJuL71c0ilWBo=s176-c-k-c0x00ffffff-no-rj"
-                        rounded="pill"
-                        :text="item.video_name"
-                      />
-                      <v-tooltip text="Videonun tamamını izle" location="top">
-                        <template #activator="{ props: tipProps }">
-                          <v-btn
-                            v-bind="tipProps"
-                            :href="item.video_full_link"
-                            target="_blank"
-                            :ripple="false"
-                            size="small"
-                            icon="mdi-open-in-new"
-                            variant="text"
-                            class="ml-auto video-header-element"
-                          />
-                        </template>
-                      </v-tooltip>
+                <v-skeleton-loader
+                  v-if="isLoadedVideos"
+                  class="home-video-card__skeleton rounded-xl"
+                  :height="200"
+                  type="image"
+                />
+                <template v-else>
+                  <button
+                    type="button"
+                    class="home-video-card__media"
+                    :aria-label="`${item.video_name} videosunu izle`"
+                    @click="openVideo(item.video_full_link)"
+                  >
+                    <img
+                      :src="item.video_img"
+                      :alt="item.video_name"
+                      class="home-video-card__thumb"
+                      loading="lazy"
+                    />
+                    <div class="home-video-card__overlay" aria-hidden="true">
+                      <span class="home-video-card__play">
+                        <v-icon icon="mdi-play" size="28" color="white" />
+                      </span>
                     </div>
-                  </template>
-                </v-video>
-              </div>
+                    <span class="home-video-card__badge default-title-letter">
+                      <v-icon icon="mdi-youtube" size="14" />
+                      YouTube
+                    </span>
+                  </button>
+                  <div class="home-video-card__body">
+                    <h3 class="home-video-card__title default-title-letter">
+                      {{ item.video_name }}
+                    </h3>
+                    <v-btn
+                      :href="item.video_full_link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variant="text"
+                      size="small"
+                      icon="mdi-open-in-new"
+                      color="grey-lighten-1"
+                      class="home-video-card__link"
+                      :ripple="false"
+                      aria-label="YouTube'da aç"
+                      @click.stop
+                    />
+                  </div>
+                </template>
+              </article>
             </div>
           </div>
         </v-col>
@@ -629,6 +638,10 @@ const handleBlogClick = (blog: any) => {
 
 const goToChannel = () => {
   window.open("https://www.youtube.com/@npmrungame", "_blank");
+};
+
+const openVideo = (url: string) => {
+  if (url) window.open(url, "_blank", "noopener,noreferrer");
 };
 
 const handleRowClick = (item: any) => {
