@@ -305,29 +305,110 @@
       </v-row>
 
       <!-- 2026 Section -->
-      <section v-if="games2026.length > 0" class="games-2026-section mb-8 mb-lg-10">
-        <div class="games-2026-header">
-          <div class="year-badge-2026">
-            <v-icon icon="mdi-calendar-star" color="#69f0ae" :size="smallScreen ? 'default' : 'large'" />
-            <span class="year-text-2026">2026</span>
-          </div>
-          <div class="games-2026-header-text">
-            <h2 class="section-title-2026 default-title-letter">2026'da Bitirdiğim Oyunlar</h2>
-            <p class="games-2026-subtitle">
-              <v-icon icon="mdi-flag-checkered" size="x-small" class="mr-1" />
-              {{ games2026.length }} oyun tamamlandı
-            </p>
-          </div>
-        </div>
+      <section
+        v-if="games2026.length > 0"
+        id="games-2026-section"
+        class="games-2026-section mb-8 mb-lg-10"
+      >
+        <v-expansion-panels
+          v-model="games2026Expanded"
+          class="games-2026-panels"
+          variant="accordion"
+          :ripple="false"
+        >
+          <v-expansion-panel value="2026" :ripple="false" bg-color="transparent" elevation="0">
+            <v-expansion-panel-title class="games-2026-panel-title" :ripple="false">
+              <div class="games-2026-header">
+                <div class="year-badge-2026">
+                  <v-icon
+                    icon="mdi-calendar-star"
+                    color="#69f0ae"
+                    :size="smallScreen ? 'default' : 'large'"
+                  />
+                  <span class="year-text-2026">2026</span>
+                </div>
 
-        <div class="games-2026-container completed-games-grid">
-          <Game_Card
-            density="comfortable"
-            :loading="isGettingGames2026"
-            :arr="games2026"
-            :on-row-click="handleRowClick"
-          />
-        </div>
+                <div class="games-2026-header-text">
+                  <h2 class="section-title-2026 default-title-letter">
+                    2026'da Bitirdiğim Oyunlar
+                  </h2>
+                  <p class="games-2026-subtitle">
+                    <v-icon icon="mdi-flag-checkered" size="x-small" class="mr-1" />
+                    {{ games2026.length }} oyun tamamlandı
+                    <span v-if="totalGames2026Pages > 1" class="games-2026-subtitle-divider">
+                      · sayfa {{ games2026Page }}/{{ totalGames2026Pages }}
+                    </span>
+                  </p>
+                </div>
+
+                <div class="games-2026-header-preview" aria-hidden="true">
+                  <div
+                    v-for="game in games2026Preview"
+                    :key="game.id"
+                    class="games-2026-preview-thumb"
+                  >
+                    <v-img
+                      v-if="game.background_image"
+                      :src="game.background_image"
+                      :alt="game.name"
+                      cover
+                    />
+                    <v-icon v-else icon="mdi-gamepad-variant-outline" size="14" color="grey" />
+                  </div>
+                  <span
+                    v-if="games2026.length > games2026Preview.length"
+                    class="games-2026-preview-more"
+                  >
+                    +{{ games2026.length - games2026Preview.length }}
+                  </span>
+                </div>
+              </div>
+
+              <template #actions="{ expanded }">
+                <v-chip
+                  size="small"
+                  variant="tonal"
+                  color="green-accent-2"
+                  class="games-2026-toggle-chip default-title-letter text-capitalize"
+                  :prepend-icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                  :text="expanded ? 'Gizle' : 'Göster'"
+                />
+              </template>
+            </v-expansion-panel-title>
+
+            <v-expansion-panel-text class="games-2026-panel-body">
+              <div class="games-2026-container completed-games-grid">
+                <Game_Card
+                  density="comfortable"
+                  :loading="isGettingGames2026"
+                  :arr="paginatedGames2026"
+                  :on-row-click="handleRowClick"
+                />
+              </div>
+
+              <div
+                v-if="!isGettingGames2026 && games2026.length > GAMES_2026_PAGE_SIZE"
+                class="library-pagination-wrap games-2026-pagination-wrap"
+              >
+                <v-pagination
+                  v-model="games2026Page"
+                  :length="totalGames2026Pages"
+                  :total-visible="smallScreen ? 5 : 7"
+                  rounded="circle"
+                  color="green-accent-2"
+                  active-color="green-accent-2"
+                  :density="smallScreen ? 'compact' : 'comfortable'"
+                  :ripple="false"
+                  @update:model-value="scrollToGames2026"
+                />
+                <p class="library-pagination-hint mb-0">
+                  {{ games2026RangeStart }}–{{ games2026RangeEnd }} / {{ games2026.length }} oyun
+                  gösteriliyor
+                </p>
+              </div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </section>
 
       <!-- Main library -->
@@ -581,9 +662,12 @@ const searchInputRef = ref<HTMLInputElement | null>(null);
 const searchInputMobileRef = ref<HTMLInputElement | null>(null);
 
 const LIBRARY_PAGE_SIZE = 24;
+const GAMES_2026_PAGE_SIZE = 8;
 
 const totalGamesCount = computed(() => allCompletedGames.value.length);
 const libraryPage = ref(1);
+const games2026Page = ref(1);
+const games2026Expanded = ref<string | undefined>("2026");
 
 const filteredGamesCount = computed(() => completedGames.value.length);
 
@@ -607,6 +691,34 @@ const libraryRangeEnd = computed(() =>
 
 const resetLibraryPage = () => {
   libraryPage.value = 1;
+};
+
+const totalGames2026Pages = computed(() =>
+  Math.max(1, Math.ceil(games2026.value.length / GAMES_2026_PAGE_SIZE))
+);
+
+const paginatedGames2026 = computed(() => {
+  const start = (games2026Page.value - 1) * GAMES_2026_PAGE_SIZE;
+  return games2026.value.slice(start, start + GAMES_2026_PAGE_SIZE);
+});
+
+const games2026Preview = computed(() => games2026.value.slice(0, 4));
+
+const games2026RangeStart = computed(() => {
+  if (!games2026.value.length) return 0;
+  return (games2026Page.value - 1) * GAMES_2026_PAGE_SIZE + 1;
+});
+
+const games2026RangeEnd = computed(() =>
+  Math.min(games2026Page.value * GAMES_2026_PAGE_SIZE, games2026.value.length)
+);
+
+const scrollToGames2026 = () => {
+  if (!import.meta.client) return;
+  document.getElementById("games-2026-section")?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
 };
 
 const getCompletedSortTime = (game: { completed_at?: string; released?: string }) => {

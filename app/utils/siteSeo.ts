@@ -57,6 +57,12 @@ export const STATIC_ROUTE_SEO: RouteSeoEntry[] = [
       "Topluluktan oyun önerileri gönder ve önerilen oyunları incele. npmrungame oyun öneri sayfası.",
   },
   {
+    path: "/top-10",
+    title: "Top 10 Listeni Oluştur | npmrungame",
+    description:
+      "En sevdiğin 10 oyunu seç, sırala ve paylaş. Kendi Top 10 oyun listeni oluştur — npmrungame.",
+  },
+  {
     path: "/blogs",
     title: "Blog | npmrungame",
     description:
@@ -127,6 +133,13 @@ export const resolveStaticRouteSeo = (path: string): SiteSeoOptions | null => {
       description: "npmrungame blog yazısı.",
       path,
       type: "article",
+    };
+  }
+  if (path.startsWith("/top-10/") && path !== "/top-10") {
+    return {
+      title: "Top 10 Listesi | npmrungame",
+      description: "Topluluk Top 10 oyun listesi — npmrungame.",
+      path,
     };
   }
 

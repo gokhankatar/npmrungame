@@ -975,12 +975,51 @@
   }
 }
 
+.games-2026-panels {
+  background: transparent !important;
+}
+
+.games-2026-panels :deep(.v-expansion-panel) {
+  background: transparent !important;
+}
+
+.games-2026-panels :deep(.v-expansion-panel__shadow) {
+  display: none;
+}
+
+.games-2026-panel-title {
+  padding: 0 !important;
+  min-height: unset !important;
+}
+
+.games-2026-panel-title :deep(.v-expansion-panel-title__overlay) {
+  opacity: 0 !important;
+}
+
+.games-2026-panel-title:hover :deep(.v-expansion-panel-title__overlay) {
+  opacity: 0.04 !important;
+}
+
+.games-2026-panel-title :deep(.v-expansion-panel-title__icon) {
+  display: none;
+}
+
+.games-2026-panel-body :deep(.v-expansion-panel-text__wrapper) {
+  padding: 0 !important;
+}
+
+.games-2026-panel-body {
+  padding-top: 1.25rem;
+}
+
 .games-2026-header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1rem 1.25rem;
+  flex: 1;
+  min-width: 0;
+  padding-right: 0.5rem;
 }
 
 .games-2026-header-text {
@@ -994,6 +1033,59 @@
   color: rgba(255, 255, 255, 0.45);
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+}
+
+.games-2026-subtitle-divider {
+  color: rgba(105, 240, 174, 0.55);
+}
+
+.games-2026-header-preview {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+@media (min-width: 960px) {
+  .games-2026-header-preview {
+    display: flex;
+  }
+}
+
+.games-2026-preview-thumb {
+  width: 36px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(105, 240, 174, 0.25);
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.games-2026-preview-more {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(105, 240, 174, 0.85);
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(105, 240, 174, 0.1);
+  border: 1px solid rgba(105, 240, 174, 0.25);
+}
+
+.games-2026-toggle-chip {
+  flex-shrink: 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.games-2026-pagination-wrap {
+  margin-top: 1.25rem;
 }
 
 .year-badge-2026 {

@@ -94,6 +94,8 @@
         </div>
       </div>
 
+      <Home_Top10_Section />
+
       <v-row class="home-sections-row ma-0" :dense="smallScreen">
         <!-- Videos carousel -->
         <v-col cols="12" class="video-carousel-section">
@@ -432,6 +434,7 @@ import _ from "lodash";
 import Animated_Text from "~/components/common/Animated_Text.vue";
 import Game_Card from "~/components/common/Game_Card.vue";
 import Home_Newsletter_Block from "~/components/home/Home_Newsletter_Block.vue";
+import Home_Top10_Section from "~/components/home/Home_Top10_Section.vue";
 import Home_Section_Header from "~/components/home/Home_Section_Header.vue";
 import Home_Current_Games_Row from "~/components/home/Home_Current_Games_Row.vue";
 import Bg_Anim from "~/components/layout/Bg_Anim.vue";

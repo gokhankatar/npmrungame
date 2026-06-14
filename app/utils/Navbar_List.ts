@@ -24,6 +24,12 @@ export const navbarListItems: NavbarList[] = [
         icon: "mdi-hand-heart-outline",
     },
     {
+        title: "Top 10",
+        shortTitle: "Top 10",
+        path: "/top-10",
+        icon: "mdi-numeric-10-box-multiple-outline",
+    },
+    {
         title: "Radarımdaki Oyunlar",
         shortTitle: "Radar",
         path: "/radarimdaki-oyunlar",

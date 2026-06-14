@@ -257,6 +257,7 @@
 </template>
 
 <script lang="ts" setup>
+import { signOut } from "firebase/auth";
 import store from "~/store/store";
 import type { AdminListItemSlug } from "~/composables/core/interfaces";
 import { useNotificationsStore } from "~/store/notifications";
@@ -269,6 +270,7 @@ import adminLogoImg from "~/assets/img/logo_fixed.webp";
 
 const _store = store();
 const router = useRouter();
+const { $auth } = useNuxtApp();
 const display = useDisplay();
 
 const isCompactNav = computed(() => display.smAndDown.value);
@@ -286,8 +288,15 @@ const selectSection = (slug: AdminListItemSlug) => {
   _store.setActiveAdminListItem(slug as any);
 };
 
-const handleLogout = () => {
+const handleLogout = async () => {
   _store.logOut();
+
+  try {
+    await signOut($auth);
+  } catch {
+    // Oturum zaten kapalı olabilir
+  }
+
   setTimeout(() => {
     router.push("/");
   }, 150);

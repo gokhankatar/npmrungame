@@ -11,7 +11,7 @@
           alt="npmrungame"
           @click="router.push('/')"
         />
-        <span class="navbar-version default-title-letter">v1.2</span>
+        <span class="navbar-version default-title-letter">v1.3</span>
       </div>
 
       <nav

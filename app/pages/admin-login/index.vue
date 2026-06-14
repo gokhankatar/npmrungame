@@ -233,7 +233,13 @@
 
 <script lang="ts" setup>
 import { collection, getDocs } from "firebase/firestore";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  browserSessionPersistence,
+  onAuthStateChanged,
+  setPersistence,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { VForm } from "vuetify/components";
 import store from "~/store/store";
 import type { Admin_User } from "~/composables/core/interfaces";
@@ -252,6 +258,8 @@ useHead({
 
 const _store = store();
 const router = useRouter();
+const { save: saveRememberMe, load: loadRememberMe, clear: clearRememberMe } =
+  useAdminRememberMe();
 const display = useDisplay();
 const isExtraLargeScreen = computed(() => display.lgAndUp.value);
 const { $auth, $firestore } = useNuxtApp();
@@ -347,6 +355,13 @@ const handleAdminAuth = async () => {
   try {
     isLoadingLogin.value = true;
 
+    const remember = adminModels.value.isSelectedRememberMe;
+
+    await setPersistence(
+      $auth,
+      remember ? browserLocalPersistence : browserSessionPersistence
+    );
+
     const userCredential = await signInWithEmailAndPassword(
       $auth,
       adminModels.value.email,
@@ -355,15 +370,16 @@ const handleAdminAuth = async () => {
 
     const user = userCredential.user;
 
-    if (user && adminModels.value.isSelectedRememberMe) {
+    if (user && remember) {
+      saveRememberMe(adminModels.value.email, adminModels.value.password);
       _store.setAnySuccessfullLogin();
+    } else {
+      clearRememberMe();
     }
 
     msgAfterLogin.value = "Giriş Başarılı";
     colorAfterLogin.value = "success";
     isVisibleAlertAfterLogin.value = true;
-
-    adminForm.value?.reset();
 
     setTimeout(() => {
       _store.login();
@@ -389,15 +405,11 @@ const handleAdminAuth = async () => {
 
 watch(
   () => adminModels.value.isSelectedRememberMe,
-  async (val) => {
-    if (_store.hasAnySuccessfulLogin) {
-      if (val) {
-        const data = await $fetch("/api/admin/admin-credential");
-        adminModels.value.email = data.email;
-        adminModels.value.password = data.password;
-      } else {
-        adminForm.value?.reset();
-      }
+  (val) => {
+    if (!val) {
+      clearRememberMe();
+      adminModels.value.email = "";
+      adminModels.value.password = "";
     }
   }
 );
@@ -410,9 +422,35 @@ watch(
   { immediate: true }
 );
 
-onMounted(() => {
+const restoreRememberedLogin = () =>
+  new Promise<void>((resolve) => {
+    const saved = loadRememberMe();
+
+    if (saved) {
+      adminModels.value.isSelectedRememberMe = true;
+      adminModels.value.email = saved.email;
+      adminModels.value.password = saved.password;
+    }
+
+    const unsubscribe = onAuthStateChanged($auth, (user) => {
+      unsubscribe();
+
+      if (user && saved?.enabled && user.email === saved.email) {
+        _store.login();
+        _store.setAdminUserInfo(user.metadata as Admin_User);
+      }
+
+      resolve();
+    });
+  });
+
+onMounted(async () => {
+  await restoreRememberedLogin();
   fetchLatestCompleted();
-  adminFormEmailRef.value?.focus();
+
+  if (!_store.isAdmin) {
+    adminFormEmailRef.value?.focus();
+  }
 });
 </script>
 

@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts" setup>
+import { onAuthStateChanged } from "firebase/auth";
 import store from "~/store/store";
 import Dashboard from "~/components/admin/Dashboard.vue";
 import Completed_Games from "~/components/admin/Completed_Games.vue";
@@ -41,9 +42,34 @@ const router = useRouter();
 const display = useDisplay();
 const isCompactNav = computed(() => display.smAndDown.value);
 
+const authChecked = ref(false);
+const { $auth } = useNuxtApp();
+const { load: loadRememberMe } = useAdminRememberMe();
+
+onMounted(() => {
+  const saved = loadRememberMe();
+
+  const unsubscribe = onAuthStateChanged($auth, (user) => {
+    unsubscribe();
+
+    if (
+      !_store.isAdmin &&
+      user &&
+      saved?.enabled &&
+      user.email === saved.email
+    ) {
+      _store.login();
+      _store.setAdminUserInfo(user.metadata as Admin_User);
+    }
+
+    authChecked.value = true;
+  });
+});
+
 watch(
-  () => _store.isAdmin,
-  (isAdmin) => {
+  [() => _store.isAdmin, authChecked],
+  ([isAdmin, checked]) => {
+    if (!checked) return;
     if (!isAdmin) router.replace("/admin-login");
   },
   { immediate: true }
