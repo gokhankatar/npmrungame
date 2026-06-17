@@ -30,6 +30,12 @@
   --ac-soft: #ffcc80;
 }
 
+.admin-collection-page--lime {
+  --ac-rgb: 129, 199, 132;
+  --ac-hex: #81c784;
+  --ac-soft: #a5d6a7;
+}
+
 /* Çıkacak oyunlar — form + liste */
 .upcoming-form-panel {
   padding: 1.25rem 1.35rem;

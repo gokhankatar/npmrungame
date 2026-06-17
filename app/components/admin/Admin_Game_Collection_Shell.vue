@@ -4,6 +4,7 @@
     :class="{
       'admin-collection-page--cyan': theme === 'cyan',
       'admin-collection-page--red': theme === 'red',
+      'admin-collection-page--lime': theme === 'lime',
       'admin-completed-page': theme === 'green',
     }"
   >
@@ -179,7 +180,7 @@ const viewMode = defineModel<"card" | "list" | "table">("viewMode", { default: "
 
 const props = withDefaults(
   defineProps<{
-    theme?: "green" | "cyan" | "red";
+    theme?: "green" | "cyan" | "red" | "lime";
     title: string;
     subtitle: string;
     badge: string;
@@ -208,12 +209,14 @@ const props = withDefaults(
 const collectionGoal = computed(() => {
   if (props.theme === "cyan") return 50;
   if (props.theme === "red") return 20;
+  if (props.theme === "lime") return 100;
   return 100;
 });
 
 const totalLabel = computed(() => {
   if (props.theme === "cyan") return "Kuyruktaki oyun";
   if (props.theme === "red") return "Aktif oyun";
+  if (props.theme === "lime") return "Önerilen oyun";
   return "Bitirilen oyun";
 });
 
@@ -239,7 +242,12 @@ const statCards = computed(() => {
   return [
     {
       id: "total",
-      icon: props.theme === "cyan" ? "mdi-playlist-play" : "mdi-trophy-outline",
+      icon:
+        props.theme === "cyan"
+          ? "mdi-playlist-play"
+          : props.theme === "lime"
+            ? "mdi-thumb-up-outline"
+            : "mdi-trophy-outline",
       label: totalLabel.value,
       value: String(total),
       progress: goalProgress,

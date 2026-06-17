@@ -201,7 +201,7 @@ const props = withDefaults(
     title?: string;
     subtitle?: string;
     submitText: string;
-    theme?: "green" | "cyan" | "red" | "default";
+    theme?: "green" | "cyan" | "red" | "lime" | "default";
   }>(),
   {
     loading: false,

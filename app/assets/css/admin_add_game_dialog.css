@@ -44,6 +44,12 @@
   --aad-soft: rgba(144, 202, 249, 0.12);
 }
 
+.admin-add-game-dialog--lime {
+  --aad-accent: #81c784;
+  --aad-accent-rgb: 129, 199, 132;
+  --aad-soft: rgba(129, 199, 132, 0.12);
+}
+
 .admin-add-game-dialog__glow {
   pointer-events: none;
   position: absolute;
