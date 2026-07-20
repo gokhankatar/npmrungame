@@ -1,0 +1,164 @@
+/* Koleksiyon sayfaları — radar yatay kart (Admin_Collection_Game_Cards) */
+
+.admin-collection-radar-cards .upcoming-game-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  align-items: stretch;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.38);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+  animation: upcomingRowIn 0.4s ease forwards;
+  opacity: 0;
+}
+
+@media (min-width: 960px) {
+  .admin-collection-radar-cards .upcoming-game-card {
+    grid-template-columns: minmax(280px, 380px) 1fr;
+  }
+}
+
+.admin-collection-radar-cards .upcoming-game-card:hover {
+  border-color: rgba(var(--ac-rgb), 0.4);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.admin-collection-radar-cards .upcoming-game-card__media {
+  position: relative;
+  width: 100%;
+  min-height: 140px;
+  height: 100%;
+  align-self: stretch;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.admin-collection-radar-cards .upcoming-game-card__media .v-img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100%;
+}
+
+.admin-collection-radar-cards .upcoming-game-card__media .v-img__img,
+.admin-collection-radar-cards .upcoming-game-card__media .v-img__img--cover,
+.admin-collection-radar-cards .upcoming-game-card__media .v-img__img--preload {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.admin-collection-radar-cards .upcoming-game-card__img--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ac-rgb), 0.15) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+.admin-collection-radar-cards .upcoming-game-card__media-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+}
+
+.admin-collection-radar-cards .upcoming-game-card__body {
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.admin-collection-radar-cards .upcoming-game-card__title {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.admin-collection-radar-cards .upcoming-game-card__date {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.4;
+}
+
+.admin-collection-radar-cards .upcoming-date-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.25rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 12px;
+  background: rgba(var(--ac-rgb), 0.12);
+  border: 1px solid rgba(var(--ac-rgb), 0.28);
+  flex-shrink: 0;
+}
+
+.admin-collection-radar-cards .upcoming-date-pill__day {
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ac-hex);
+}
+
+.admin-collection-radar-cards .upcoming-date-pill__month {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 0.15rem;
+}
+
+.admin-collection-radar-cards .upcoming-date-pill__year {
+  font-size: 0.55rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.1rem;
+}
+
+@media (max-width: 599px) {
+  .admin-collection-radar-cards .upcoming-game-card {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-collection-radar-cards .upcoming-game-card__media {
+    min-height: 180px;
+    height: 180px;
+  }
+
+  .admin-collection-radar-cards .upcoming-game-card__media-overlay {
+    background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.7) 100%);
+  }
+}
+
+@keyframes upcomingRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

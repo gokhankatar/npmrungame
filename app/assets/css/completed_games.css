@@ -1249,15 +1249,24 @@
   box-shadow: 0 12px 36px rgba(105, 240, 174, 0.18), 0 0 24px rgba(105, 240, 174, 0.08);
 }
 
-/* Legacy pop-up styles (admin / dialogs) */
+/* Legacy pop-up styles (admin / dialogs) — admin.css ile uyumlu */
 .delete-game-pop-up,
 .game-detail-pop-up,
 .add-game-pop-up {
   position: relative;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(0.7rem);
-  -webkit-backdrop-filter: blur(0.7rem);
+  background: linear-gradient(
+    168deg,
+    rgba(36, 40, 48, 0.98) 0%,
+    rgba(20, 22, 28, 0.99) 45%,
+    rgba(12, 14, 18, 1) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .close-btn {
@@ -1283,10 +1292,18 @@
 
 .successfully-done-container {
   position: relative;
-  background: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(0.5rem);
-  -webkit-backdrop-filter: blur(0.5rem);
+  background: linear-gradient(
+    168deg,
+    rgba(36, 40, 48, 0.98) 0%,
+    rgba(20, 22, 28, 0.99) 45%,
+    rgba(12, 14, 18, 1) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .close-icon-in-successfully-done-container {

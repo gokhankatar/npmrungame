@@ -80,16 +80,27 @@
                                 "
                             />
 
-                            <v-btn
-                                v-if="!bulkDeleteMode"
-                                @click.stop="onDeleteClick(item)"
-                                variant="tonal"
-                                prepend-icon="mdi-delete"
-                                class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl mt-1"
-                                text="Sil"
-                                color="error"
-                                block
-                            />
+                            <div v-if="!bulkDeleteMode" class="d-flex flex-column ga-1 mt-1 w-100">
+                                <v-btn
+                                    v-if="onCompleteClick"
+                                    @click.stop="onCompleteClick(item)"
+                                    variant="tonal"
+                                    prepend-icon="mdi-check-circle"
+                                    class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl"
+                                    text="Tamamladım"
+                                    color="success"
+                                    block
+                                />
+                                <v-btn
+                                    @click.stop="onDeleteClick(item)"
+                                    variant="tonal"
+                                    prepend-icon="mdi-delete"
+                                    class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl"
+                                    text="Sil"
+                                    color="error"
+                                    block
+                                />
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -173,15 +184,27 @@
                     </td>
 
                     <td v-if="!bulkDeleteMode">
-                        <v-btn
-                            @click.stop="onDeleteClick(item)"
-                            variant="tonal"
-                            prepend-icon="mdi-delete"
-                            class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl"
-                            text="Sil"
-                            color="error"
-                            block
-                        />
+                        <div class="d-flex flex-column ga-1">
+                            <v-btn
+                                v-if="onCompleteClick"
+                                @click.stop="onCompleteClick(item)"
+                                variant="tonal"
+                                prepend-icon="mdi-check-circle"
+                                class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl"
+                                text="Tamamladım"
+                                color="success"
+                                block
+                            />
+                            <v-btn
+                                @click.stop="onDeleteClick(item)"
+                                variant="tonal"
+                                prepend-icon="mdi-delete"
+                                class="text-caption text-lg-subtitle-2 default-title-letter rounded-xl"
+                                text="Sil"
+                                color="error"
+                                block
+                            />
+                        </div>
                     </td>
                 </tr>
             </template>
@@ -205,6 +228,7 @@ const props = defineProps<{
     arr: any[];
     loading: boolean;
     onDeleteClick: (item: any) => void;
+    onCompleteClick?: (item: any) => void;
     onRowClick: (item: any) => void;
     bulkDeleteMode?: boolean;
     isSelected?: (item: any) => boolean;
@@ -217,7 +241,12 @@ const tableHeaders = computed(() => {
     if (props.bulkDeleteMode) {
         return header_games.filter((h) => h.key !== "delete");
     }
-    return [...header_games];
+    const headers = header_games.map((h) => ({ ...h }));
+    if (props.onCompleteClick) {
+        const actionCol = headers.find((h) => h.key === "delete");
+        if (actionCol) actionCol.title = "Aksiyon";
+    }
+    return headers;
 });
 
 const isItemSelected = (item: any) => props.isSelected?.(item) ?? false;

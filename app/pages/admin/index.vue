@@ -12,6 +12,7 @@
     <Registered_Users_Messages v-if="_store.active_admin_list_item == 'messages'" />
     <Recommended_Games v-if="_store.active_admin_list_item == 'recommended_games'" />
     <Upcoming_Games v-if="_store.active_admin_list_item == 'upcoming_games'" />
+    <To_Play_Games v-if="_store.active_admin_list_item == 'to_play_games'" />
     <Settings v-if="_store.active_admin_list_item == 'settings'" />
   </v-container>
 </template>
@@ -26,6 +27,7 @@ import Current_Games from "~/components/admin/Current_Games.vue";
 import Registered_Users_Messages from "~/components/admin/Registered_Users_Messages.vue";
 import Recommended_Games from "~/components/admin/Recommended_Games.vue";
 import Upcoming_Games from "~/components/admin/Upcoming_Games.vue";
+import To_Play_Games from "~/components/admin/To_Play_Games.vue";
 import Notificiations from "~/components/admin/Notificiations.vue";
 import Settings from "~/components/admin/Settings.vue";
 

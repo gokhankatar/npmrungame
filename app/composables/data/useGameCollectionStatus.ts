@@ -22,7 +22,6 @@ export const useGameCollectionStatus = ($firestore: any) => {
                     { key: "completed_games", name: "completed_games" },
                     { key: "current_games", name: "current_games" },
                     { key: "upcoming_games", name: "upcoming_games" },
-                    { key: "to_play_games", name: "to_play_games" },
                     { key: "recommended_games", name: "recommended_games" },
                 ];
 

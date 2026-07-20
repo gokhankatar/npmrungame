@@ -8,7 +8,6 @@
     accent-color="#ff8a80"
     :show-added-sort="false"
     v-model:list-search-query="listSearchQuery"
-    v-model:view-mode="viewMode"
     :total-games-count="totalGamesCount"
     :filtered-games-count="filteredGamesCount"
     :avg-playtime="avgPlaytime"
@@ -71,38 +70,24 @@
       />
     </div>
 
-    <Game_Card
-      v-else-if="viewMode === 'card'"
-      :loading="isGettingCurrentGames"
-      :arr="currentGames"
-        density="admin-grid"
-      :on-row-click="handleRowClick"
-      :bulk-delete-mode="bulkDeleteMode"
-      :is-selected="isSelected"
-      :on-toggle-select="toggleSelect"
-    />
+    <template v-else>
+      <Admin_Collection_Game_Cards
+        :loading="isGettingCurrentGames"
+        :arr="paginatedItems"
+        :on-row-click="handleRowClick"
+        :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
+        :on-complete-click="bulkDeleteMode ? undefined : handleCompleteGame"
+        :bulk-delete-mode="bulkDeleteMode"
+        :is-selected="isSelected"
+        :on-toggle-select="toggleSelect"
+      />
 
-    <Admin_Game_List
-      v-else-if="viewMode === 'list'"
-      :loading="isGettingCurrentGames"
-      :arr="currentGames"
-      :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
-      :on-row-click="handleRowClick"
-      :bulk-delete-mode="bulkDeleteMode"
-      :is-selected="isSelected"
-      :on-toggle-select="toggleSelect"
-    />
-
-    <Admin_Game_Table
-      v-else-if="viewMode === 'table'"
-      :loading="isGettingCurrentGames"
-      :arr="currentGames"
-      :on-delete-click="handleDeleteGame"
-      :on-row-click="handleRowClick"
-      :bulk-delete-mode="bulkDeleteMode"
-      :is-selected="isSelected"
-      :on-toggle-select="toggleSelect"
-    />
+      <Admin_Collection_Pagination
+        v-model="page"
+        :page-count="pageCount"
+        :page-size="pageSize"
+      />
+    </template>
   </Admin_Game_Collection_Shell>
 
 
@@ -151,6 +136,63 @@
           variant="tonal"
           prepend-icon="mdi-delete"
           text="Evet, sil"
+        />
+      </div>
+    </div>
+  </v-dialog>
+
+  <!-- Tamamladım onayı -->
+  <v-dialog
+    v-model="isOpenCompleteConfirmationDialog"
+    :max-width="600"
+    style="
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(0.7rem);
+      -webkit-backdrop-filter: blur(0.7rem);
+    "
+  >
+    <div class="delete-game-pop-up d-flex flex-column align-start ga-2 ga-lg-4 rounded pa-2 pa-lg-5">
+      <p class="text-subtitle-2 text-md-subtitle-1 text-xl-h5 default-title-letter text-grey-lighten-1">
+        Bu oyunu bitirdin mi?
+      </p>
+      <p class="text-caption text-grey-lighten-2 mb-0">
+        Onaylarsan oyun şuan oynananlardan kaldırılır ve bitirdiğim oyunlara eklenir.
+      </p>
+
+      <v-divider color="white" class="w-100" />
+
+      <div class="d-flex flex-column align-start ga-1">
+        <v-img :src="activeGame?.background_image" width="75" />
+        <p class="text-caption text-lg-subtitle-2 text-grey-lighten-1">
+          {{
+            `${activeGame?.name}
+          (${new Date(activeGame?.released).getFullYear()})`
+          }}
+        </p>
+      </div>
+
+      <div class="w-100 d-flex align-center justify-end ga-1 mt-2">
+        <v-btn
+          @click="isOpenCompleteConfirmationDialog = false"
+          :ripple="false"
+          class="rounded"
+          :size="isExtraLargeScreen ? 'default' : 'small'"
+          color="grey-lighten-2"
+          variant="text"
+          prepend-icon="mdi-close"
+          text="İptal"
+        />
+
+        <v-btn
+          @click="completeThisGameFromDb(activeGame?.firestoreId)"
+          :loading="isCompletingGame"
+          :ripple="false"
+          class="rounded"
+          color="success"
+          :size="isExtraLargeScreen ? 'default' : 'small'"
+          variant="tonal"
+          prepend-icon="mdi-check-circle"
+          text="Evet, tamamladım"
         />
       </div>
     </div>
@@ -278,6 +320,21 @@
           @click="showFullDescription = !showFullDescription"
           :text="showFullDescription ? 'Daha az göster' : 'Açıklamanın tamamını oku'" />
       </div>
+
+      <v-divider color="white" class="w-100" />
+
+      <div class="w-100 d-flex flex-wrap align-center justify-end ga-2">
+        <v-btn
+          variant="tonal"
+          color="success"
+          rounded="lg"
+          prepend-icon="mdi-check-circle"
+          class="text-capitalize"
+          text="Tamamladım"
+          :ripple="false"
+          @click="openCompleteFromDetail"
+        />
+      </div>
     </div>
   </v-dialog>
 
@@ -334,17 +391,18 @@ import {
   useMetacriticStyle,
 } from "~/composables/data/handleData";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
-import Admin_Game_Table from "../common/Admin_Game_Table.vue";
-import Admin_Game_List from "../common/Admin_Game_List.vue";
 import Admin_Bulk_Delete_Bar from "../common/Admin_Bulk_Delete_Bar.vue";
+import Admin_Collection_Game_Cards from "../common/Admin_Collection_Game_Cards.vue";
+import Admin_Collection_Pagination from "../common/Admin_Collection_Pagination.vue";
 import Admin_Game_Collection_Shell from "./Admin_Game_Collection_Shell.vue";
 import Admin_Add_Game_Dialog from "./Admin_Add_Game_Dialog.vue";
-import Game_Card from "../common/Game_Card.vue";
 import {
   useAdminBulkDelete,
   batchDeleteFromFirestore,
 } from "~/composables/admin/useAdminBulkDelete";
 import { useAdminCollectionList } from "~/composables/admin/useAdminCollectionList";
+import { useAdminCollectionPagination } from "~/composables/admin/useAdminCollectionPagination";
+import { moveGameToCompletedCollections } from "~/composables/admin/useAdminMoveToCompleted";
 
 const { $firestore } = useNuxtApp();
 
@@ -368,9 +426,11 @@ const {
 
 const isGettingCurrentGames = ref(false);
 const isOpenConfirmationDialog = ref(false);
+const isOpenCompleteConfirmationDialog = ref(false);
 const isOpenBulkConfirmationDialog = ref(false);
 const isOpenGameDetail = ref(false);
 const isDeletingGameFromDb = ref(false);
+const isCompletingGame = ref(false);
 const notificationModels = ref({
   isAvailable: false,
   msg: "",
@@ -392,12 +452,29 @@ const {
   avgMetacritic,
   sortLabel,
   sortMenuIcon,
-  onListSearchInput,
-  clearListSearch,
+  onListSearchInput: onListSearchInputBase,
+  clearListSearch: clearListSearchBase,
   sortBy,
   setAllGames,
 } = useAdminCollectionList("new");
-const viewMode = ref<"card" | "list" | "table">("card");
+const {
+  page,
+  pageCount,
+  paginatedItems,
+  pageSize,
+  resetPage,
+} = useAdminCollectionPagination(currentGames);
+
+const onListSearchInput = () => {
+  resetPage();
+  onListSearchInputBase();
+};
+
+const clearListSearch = () => {
+  resetPage();
+  clearListSearchBase();
+};
+
 const activeGame = ref<any | null>(null);
 const selectedGamesAfterResearch = ref<any[]>([]);
 const searchGameText = ref<string>("");
@@ -464,6 +541,16 @@ const handleDeleteGame = (game: any) => {
   isOpenConfirmationDialog.value = true;
 };
 
+const handleCompleteGame = (game: any) => {
+  activeGame.value = game;
+  isOpenCompleteConfirmationDialog.value = true;
+};
+
+const openCompleteFromDetail = () => {
+  isOpenGameDetail.value = false;
+  isOpenCompleteConfirmationDialog.value = true;
+};
+
 const sendNotification = (msg: string) => {
   notificationModels.value.msg = msg;
   notificationModels.value.isAvailable = true;
@@ -485,6 +572,31 @@ const deleteThisGameFromDb = async (firestoreId: string) => {
     isOpenConfirmationDialog.value = false;
     isDeletingGameFromDb.value = false;
 
+    await getCurrentGames();
+  }
+};
+
+const completeThisGameFromDb = async (firestoreId: string | undefined) => {
+  if (!firestoreId || !activeGame.value) return;
+
+  try {
+    isCompletingGame.value = true;
+
+    await moveGameToCompletedCollections(
+      $firestore,
+      COLLECTION_NAME,
+      firestoreId,
+      activeGame.value
+    );
+
+    sendNotification(
+      `${activeGame.value.name} bitirdiğim oyunlara taşındı!`
+    );
+  } catch (error) {
+    console.error("Tamamlama hatası:", error);
+  } finally {
+    isOpenCompleteConfirmationDialog.value = false;
+    isCompletingGame.value = false;
     await getCurrentGames();
   }
 };

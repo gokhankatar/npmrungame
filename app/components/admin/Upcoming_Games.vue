@@ -14,6 +14,16 @@
 
       <div class="d-flex flex-wrap align-center ga-2">
         <v-btn
+          class="admin-collection-add-btn text-capitalize"
+          color="#ffb74d"
+          variant="flat"
+          rounded="lg"
+          prepend-icon="mdi-plus"
+          text="Oyun Ekle"
+          :ripple="false"
+          @click="openAddDialog"
+        />
+        <v-btn
           icon="mdi-refresh"
           variant="tonal"
           rounded="lg"
@@ -132,304 +142,325 @@
       </v-col>
     </v-row>
 
-    <v-row :dense="smallScreen">
-      <v-col cols="12">
-        <div class="upcoming-form-panel w-100">
-          <div class="d-flex align-center ga-2 mb-4">
-            <v-icon
-              :icon="isEditing ? 'mdi-pencil-outline' : 'mdi-plus-circle-outline'"
-              color="#ffb74d"
-              size="20"
-            />
-            <p class="text-subtitle-2 text-grey-lighten-1 default-title-letter mb-0">
-              {{ isEditing ? "Kaydı düzenle" : "Yeni oyun ekle" }}
-            </p>
-          </div>
+    <p
+      v-if="upcomingGames.length && !isLoading"
+      class="text-subtitle-2 text-grey-lighten-1 default-title-letter mb-3"
+    >
+      Radardaki oyunlar ({{ upcomingGames.length }})
+    </p>
 
-          <v-form ref="gameForm" @submit.prevent="handleSubmit">
-            <!-- Oyun ara (RAWG) -->
-            <v-text-field
-              v-model="searchGameText"
-              label="Oyun ara"
-              placeholder="En az 3 karakter — örn. GTA 6"
-              variant="solo-filled"
-              flat
-              rounded="xl"
-              prepend-inner-icon="mdi-magnify"
-              :density="smallScreen ? 'compact' : 'comfortable'"
-              hide-details
-              clearable
-              class="default-title-letter"
-              color="grey-lighten-1"
-              :disabled="isEditing && !searchGameText"
-              @update:model-value="onSearchInput"
-            />
-
-            <p class="text-caption text-grey-darken-1 default-title-letter mt-1 mb-2">
-              <v-icon icon="mdi-information-outline" size="14" class="me-1" />
-              Oyun adı RAWG veritabanından seçilir.
-            </p>
-
-            <div v-if="isSearchingGame" class="d-flex align-center ga-2 py-2">
-              <v-progress-circular indeterminate size="18" width="2" color="#ffb74d" />
-              <span class="text-caption text-grey-lighten-2">Aranıyor…</span>
-            </div>
-
-            <div
-              v-else-if="searchGameText.length >= 3 && searchResults.length"
-              class="upcoming-search-results"
-            >
-              <button
-                v-for="game in searchResults"
-                :key="game.id"
-                type="button"
-                class="upcoming-pick-btn"
-                :class="{ 'upcoming-pick-btn--active': selectedGame?.id === game.id }"
-                @click="selectGameFromApi(game)"
-              >
-                <v-avatar :size="40" rounded="lg">
-                  <v-img :src="game.background_image" :alt="game.name" cover />
-                </v-avatar>
-                <div class="min-w-0 flex-grow-1">
-                  <p class="text-caption text-subtitle-2 text-grey-lighten-1 mb-0 text-truncate">
-                    {{ game.name }}
-                    <span v-if="game.released" class="text-grey-darken-1">
-                      ({{ formatYear(game.released) }})
-                    </span>
-                  </p>
-                </div>
-                <v-icon
-                  :icon="selectedGame?.id === game.id ? 'mdi-check-circle' : 'mdi-plus-circle-outline'"
-                  size="20"
-                  color="#ffb74d"
-                />
-              </button>
-            </div>
-
-            <p
-              v-else-if="searchGameText.length >= 3 && !isSearchingGame"
-              class="text-caption text-grey-darken-1 default-title-letter py-2"
-            >
-              Sonuç bulunamadı.
-            </p>
-
-            <!-- Seçili oyun -->
-            <div v-if="displaySelectedGame" class="upcoming-selected-game">
-              <v-avatar :size="52" rounded="lg">
-                <v-img
-                  v-if="displaySelectedGame.background_image"
-                  :src="displaySelectedGame.background_image"
-                  cover
-                />
-                <v-icon v-else icon="mdi-gamepad-variant" />
-              </v-avatar>
-              <div class="min-w-0 flex-grow-1">
-                <p class="text-subtitle-2 text-grey-lighten-1 default-title-letter mb-0 text-truncate">
-                  {{ displaySelectedGame.name }}
-                </p>
-                <p v-if="displaySelectedGame.rawgId" class="text-caption text-grey-darken-1 mb-0">
-                  RAWG #{{ displaySelectedGame.rawgId }}
-                </p>
-              </div>
-              <v-btn
-                v-if="!isEditing || searchGameText"
-                icon="mdi-close"
-                size="x-small"
-                variant="text"
-                color="grey-lighten-1"
-                :ripple="false"
-                @click="clearSelectedGame"
-              />
-            </div>
-
-            <!-- Vuetify tarih seçici -->
-            <v-menu
-              v-model="dateMenuOpen"
-              :close-on-content-click="false"
-              location="bottom start"
-              transition="scale-transition"
-            >
-              <template #activator="{ props: menuProps }">
-                <v-text-field
-                  v-bind="menuProps"
-                  :model-value="releaseDateLabel"
-                  label="Çıkış tarihi"
-                  placeholder="Takvimden seç"
-                  variant="outlined"
-                  rounded="lg"
-                  prepend-inner-icon="mdi-calendar-month"
-                  append-inner-icon="mdi-chevron-down"
-                  :rules="rules.releaseDate"
-                  :density="smallScreen ? 'compact' : 'comfortable'"
-                  class="default-title-letter mt-2"
-                  color="grey-lighten-1"
-                  readonly
-                  clearable
-                  hint="Tahmini veya kesin çıkış tarihi"
-                  persistent-hint
-                  @click:clear.stop="clearReleaseDate"
-                />
-              </template>
-
-              <v-card class="upcoming-date-picker-card pa-2" :elevation="8">
-                <v-date-picker
-                  v-model="pickerDate"
-                  color="warning"
-                  show-adjacent-months
-                  :min="minReleaseDate"
-                  width="100%"
-                  @update:model-value="onDatePicked"
-                />
-                <div class="d-flex justify-end pa-2 pt-0">
-                  <v-btn
-                    size="small"
-                    variant="text"
-                    color="grey-lighten-1"
-                    text="Kapat"
-                    :ripple="false"
-                    @click="dateMenuOpen = false"
-                  />
-                  <v-btn
-                    size="small"
-                    variant="flat"
-                    color="warning"
-                    class="text-black ms-2"
-                    text="Tamam"
-                    :ripple="false"
-                    :disabled="!form.releaseDate"
-                    @click="dateMenuOpen = false"
-                  />
-                </div>
-              </v-card>
-            </v-menu>
-
-            <div class="d-flex flex-wrap ga-2 mt-3">
-              <v-btn
-                type="submit"
-                :loading="isSaving"
-                :disabled="!canSubmit"
-                :ripple="false"
-                color="#ffb74d"
-                variant="flat"
-                rounded="lg"
-                class="text-black font-weight-bold default-title-letter text-capitalize flex-grow-1"
-                :prepend-icon="isEditing ? 'mdi-content-save-outline' : 'mdi-plus'"
-                :text="isEditing ? 'Kaydet' : 'Listeye ekle'"
-              />
-
-              <v-btn
-                v-if="isEditing"
-                variant="tonal"
-                color="grey-lighten-1"
-                rounded="lg"
-                class="default-title-letter text-capitalize"
-                prepend-icon="mdi-close"
-                text="Vazgeç"
-                :ripple="false"
-                @click="resetForm"
-              />
-            </div>
-          </v-form>
-        </div>
-      </v-col>
-
-      <v-col cols="12">
-        <p
-          v-if="upcomingGames.length && !isLoading"
-          class="text-subtitle-2 text-grey-lighten-1 default-title-letter mb-3"
-        >
-          Radardaki oyunlar ({{ upcomingGames.length }})
-        </p>
-
-        <v-row v-if="isLoading" :dense="smallScreen">
-          <v-col v-for="i in 3" :key="i" cols="12">
-            <v-skeleton-loader type="image, article" class="rounded-xl upcoming-game-card-skeleton" />
-          </v-col>
-        </v-row>
-
-        <v-row v-else-if="upcomingGames.length" :dense="smallScreen">
-          <v-col
-            v-for="(game, index) in upcomingGames"
-            :key="game.firestoreId"
-            cols="12"
-          >
-            <article
-              class="upcoming-game-card"
-              :style="{ animationDelay: `${index * 0.05}s` }"
-            >
-              <div class="upcoming-game-card__media">
-                <v-img
-                  v-if="game.background_image"
-                  :src="game.background_image"
-                  :alt="game.name"
-                  cover
-                  class="upcoming-game-card__img"
-                />
-                <div v-else class="upcoming-game-card__img upcoming-game-card__img--empty">
-                  <v-icon icon="mdi-gamepad-variant-outline" size="40" color="rgba(255,255,255,0.3)" />
-                </div>
-                <div class="upcoming-game-card__media-overlay" aria-hidden="true" />
-              </div>
-
-              <div class="upcoming-game-card__body">
-                <div class="d-flex align-start justify-space-between ga-2 mb-2">
-                  <div class="upcoming-date-pill">
-                    <span class="upcoming-date-pill__day">{{ getDateParts(game.releaseDate).day }}</span>
-                    <span class="upcoming-date-pill__month">{{ getDateParts(game.releaseDate).month }}</span>
-                    <span class="upcoming-date-pill__year">{{ getDateParts(game.releaseDate).year }}</span>
-                  </div>
-
-                  <div class="d-flex align-center ga-1 flex-shrink-0">
-                    <v-btn
-                      icon="mdi-pencil-outline"
-                      size="small"
-                      variant="tonal"
-                      color="grey-lighten-1"
-                      :ripple="false"
-                      @click="startEdit(game)"
-                    />
-                    <v-btn
-                      icon="mdi-delete-outline"
-                      size="small"
-                      variant="tonal"
-                      color="error"
-                      :ripple="false"
-                      @click="openDeleteDialog(game)"
-                    />
-                  </div>
-                </div>
-
-                <h3 class="upcoming-game-card__title default-title-letter">
-                  {{ game.name }}
-                </h3>
-                <p class="upcoming-game-card__date default-title-letter">
-                  {{ formatReleaseDate(game.releaseDate) }}
-                </p>
-                <v-chip
-                  size="small"
-                  variant="tonal"
-                  class="upcoming-countdown-chip default-title-letter mt-2"
-                  :color="getCountdownChip(game.releaseDate).color"
-                  :prepend-icon="getCountdownChip(game.releaseDate).icon"
-                  :text="getCountdownChip(game.releaseDate).text"
-                />
-              </div>
-            </article>
-          </v-col>
-        </v-row>
-
-        <div v-else class="admin-collection-empty">
-          <v-icon icon="mdi-calendar-blank-outline" size="48" color="rgba(255,183,77,0.45)" />
-          <p class="admin-collection-empty-title default-title-letter">
-            Henüz radarda oyun yok
-          </p>
-          <p class="admin-collection-empty-desc">
-            Yukarıdan oyun ara, listeden seç ve çıkış tarihini belirle.
-          </p>
-        </div>
+    <v-row v-if="isLoading" :dense="smallScreen">
+      <v-col v-for="i in 3" :key="i" cols="12">
+        <v-skeleton-loader type="image, article" class="rounded-xl upcoming-game-card-skeleton" />
       </v-col>
     </v-row>
+
+    <v-row v-else-if="upcomingGames.length" :dense="smallScreen">
+      <v-col
+        v-for="(game, index) in upcomingGames"
+        :key="game.firestoreId"
+        cols="12"
+      >
+        <article
+          class="upcoming-game-card"
+          :style="{ animationDelay: `${index * 0.05}s` }"
+        >
+          <div class="upcoming-game-card__media">
+            <v-img
+              v-if="game.background_image"
+              :src="game.background_image"
+              :alt="game.name"
+              cover
+              class="upcoming-game-card__img"
+            />
+            <div v-else class="upcoming-game-card__img upcoming-game-card__img--empty">
+              <v-icon icon="mdi-gamepad-variant-outline" size="40" color="rgba(255,255,255,0.3)" />
+            </div>
+            <div class="upcoming-game-card__media-overlay" aria-hidden="true" />
+          </div>
+
+          <div class="upcoming-game-card__body">
+            <div class="d-flex align-start justify-space-between ga-2 mb-2">
+              <div class="upcoming-date-pill">
+                <span class="upcoming-date-pill__day">{{ getDateParts(game.releaseDate).day }}</span>
+                <span class="upcoming-date-pill__month">{{ getDateParts(game.releaseDate).month }}</span>
+                <span class="upcoming-date-pill__year">{{ getDateParts(game.releaseDate).year }}</span>
+              </div>
+
+              <div class="d-flex align-center ga-1 flex-shrink-0">
+                <v-btn
+                  icon="mdi-pencil-outline"
+                  size="small"
+                  variant="outlined"
+                  color="grey-lighten-1"
+                  :ripple="false"
+                  @click="startEdit(game)"
+                />
+                <v-btn
+                  icon="mdi-delete-outline"
+                  size="small"
+                  variant="outlined"
+                  color="error"
+                  :ripple="false"
+                  @click="openDeleteDialog(game)"
+                />
+              </div>
+            </div>
+
+            <h3 class="upcoming-game-card__title default-title-letter">
+              {{ game.name }}
+            </h3>
+            <p class="upcoming-game-card__date default-title-letter">
+              {{ formatReleaseDate(game.releaseDate) }}
+            </p>
+            <v-chip
+              size="small"
+              variant="tonal"
+              class="upcoming-countdown-chip default-title-letter mt-2"
+              :color="getCountdownChip(game.releaseDate).color"
+              :prepend-icon="getCountdownChip(game.releaseDate).icon"
+              :text="getCountdownChip(game.releaseDate).text"
+            />
+          </div>
+        </article>
+      </v-col>
+    </v-row>
+
+    <div v-else class="admin-collection-empty">
+      <v-icon icon="mdi-calendar-blank-outline" size="48" color="rgba(255,183,77,0.45)" />
+      <p class="admin-collection-empty-title default-title-letter">
+        Henüz radarda oyun yok
+      </p>
+      <p class="admin-collection-empty-desc">
+        Oyun Ekle ile RAWG’den ara, çıkış tarihini seç ve radara ekle.
+      </p>
+      <v-btn
+        color="#ffb74d"
+        variant="tonal"
+        rounded="lg"
+        prepend-icon="mdi-plus"
+        class="text-capitalize"
+        text="Oyun ekle"
+        @click="openAddDialog"
+      />
+    </div>
   </div>
+
+  <!-- Ekle / düzenle popup -->
+  <v-dialog
+    v-model="isFormDialogOpen"
+    :max-width="560"
+    scrollable
+    transition="dialog-bottom-transition"
+    scrim="rgba(0,0,0,0.85)"
+    @after-leave="onFormDialogClosed"
+  >
+    <div class="delete-game-pop-up upcoming-form-dialog d-flex flex-column ga-3 rounded-xl pa-4 pa-lg-5">
+      <div class="d-flex align-center justify-space-between ga-2">
+        <div class="d-flex align-center ga-2 min-w-0">
+          <v-icon
+            :icon="isEditing ? 'mdi-pencil-outline' : 'mdi-plus-circle-outline'"
+            color="#ffb74d"
+            size="22"
+          />
+          <p class="text-subtitle-1 text-grey-lighten-1 default-title-letter mb-0 text-truncate">
+            {{ isEditing ? "Kaydı düzenle" : "Yeni oyun ekle" }}
+          </p>
+        </div>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          size="small"
+          color="grey-lighten-1"
+          :ripple="false"
+          @click="closeFormDialog"
+        />
+      </div>
+
+      <v-divider color="rgba(255,255,255,0.12)" />
+
+      <v-form ref="gameForm" @submit.prevent="handleSubmit">
+        <v-text-field
+          v-model="searchGameText"
+          label="Oyun ara"
+          placeholder="En az 3 karakter — örn. GTA 6"
+          variant="solo-filled"
+          flat
+          rounded="xl"
+          prepend-inner-icon="mdi-magnify"
+          :density="smallScreen ? 'compact' : 'comfortable'"
+          hide-details
+          clearable
+          class="default-title-letter"
+          color="grey-lighten-1"
+          :disabled="isEditing && !searchGameText"
+          @update:model-value="onSearchInput"
+        />
+
+        <p class="text-caption text-grey-darken-1 default-title-letter mt-1 mb-2">
+          <v-icon icon="mdi-information-outline" size="14" class="me-1" />
+          Oyun adı RAWG veritabanından seçilir.
+        </p>
+
+        <div v-if="isSearchingGame" class="d-flex align-center ga-2 py-2">
+          <v-progress-circular indeterminate size="18" width="2" color="#ffb74d" />
+          <span class="text-caption text-grey-lighten-2">Aranıyor…</span>
+        </div>
+
+        <div
+          v-else-if="searchGameText.length >= 3 && searchResults.length"
+          class="upcoming-search-results"
+        >
+          <button
+            v-for="game in searchResults"
+            :key="game.id"
+            type="button"
+            class="upcoming-pick-btn"
+            :class="{ 'upcoming-pick-btn--active': selectedGame?.id === game.id }"
+            @click="selectGameFromApi(game)"
+          >
+            <v-avatar :size="40" rounded="lg">
+              <v-img :src="game.background_image" :alt="game.name" cover />
+            </v-avatar>
+            <div class="min-w-0 flex-grow-1">
+              <p class="text-caption text-subtitle-2 text-grey-lighten-1 mb-0 text-truncate">
+                {{ game.name }}
+                <span v-if="game.released" class="text-grey-darken-1">
+                  ({{ formatYear(game.released) }})
+                </span>
+              </p>
+            </div>
+            <v-icon
+              :icon="selectedGame?.id === game.id ? 'mdi-check-circle' : 'mdi-plus-circle-outline'"
+              size="20"
+              color="#ffb74d"
+            />
+          </button>
+        </div>
+
+        <p
+          v-else-if="searchGameText.length >= 3 && !isSearchingGame"
+          class="text-caption text-grey-darken-1 default-title-letter py-2"
+        >
+          Sonuç bulunamadı.
+        </p>
+
+        <div v-if="displaySelectedGame" class="upcoming-selected-game">
+          <v-avatar :size="52" rounded="lg">
+            <v-img
+              v-if="displaySelectedGame.background_image"
+              :src="displaySelectedGame.background_image"
+              cover
+            />
+            <v-icon v-else icon="mdi-gamepad-variant" />
+          </v-avatar>
+          <div class="min-w-0 flex-grow-1">
+            <p class="text-subtitle-2 text-grey-lighten-1 default-title-letter mb-0 text-truncate">
+              {{ displaySelectedGame.name }}
+            </p>
+            <p v-if="displaySelectedGame.rawgId" class="text-caption text-grey-darken-1 mb-0">
+              RAWG #{{ displaySelectedGame.rawgId }}
+            </p>
+          </div>
+          <v-btn
+            v-if="!isEditing || searchGameText"
+            icon="mdi-close"
+            size="x-small"
+            variant="text"
+            color="grey-lighten-1"
+            :ripple="false"
+            @click="clearSelectedGame"
+          />
+        </div>
+
+        <v-menu
+          v-model="dateMenuOpen"
+          :close-on-content-click="false"
+          location="bottom start"
+          transition="scale-transition"
+        >
+          <template #activator="{ props: menuProps }">
+            <v-text-field
+              v-bind="menuProps"
+              :model-value="releaseDateLabel"
+              label="Çıkış tarihi"
+              placeholder="Takvimden seç"
+              variant="outlined"
+              rounded="lg"
+              prepend-inner-icon="mdi-calendar-month"
+              append-inner-icon="mdi-chevron-down"
+              :rules="rules.releaseDate"
+              :density="smallScreen ? 'compact' : 'comfortable'"
+              class="default-title-letter mt-2"
+              color="grey-lighten-1"
+              readonly
+              clearable
+              hint="Tahmini veya kesin çıkış tarihi"
+              persistent-hint
+              @click:clear.stop="clearReleaseDate"
+            />
+          </template>
+
+          <v-card class="upcoming-date-picker-card pa-2" :elevation="8">
+            <v-date-picker
+              v-model="pickerDate"
+              color="warning"
+              show-adjacent-months
+              :min="minReleaseDate"
+              width="100%"
+              @update:model-value="onDatePicked"
+            />
+            <div class="d-flex justify-end pa-2 pt-0">
+              <v-btn
+                size="small"
+                variant="text"
+                color="grey-lighten-1"
+                text="Kapat"
+                :ripple="false"
+                @click="dateMenuOpen = false"
+              />
+              <v-btn
+                size="small"
+                variant="flat"
+                color="warning"
+                class="text-black ms-2"
+                text="Tamam"
+                :ripple="false"
+                :disabled="!form.releaseDate"
+                @click="dateMenuOpen = false"
+              />
+            </div>
+          </v-card>
+        </v-menu>
+
+        <div class="d-flex flex-wrap ga-2 mt-4">
+          <v-btn
+            type="submit"
+            :loading="isSaving"
+            :disabled="!canSubmit"
+            :ripple="false"
+            color="#ffb74d"
+            variant="flat"
+            rounded="lg"
+            class="text-black font-weight-bold default-title-letter text-capitalize flex-grow-1"
+            :prepend-icon="isEditing ? 'mdi-content-save-outline' : 'mdi-plus'"
+            :text="isEditing ? 'Kaydet' : 'Listeye ekle'"
+          />
+
+          <v-btn
+            variant="text"
+            color="grey-lighten-1"
+            rounded="lg"
+            class="default-title-letter text-capitalize"
+            prepend-icon="mdi-close"
+            text="İptal"
+            :ripple="false"
+            @click="closeFormDialog"
+          />
+        </div>
+      </v-form>
+    </div>
+  </v-dialog>
 
   <v-dialog v-model="isDeleteDialogOpen" :max-width="480" scrim="rgba(0,0,0,0.85)">
     <div class="delete-game-pop-up d-flex flex-column ga-3 rounded pa-4 pa-lg-5">
@@ -506,6 +537,7 @@ const isDeleting = ref(false);
 const isEditing = ref(false);
 const editingId = ref<string | null>(null);
 const isDeleteDialogOpen = ref(false);
+const isFormDialogOpen = ref(false);
 const gameToDelete = ref<UpcomingGame | null>(null);
 const upcomingGames = ref<UpcomingGame[]>([]);
 
@@ -790,6 +822,19 @@ const resetForm = () => {
   gameForm.value?.resetValidation();
 };
 
+const openAddDialog = () => {
+  resetForm();
+  isFormDialogOpen.value = true;
+};
+
+const closeFormDialog = () => {
+  isFormDialogOpen.value = false;
+};
+
+const onFormDialogClosed = () => {
+  resetForm();
+};
+
 const buildPayload = () => ({
   name: form.value.name.trim(),
   releaseDate: form.value.releaseDate,
@@ -818,6 +863,7 @@ const handleSubmit = async () => {
     }
 
     resetForm();
+    isFormDialogOpen.value = false;
     await fetchUpcomingGames();
   } catch (error) {
     console.error("Kayıt hatası:", error);
@@ -848,6 +894,7 @@ const startEdit = (game: UpcomingGame) => {
   syncPickerFromForm();
   searchGameText.value = "";
   searchResults.value = [];
+  isFormDialogOpen.value = true;
 };
 
 const openDeleteDialog = (game: UpcomingGame) => {
@@ -879,4 +926,9 @@ onMounted(fetchUpcomingGames);
 <style scoped>
 @import "~/assets/css/admin.css";
 @import "~/assets/css/admin_collection_page.css";
+
+.upcoming-form-dialog {
+  max-height: min(85vh, 720px);
+  overflow-y: auto;
+}
 </style>

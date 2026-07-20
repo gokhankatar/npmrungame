@@ -1,14 +1,13 @@
 <template>
   <Admin_Game_Collection_Shell
     theme="cyan"
-    title="Oynayacağım Oyunlar"
-    subtitle="Listendeki oyunları ekle, ara, sırala ve yönet."
+    title="Bir Ara Oynayacaklarım"
+    subtitle="Radardan bağımsız kişisel backlog; çıkış takibi için Radarımdaki Oyunlar'ı kullan. Sitede görünmez."
     badge="Liste"
     badge-icon="mdi-playlist-play"
     accent-color="#4dd0e1"
     :show-added-sort="false"
     v-model:list-search-query="listSearchQuery"
-    v-model:view-mode="viewMode"
     :total-games-count="totalGamesCount"
     :filtered-games-count="filteredGamesCount"
     :avg-playtime="avgPlaytime"
@@ -18,7 +17,7 @@
     :loading="isGettingToPlayGames"
     :bulk-delete-mode="bulkDeleteMode"
     @add="isAddGame = true"
-    @refresh="getToPlayGames"
+    @refresh="refreshToPlaySection"
     @bulk-toggle="toggleBulkMode"
     @search-input="onListSearchInput"
     @clear-search="clearListSearch"
@@ -48,7 +47,7 @@
         {{
           listSearchQuery
             ? "Farklı bir arama dene veya filtreyi temizle."
-            : "Oynayacağın ilk oyunu eklemek için Oyun Ekle butonunu kullan."
+            : "Radarda olmayan, bir ara oynamak istediğin oyunları ekle. Çıkış takibi için radarı kullan."
         }}
       </p>
       <v-btn
@@ -71,39 +70,23 @@
       />
     </div>
 
-    <Game_Card
-      v-else-if="viewMode === 'card'"
-      :loading="isGettingToPlayGames"
-      :arr="toPlayGames"
-        density="admin-grid"
-      :on-row-click="handleRowClick"
-      :bulk-delete-mode="bulkDeleteMode"
-      :is-selected="isSelected"
-      :on-toggle-select="toggleSelect"
-    />
+    <template v-else>
+      <Admin_Collection_Game_Cards
+        :loading="isGettingToPlayGames"
+        :arr="paginatedItems"
+        :on-row-click="handleRowClick"
+        :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
+        :bulk-delete-mode="bulkDeleteMode"
+        :is-selected="isSelected"
+        :on-toggle-select="toggleSelect"
+      />
 
-    <Admin_Game_List
-      v-else-if="viewMode === 'list'"
-      :loading="isGettingToPlayGames"
-      :arr="toPlayGames"
-      :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
-      :on-row-click="handleRowClick"
-      :bulk-delete-mode="bulkDeleteMode"
-      :is-selected="isSelected"
-      :on-toggle-select="toggleSelect"
-    />
-
-    <Admin_Game_Table
-      v-else-if="viewMode === 'table'"
-      :loading="isGettingToPlayGames"
-      :arr="toPlayGames"
-      :on-delete-click="handleDeleteGame"
-      :on-row-click="handleRowClick"
-      :bulk-delete-mode="bulkDeleteMode"
-      :is-selected="isSelected"
-      :on-toggle-select="toggleSelect"
-    />
-
+      <Admin_Collection_Pagination
+        v-model="page"
+        :page-count="pageCount"
+        :page-size="pageSize"
+      />
+    </template>
   </Admin_Game_Collection_Shell>
 
 
@@ -398,8 +381,8 @@
     v-model="isAddGame"
     v-model:search="searchGameText"
     theme="cyan"
-    subtitle="Oynayacağın oyunları ara, seç ve listene ekle"
-    submit-text="Oynayacaklarım'a ekle"
+    subtitle="Radardaki oyunları ekleme; yalnızca bir ara oynayacağın çıkmış / elindeki oyunlar"
+    submit-text="Listeye ekle"
     :search-results="searchResults"
     :selected="selectedGamesAfterResearch"
     :loading="isSearchingGameLoading"
@@ -461,17 +444,21 @@ import {
   useMetacriticStyle,
 } from "~/composables/data/handleData";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
-import Admin_Game_Table from "../common/Admin_Game_Table.vue";
-import Admin_Game_List from "../common/Admin_Game_List.vue";
 import Admin_Bulk_Delete_Bar from "../common/Admin_Bulk_Delete_Bar.vue";
+import Admin_Collection_Game_Cards from "../common/Admin_Collection_Game_Cards.vue";
+import Admin_Collection_Pagination from "../common/Admin_Collection_Pagination.vue";
 import Admin_Game_Collection_Shell from "./Admin_Game_Collection_Shell.vue";
 import Admin_Add_Game_Dialog from "./Admin_Add_Game_Dialog.vue";
-import Game_Card from "../common/Game_Card.vue";
 import {
   useAdminBulkDelete,
   batchDeleteFromFirestore,
 } from "~/composables/admin/useAdminBulkDelete";
 import { useAdminCollectionList } from "~/composables/admin/useAdminCollectionList";
+import { useAdminCollectionPagination } from "~/composables/admin/useAdminCollectionPagination";
+import {
+  fetchRadarRawgIds,
+  isRawgGameOnRadar,
+} from "~/composables/admin/useAdminRadarGameIds";
 
 const { $firestore } = useNuxtApp();
 
@@ -519,16 +506,38 @@ const {
   avgMetacritic,
   sortLabel,
   sortMenuIcon,
-  onListSearchInput,
-  clearListSearch,
+  onListSearchInput: onListSearchInputBase,
+  clearListSearch: clearListSearchBase,
   sortBy,
   setAllGames,
 } = useAdminCollectionList("new");
-const viewMode = ref<"card" | "list" | "table">("card");
+const {
+  page,
+  pageCount,
+  paginatedItems,
+  pageSize,
+  resetPage,
+} = useAdminCollectionPagination(toPlayGames);
+
+const onListSearchInput = () => {
+  resetPage();
+  onListSearchInputBase();
+};
+
+const clearListSearch = () => {
+  resetPage();
+  clearListSearchBase();
+};
+
 const activeGame = ref<any | null>(null);
 const selectedGamesAfterResearch = ref<any[]>([]);
 const searchGameText = ref<string>("");
 const searchResults = ref<any[]>([]);
+const radarRawgIds = ref<Set<number>>(new Set());
+
+const loadRadarIds = async () => {
+  radarRawgIds.value = await fetchRadarRawgIds($firestore);
+};
 
 const displayedDescription = computed(() => {
   if (showFullDescription.value) return activeGame.value?.description;
@@ -545,6 +554,13 @@ const openBulkDeleteDialog = () => {
 };
 
 const selectGameAfterSearch = (item: any) => {
+  if (isRawgGameOnRadar(item, radarRawgIds.value)) {
+    sendNotification(
+      `${item.name} zaten radarda — çıkış takibi için orada kalsın, bu listeye ekleme.`
+    );
+    return;
+  }
+
   const exists = selectedGamesAfterResearch.value.some(
     (game: any) => game.id === item.id
   );
@@ -579,6 +595,11 @@ const getToPlayGames = async () => {
       isGettingToPlayGames.value = false;
     }, 250);
   }
+};
+
+const refreshToPlaySection = async () => {
+  await loadRadarIds();
+  await getToPlayGames();
 };
 
 const handleRowClick = (item: any) => {
@@ -667,15 +688,33 @@ const addGameToDb = async (collectionName: string = "to_play_games") => {
 
   if (!games || games.length === 0) return;
 
+  const onRadar = games.filter((g) => isRawgGameOnRadar(g, radarRawgIds.value));
+  const toAdd = games.filter((g) => !isRawgGameOnRadar(g, radarRawgIds.value));
+
+  if (onRadar.length && !toAdd.length) {
+    sendNotification(
+      "Seçilen oyun(lar) radarda. Bu liste radardan ayrı — önce radardan çıkar veya başka oyun seç."
+    );
+    return;
+  }
+
+  if (onRadar.length && toAdd.length) {
+    sendNotification(
+      `${onRadar.length} oyun radarda olduğu için atlandı; ${toAdd.length} oyun eklenecek.`
+    );
+  }
+
+  if (!toAdd.length) return;
+
   try {
     isAddingToDb.value = true;
 
-    addedGameToDbCount.value = games.length;
+    addedGameToDbCount.value = toAdd.length;
 
     // 🔥 Single
-    if (games.length === 1) {
-      await addDoc(collection($firestore, collectionName), games[0]);
-      console.log("Tek oyun eklendi:", games[0].name);
+    if (toAdd.length === 1) {
+      await addDoc(collection($firestore, collectionName), toAdd[0]);
+      console.log("Tek oyun eklendi:", toAdd[0].name);
       isAddedToDb.value = true;
 
       setTimeout(() => {
@@ -685,14 +724,14 @@ const addGameToDb = async (collectionName: string = "to_play_games") => {
       // 🔥 Multiple
       const batch = writeBatch($firestore);
 
-      games.forEach((g) => {
+      toAdd.forEach((g) => {
         const ref = doc(collection($firestore, collectionName));
         batch.set(ref, g);
       });
 
       await batch.commit();
 
-      console.log(`${games.length} oyun toplu olarak eklendi`);
+      console.log(`${toAdd.length} oyun toplu olarak eklendi`);
       isAddedToDb.value = true;
 
       setTimeout(() => {
@@ -720,8 +759,9 @@ watch(
   { immediate: true }
 );
 
-onMounted(() => {
-  getToPlayGames();
+onMounted(async () => {
+  await loadRadarIds();
+  await getToPlayGames();
 });
 </script>
 <style scoped>

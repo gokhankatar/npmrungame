@@ -78,19 +78,6 @@
         @click:clear="$emit('clear-search')"
       />
       <div class="admin-collection-toolbar-actions admin-completed-toolbar-actions">
-        <v-btn-toggle
-          :model-value="viewMode"
-          mandatory
-          density="compact"
-          class="admin-collection-view-toggle admin-completed-view-toggle"
-          :color="accentColor"
-          @update:model-value="$emit('update:viewMode', $event)"
-        >
-          <v-btn value="card" icon="mdi-view-grid" size="small" :ripple="false" />
-          <v-btn value="list" icon="mdi-view-list" size="small" :ripple="false" />
-          <v-btn value="table" icon="mdi-table" size="small" :ripple="false" />
-        </v-btn-toggle>
-
         <v-menu location="bottom end">
           <template #activator="{ props: menuProps }">
             <v-btn
@@ -176,7 +163,6 @@
 import type { AdminCollectionSortMode } from "~/composables/admin/useAdminCollectionList";
 
 const listSearchQuery = defineModel<string>("listSearchQuery", { default: "" });
-const viewMode = defineModel<"card" | "list" | "table">("viewMode", { default: "card" });
 
 const props = withDefaults(
   defineProps<{

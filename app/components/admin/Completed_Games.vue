@@ -7,7 +7,6 @@
     badge-icon="mdi-trophy"
     accent-color="#69f0ae"
     v-model:list-search-query="listSearchQuery"
-    v-model:view-mode="viewMode"
     :total-games-count="totalGamesCount"
     :filtered-games-count="filteredGamesCount"
     :avg-playtime="avgPlaytime"
@@ -68,38 +67,23 @@
         />
       </div>
 
-      <Game_Card
-        v-else-if="viewMode === 'card'"
-        :loading="isGettingCompletedGames"
-        :arr="completedGames"
-        density="admin-grid"
-        :on-row-click="handleRowClick"
-        :bulk-delete-mode="bulkDeleteMode"
-        :is-selected="isSelected"
-        :on-toggle-select="toggleSelect"
-      />
+      <template v-else>
+        <Admin_Collection_Game_Cards
+          :loading="isGettingCompletedGames"
+          :arr="paginatedItems"
+          :on-row-click="handleRowClick"
+          :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
+          :bulk-delete-mode="bulkDeleteMode"
+          :is-selected="isSelected"
+          :on-toggle-select="toggleSelect"
+        />
 
-      <Admin_Game_List
-        v-else-if="viewMode === 'list'"
-        :loading="isGettingCompletedGames"
-        :arr="completedGames"
-        :on-delete-click="bulkDeleteMode ? undefined : handleDeleteGame"
-        :on-row-click="handleRowClick"
-        :bulk-delete-mode="bulkDeleteMode"
-        :is-selected="isSelected"
-        :on-toggle-select="toggleSelect"
-      />
-
-      <Admin_Game_Table
-        v-else-if="viewMode === 'table'"
-        :loading="isGettingCompletedGames"
-        :arr="completedGames"
-        :on-delete-click="handleDeleteGame"
-        :on-row-click="handleRowClick"
-        :bulk-delete-mode="bulkDeleteMode"
-        :is-selected="isSelected"
-        :on-toggle-select="toggleSelect"
-      />
+        <Admin_Collection_Pagination
+          v-model="page"
+          :page-count="pageCount"
+          :page-size="pageSize"
+        />
+      </template>
   </Admin_Game_Collection_Shell>
 
     <!-- Bulk Delete Confirmation -->
@@ -457,13 +441,13 @@ import {
   useMetacriticStyle,
 } from "~/composables/data/handleData";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
-import Admin_Game_Table from "../common/Admin_Game_Table.vue";
-import Admin_Game_List from "../common/Admin_Game_List.vue";
 import Admin_Bulk_Delete_Bar from "../common/Admin_Bulk_Delete_Bar.vue";
+import Admin_Collection_Game_Cards from "../common/Admin_Collection_Game_Cards.vue";
+import Admin_Collection_Pagination from "../common/Admin_Collection_Pagination.vue";
 import Admin_Game_Collection_Shell from "./Admin_Game_Collection_Shell.vue";
 import Admin_Add_Game_Dialog from "./Admin_Add_Game_Dialog.vue";
-import Game_Card from "../common/Game_Card.vue";
 import { useAdminCollectionList } from "~/composables/admin/useAdminCollectionList";
+import { useAdminCollectionPagination } from "~/composables/admin/useAdminCollectionPagination";
 import {
   useAdminBulkDelete,
   batchDeleteFromFirestore,
@@ -516,12 +500,29 @@ const {
   avgMetacritic,
   sortLabel,
   sortMenuIcon,
-  onListSearchInput,
-  clearListSearch,
+  onListSearchInput: onListSearchInputBase,
+  clearListSearch: clearListSearchBase,
   sortBy,
   setAllGames,
 } = useAdminCollectionList("added");
-const viewMode = ref<"card" | "list" | "table">("card");
+const {
+  page,
+  pageCount,
+  paginatedItems,
+  pageSize,
+  resetPage,
+} = useAdminCollectionPagination(completedGames);
+
+const onListSearchInput = () => {
+  resetPage();
+  onListSearchInputBase();
+};
+
+const clearListSearch = () => {
+  resetPage();
+  clearListSearchBase();
+};
+
 const activeGame = ref<any | null>(null);
 const selectedGamesAfterResearch = ref<any[]>([]);
 const searchGameText = ref<string>("");

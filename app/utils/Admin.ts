@@ -51,6 +51,17 @@ export const adminNavSections: AdminNavSection[] = [
     ],
   },
   {
+    id: "personal",
+    title: "Kişisel (sadece panel)",
+    items: [
+      {
+        title: "Bir ara oynayacaklarım",
+        slug: "to_play_games",
+        icon: "mdi-playlist-play",
+      },
+    ],
+  },
+  {
     id: "content",
     title: "İçerik ve iletişim",
     items: [

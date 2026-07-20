@@ -393,10 +393,9 @@ export const getGameCollectionPublicInfo = (
     },
     to_play_games: {
       icon: "mdi-playlist-play",
-      color: "#ffb74d",
-      title: "Oynanacaklar listesinde",
-      message: "Bu oyun oynanmayı bekleyenler arasında.",
-      path: "/radarimdaki-oyunlar",
+      color: "#4dd0e1",
+      title: "Kişisel oynama listesi",
+      message: "Bu liste yalnızca admin panelinde tutulur; sitede yayınlanmaz.",
     },
     upcoming_games: {
       icon: "mdi-radar",

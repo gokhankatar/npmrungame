@@ -1554,3 +1554,40 @@
 .yt-stats-card-icon {
   display: none;
 }
+
+/* ─── Admin modal panelleri (onay, detay, toast) ─── */
+
+.delete-game-pop-up,
+.game-detail-pop-up,
+.add-game-pop-up,
+.successfully-done-container {
+  position: relative;
+  background: linear-gradient(
+    168deg,
+    rgba(36, 40, 48, 0.98) 0%,
+    rgba(20, 22, 28, 0.99) 45%,
+    rgba(12, 14, 18, 1) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.successfully-done-container {
+  text-align: center;
+}
+
+/* Overlay — panel sayfadan net ayrışsın */
+.v-overlay:has(.delete-game-pop-up) .v-overlay__scrim,
+.v-overlay:has(.game-detail-pop-up) .v-overlay__scrim,
+.v-overlay:has(.add-game-pop-up) .v-overlay__scrim,
+.v-overlay:has(.successfully-done-container) .v-overlay__scrim {
+  background: rgba(0, 0, 0, 0.8) !important;
+  opacity: 1 !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}

@@ -89,6 +89,16 @@
             />
 
             <v-btn
+              v-if="onCompleteClick"
+              @click.stop="onCompleteClick(item)"
+              icon="mdi-check-circle"
+              size="small"
+              color="success"
+              variant="text"
+              :ripple="false"
+            />
+
+            <v-btn
               v-if="onDeleteClick"
               @click.stop="onDeleteClick(item)"
               icon="mdi-delete"
@@ -117,6 +127,7 @@ const props = defineProps<{
   arr: any[];
   loading: boolean;
   onDeleteClick?: (item: any) => void;
+  onCompleteClick?: (item: any) => void;
   onRowClick: (item: any) => void;
   bulkDeleteMode?: boolean;
   isSelected?: (item: any) => boolean;
