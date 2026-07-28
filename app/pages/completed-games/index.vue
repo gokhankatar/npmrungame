@@ -662,7 +662,7 @@ const searchInputRef = ref<HTMLInputElement | null>(null);
 const searchInputMobileRef = ref<HTMLInputElement | null>(null);
 
 const LIBRARY_PAGE_SIZE = 24;
-const GAMES_2026_PAGE_SIZE = 8;
+const GAMES_2026_PAGE_SIZE = 12;
 
 const totalGamesCount = computed(() => allCompletedGames.value.length);
 const libraryPage = ref(1);
