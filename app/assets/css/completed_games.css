@@ -35,6 +35,28 @@
   position: relative;
   z-index: 1;
   margin-top: -2.5rem;
+  max-width: 1280px !important;
+}
+
+@media (min-width: 1600px) {
+  .completed-container {
+    max-width: 1440px !important;
+    padding-inline: clamp(2rem, 4vw, 3.5rem) !important;
+  }
+}
+
+@media (min-width: 1920px) {
+  .completed-container {
+    max-width: 1560px !important;
+    padding-inline: clamp(2.5rem, 5vw, 4.5rem) !important;
+  }
+}
+
+@media (min-width: 2560px) {
+  .completed-container {
+    max-width: 1680px !important;
+    padding-inline: clamp(3.5rem, 8vw, 6.5rem) !important;
+  }
 }
 
 /* Netflix tarzı — son bitirilen oyun */
@@ -1226,27 +1248,30 @@
   border: 1px dashed rgba(255, 255, 255, 0.12);
 }
 
-/* Game grid on this page */
+/* Game grid on this page — Steam capsule look */
 .completed-games-grid :deep(.game-card) {
-  border-radius: 14px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .completed-games-grid :deep(.game-card:hover) {
-  border-color: rgba(105, 240, 174, 0.35);
+  border-color: rgba(105, 240, 174, 0.4);
 }
 
 .completed-games-grid :deep(.game-card-info) {
-  border-radius: 0 0 14px 14px;
+  border-radius: 0;
+  background: transparent;
 }
 
 .games-2026-container :deep(.game-card) {
-  border: 1px solid rgba(105, 240, 174, 0.12);
+  border: 1px solid rgba(105, 240, 174, 0.14);
 }
 
 .games-2026-container :deep(.game-card:hover) {
-  border-color: rgba(105, 240, 174, 0.45);
-  box-shadow: 0 12px 36px rgba(105, 240, 174, 0.18), 0 0 24px rgba(105, 240, 174, 0.08);
+  border-color: rgba(105, 240, 174, 0.5);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(105, 240, 174, 0.14);
 }
 
 /* Legacy pop-up styles (admin / dialogs) — admin.css ile uyumlu */
