@@ -1,13 +1,11 @@
 export default defineEventHandler(async (event) => {
     const { search, page } = getQuery(event);
-    const config = useRuntimeConfig();
 
-    const data: any = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-            key: config.rawg_api_key,
-            search,
-            page,
-        },
+    // Typeahead: fail fast instead of letting the user wait on a stalled upstream.
+    const data: any = await rawgFetch("/games", {
+        params: { search, page },
+        timeout: 6000,
+        retry: 0,
     });
 
     const makeProxyUrl = (rawUrl: string | null) => {

@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
-  const config = useRuntimeConfig();
 
   const type = query.type as string;
   const slug = query.slug as string;
@@ -25,13 +24,12 @@ export default defineEventHandler(async (event) => {
   }
 
   const params: any = {
-    key: config.rawg_api_key,
     [type]: slug,
     page,
     page_size,
   };
 
-  const data: any = await $fetch("https://api.rawg.io/api/games", { params });
+  const data: any = await rawgFetch("/games", { params });
 
   const makeProxyUrl = (rawUrl: string | null) => {
     if (!rawUrl) return null;

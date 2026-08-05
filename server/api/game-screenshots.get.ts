@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
     const { id } = getQuery(event);
-    const config = useRuntimeConfig();
 
     if (!id) {
         throw createError({
@@ -9,16 +8,9 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const data: any = await $fetch(
-        `https://api.rawg.io/api/games/${id}/screenshots`,
-        {
-            params: {
-                key: config.rawg_api_key,
-            },
-        }
-    );
+    const data: any = await rawgFetch(`/games/${id}/screenshots`);
 
     return {
-        results: data.results ?? [],
+        results: data?.results ?? [],
     };
 });

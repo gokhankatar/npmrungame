@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
-  const config = useRuntimeConfig();
 
   const page = Number(query.page) || 1;
   const page_size = Number(query.page_size) || 40;
@@ -21,7 +20,6 @@ export default defineEventHandler(async (event) => {
       : undefined;
 
   const params: any = {
-    key: config.rawg_api_key,
     page,
     page_size,
   };
@@ -54,7 +52,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // RAWG API 
-  const data: any = await $fetch("https://api.rawg.io/api/games", { params });
+  const data: any = await rawgFetch("/games", { params });
 
   // Pagination URL for proxying through our API
   const makeProxyUrl = (rawUrl: string | null) => {
