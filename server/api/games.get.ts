@@ -1,13 +1,26 @@
+import { igdbFetch, IGDB_LIST_FIELDS, isoDateRangeToUnix } from "../utils/igdb";
+import {
+  isSafeForPublicCatalog,
+  mapIgdbGameToRawgShape,
+  type IgdbGame,
+} from "../utils/igdbMap";
+import {
+  MAX_IGDB_PAGE,
+  PLATFORM_IDS,
+  safeContentWhereParts,
+} from "../utils/igdbFilters";
+
+const buildWhere = (parts: string[]) =>
+  parts.length ? `where ${parts.join(" & ")};` : "";
+
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
 
-  const page = Number(query.page) || 1;
-  const page_size = Number(query.page_size) || 40;
-  const MAX_RAWG_PAGE = 1000;
+  const page = Math.max(1, Number(query.page) || 1);
+  const page_size = Math.min(Math.max(Number(query.page_size) || 40, 1), 50);
 
-  const platform = query.platform && query.platform !== ""
-    ? String(query.platform)
-    : undefined;
+  const platform =
+    query.platform && query.platform !== "" ? String(query.platform) : undefined;
 
   const dates =
     query.dates && String(query.dates).trim() !== ""
@@ -19,48 +32,66 @@ export default defineEventHandler(async (event) => {
       ? String(query.ordering)
       : undefined;
 
-  const params: any = {
-    page,
-    page_size,
-  };
+  const whereParts: string[] = ["cover != null", ...safeContentWhereParts()];
 
-  if (dates) {
-    params.dates = dates;
+  if (platform === "star" || ordering === "-metacritic") {
+    whereParts.push("aggregated_rating != null");
   }
 
-  if (ordering) {
-    params.ordering = ordering;
-  }
-
-  // ⭐ STAR: Metacritic ordering
-  if (platform === "star") {
-    params.ordering = "-metacritic";
-  }
-
-  // 🎮 Platform filter
   if (platform && platform !== "star") {
-    const platformMap: Record<string, number> = {
-      pc: 1,
-      ps5: 2,
-      xbox: 3,
-      nintendo: 7,
-    };
-
-    if (platformMap[platform]) {
-      params.parent_platforms = platformMap[platform];
+    const ids = PLATFORM_IDS[platform];
+    if (ids?.length) {
+      whereParts.push(`platforms = (${ids.join(",")})`);
     }
   }
 
-  // RAWG API 
-  const data: any = await rawgFetch("/games", { params });
+  const range = isoDateRangeToUnix(dates);
+  if (range) {
+    whereParts.push(`first_release_date >= ${range.fromTs}`);
+    whereParts.push(`first_release_date <= ${range.toTs}`);
+  }
 
-  // Pagination URL for proxying through our API
-  const makeProxyUrl = (rawUrl: string | null) => {
-    if (!rawUrl) return null;
+  let sort = "sort total_rating_count desc;";
+  if (platform === "star" || ordering === "-metacritic") {
+    sort = "sort aggregated_rating desc;";
+  } else if (ordering === "-released" || ordering === "released") {
+    sort =
+      ordering === "-released"
+        ? "sort first_release_date desc;"
+        : "sort first_release_date asc;";
+  } else if (ordering === "-rating") {
+    sort = "sort rating desc;";
+  } else if (ordering === "-added" || ordering === "-created") {
+    sort = "sort created_at desc;";
+  }
 
-    const url = new URL(rawUrl);
+  const offset = (page - 1) * page_size;
 
-    const nextPage = url.searchParams.get("page");
+  const listBody = `
+    fields ${IGDB_LIST_FIELDS};
+    ${buildWhere(whereParts)}
+    ${sort}
+    limit ${page_size};
+    offset ${offset};
+  `;
+
+  const countBody = `
+    ${buildWhere(whereParts)}
+  `;
+
+  const [games, countRes] = await Promise.all([
+    igdbFetch<IgdbGame[]>("games", listBody),
+    igdbFetch<{ count: number } | { count: number }[]>("games/count", countBody),
+  ]);
+
+  const totalCount = Array.isArray(countRes)
+    ? countRes?.[0]?.count ?? 0
+    : countRes?.count ?? 0;
+  const limitedTotalCount = Math.min(totalCount, MAX_IGDB_PAGE * page_size);
+  const totalPages = Math.min(Math.ceil(totalCount / page_size) || 1, MAX_IGDB_PAGE);
+
+  const makeProxyUrl = (targetPage: number | null) => {
+    if (!targetPage || targetPage < 1 || targetPage > totalPages) return null;
 
     const extra = [
       platform ? `platform=${platform}` : "",
@@ -70,20 +101,17 @@ export default defineEventHandler(async (event) => {
       .filter(Boolean)
       .join("&");
 
-    return `/api/games?page=${nextPage}&page_size=${page_size}${extra ? `&${extra}` : ""}`;
+    return `/api/games?page=${targetPage}&page_size=${page_size}${extra ? `&${extra}` : ""}`;
   };
-
-
-  const totalCount = data?.count || 0;
-  const limitedTotalCount = Math.min(totalCount, MAX_RAWG_PAGE * page_size);
-  const totalPages = Math.min(Math.ceil(totalCount / page_size), MAX_RAWG_PAGE);
 
   return {
     current: page,
-    next: makeProxyUrl(data?.next),
-    previous: makeProxyUrl(data?.previous),
+    next: makeProxyUrl(page < totalPages ? page + 1 : null),
+    previous: makeProxyUrl(page > 1 ? page - 1 : null),
     totalCount: limitedTotalCount,
     totalPages,
-    results: data?.results,
+    results: (games ?? [])
+      .filter(isSafeForPublicCatalog)
+      .map((g) => mapIgdbGameToRawgShape(g)),
   };
 });

@@ -9,6 +9,8 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     rawg_api_key: process.env.API_KEY,
+    twitch_client_id: process.env.TWITCH_CLIENT_ID,
+    twitch_client_secret: process.env.TWITCH_CLIENT_SECRET,
     youtube_api_key: process.env.YOUTUBE_API_KEY,
     youtube_channel_id: process.env.YOUTUBE_CHANNEL_ID,
     adminPassw: process.env.ADMIN_PASSWORD_KEY,
@@ -19,7 +21,6 @@ export default defineNuxtConfig({
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_KEY,
-      rawg_api_key: process.env.API_KEY,
       siteUrl: "https://www.npmrungame.com",
     },
   },

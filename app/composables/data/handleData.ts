@@ -5,23 +5,28 @@ const GENRE_LABEL_BY_SLUG = Object.fromEntries(
   game_genres.map((genre) => [genre.slug, genre.name])
 ) as Record<string, string>;
 
-/** RAWG genre adı → sitedeki Türkçe tür etiketi */
+/** RAWG / IGDB genre adı → sitedeki Türkçe tür etiketi */
 const GENRE_LABEL_BY_RAWG_NAME: Record<string, string> = {
   Action: "Aksiyon",
   Adventure: "Macera",
   RPG: "Rol Yapma",
   "Role-playing": "Rol Yapma",
+  "Role-playing (RPG)": "Rol Yapma",
   Shooter: "Nişancı",
   Strategy: "Strateji",
   Indie: "Indie",
   Puzzle: "Bulmaca",
   Racing: "Yarış",
+  Sport: "Spor",
   Sports: "Spor",
+  Simulator: "Simülasyon",
   Simulation: "Simülasyon",
+  Platform: "Platform",
   Platformer: "Platform",
   Fighting: "Dövüş",
   Casual: "Gündelik",
   Arcade: "Arcade",
+  Horror: "Korku",
 };
 
 type GameGenreRef = { slug?: string; name?: string };
@@ -105,6 +110,21 @@ export const useMetacriticStyle = (score?: number) => {
     icon: "mdi-thumb-down-outline",
     text: `${score}`,
   };
+};
+
+/** Resmi Metacritic renk skalası (kart badge) */
+export const getMetacriticBadge = (score?: number | null) => {
+  if (score == null || Number.isNaN(Number(score))) {
+    return null;
+  }
+  const value = Math.round(Number(score));
+  if (value >= 75) {
+    return { value, bg: "#66cc33", fg: "#0b1206", tier: "high" as const };
+  }
+  if (value >= 50) {
+    return { value, bg: "#ffcc33", fg: "#1a1400", tier: "mid" as const };
+  }
+  return { value, bg: "#ff0000", fg: "#fff", tier: "low" as const };
 };
 
 export const getActiveGamePlatformColor = (

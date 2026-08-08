@@ -76,47 +76,17 @@
           />
 
           <v-col cols="12" class="discover-pagination">
-            <div class="d-flex justify-center align-center ga-2 ga-lg-4 w-100">
-              <v-btn
-                :disabled="!_store.prevPage"
-                variant="tonal"
-                rounded="pill"
-                prepend-icon="mdi-chevron-left"
-                class="text-capitalize default-title-letter"
-                text="Geri"
-                :size="display.smAndDown.value ? 'small' : 'default'"
-                :ripple="false"
-                @click="goPrev"
-              />
-
-              <div class="d-flex align-center ga-1 ga-lg-2">
-                <v-progress-circular
-                  v-if="isGettingGames"
-                  color="grey-darken-1"
-                  size="12"
-                  width="2"
-                  indeterminate
-                />
-                <p
-                  v-else
-                  class="text-caption text-xl-subtitle-2 default-title-letter text-grey-darken-1 mb-0"
-                >
-                  {{ _store.currentPage }} / {{ totalPagesDisplay }}
-                </p>
-              </div>
-
-              <v-btn
-                :disabled="!_store.nextPage"
-                variant="tonal"
-                rounded="pill"
-                append-icon="mdi-chevron-right"
-                class="text-capitalize default-title-letter"
-                text="İleri"
-                :size="display.smAndDown.value ? 'small' : 'default'"
-                :ripple="false"
-                @click="goNext"
-              />
-            </div>
+            <Discover_Pagination
+              :current-page="_store.currentPage || page"
+              :total-pages="totalPagesDisplay"
+              :total-count="total_count"
+              :can-prev="!!_store.prevPage"
+              :can-next="!!_store.nextPage"
+              :loading="isGettingGames"
+              @prev="goPrev"
+              @next="goNext"
+              @go="goToPage"
+            />
           </v-col>
         </v-row>
       </section>
@@ -129,6 +99,7 @@ import axios from "axios";
 import store from "~/store/store";
 import { useDiscoverStore } from "~/store/queryStore";
 import Game_Card from "~/components/common/Game_Card.vue";
+import Discover_Pagination from "~/components/common/Discover_Pagination.vue";
 import { formatNumber } from "~/composables/data/handleData";
 import { slugify } from "~/composables/core/basicFunc";
 import { game_genres } from "~/utils/Game_Genres";
@@ -220,6 +191,14 @@ const goPrev = () => {
       query: { ...route.query, page: prevPage },
     });
   }
+};
+
+const goToPage = (target: number) => {
+  if (!target || target === page.value) return;
+  if (target < 1 || target > totalPagesDisplay.value) return;
+  router.push({
+    query: { ...route.query, page: String(target) },
+  });
 };
 
 const defaultTitle = "npmrungame | Keşfet";

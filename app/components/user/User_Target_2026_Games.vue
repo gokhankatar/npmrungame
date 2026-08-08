@@ -353,9 +353,9 @@ const searchGames = _.debounce(async (value: string) => {
 
   try {
     isSearchingGameLoading.value = true;
-    const response = await axios.get(
-      `https://api.rawg.io/api/games?key=${useRuntimeConfig().public.rawg_api_key}&search=${value}&page_size=10`
-    );
+    const response = await axios.get("/api/search-games", {
+      params: { search: value, page: 1 },
+    });
     searchResults.value = response.data.results || [];
   } catch (error) {
     console.error("Error searching games:", error);

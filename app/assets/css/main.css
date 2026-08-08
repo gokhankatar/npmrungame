@@ -135,16 +135,21 @@
 
 .metacritic-point {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 8px;
+  right: 8px;
   z-index: 10;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  background: transparent;
+  transition: none;
 }
 
 .game-card:hover .metacritic-point {
-  transform: scale(1.1);
+  transform: none;
 }
 
 .game-card-img {
@@ -250,17 +255,25 @@
   background: rgba(255, 255, 255, 0.15) !important;
 }
 
-.game-card .playtime-icon,
-.game-card .metacritic-point {
+.game-card .playtime-icon {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.game-card:hover .playtime-icon,
-.game-card:hover .metacritic-point {
+.game-card:hover .playtime-icon {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6),
     0 0 15px rgba(105, 240, 174, 0.3);
   border-color: rgba(105, 240, 174, 0.3);
+}
+
+.game-card .metacritic-point {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.game-card:hover .metacritic-point {
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .category-chip:hover {

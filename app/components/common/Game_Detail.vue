@@ -642,6 +642,7 @@ const getGameScreenshots = async () => {
     const res = await axios.get("/api/game-screenshots", {
       params: {
         id: _store.active_detailed_game?.id,
+        name: _store.active_detailed_game?.name,
       },
     });
 
@@ -662,6 +663,7 @@ const getGamesById = async () => {
     const res = await axios.get("/api/game-details", {
       params: {
         id: _store.active_detailed_game?.id,
+        name: _store.active_detailed_game?.name,
       },
     });
 

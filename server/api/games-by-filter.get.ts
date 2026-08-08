@@ -1,13 +1,29 @@
+import { igdbFetch, IGDB_LIST_FIELDS } from "../utils/igdb";
+import {
+  isSafeForPublicCatalog,
+  mapIgdbGameToRawgShape,
+  type IgdbGame,
+} from "../utils/igdbMap";
+import {
+  GENRE_AS_THEME_IDS,
+  GENRE_IDS,
+  KEYWORD_IDS,
+  MAX_IGDB_PAGE,
+  THEME_IDS,
+  safeContentWhereParts,
+} from "../utils/igdbFilters";
+
+const buildWhere = (parts: string[]) =>
+  parts.length ? `where ${parts.join(" & ")};` : "";
+
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
 
   const type = query.type as string;
   const slug = query.slug as string;
 
-  const page = Number(query.page) || 1;
-  const page_size = Number(query.page_size ?? 40);
-
-  const MAX_RAWG_PAGE = 1000;
+  const page = Math.max(1, Number(query.page) || 1);
+  const page_size = Math.min(Math.max(Number(query.page_size ?? 40), 1), 50);
 
   if (!type || !slug) {
     throw createError({
@@ -16,42 +32,80 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (!["genres", "tags"].includes(type)) {
+  if (!["genre", "tag", "genres", "tags"].includes(type)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Type must be 'genres' or 'tags'",
+      statusMessage: "Type must be 'genre'/'genres' or 'tag'/'tags'",
     });
   }
 
-  const params: any = {
-    [type]: slug,
-    page,
-    page_size,
-  };
+  const normalizedType = type.startsWith("genre") ? "genre" : "tag";
+  const whereParts: string[] = ["cover != null", ...safeContentWhereParts()];
 
-  const data: any = await rawgFetch("/games", { params });
+  if (normalizedType === "genre") {
+    if (GENRE_AS_THEME_IDS[slug] != null) {
+      whereParts.push(`themes = (${GENRE_AS_THEME_IDS[slug]})`);
+    } else {
+      const genreId = GENRE_IDS[slug];
+      if (!genreId) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: `Unknown genre slug: ${slug}`,
+        });
+      }
+      whereParts.push(`genres = (${genreId})`);
+    }
+  } else if (KEYWORD_IDS[slug] != null) {
+    whereParts.push(`keywords = (${KEYWORD_IDS[slug]})`);
+  } else {
+    const themeId = THEME_IDS[slug];
+    if (!themeId) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: `Unknown tag slug: ${slug}`,
+      });
+    }
+    whereParts.push(`themes = (${themeId})`);
+  }
 
-  const makeProxyUrl = (rawUrl: string | null) => {
-    if (!rawUrl) return null;
+  const offset = (page - 1) * page_size;
 
-    const url = new URL(rawUrl);
-    const nextPage = url.searchParams.get("page");
+  const listBody = `
+    fields ${IGDB_LIST_FIELDS};
+    ${buildWhere(whereParts)}
+    sort total_rating_count desc;
+    limit ${page_size};
+    offset ${offset};
+  `;
 
-    return `/api/games-by-filter?page=${nextPage}&page_size=${page_size}&type=${type}&slug=${slug}`;
-  };
+  const countBody = `${buildWhere(whereParts)}`;
 
-  const totalCount = data?.count || 0;
+  const [games, countRes] = await Promise.all([
+    igdbFetch<IgdbGame[]>("games", listBody),
+    igdbFetch<{ count: number } | { count: number }[]>("games/count", countBody),
+  ]);
+
+  const totalCount = Array.isArray(countRes)
+    ? countRes?.[0]?.count ?? 0
+    : countRes?.count ?? 0;
   const totalPages = Math.min(
-    Math.ceil(totalCount / page_size),
-    MAX_RAWG_PAGE
+    Math.ceil(totalCount / page_size) || 1,
+    MAX_IGDB_PAGE
   );
+
+  const makeProxyUrl = (targetPage: number | null) => {
+    if (!targetPage || targetPage < 1 || targetPage > totalPages) return null;
+    return `/api/games-by-filter?page=${targetPage}&page_size=${page_size}&type=${type}&slug=${slug}`;
+  };
 
   return {
     current: page,
-    next: makeProxyUrl(data?.next),
-    previous: makeProxyUrl(data?.previous),
+    next: makeProxyUrl(page < totalPages ? page + 1 : null),
+    previous: makeProxyUrl(page > 1 ? page - 1 : null),
     totalPages,
-    totalCount,
-    results: data?.results ?? [],
+    totalCount: Math.min(totalCount, MAX_IGDB_PAGE * page_size),
+    results: (games ?? [])
+      .filter(isSafeForPublicCatalog)
+      .map((g) => mapIgdbGameToRawgShape(g)),
   };
 });

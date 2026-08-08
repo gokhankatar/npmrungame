@@ -289,7 +289,8 @@
 }
 
 .discover-pagination {
-  padding-top: 0.5rem;
+  padding-top: 1.25rem;
+  padding-bottom: 0.5rem;
 }
 
 .discover-games-grid :deep(.game-card) {

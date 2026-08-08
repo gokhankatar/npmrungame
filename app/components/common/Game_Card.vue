@@ -51,21 +51,28 @@
                 />
               </template>
             </v-tooltip>
-            <div class="metacritic-point d-flex align-center ga-1 ma-1">
+
+            <div v-if="metacriticBadge(item)" class="metacritic-point">
               <v-tooltip text="Metacritic puanı" location="top">
                 <template #activator="{ props: tipProps }">
-                  <v-chip
-                    v-if="item.metacritic"
+                  <span
                     v-bind="tipProps"
-                    class="rounded-pill"
-                    :ripple="false"
-                    size="x-small"
-                    :prepend-icon="item.metacritic < 90 ? 'mdi-star-outline' : ''"
-                    :prepend-avatar="item.metacritic >= 90 ? fireAnimation : ''"
-                    variant="elevated"
-                    :color="useMetacriticStyle(item.metacritic).color"
-                    :text="String(item.metacritic)"
-                  />
+                    class="mc-badge"
+                    :class="{ 'mc-badge--hot': metacriticBadge(item)!.value >= 90 }"
+                    :style="{
+                      background: metacriticBadge(item)!.bg,
+                      color: metacriticBadge(item)!.fg,
+                    }"
+                    :aria-label="`Metacritic ${metacriticBadge(item)!.value}`"
+                  >
+                    <img
+                      v-if="metacriticBadge(item)!.value >= 90"
+                      :src="fireAnimation"
+                      alt=""
+                      class="mc-badge__fire"
+                    />
+                    {{ metacriticBadge(item)!.value }}
+                  </span>
                 </template>
               </v-tooltip>
               <v-tooltip
@@ -87,12 +94,24 @@
           </template>
 
           <div class="game-card-info">
-            <p
-              class="game-card-title default-title-letter font-weight-medium"
-              :class="display.xs.value ? 'extra-small-text' : 'text-caption'"
-            >
-              {{ truncateText(item.name, display.xs.value ? 22 : 28) }}
-            </p>
+            <div class="game-card-info__top">
+              <p
+                class="game-card-title default-title-letter font-weight-medium"
+                :class="display.xs.value ? 'extra-small-text' : 'text-caption'"
+              >
+                {{ truncateText(item.name, display.xs.value ? 22 : 28) }}
+              </p>
+              <span
+                v-if="display.xs.value && metacriticBadge(item)"
+                class="mc-badge mc-badge--inline"
+                :style="{
+                  background: metacriticBadge(item)!.bg,
+                  color: metacriticBadge(item)!.fg,
+                }"
+              >
+                {{ metacriticBadge(item)!.value }}
+              </span>
+            </div>
             <div class="d-flex align-center ga-2 flex-wrap">
               <p
                 class="text-caption text-grey-lighten-1 game-card-meta mb-0"
@@ -106,16 +125,6 @@
                       : "—"
                 }}
               </p>
-              <template v-if="display.xs.value">
-                <v-chip
-                  v-if="item.metacritic"
-                  size="x-small"
-                  variant="tonal"
-                  :ripple="false"
-                  :color="useMetacriticStyle(item.metacritic).color"
-                  :text="String(item.metacritic)"
-                />
-              </template>
             </div>
 
             <div class="game-card-hover-details d-flex flex-wrap align-center ga-1 mt-1">
@@ -145,8 +154,8 @@ import fireAnimationSrc from "~/assets/img/fire_anim.gif";
 import { truncateText } from "~/composables/core/basicFunc";
 import {
   formatGameYearAndGenres,
+  getMetacriticBadge,
   getUniquePlatformIcons,
-  useMetacriticStyle,
 } from "~/composables/data/handleData";
 
 const props = withDefaults(
@@ -184,6 +193,8 @@ const gridXl = computed(() => 2);
 
 const display = useDisplay();
 const fireAnimation = fireAnimationSrc;
+
+const metacriticBadge = (item: any) => getMetacriticBadge(item?.metacritic);
 
 const isItemSelected = (item: any) => props.isSelected?.(item) ?? false;
 
@@ -260,6 +271,13 @@ const handleCardClick = (item: any) => {
   backdrop-filter: none !important;
 }
 
+.game-card-info__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
 .game-card-title {
   margin: 0;
   line-height: 1.25;
@@ -268,6 +286,8 @@ const handleCardClick = (item: any) => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-width: 0;
+  flex: 1;
 }
 
 .game-card-meta--genres {
@@ -285,6 +305,61 @@ const handleCardClick = (item: any) => {
 .game-card:hover .game-card-hover-details {
   opacity: 1;
   max-height: 56px;
+}
+
+/* Metacritic — resmi kutu, hover’da kare border yok */
+.metacritic-point {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  background: transparent !important;
+  transform: none !important;
+}
+
+.mc-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.35rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+  border: none;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.mc-badge--inline {
+  min-width: 1.65rem;
+  height: 1.65rem;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.mc-badge--hot {
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.45),
+    0 0 12px rgba(102, 204, 51, 0.35);
+}
+
+.mc-badge__fire {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
 }
 
 .admin-bulk-card-selected {

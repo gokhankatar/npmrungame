@@ -196,25 +196,16 @@
         <v-col cols="12">
           <Home_Section_Header
             title="Keşfet'ten Öne Çıkanlar"
-            subtitle="Bu yıl öne çıkan oyunlardan bir seçki — türe göre keşfet"
+            subtitle="Popüler yüksek puanlı oyunlar — türe göre keşfet"
             icon="mdi-compass-outline"
             to="/discover"
             clickable
           />
-          <v-row v-if="isGettingDiscover" :dense="smallScreen">
-            <v-col v-for="n in 8" :key="n" cols="6" md="4" lg="3">
-              <v-skeleton-loader type="image" class="rounded-lg" />
-            </v-col>
-          </v-row>
-          <div v-else-if="discoverPreview.length" class="home-discover-grid">
-            <Game_Card
-              density="comfortable"
-              meta-format="year-genres"
-              :loading="false"
-              :arr="discoverPreview"
-              :on-row-click="handleDiscoverClick"
-            />
-          </div>
+          <Home_Discover_Featured
+            :games="discoverPreview"
+            :loading="isGettingDiscover"
+            :on-select="handleDiscoverClick"
+          />
         </v-col>
 
         <!-- Features -->
@@ -434,11 +425,11 @@ import {
 import axios from "axios";
 import _ from "lodash";
 import Animated_Text from "~/components/common/Animated_Text.vue";
-import Game_Card from "~/components/common/Game_Card.vue";
 import Home_Newsletter_Block from "~/components/home/Home_Newsletter_Block.vue";
 import Home_Top10_Section from "~/components/home/Home_Top10_Section.vue";
 import Home_Section_Header from "~/components/home/Home_Section_Header.vue";
 import Home_Current_Games_Row from "~/components/home/Home_Current_Games_Row.vue";
+import Home_Discover_Featured from "~/components/home/Home_Discover_Featured.vue";
 import Home_Youtube_Stats from "~/components/home/Home_Youtube_Stats.vue";
 import Bg_Anim from "~/components/layout/Bg_Anim.vue";
 import { slugify, truncateText } from "~/composables/core/basicFunc";
@@ -620,16 +611,14 @@ const getBlogsFromDb = async () => {
 const getDiscoverPreview = async () => {
   try {
     isGettingDiscover.value = true;
-    const year = new Date().getFullYear();
+    // Popüler / bilinen oyunlar — "bu yıl çıkan bilinmeyenler" değil
     const { data } = await axios.get("/api/games", {
       params: {
         page: 1,
-        page_size: 8,
-        dates: `${year}-01-01,${year}-12-31`,
-        ordering: "-released",
+        page_size: 6,
       },
     });
-    discoverPreview.value = (data?.results ?? []).slice(0, 8);
+    discoverPreview.value = (data?.results ?? []).slice(0, 6);
   } catch (e: any) {
     console.error("Discover preview:", e?.message);
   } finally {

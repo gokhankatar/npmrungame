@@ -120,6 +120,13 @@ export type Game_Genre_Slug =
   | "horror"
   | "souls-like";
 
+export interface Game_Genre {
+  name: Game_Genre_Name;
+  slug: Game_Genre_Slug;
+  background_img: string;
+  type: Game_Filter_Type;
+}
+
 export type Existed_Game_Collection =
   | "completed_games"
   | "current_games"
