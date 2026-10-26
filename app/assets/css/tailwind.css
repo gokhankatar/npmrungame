@@ -1,0 +1,41 @@
+/*
+  Tailwind v4 — panel/dashboard stack.
+  Preflight bilinçli kapalı: Vuetify hâlâ ayakta; çakışmayı önlemek için
+  sadece theme + utilities yükleniyor. Vuetify tamamen çıkınca preflight açılır.
+*/
+@layer theme, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/*
+  Class-based dark mode — media query yerine html.dark.
+  @import'tan SONRA olmalı (aksi halde override düşer, dark: OS'e bağlı kalır).
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Brand — mevcut Vuetify dark theme ile birebir */
+  --color-bg: #0d1421;
+  --color-surface: #0d1421;
+  --color-surface-elevated: #121620;
+  --color-surface-glass: rgb(18 22 32 / 0.72);
+
+  --color-primary: #69f0ae;
+  --color-primary-muted: rgb(105 240 174 / 0.45);
+  --color-secondary: #d1d1d1;
+  --color-muted: #9e9e9e;
+
+  --color-error: #cf6679;
+  --color-info: #2196f3;
+  --color-success: #4caf50;
+  --color-warning: #fb8c00;
+
+  --color-border: rgb(255 255 255 / 0.14);
+  --color-border-strong: rgb(255 255 255 / 0.25);
+
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-panel: 0 8px 24px rgb(0 0 0 / 0.35);
+  --shadow-panel-hover: 0 10px 28px rgb(0 0 0 / 0.4);
+}

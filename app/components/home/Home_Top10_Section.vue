@@ -1,9 +1,9 @@
 <template>
   <section class="home-top10-section">
     <Home_Section_Header
-      title="Top 10 listeni yaptın mı?"
-      subtitle="En sevdiğin 10 oyunu seç, paylaş — topluluğun listelerine göz at"
-      icon="mdi-numeric-10-box-multiple-outline"
+      title="Top 9 listeni yaptın mı?"
+      subtitle="En sevdiğin 9 oyunu seç, 3×3 ekran olarak paylaş — topluluğun listelerine göz at"
+      icon="mdi-numeric-9-plus-box-multiple-outline"
       icon-color="#69f0ae"
     />
 
@@ -12,7 +12,7 @@
         <v-icon icon="mdi-playlist-star" color="#69f0ae" size="26" />
       </div>
       <div class="home-top10-cta__text">
-        <h3 class="default-title-letter">Kendi Top 10'unu oluştur</h3>
+        <h3 class="default-title-letter">Kendi Top 9'unu oluştur</h3>
         <p class="default-title-letter">
           Oyun ara, sırala, kaydet — ekran görüntüsü alıp sosyal medyada paylaş.
         </p>
@@ -51,7 +51,7 @@
       >
         <p class="home-top10-card__user default-title-letter">{{ item.username }}</p>
         <p class="home-top10-card__count default-title-letter">
-          {{ item.gameCount }} oyun · Top 10
+          {{ item.gameCount }} oyun · Top 9
         </p>
         <div class="home-top10-card__covers">
           <div

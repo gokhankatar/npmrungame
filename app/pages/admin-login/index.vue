@@ -84,7 +84,7 @@
               prepend-icon="mdi-bookshelf"
               text="Koleksiyonu gör"
               :ripple="false"
-              to="/completed-games"
+              to="/dashboard/completed"
             />
           </div>
         </div>

@@ -9,7 +9,6 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   await nextTick();
-
   setTimeout(() => {
     isLoading.value = false;
   }, 500);
@@ -17,13 +16,14 @@ onMounted(async () => {
 </script>
 
 <template>
+  <!-- JSON-LD her zaman SSR'da olsun (loading arkasına gömme) -->
+  <Site_JsonLd />
+
   <Loading v-if="isLoading" />
-  <template v-else>
-    <Site_JsonLd />
+  <div v-show="!isLoading">
     <Navbar />
-    <NuxtPage />
+    <slot />
     <Footer />
     <Scroll_To_Top />
-  </template>
+  </div>
 </template>
-

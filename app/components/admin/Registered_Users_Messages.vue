@@ -212,17 +212,15 @@ import {
 } from "~/composables/data/headerTables";
 import Animated_Text from "../common/Animated_Text.vue";
 
-const router = useRouter();
 const { $firestore } = useNuxtApp();
 const { formatDateTR } = useFirestoreDateFormatted();
 
 const display = useDisplay();
 const isSmallScreen = computed(() => display.smAndDown.value);
 
-const goToProfile = (user: any) => {
-  if (user?.firestoreId) {
-    router.push(`/profile/${user.firestoreId}`);
-  }
+/** Public profil sayfası kaldırıldı — panel-first */
+const goToProfile = (_user: any) => {
+  /* no-op */
 };
 
 const isGettingRegisteredUsers = ref(false);

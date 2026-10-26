@@ -118,6 +118,24 @@
         <div class="upcoming-admin-spotlight__actions">
           <v-btn
             variant="tonal"
+            color="success"
+            rounded="lg"
+            size="small"
+            :prepend-icon="
+              spotlightId === nextGame.firestoreId ? 'mdi-star' : 'mdi-star-outline'
+            "
+            class="text-capitalize default-title-letter"
+            :text="
+              spotlightId === nextGame.firestoreId
+                ? 'Panel vitrininde'
+                : 'Panelde göster'
+            "
+            :loading="spotlightSavingId === nextGame.firestoreId"
+            :ripple="false"
+            @click="pinToPanel(nextGame)"
+          />
+          <v-btn
+            variant="tonal"
             color="warning"
             rounded="lg"
             size="small"
@@ -188,6 +206,26 @@
               </div>
 
               <div class="d-flex align-center ga-1 flex-shrink-0">
+                <v-btn
+                  :icon="
+                    spotlightId === game.firestoreId
+                      ? 'mdi-star'
+                      : 'mdi-star-outline'
+                  "
+                  size="small"
+                  variant="outlined"
+                  :color="
+                    spotlightId === game.firestoreId ? 'success' : 'grey-lighten-1'
+                  "
+                  :loading="spotlightSavingId === game.firestoreId"
+                  :ripple="false"
+                  :title="
+                    spotlightId === game.firestoreId
+                      ? 'Panel vitrininde'
+                      : 'Panelde göster'
+                  "
+                  @click="pinToPanel(game)"
+                />
                 <v-btn
                   icon="mdi-pencil-outline"
                   size="small"
@@ -522,11 +560,17 @@ import {
 } from "firebase/firestore";
 import { VForm } from "vuetify/components";
 import successfullyDoneImg from "~/assets/img/successfully_done_anim.gif";
+import store from "~/store/store";
 
 const COLLECTION = "upcoming_games";
 
 const { $firestore } = useNuxtApp();
 const display = useDisplay();
+const _store = store();
+const { setSpotlight, getSpotlightId } = useDashboardSpotlight();
+
+const spotlightId = ref<string | null>(null);
+const spotlightSavingId = ref<string | null>(null);
 
 const smallScreen = computed(() => display.smAndDown.value);
 
@@ -920,7 +964,33 @@ const confirmDelete = async () => {
   }
 };
 
-onMounted(fetchUpcomingGames);
+const pinToPanel = async (game: UpcomingGame) => {
+  if (spotlightSavingId.value) return;
+  spotlightSavingId.value = game.firestoreId;
+  try {
+    await setSpotlight(
+      {
+        firestoreId: game.firestoreId,
+        name: game.name,
+        releaseDate: game.releaseDate,
+        background_image: game.background_image ?? null,
+        rawgId: game.rawgId ?? null,
+      },
+      _store.user?.uid || _store.admin_user?.uid || null
+    );
+    spotlightId.value = game.firestoreId;
+    showToast(`Panel vitrini: ${game.name}`);
+  } catch (error) {
+    console.error("Spotlight kaydı başarısız:", error);
+    showToast("Panel vitrini kaydedilemedi");
+  } finally {
+    spotlightSavingId.value = null;
+  }
+};
+
+onMounted(async () => {
+  await Promise.all([fetchUpcomingGames(), getSpotlightId().then((id) => (spotlightId.value = id))]);
+});
 </script>
 
 <style scoped>

@@ -1,3 +1,5 @@
+import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   modules: [
@@ -29,12 +31,12 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: "tr" },
       charset: "utf-8",
       viewport: "width=device-width, initial-scale=1",
-      title: "npmrungame | 4K Oyun Kanalı & Oyun Kütüphanesi",
+      title: "npmrungame | 4K Oyun Kanalı & Kişisel Oyun Paneli",
       meta: [
         {
           name: "description",
           content:
-            "Türkçe 4K oyun kanalı: bitirdiğim oyunlar, radarımdaki çıkışlar, oyun önerileri, blog ve 800.000+ oyuna keşfet.",
+            "Türkçe 4K oyun kanalı ve kişisel oyun paneli: bitirdiğim oyunlar, radar, Top 10, blog ve 800.000+ oyuna keşfet. Kayıt ol, kendi listenini kur.",
         },
         { name: "robots", content: "index, follow" },
         { name: "theme-color", content: "#0D1421" },
@@ -79,6 +81,13 @@ export default defineNuxtConfig({
           href: "https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap",
         },
       ],
+      script: [
+        {
+          // FOUC önleme: light / dark / system tercihini ilk boyamada uygula
+          innerHTML: `(function(){try{var k='npmrungame-theme';var p=localStorage.getItem(k)||'system';var d=p==='dark'||(p==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('npmrungame-locale');if(l==='tr'||l==='en')document.documentElement.lang=l;}catch(e){}})();`,
+          tagPosition: "head",
+        },
+      ],
     },
   },
   lodash: {
@@ -92,12 +101,25 @@ export default defineNuxtConfig({
       ["isDate", "isLodashDate"],
     ],
   },
-  css: ["~/assets/css/main.css"],
+  css: ["~/assets/css/tailwind.css", "~/assets/css/main.css"],
   vuetify: {
     vuetifyOptions: {
       theme: {
         defaultTheme: "dark",
         themes: {
+          light: {
+            dark: false,
+            colors: {
+              background: "#F1F5F9",
+              surface: "#FFFFFF",
+              primary: "#059669",
+              secondary: "#64748B",
+              error: "#DC2626",
+              info: "#2563EB",
+              success: "#16A34A",
+              warning: "#D97706",
+            },
+          },
           dark: {
             dark: true,
             colors: {
@@ -122,14 +144,38 @@ export default defineNuxtConfig({
     cors: { origin: "*" },
   },
   vite: {
+    plugins: [tailwindcss()],
     server: {
       allowedHosts: true,
+      // Aynı port üzerinden HMR — ayrı 24678 çakışmasını önler
       hmr: {
+        protocol: "ws",
+        host: "localhost",
+        port: 4000,
         clientPort: 4000,
       },
     },
   },
   routeRules: {
-    "/profile/**": { ssr: false },
+    // Panel layout auth-gated
+    "/dashboard/**": { ssr: false },
+    "/top-10": { ssr: false },
+    "/top-10/**": { ssr: false },
+    // Eski marketing URL'leri → panel
+    "/about": { redirect: "/dashboard" },
+    "/blogs": { redirect: "/dashboard" },
+    "/blogs/**": { redirect: "/dashboard" },
+    "/contact": { redirect: "/dashboard" },
+    "/recommend-games": { redirect: "/dashboard" },
+    "/completed-games": { redirect: "/dashboard/completed" },
+    "/radarimdaki-oyunlar": { redirect: "/dashboard/radar" },
+    "/to-play-games": { redirect: "/dashboard/to-play" },
+    "/cikacak-oyunlar": { redirect: "/dashboard/radar" },
+    "/discover": { redirect: "/dashboard" },
+    "/discover/**": { redirect: "/dashboard" },
+    "/profile/**": { redirect: "/dashboard/account" },
+    "/dashboard/top9": { redirect: "/top-10" },
   },
 });
+
+

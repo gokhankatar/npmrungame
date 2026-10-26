@@ -75,9 +75,8 @@ const saveSteamIdToUser = async (steamId: string) => {
       _store.setUser({ ..._store.user, ...userData });
     }
 
-    // Başarılı - profil sayfasına yönlendir
     setTimeout(() => {
-      router.push(`/profile/${user.uid}`);
+      router.push("/dashboard/account");
     }, 2000);
   } catch (err: any) {
     console.error("Steam ID kaydetme hatası:", err);

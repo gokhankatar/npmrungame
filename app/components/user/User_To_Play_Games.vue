@@ -4,167 +4,52 @@
       <div
         class="d-flex align-center justify-center justify-sm-start ga-2 ga-lg-5 mt-2 mt-lg-5"
       >
-        <Animated_Text
-          text="Oynayacağım Oyunlar"
-          class="cursor-pointer"
-          :msPerChar="50"
-          :duration="550"
-          :loop="true"
-        />
+        <PanelPageTitle text="Bir ara oynayacaklarım" />
       </div>
 
-      <div class="d-flex align-center ga-1 ga-lg-2">
-        <!-- View Selector -->
-        <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
-          <template #activator="{ props }">
-            <v-btn
-              v-if="!display.xs.value"
-              v-bind="props"
-              icon="mdi-view-module"
-              class="rounded text-caption text-lg-subtitle-2"
-              :ripple="false"
-              variant="text"
-              rounded="xl"
-              color="grey-lighten-1"
-              :size="display.smAndDown.value ? 'x-small' : 'small'"
-            />
-          </template>
-
-          <v-card
-            class="pa-1 pa-sm-2"
-            :ripple="false"
-            style="
-              background: rgba(0, 0, 0, 0.2);
-              border: 1px solid rgba(255, 255, 255, 0.15);
-              backdrop-filter: blur(0.5rem);
-              -webkit-backdrop-filter: blur(0.5rem);
-            "
-            elevation="2"
-          >
-            <v-list density="compact" class="bg-transparent">
-              <v-list-item @click="viewMode = 'card'" prepend-icon="mdi-view-grid">
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Kart Görünümü</v-list-item-title
-                >
-              </v-list-item>
-
-              <v-list-item @click="viewMode = 'list'" prepend-icon="mdi-view-list">
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Liste Görünümü</v-list-item-title
-                >
-              </v-list-item>
-
-              <v-list-item @click="viewMode = 'table'" prepend-icon="mdi-table">
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Tablo Görünümü</v-list-item-title
-                >
-              </v-list-item>
-            </v-list>
-          </v-card>
-        </v-menu>
-
-        <v-menu :close-on-content-click="true" :offset="[5, 10]" location="bottom end">
-          <template #activator="{ props }">
-            <v-btn
-              v-if="!display.xs.value"
-              v-bind="props"
-              icon="mdi-sort"
-              class="rounded text-caption text-lg-subtitle-2"
-              :ripple="false"
-              variant="text"
-              rounded="xl"
-              color="grey-lighten-1"
-              :size="display.smAndDown.value ? 'x-small' : 'small'"
-            />
-          </template>
-
-          <v-card
-            class="pa-1 pa-sm-2"
-            :ripple="false"
-            style="
-              background: rgba(0, 0, 0, 0.2);
-              border: 1px solid rgba(255, 255, 255, 0.15);
-              backdrop-filter: blur(0.5rem);
-              -webkit-backdrop-filter: blur(0.5rem);
-            "
-            elevation="2"
-          >
-            <v-list density="compact" class="bg-transparent">
-              <v-list-item @click="sortBy('new')" prepend-icon="mdi-arrow-up">
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Tarihe Göre En Yeni</v-list-item-title
-                >
-              </v-list-item>
-
-              <v-list-item
-                @click="sortBy('old')"
-                :ripple="false"
-                prepend-icon="mdi-arrow-down"
-              >
-                <v-list-item-title
-                  class="text-caption text-sm-subtitle-2 text-grey-lighten-1"
-                  >Tarihe Göre En Eski</v-list-item-title
-                >
-              </v-list-item>
-            </v-list>
-          </v-card>
-        </v-menu>
-
-        <v-btn
-          icon="mdi-refresh"
-          class="rounded text-caption text-lg-subtitle-2"
-          :ripple="false"
-          variant="text"
-          rounded="xl"
-          :color="isLoading ? 'green-accent-2' : 'grey-lighten-1'"
-          @click="getGames"
-          :size="smallScreen ? 'x-small' : 'small'"
-          :loading="isLoading"
-        />
-
-        <v-btn
-          icon="mdi-plus"
-          class="rounded text-caption text-lg-subtitle-2"
-          :ripple="false"
-          variant="text"
-          rounded="xl"
-          color="green-accent-2"
-          @click="isAddGame = true"
-          :size="smallScreen ? 'x-small' : 'small'"
-        />
-      </div>
+      <PanelListActions
+        :games="games"
+        title="Bir ara oynayacaklarım"
+        file-name="bir-ara-oynayacaklarim"
+        @add="isAddGame = true"
+      />
     </v-col>
 
     <v-col cols="12" lg="10">
-      <!-- Card View -->
-      <Game_Card
-        v-if="viewMode === 'card'"
-        :loading="isLoading"
-        :arr="games"
-        :onRowClick="handleRowClick"
+      <PanelEmptyState
+        v-if="!isLoading && games.length === 0"
+        icon="mdi-playlist-play"
+        :title="tx('panel.empty.toPlay.title')"
+        :description="tx('panel.empty.toPlay.body')"
+        :tips="emptyTips"
+        :primary-action-text="tx('panel.empty.addGame')"
+        @primary-action="isAddGame = true"
       />
 
-      <!-- List View -->
-      <Admin_Game_List
-        v-else-if="viewMode === 'list'"
-        :loading="isLoading"
-        :arr="games"
-        :onDeleteClick="handleDeleteGame"
-        :onRowClick="handleRowClick"
-      />
+      <template v-else>
+        <Game_Card
+          v-if="viewMode === 'card'"
+          :loading="isLoading"
+          :arr="games"
+          :onRowClick="handleRowClick"
+        />
 
-      <!-- Table View -->
-      <Admin_Game_Table
-        v-else
-        :loading="isLoading"
-        :arr="games"
-        :onDeleteClick="handleDeleteGame"
-        :onRowClick="handleRowClick"
-      />
+        <Admin_Game_List
+          v-else-if="viewMode === 'list'"
+          :loading="isLoading"
+          :arr="games"
+          :onDeleteClick="handleDeleteGame"
+          :onRowClick="handleRowClick"
+        />
+
+        <Admin_Game_Table
+          v-else
+          :loading="isLoading"
+          :arr="games"
+          :onDeleteClick="handleDeleteGame"
+          :onRowClick="handleRowClick"
+        />
+      </template>
     </v-col>
   </v-row>
 
@@ -214,7 +99,7 @@
         :density="display.lgAndUp.value ? 'comfortable' : 'compact'"
         clearable
         :loading="isSearchingGameLoading"
-        @input="searchGames"
+        @update:model-value="onSearchInput"
       />
 
       <div v-if="searchResults.length > 0" class="w-100">
@@ -297,14 +182,22 @@ import {
 import Admin_Game_Table from "../common/Admin_Game_Table.vue";
 import Admin_Game_List from "../common/Admin_Game_List.vue";
 import Game_Card from "../common/Game_Card.vue";
-import Animated_Text from "../common/Animated_Text.vue";
+import PanelEmptyState from "~/components/panel/PanelEmptyState.vue";
+import PanelPageTitle from "~/components/panel/PanelPageTitle.vue";
 import store from "~/store/store";
+import { useAppLocale } from "~/composables/useAppLocale";
+import { isAbortError } from "~/utils/isAbortError";
 
 const { $firestore } = useNuxtApp();
 const display = useDisplay();
 const _store = store();
+const { tx } = useAppLocale();
 
 const smallScreen = computed(() => display.smAndDown.value);
+
+const emptyTips = computed(() => [
+  { icon: "mdi-magnify", text: tx("panel.empty.tipSearch") },
+]);
 
 const isLoading = ref(false);
 const isAddGame = ref(false);
@@ -332,12 +225,16 @@ const getGames = async () => {
 
     games.value = _.sortBy(gamesList, (g: any) => g.released).reverse();
   } catch (error) {
-    console.error("Error getting games:", error);
+    if (!isAbortError(error)) console.error("Error getting games:", error);
   } finally {
     setTimeout(() => {
       isLoading.value = false;
     }, 250);
   }
+};
+
+const onSearchInput = (value: string | null) => {
+  searchGames(String(value ?? "").trim());
 };
 
 const searchGames = _.debounce(async (value: string) => {

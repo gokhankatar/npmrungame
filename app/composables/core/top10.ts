@@ -1,4 +1,5 @@
-export type Top10DisplayMode = "grid" | "list";
+/** grid = kart · list = sıralı · wallpaper = 3×3 ekran/duvar kağıdı */
+export type Top10DisplayMode = "grid" | "list" | "wallpaper";
 
 export type Top10GameEntry = {
   rank: number;
@@ -26,8 +27,9 @@ export type UserTop10List = {
 };
 
 export const TOP10_COLLECTION = "user_top10_lists";
-export const TOP10_MAX_GAMES = 10;
-export const TOP10_MIN_SHARE = 10;
+/** Top 9 — 3×3 wallpaper / ekran görünümü için ideal */
+export const TOP10_MAX_GAMES = 9;
+export const TOP10_MIN_SHARE = 9;
 
 export const snapshotTop10Game = (game: any, rank: number): Top10GameEntry => ({
   rank,

@@ -27,9 +27,11 @@
     "vuetify-nuxt-module": "^0.18.8"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^24.9.2",
     "@types/nodemailer": "^7.0.4",
     "@types/three": "^0.181.0",
-    "nuxt-lodash": "^2.5.3"
+    "nuxt-lodash": "^2.5.3",
+    "tailwindcss": "^4.3.3"
   }
 }

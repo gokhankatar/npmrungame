@@ -125,9 +125,12 @@ const metacriticFromIgdb = (game: IgdbGame) => {
 
 /** Frontend'in beklediği RAWG-benzeri oyun objesi */
 export const mapIgdbGameToRawgShape = (game: IgdbGame, detailed = false) => {
-  const background =
+  const cover =
     igdbImageUrl(game.cover?.image_id, "cover_big_2x") ??
-    igdbImageUrl(game.screenshots?.[0]?.image_id, "screenshot_huge");
+    igdbImageUrl(game.cover?.image_id, "cover_big");
+  const shot =
+    igdbImageUrl(game.screenshots?.[0]?.image_id, "screenshot_huge") ??
+    igdbImageUrl(game.screenshots?.[0]?.image_id, "screenshot_big");
 
   const base: Record<string, any> = {
     id: game.id,
@@ -136,13 +139,18 @@ export const mapIgdbGameToRawgShape = (game: IgdbGame, detailed = false) => {
     slug: game.slug ?? slugifyName(game.name),
     name: game.name ?? "Unknown",
     released: unixToIsoDate(game.first_release_date),
-    background_image: background,
+    /** Geniş hero / atmosfer — screenshot tercih */
+    background_image: shot ?? cover,
+    /** Dikey poster */
+    cover_image: cover ?? shot,
+    background_image_additional: shot && cover ? shot : null,
     metacritic: metacriticFromIgdb(game),
     rating: game.rating != null ? Number((game.rating / 20).toFixed(2)) : null,
+    ratings_count: game.aggregated_rating_count ?? null,
     genres: mapGenres(game.genres),
     platforms: mapPlatforms(game.platforms),
     tags: mapTags(game),
-    short_screenshots: (game.screenshots ?? []).slice(0, 8).map((s, index) => ({
+    short_screenshots: (game.screenshots ?? []).slice(0, 12).map((s, index) => ({
       id: index,
       image: igdbImageUrl(s.image_id, "screenshot_big"),
     })),
@@ -154,6 +162,12 @@ export const mapIgdbGameToRawgShape = (game: IgdbGame, detailed = false) => {
 
   if (!detailed) return base;
 
+  const summaryHtml = game.summary
+    ? `<p>${String(game.summary).replace(/\n+/g, "</p><p>")}</p>`
+    : null;
+  const storylineHtml = game.storyline
+    ? `<p>${String(game.storyline).replace(/\n+/g, "</p><p>")}</p>`
+    : null;
   const descriptionParts = [game.summary, game.storyline].filter(Boolean);
   const descriptionHtml = descriptionParts
     .map((p) => `<p>${String(p).replace(/\n+/g, "</p><p>")}</p>`)
@@ -163,6 +177,8 @@ export const mapIgdbGameToRawgShape = (game: IgdbGame, detailed = false) => {
     ...base,
     description: descriptionHtml || null,
     description_raw: descriptionParts.join("\n\n") || null,
+    summary_html: summaryHtml,
+    storyline_html: storylineHtml,
     website: pickOfficialWebsite(game.websites) ?? game.url ?? null,
     metacritic_url: null,
     developers: mapCompanies(game, "developer"),

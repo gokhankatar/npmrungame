@@ -10,10 +10,10 @@
     <div class="top10-share-card__glow" aria-hidden="true" />
     <div class="top10-share-card__shine" aria-hidden="true" />
 
-    <header class="top10-share-card__head">
+    <header v-if="displayMode !== 'wallpaper'" class="top10-share-card__head">
       <div class="top10-share-card__brand default-title-letter">
-        <v-icon icon="mdi-numeric-10-box-multiple-outline" size="18" color="#69f0ae" />
-        npmrungame · top 10
+        <v-icon icon="mdi-numeric-9-plus-box-multiple-outline" size="18" color="#69f0ae" />
+        npmrungame · top 9
       </div>
       <h2 class="top10-share-card__title default-title-letter">{{ title }}</h2>
       <p class="top10-share-card__user default-title-letter">
@@ -22,8 +22,55 @@
       </p>
     </header>
 
+    <!-- Wallpaper / ekran görünümü — 3×3 poster duvar -->
+    <div v-if="displayMode === 'wallpaper'" class="top10-wallpaper">
+      <div class="top10-wallpaper__wall">
+        <article
+          v-for="game in displayGames"
+          :key="`wall-${game.rank}-${game.id}`"
+          class="top10-wallpaper__cell"
+          :class="{ [`top10-wallpaper__cell--top${game.rank}`]: game.rank <= 3 }"
+        >
+          <v-img
+            v-if="game.background_image"
+            :src="game.background_image"
+            :alt="game.name"
+            cover
+            position="center center"
+            class="top10-wallpaper__img"
+          />
+          <div v-else class="top10-wallpaper__img top10-wallpaper__img--empty">
+            <v-icon icon="mdi-gamepad-variant-outline" size="28" color="grey" />
+          </div>
+          <div class="top10-wallpaper__shade" aria-hidden="true" />
+          <span class="top10-wallpaper__rank">{{ game.rank }}</span>
+          <p class="top10-wallpaper__name default-title-letter">{{ game.name }}</p>
+        </article>
+
+        <article
+          v-for="slot in emptySlots"
+          :key="`wall-empty-${slot}`"
+          class="top10-wallpaper__cell top10-wallpaper__cell--empty"
+        >
+          <span class="top10-wallpaper__rank">{{ slot }}</span>
+          <v-icon icon="mdi-plus" size="22" color="rgba(255,255,255,0.22)" />
+        </article>
+      </div>
+
+      <footer class="top10-wallpaper__bar">
+        <div class="top10-wallpaper__brand default-title-letter">
+          <v-icon icon="mdi-numeric-9-plus-box-multiple-outline" size="16" color="#69f0ae" />
+          npmrungame · top 9
+        </div>
+        <div class="top10-wallpaper__meta">
+          <strong class="default-title-letter">{{ title }}</strong>
+          <span class="default-title-letter">{{ username }}</span>
+        </div>
+      </footer>
+    </div>
+
     <!-- Grid / kart görünümü -->
-    <div v-if="displayMode === 'grid'" class="top10-share-card__grid">
+    <div v-else-if="displayMode === 'grid'" class="top10-share-card__grid">
       <article
         v-for="game in displayGames"
         :key="`${game.rank}-${game.id}`"
@@ -108,7 +155,10 @@
       </li>
     </ol>
 
-    <footer v-if="showFooter" class="top10-share-card__foot default-title-letter">
+    <footer
+      v-if="showFooter && displayMode !== 'wallpaper'"
+      class="top10-share-card__foot default-title-letter"
+    >
       npmrungame.com/top-10
     </footer>
   </div>
@@ -129,7 +179,7 @@ const props = withDefaults(
     showEmptySlots?: boolean;
   }>(),
   {
-    displayMode: "grid",
+    displayMode: "wallpaper",
     compact: false,
     showFooter: true,
     showEmptySlots: false,

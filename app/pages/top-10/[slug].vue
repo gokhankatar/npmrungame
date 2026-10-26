@@ -3,8 +3,6 @@
     <div class="top10-page-glow top10-page-glow--left" aria-hidden="true" />
     <div class="top10-page-glow top10-page-glow--right" aria-hidden="true" />
 
-    <v-responsive :height="smallScreen ? 70 : 100" />
-
     <v-container class="top10-container pa-3 pa-md-6 pa-lg-10">
       <div v-if="isLoading" class="d-flex justify-center py-16">
         <v-progress-circular indeterminate color="green-accent-2" size="48" width="3" />
@@ -31,8 +29,8 @@
       <template v-else>
         <header class="top10-public-hero">
           <div class="top10-hero-badge default-title-letter">
-            <v-icon icon="mdi-numeric-10-box-multiple-outline" size="16" color="#69f0ae" />
-            Top 10
+            <v-icon icon="mdi-numeric-9-plus-box-multiple-outline" size="16" color="#69f0ae" />
+            Top 9
           </div>
           <h1 class="top10-hero-title default-title-letter">{{ list.title }}</h1>
           <p class="top10-hero-sub default-title-letter">
@@ -101,7 +99,7 @@
           :title="list.title"
           :username="list.username"
           :games="list.games"
-          :display-mode="list.displayMode ?? 'grid'"
+          :display-mode="list.displayMode ?? 'wallpaper'"
         />
       </template>
     </v-container>
@@ -118,6 +116,10 @@ import {
 } from "~/composables/useTop10";
 import { buildPageUrl } from "~/utils/siteSeo";
 
+definePageMeta({
+  layout: "bare",
+});
+
 const route = useRoute();
 const { $firestore } = useNuxtApp();
 const display = useDisplay();
@@ -131,16 +133,16 @@ const snackbar = ref(false);
 const viewCounted = ref(false);
 
 const pageTitle = computed(() =>
-  list.value ? `${list.value.title} | npmrungame Top 10` : "Top 10 | npmrungame"
+  list.value ? `${list.value.title} | npmrungame Top 9` : "Top 9 | npmrungame"
 );
 
 const pageDescription = computed(() => {
-  if (!list.value) return "npmrungame Top 10 oyun listesi.";
+  if (!list.value) return "npmrungame Top 9 oyun listesi.";
   const names = list.value.games
     .slice(0, 3)
     .map((g) => g.name)
     .join(", ");
-  return `${list.value.username} listesi: ${names} ve daha fazlası. Kendi Top 10'unu oluştur.`;
+  return `${list.value.username} listesi: ${names} ve daha fazlası. Kendi Top 9'unu oluştur.`;
 });
 
 useHead(() => ({
@@ -153,7 +155,7 @@ const shareUrl = computed(() => buildPageUrl(`/top-10/${slug.value}`));
 const twitterShareUrl = computed(() => {
   if (!list.value) return "#";
   const text = encodeURIComponent(
-    `${list.value.username} · Top 10 oyun listesi 🎮\n${list.value.title}`
+    `${list.value.username} · Top 9 oyun listesi 🎮\n${list.value.title}`
   );
   const url = encodeURIComponent(shareUrl.value);
   return `https://twitter.com/intent/tweet?text=${text}&url=${url}`;

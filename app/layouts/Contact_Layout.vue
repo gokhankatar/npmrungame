@@ -15,8 +15,8 @@ onMounted(async () => {
 
 <template>
   <Loading v-if="isLoading" />
-  <template v-else>
+  <div v-show="!isLoading">
     <Navbar />
-    <NuxtPage />
-  </template>
+    <slot />
+  </div>
 </template>

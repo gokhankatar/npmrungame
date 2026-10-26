@@ -1,62 +1,75 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import store from "~/store/store";
+import { isAbortError } from "~/utils/isAbortError";
 
 export default defineNuxtPlugin(() => {
-  if (process.client) {
-    // Firebase plugin'inin yüklenmesini bekle
-    const initAuth = () => {
-      try {
-        const { $auth, $firestore } = useNuxtApp();
-        const _store = store();
+  if (!import.meta.client) return;
 
-        // $auth'un tanımlı olduğundan emin ol
-        if (!$auth) {
-          // Eğer auth henüz hazır değilse, biraz bekle ve tekrar dene
-          setTimeout(initAuth, 100);
-          return;
-        }
+  const { markReady } = useAuthReady();
+  let started = false;
 
-        onAuthStateChanged($auth, async (user) => {
-          if (user) {
-            try {
-              // Firestore'dan kullanıcı bilgilerini al
-              if ($firestore) {
-                const userDocRef = doc($firestore, "registered_users", user.uid);
-                const userDoc = await getDoc(userDocRef);
+  const initAuth = () => {
+    try {
+      const { $auth, $firestore } = useNuxtApp();
+      const _store = store();
 
-                let userData: any = {
-                  uid: user.uid,
-                  email: user.email,
-                  emailVerified: user.emailVerified,
-                };
+      if (!$auth) {
+        setTimeout(initAuth, 100);
+        return;
+      }
 
-                if (userDoc.exists()) {
-                  userData = { ...userData, ...userDoc.data() };
-                }
+      // HMR / çift plugin koşusunda listener çoğalmasın
+      if (started) return;
+      started = true;
 
-                _store.setUser(userData);
-              } else {
-                // Firestore yoksa sadece auth bilgilerini kaydet
-                _store.setUser({
-                  uid: user.uid,
-                  email: user.email,
-                  emailVerified: user.emailVerified,
-                });
+      onAuthStateChanged($auth, async (user) => {
+        if (user) {
+          try {
+            if ($firestore) {
+              const userDocRef = doc($firestore, "registered_users", user.uid);
+              const userDoc = await getDoc(userDocRef);
+
+              let userData: Record<string, unknown> = {
+                uid: user.uid,
+                email: user.email,
+                emailVerified: user.emailVerified,
+              };
+
+              if (userDoc.exists()) {
+                userData = { ...userData, ...userDoc.data() };
               }
-            } catch (error) {
+
+              _store.setUser(userData);
+            } else {
+              _store.setUser({
+                uid: user.uid,
+                email: user.email,
+                emailVerified: user.emailVerified,
+              });
+            }
+          } catch (error) {
+            // Firestore stream abort (HMR / navigasyon / adblock) — gürültü değil
+            if (!isAbortError(error)) {
               console.error("Error fetching user data:", error);
             }
-          } else {
-            _store.clearUser();
+            _store.setUser({
+              uid: user.uid,
+              email: user.email,
+              emailVerified: user.emailVerified,
+            });
           }
-        });
-      } catch (error) {
-        console.error("Auth plugin error:", error);
-      }
-    };
+          markReady(user.uid);
+        } else {
+          _store.clearUser();
+          markReady(null);
+        }
+      });
+    } catch (error) {
+      console.error("Auth plugin error:", error);
+      markReady(null);
+    }
+  };
 
-    // İlk denemeyi başlat
-    initAuth();
-  }
+  initAuth();
 });

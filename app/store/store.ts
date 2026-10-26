@@ -29,7 +29,17 @@ const store = defineStore("npmrungame_store", {
 
   actions: {
     changeTheme() {
-      this.theme == "dark" ? (this.theme = "light") : (this.theme = "dark");
+      // Prefer useAppTheme().setTheme / toggleTheme — kept for backward compat
+      this.theme = this.theme === "dark" ? "light" : "dark";
+      if (import.meta.client) {
+        const root = document.documentElement;
+        if (this.theme === "dark") root.classList.add("dark");
+        else root.classList.remove("dark");
+        root.style.colorScheme = this.theme;
+      }
+    },
+    setResolvedTheme(mode: "dark" | "light") {
+      this.theme = mode;
     },
     changeGamePlatform(platform: "pc" | "ps5" | "xbox" | "nintendo" | "star") {
       this.active_game_platform = platform;
@@ -91,7 +101,11 @@ const store = defineStore("npmrungame_store", {
       this.user = null;
     },
   },
-  persist: piniaPluginPersistedstate.localStorage(),
+  persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+    // Tema tek kaynak: useAppTheme (npmrungame-theme)
+    omit: ["theme"],
+  },
 });
 
 export default store;

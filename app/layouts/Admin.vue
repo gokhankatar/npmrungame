@@ -3,11 +3,11 @@
     <template v-if="_store.isAdmin">
       <Admin_Sidebar />
       <v-main class="admin-v-main">
-        <NuxtPage />
+        <slot />
       </v-main>
     </template>
     <template v-else>
-      <NuxtPage />
+      <slot />
     </template>
   </div>
 

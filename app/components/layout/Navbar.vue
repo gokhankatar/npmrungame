@@ -40,6 +40,20 @@
             {{ navLabel(item) }}
           </span>
         </button>
+
+        <NuxtLink
+          :to="_store.user?.uid ? '/dashboard' : '/auth/login'"
+          class="navbar-item navbar-item--cta d-flex align-center ga-2 text-decoration-none"
+        >
+          <v-icon
+            :icon="_store.user?.uid ? 'mdi-view-dashboard-outline' : 'mdi-login'"
+            class="navbar-item-icon"
+            size="18"
+          />
+          <span class="navbar-item-label default-title-letter">
+            {{ _store.user?.uid ? "Panel" : "Giriş" }}
+          </span>
+        </NuxtLink>
       </nav>
 
       <v-btn
@@ -128,6 +142,26 @@
       </nav>
 
       <v-row class="action-buttons-in-responsive-bar w-100 mx-auto" dense>
+        <v-col cols="12">
+          <v-btn
+            variant="tonal"
+            color="primary"
+            :text="_store.user?.uid ? 'Panel' : 'Giriş / Kayıt'"
+            class="text-capitalize"
+            :size="display.xs.value ? 'small' : 'default'"
+            :ripple="false"
+            :prepend-icon="
+              _store.user?.uid ? 'mdi-view-dashboard-outline' : 'mdi-login'
+            "
+            block
+            rounded="lg"
+            @click="
+              handleRouteForResponsive(
+                _store.user?.uid ? '/dashboard' : '/auth/login'
+              )
+            "
+          />
+        </v-col>
         <v-col :cols="_store.isAdmin ? 6 : 12">
           <v-btn
             variant="tonal"

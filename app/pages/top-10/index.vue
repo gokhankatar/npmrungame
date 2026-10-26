@@ -1,62 +1,31 @@
 <template>
-  <div class="top10-page">
-    <div class="top10-page-glow top10-page-glow--left" aria-hidden="true" />
-    <div class="top10-page-glow top10-page-glow--right" aria-hidden="true" />
-
-    <v-responsive :height="smallScreen ? 70 : 100" />
-
-    <v-container class="top10-container pa-3 pa-md-6 pa-lg-10">
-      <header class="top10-hero">
-        <div class="top10-hero-top">
-          <div class="top10-hero-copy">
-            <div class="top10-hero-badge default-title-letter">
-              <v-icon icon="mdi-numeric-10-box-multiple-outline" size="16" color="#69f0ae" />
-              Top 10
-            </div>
-            <h1 class="top10-hero-title default-title-letter">En sevdiğin 10 oyunu seç</h1>
-            <p class="top10-hero-sub default-title-letter">
-              Listeni oluştur, görünümünü seç, paylaş — ekran görüntüsü alıp sosyal medyada yayınla.
-            </p>
-          </div>
-
-          <div class="top10-hero-progress" aria-label="Liste ilerlemesi">
-            <v-progress-circular
-              :model-value="progressPercent"
-              :size="smallScreen ? 72 : 88"
-              :width="5"
-              color="#69f0ae"
-              bg-color="rgba(255,255,255,0.08)"
-            >
-              <span class="top10-hero-progress__value">{{ selectedGames.length }}/{{ TOP10_MAX_GAMES }}</span>
-            </v-progress-circular>
-            <p class="top10-hero-progress__label default-title-letter">oyun seçildi</p>
-          </div>
+  <div class="top10-page top10-page--panel">
+    <header class="top10-hero top10-hero--panel">
+      <div class="top10-hero-top">
+        <div class="top10-hero-copy">
+          <p class="top10-hero-badge">Top 9</p>
+          <h1 class="top10-hero-title">Kendi 9'unu oluştur</h1>
+          <p class="top10-hero-sub">
+            Dokuz oyunu sırala, ekran görünümünü seç, kaydet ve paylaş.
+          </p>
         </div>
-      </header>
 
-      <v-alert
-        v-if="!currentUser"
-        type="info"
-        variant="tonal"
-        color="green-accent-2"
-        class="top10-auth-alert mb-4 default-title-letter"
-        icon="mdi-account-lock-outline"
-      >
-        Listeni kaydetmek için giriş yapman gerekiyor.
-        <template #append>
-          <v-btn
-            size="small"
-            color="green-accent-2"
-            variant="flat"
-            class="text-black text-capitalize"
-            text="Giriş yap"
-            :ripple="false"
-            @click="isAuthOpen = true"
-          />
-        </template>
-      </v-alert>
+        <div class="top10-hero-progress" aria-label="Liste ilerlemesi">
+          <v-progress-circular
+            :model-value="progressPercent"
+            :size="smallScreen ? 68 : 80"
+            :width="5"
+            color="#69f0ae"
+            bg-color="rgba(255,255,255,0.08)"
+          >
+            <span class="top10-hero-progress__value">{{ selectedGames.length }}/{{ TOP10_MAX_GAMES }}</span>
+          </v-progress-circular>
+          <p class="top10-hero-progress__label">oyun</p>
+        </div>
+      </div>
+    </header>
 
-      <div class="top10-layout">
+    <div class="top10-layout">
         <!-- Sol: arama + slotlar -->
         <div class="top10-panel top10-panel--editor">
           <section class="top10-editor-block">
@@ -131,7 +100,7 @@
             </div>
 
             <p v-else class="top10-search-hint default-title-letter">
-              En az 2 karakter yaz — RAWG üzerinden ara.
+              En az 2 karakter yazarak oyun ara.
             </p>
           </section>
 
@@ -305,6 +274,29 @@
               <button
                 type="button"
                 class="top10-view-option"
+                :class="{ 'top10-view-option--active': displayMode === 'wallpaper' }"
+                @click="displayMode = 'wallpaper'"
+              >
+                <v-icon
+                  icon="mdi-wallpaper"
+                  size="22"
+                  :color="displayMode === 'wallpaper' ? '#69f0ae' : 'grey'"
+                />
+                <span class="top10-view-option__title default-title-letter">Ekran</span>
+                <span class="top10-view-option__sub default-title-letter"
+                  >3×3 duvar kağıdı — wallpaper</span
+                >
+                <div
+                  class="top10-view-option__mini top10-view-option__mini--wall"
+                  aria-hidden="true"
+                >
+                  <span v-for="n in 9" :key="n" />
+                </div>
+              </button>
+
+              <button
+                type="button"
+                class="top10-view-option"
                 :class="{ 'top10-view-option--active': displayMode === 'grid' }"
                 @click="displayMode = 'grid'"
               >
@@ -348,15 +340,11 @@
           </p>
         </div>
       </div>
-    </v-container>
-
-    <Auth_Dialog v-model="isAuthOpen" @success="onAuthSuccess" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import axios from "axios";
-import Auth_Dialog from "~/components/common/Auth_Dialog.vue";
 import Top10_Share_Card from "~/components/top10/Top10_Share_Card.vue";
 import {
   snapshotTop10Game,
@@ -372,8 +360,15 @@ import {
 } from "~/composables/useTop10";
 import store from "~/store/store";
 
+definePageMeta({
+  layout: "panel",
+  ssr: false,
+  middleware: "auth",
+});
+
 useHead({
-  title: "npmrungame | Top 10 Listeni Oluştur",
+  title: "Kendi 9'unu oluştur | npmrungame",
+  meta: [{ name: "robots", content: "noindex, nofollow" }],
 });
 
 const { $firestore } = useNuxtApp();
@@ -388,10 +383,9 @@ const searchResults = ref<any[]>([]);
 const isSearching = ref(false);
 const selectedGames = ref<Top10GameEntry[]>([]);
 const listTitle = ref("");
-const displayMode = ref<Top10DisplayMode>("grid");
+const displayMode = ref<Top10DisplayMode>("wallpaper");
 const savedSlug = ref<string | null>(null);
 const isSaving = ref(false);
-const isAuthOpen = ref(false);
 const saveMessage = ref("");
 const saveMessageOk = ref(true);
 
@@ -406,7 +400,7 @@ const displayUsername = computed(
 );
 
 const previewTitle = computed(
-  () => listTitle.value.trim() || `${displayUsername.value} · Top 10`
+  () => listTitle.value.trim() || `${displayUsername.value} · Top 9`
 );
 
 const previewGames = computed(() =>
@@ -456,18 +450,14 @@ const loadExistingList = async () => {
     selectedGames.value = [...existing.games].sort((a, b) => a.rank - b.rank);
     listTitle.value = existing.title;
     savedSlug.value = existing.slug;
-    displayMode.value = existing.displayMode ?? "grid";
+    displayMode.value = existing.displayMode ?? "wallpaper";
   } catch (e) {
     console.error("Top10 load:", e);
   }
 };
 
 const handleSave = async () => {
-  if (!currentUser.value?.uid) {
-    isAuthOpen.value = true;
-    return;
-  }
-  if (!selectedGames.value.length) return;
+  if (!currentUser.value?.uid || !selectedGames.value.length) return;
 
   try {
     isSaving.value = true;
@@ -486,7 +476,7 @@ const handleSave = async () => {
     saveMessageOk.value = true;
     saveMessage.value = canShare.value
       ? "Liste kaydedildi! Paylaşım linkini kopyalayabilirsin."
-      : "Taslak kaydedildi. 10 oyun tamamlayınca paylaşım açılır.";
+      : `Taslak kaydedildi. ${TOP10_MAX_GAMES} oyun tamamlayınca paylaşım açılır.`;
   } catch (e) {
     console.error("Top10 save:", e);
     saveMessageOk.value = false;
@@ -507,10 +497,6 @@ const copyShareLink = async () => {
     saveMessageOk.value = false;
     saveMessage.value = url;
   }
-};
-
-const onAuthSuccess = () => {
-  loadExistingList();
 };
 
 watch(searchQuery, (val) => {

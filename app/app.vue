@@ -1,23 +1,37 @@
 <script lang="ts" setup>
-import store from "./store/store";
+import { useAppTheme } from "~/composables/useAppTheme";
 
-const _store = store();
+const { theme } = useAppTheme();
 const route = useRoute();
 
-const isAdminLayout = computed(
-  () => route.meta.layout === "admin" || route.path.startsWith("/admin")
+/** Admin + auth + dashboard: full-bleed (v-main sarmalayıcısı yok) */
+const isBareLayout = computed(
+  () =>
+    route.meta.layout === "admin" ||
+    route.meta.layout === "auth" ||
+    route.meta.layout === "panel" ||
+    route.meta.layout === "bare" ||
+    route.meta.layout === false ||
+    route.path.startsWith("/admin") ||
+    route.path.startsWith("/auth") ||
+    route.path.startsWith("/dashboard") ||
+    route.path.startsWith("/top-10") ||
+    route.path.startsWith("/game-detail")
 );
 
 useSiteSeo();
 </script>
 
 <template>
-  <v-app :theme="_store.theme">
-    <!-- Admin: drawer + v-main doğrudan v-app altında (Vuetify app prop) -->
-    <NuxtLayout v-if="isAdminLayout" />
+  <v-app :theme="theme || 'dark'">
+    <NuxtLayout v-if="isBareLayout">
+      <NuxtPage />
+    </NuxtLayout>
     <v-main v-else class="root-main">
       <v-container fluid class="root-container pa-0">
-        <NuxtLayout />
+        <NuxtLayout>
+          <NuxtPage />
+        </NuxtLayout>
       </v-container>
     </v-main>
   </v-app>
