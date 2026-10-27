@@ -432,7 +432,6 @@ const signInWithGoogle = async () => {
 };
 
 const signInWithSteam = async () => {
-  // Önce kullanıcının giriş yapmış olması gerekiyor
   if (!$auth?.currentUser) {
     authMessage.value = "Steam bağlamak için önce giriş yapmanız gerekiyor";
     authMessageType.value = "error";
@@ -441,12 +440,8 @@ const signInWithSteam = async () => {
 
   try {
     isLoadingSteam.value = true;
-
-    // Steam OpenID için redirect URL
-    const returnUrl = encodeURIComponent(window.location.origin + "/auth/steam/callback");
-    const steamAuthUrl = `https://steamcommunity.com/openid/login?openid.mode=checkid_setup&openid.ns=http://specs.openid.net/auth/2.0&openid.claimed_id=http://specs.openid.net/auth/2.0/identifier_select&openid.identity=http://specs.openid.net/auth/2.0/identifier_select&openid.return_to=${returnUrl}&openid.realm=${window.location.origin}`;
-
-    window.location.href = steamAuthUrl;
+    const { startSteamOpenIdLink } = await import("~/utils/steamOpenId");
+    startSteamOpenIdLink("/auth/steam/callback");
   } catch (error: any) {
     console.error("Steam sign in error:", error);
     authMessage.value = "Steam bağlantısı başarısız";

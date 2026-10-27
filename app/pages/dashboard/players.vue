@@ -5,6 +5,7 @@ import PanelPageTitle from "~/components/panel/PanelPageTitle.vue";
 import { useAdminBulkDelete } from "~/composables/admin/useAdminBulkDelete";
 import { purgePlayerAccount } from "~/composables/admin/purgePlayerAccount";
 import {
+  enrichPlayersWithSteamLive,
   fetchOwnerPlayerOverview,
   summarizePlayerRows,
   type PlayerOverviewRow,
@@ -64,7 +65,10 @@ const filtered = computed(() => {
       p.username.toLowerCase().includes(q) ||
       p.email.toLowerCase().includes(q) ||
       p.displayName.toLowerCase().includes(q) ||
-      p.uid.toLowerCase().includes(q)
+      p.uid.toLowerCase().includes(q) ||
+      (p.steamId && p.steamId.includes(q)) ||
+      (p.steamLive?.personaname || "").toLowerCase().includes(q) ||
+      (p.steamLive?.gameName || "").toLowerCase().includes(q)
   );
 });
 
@@ -82,7 +86,8 @@ async function load() {
   loading.value = true;
   errorMsg.value = "";
   try {
-    players.value = await fetchOwnerPlayerOverview($firestore);
+    const base = await fetchOwnerPlayerOverview($firestore);
+    players.value = await enrichPlayersWithSteamLive(base);
   } catch (e: any) {
     console.error("players overview:", e);
     errorMsg.value =
@@ -116,6 +121,10 @@ const brokenAvatars = ref<Record<string, boolean>>({});
 function avatarLetter(p: PlayerOverviewRow) {
   const src = p.displayName || p.username || p.email || "?";
   return src.slice(0, 1).toUpperCase();
+}
+
+function playerAvatar(p: PlayerOverviewRow) {
+  return p.steamLive?.avatar || p.photoURL || null;
 }
 
 function onAvatarError(uid: string) {
@@ -303,6 +312,17 @@ async function confirmBulkDelete() {
           </div>
         </article>
       </v-col>
+      <v-col cols="12" sm="6">
+        <article class="owner-players__stat">
+          <div class="owner-players__stat-icon" aria-hidden="true">
+            <v-icon icon="mdi-steam" size="20" />
+          </div>
+          <div>
+            <span>Steam bağlı</span>
+            <strong>{{ summary.steamLinkedCount }}</strong>
+          </div>
+        </article>
+      </v-col>
     </v-row>
 
     <div class="owner-players__toolbar">
@@ -348,6 +368,7 @@ async function confirmBulkDelete() {
           <tr>
             <th v-if="bulkDeleteMode" class="owner-players__th-check" />
             <th>Oyuncu</th>
+            <th>Steam</th>
             <th>Oynuyor</th>
             <th>Bitirdi</th>
             <th>Radar</th>
@@ -385,8 +406,8 @@ async function confirmBulkDelete() {
             <td>
               <div class="owner-players__user">
                 <img
-                  v-if="p.photoURL && !brokenAvatars[p.uid]"
-                  :src="p.photoURL"
+                  v-if="playerAvatar(p) && !brokenAvatars[p.uid]"
+                  :src="playerAvatar(p)!"
                   alt=""
                   class="owner-players__avatar"
                   referrerpolicy="no-referrer"
@@ -406,6 +427,30 @@ async function confirmBulkDelete() {
                   <small>{{ p.email || p.uid }}</small>
                 </div>
               </div>
+            </td>
+            <td>
+              <div v-if="p.steamId" class="owner-players__steam">
+                <span class="owner-players__steam-badge">
+                  <v-icon icon="mdi-steam" size="14" />
+                  {{ p.steamLive?.personaname || "Steam" }}
+                </span>
+                <small
+                  v-if="p.steamLive?.gameName"
+                  class="owner-players__steam-game"
+                >
+                  Şu an: {{ p.steamLive.gameName }}
+                </small>
+                <small
+                  v-else-if="p.steamLive?.privateOrUnavailable"
+                  class="owner-players__steam-muted"
+                >
+                  Profil gizli / yok
+                </small>
+                <small v-else class="owner-players__steam-muted">
+                  Oyunda değil
+                </small>
+              </div>
+              <span v-else class="owner-players__steam-muted">—</span>
             </td>
             <td>{{ p.counts.current_games }}</td>
             <td>{{ p.counts.completed_games }}</td>
@@ -797,6 +842,42 @@ async function confirmBulkDelete() {
 
 .owner-players__total {
   color: var(--panel-accent, #69f0ae);
+}
+
+.owner-players__steam {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 8.5rem;
+}
+
+.owner-players__steam-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: fit-content;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 750;
+  background: rgb(27 40 56 / 0.95);
+  border: 1px solid rgb(102 192 244 / 0.35);
+  color: #c7d5e0;
+}
+
+.owner-players__steam-game {
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--panel-accent, #69f0ae);
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.owner-players__steam-muted {
+  font-size: 0.72rem;
+  color: var(--panel-muted, #94a3b8);
+  opacity: 0.85;
 }
 
 .owner-players__delete {

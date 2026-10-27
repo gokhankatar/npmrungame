@@ -84,7 +84,8 @@ export default defineNuxtConfig({
       script: [
         {
           // FOUC + cookie: SSR ile aynı temayı paylaş (hydration mismatch önler)
-          innerHTML: `(function(){try{var k='npmrungame-theme',rk='npmrungame-theme-resolved';var p=localStorage.getItem(k)||'system';var d=p==='dark'||(p==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var r=d?'dark':'light';document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=r;document.cookie=k+'='+encodeURIComponent(p)+';path=/;max-age=31536000;samesite=lax';document.cookie=rk+'='+r+';path=/;max-age=31536000;samesite=lax';var l=localStorage.getItem('npmrungame-locale');if(l==='tr'||l==='en')document.documentElement.lang=l;}catch(e){}})();`,
+          // FOUC: html.dark + --app-bg hemen (Vuetify/Vue gelmeden soft light bg; 1sn parlama önler)
+          innerHTML: `(function(){try{var k='npmrungame-theme',rk='npmrungame-theme-resolved';var p=localStorage.getItem(k)||'system';var d=p==='dark'||(p==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var r=d?'dark':'light';var bg=d?'#070b14':'#b9c1cf';var root=document.documentElement;root.classList.toggle('dark',d);root.style.colorScheme=r;root.style.backgroundColor=bg;root.style.setProperty('--app-bg',bg);document.cookie=k+'='+encodeURIComponent(p)+';path=/;max-age=31536000;samesite=lax';document.cookie=rk+'='+r+';path=/;max-age=31536000;samesite=lax';var l=localStorage.getItem('npmrungame-locale');if(l==='tr'||l==='en')root.lang=l;}catch(e){}})();`,
           tagPosition: "head",
         },
       ],
@@ -110,8 +111,10 @@ export default defineNuxtConfig({
           light: {
             dark: false,
             colors: {
-              background: "#F1F5F9",
-              surface: "#FFFFFF",
+              background: "#B9C1CF",
+              surface: "#CED5E0",
+              surfaceBright: "#CED5E0",
+              surfaceLight: "#C2CAD6",
               primary: "#059669",
               secondary: "#64748B",
               error: "#DC2626",
@@ -123,8 +126,8 @@ export default defineNuxtConfig({
           dark: {
             dark: true,
             colors: {
-              background: "#0D1421",
-              surface: "#0D1421",
+              background: "#070B14",
+              surface: "#0C1220",
               primary: "#69F0AE",
               secondary: "#D1D1D1",
               error: "#CF6679",

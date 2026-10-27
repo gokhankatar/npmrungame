@@ -4,6 +4,41 @@
   scroll-behavior: smooth;
 }
 
+/*
+  Tema zemini — FOUC script --app-bg set eder.
+  Vuetify light hydrate/theme.change sonrası beyaz surface basmasın.
+*/
+html,
+body {
+  background-color: var(--app-bg, #070b14);
+}
+html:not(.dark) {
+  --app-bg: #b9c1cf;
+}
+html.dark {
+  --app-bg: #070b14;
+}
+.v-application,
+.v-application__wrap {
+  background: var(--app-bg, #070b14) !important;
+  background-color: var(--app-bg, #070b14) !important;
+}
+/* Vuetify RGB — beyaz surface yasak, Keşif ile aynı slate */
+html:not(.dark) .v-theme--light,
+html:not(.dark) .v-application {
+  --v-theme-background: 185, 193, 207 !important;
+  --v-theme-surface: 206, 213, 224 !important;
+  --v-theme-surface-bright: 206, 213, 224 !important;
+  --v-theme-surface-light: 194, 202, 214 !important;
+  --v-theme-on-background: 15, 23, 42 !important;
+  --v-theme-on-surface: 15, 23, 42 !important;
+}
+html.dark .v-theme--dark,
+html.dark .v-application {
+  --v-theme-background: 7, 11, 20 !important;
+  --v-theme-surface: 12, 18, 32 !important;
+}
+
 .transition {
   transition: all 0.3s ease;
 }

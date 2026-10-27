@@ -1,27 +1,27 @@
+import { requireSteamId, steamGet } from "../../utils/steamApi";
+
+type SummaryResponse = {
+  response?: {
+    players?: Array<{
+      steamid?: string;
+      personaname?: string;
+      avatarfull?: string;
+      personastate?: number;
+      gameextrainfo?: string;
+      gameid?: string;
+      profileurl?: string;
+    }>;
+  };
+};
+
 export default defineEventHandler(async (event) => {
-  const query = getQuery(event);
-  const config = useRuntimeConfig();
-
-  const steamId = query.steamId as string;
-
-  if (!steamId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "steamId parametresi gerekli",
-    });
-  }
-
-  if (!config.steam_web_api_key) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Steam API key yapılandırılmamış",
-    });
-  }
+  const steamId = requireSteamId(getQuery(event).steamId);
 
   try {
-    const url = `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${config.steam_web_api_key}&steamids=${steamId}`;
-    
-    const data = await $fetch(url);
+    const data = await steamGet<SummaryResponse>(
+      "/ISteamUser/GetPlayerSummaries/v0002/",
+      { steamids: steamId }
+    );
 
     return {
       success: true,
@@ -29,8 +29,11 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     throw createError({
-      statusCode: 500,
-      statusMessage: `Steam API hatası: ${error.message}`,
+      statusCode: error?.statusCode || 500,
+      statusMessage: error?.statusMessage || "Steam player summary hatası",
+      data: {
+        message: error?.data?.message || error?.message || "Profil alınamadı.",
+      },
     });
   }
 });

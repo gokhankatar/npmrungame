@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { deleteField, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import PanelUserAvatar from "~/components/panel/PanelUserAvatar.vue";
 import { useAppLocale } from "~/composables/useAppLocale";
 import { useUserProfile } from "~/composables/useUserProfile";
+import store from "~/store/store";
+import { startSteamOpenIdLink } from "~/utils/steamOpenId";
 
 definePageMeta({
   layout: "panel",
@@ -9,6 +12,8 @@ definePageMeta({
   middleware: "auth",
 });
 
+const { $firestore } = useNuxtApp();
+const _store = store();
 const { tx } = useAppLocale();
 const {
   user,
@@ -23,7 +28,7 @@ const {
 } = useUserProfile();
 
 useSeoMeta({
-  title: "Hesabým | npmrungame",
+  title: () => `${tx("panel.account.title")} | npmrungame`,
   robots: "noindex, nofollow",
 });
 
@@ -34,6 +39,17 @@ const username = ref("");
 const fileInput = ref<HTMLInputElement | null>(null);
 const okMsg = ref("");
 const localError = ref("");
+
+const steamId = computed(() => String(user.value?.steamId || "").trim());
+const steamLinked = computed(() => /^\d{17}$/.test(steamId.value));
+const steamBusy = ref(false);
+const steamSummary = ref<{
+  personaname?: string;
+  avatarfull?: string;
+  gameextrainfo?: string;
+  personastate?: number;
+} | null>(null);
+const steamSummaryError = ref("");
 
 watch(
   user,
@@ -46,6 +62,60 @@ watch(
   },
   { immediate: true }
 );
+
+async function loadSteamSummary() {
+  steamSummary.value = null;
+  steamSummaryError.value = "";
+  if (!steamLinked.value) return;
+
+  try {
+    const res = await $fetch<{
+      success: boolean;
+      data: typeof steamSummary.value;
+    }>("/api/steam/player-summary", {
+      query: { steamId: steamId.value },
+    });
+    steamSummary.value = res?.data || null;
+  } catch {
+    steamSummaryError.value = tx("panel.account.steam.loadFail");
+  }
+}
+
+watch(
+  steamId,
+  () => {
+    loadSteamSummary();
+  },
+  { immediate: true }
+);
+
+function connectSteam() {
+  startSteamOpenIdLink("/auth/steam/callback");
+}
+
+async function disconnectSteam() {
+  const uid = user.value?.uid;
+  if (!uid || !$firestore || !steamLinked.value) return;
+
+  steamBusy.value = true;
+  localError.value = "";
+  okMsg.value = "";
+  try {
+    await updateDoc(doc($firestore, "registered_users", uid), {
+      steamId: deleteField(),
+      updatedAt: serverTimestamp(),
+    });
+    const next = { ...user.value } as Record<string, unknown>;
+    delete next.steamId;
+    _store.setUser(next);
+    steamSummary.value = null;
+    okMsg.value = tx("panel.account.steam.unlinked");
+  } catch (err: any) {
+    localError.value = err?.message || tx("panel.account.steam.unlinkFail");
+  } finally {
+    steamBusy.value = false;
+  }
+}
 
 function pickFile() {
   fileInput.value?.click();
@@ -181,6 +251,81 @@ async function onSave() {
           </button>
         </div>
       </form>
+    </section>
+
+    <section class="account-card">
+      <h2 class="account-card__title">{{ tx("panel.account.platforms") }}</h2>
+      <p class="account-platforms__lead">{{ tx("panel.account.steam.desc") }}</p>
+
+      <article class="account-platform">
+        <div class="account-platform__head">
+          <span class="account-platform__icon" aria-hidden="true">
+            <v-icon icon="mdi-steam" size="22" />
+          </span>
+          <div class="account-platform__meta">
+            <strong>{{ tx("panel.account.steam.title") }}</strong>
+            <small
+              :class="
+                steamLinked
+                  ? 'account-platform__badge account-platform__badge--on'
+                  : 'account-platform__badge'
+              "
+            >
+              {{
+                steamLinked
+                  ? tx("panel.account.steam.connected")
+                  : tx("panel.account.steam.notConnected")
+              }}
+            </small>
+          </div>
+        </div>
+
+        <template v-if="steamLinked">
+          <dl class="account-platform__facts">
+            <div>
+              <dt>{{ tx("panel.account.steam.id") }}</dt>
+              <dd>{{ steamId }}</dd>
+            </div>
+            <div v-if="steamSummary?.personaname">
+              <dt>{{ tx("panel.account.steam.persona") }}</dt>
+              <dd>{{ steamSummary.personaname }}</dd>
+            </div>
+            <div>
+              <dt>{{ tx("panel.account.steam.playing") }}</dt>
+              <dd>
+                {{
+                  steamSummary?.gameextrainfo ||
+                  tx("panel.account.steam.offline")
+                }}
+              </dd>
+            </div>
+          </dl>
+          <p v-if="steamSummaryError" class="account-msg account-msg--err">
+            {{ steamSummaryError }}
+          </p>
+          <div class="account-platform__actions">
+            <button
+              type="button"
+              class="account-btn account-btn--ghost"
+              :disabled="steamBusy"
+              @click="disconnectSteam"
+            >
+              {{ tx("panel.account.steam.disconnect") }}
+            </button>
+          </div>
+        </template>
+
+        <div v-else class="account-platform__actions">
+          <button
+            type="button"
+            class="account-btn account-btn--steam"
+            @click="connectSteam"
+          >
+            <v-icon icon="mdi-steam" size="18" />
+            {{ tx("panel.account.steam.connect") }}
+          </button>
+        </div>
+      </article>
     </section>
   </div>
 </template>
@@ -379,6 +524,111 @@ async function onSave() {
 
 .account-msg--err {
   color: #f87171;
+}
+
+.account-platforms__lead {
+  margin: -0.35rem 0 1rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--panel-muted, #94a3b8);
+}
+
+.account-platform {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--panel-border, rgb(255 255 255 / 0.1));
+  background: var(--panel-soft, rgb(0 0 0 / 0.22));
+}
+
+.account-platform__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.account-platform__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.7rem;
+  background: rgb(27 40 56 / 0.9);
+  color: #c7d5e0;
+  border: 1px solid rgb(102 192 244 / 0.35);
+}
+
+.account-platform__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.account-platform__meta strong {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--panel-text, #e8eef7);
+}
+
+.account-platform__badge {
+  width: fit-content;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.account-platform__badge--on {
+  color: #69f0ae;
+}
+
+.account-platform__facts {
+  margin: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.account-platform__facts div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.account-platform__facts dt {
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.account-platform__facts dd {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: var(--panel-text, #e8eef7);
+  word-break: break-all;
+}
+
+.account-platform__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.account-btn--steam {
+  background: #1b2838;
+  border-color: rgb(102 192 244 / 0.45);
+  color: #c7d5e0;
+}
+
+.account-btn--steam:hover:not(:disabled) {
+  background: #2a475e;
+  color: #fff;
 }
 
 .sr-only {

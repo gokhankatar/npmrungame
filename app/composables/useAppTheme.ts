@@ -52,20 +52,46 @@ export function useAppTheme() {
       : "light";
   }
 
+  function paintRoot(resolved: ThemeMode) {
+    if (!import.meta.client) return;
+    const bg = resolved === "dark" ? "#070b14" : "#b9c1cf";
+    const root = document.documentElement;
+    root.classList.toggle("dark", resolved === "dark");
+    root.style.colorScheme = resolved;
+    root.style.backgroundColor = bg;
+    root.style.setProperty("--app-bg", bg);
+  }
+
   function applyTheme(pref: ThemePreference) {
     const resolved = resolve(pref);
     theme.value = resolved;
     preferenceCookie.value = pref;
     resolvedCookie.value = resolved;
+    paintRoot(resolved);
   }
 
-  // SSR + client: html.dark Nuxt useHead ile senkron (hydration drift önler)
+  // SSR + client: html.dark + --app-bg Nuxt useHead ile senkron
   useHead({
     htmlAttrs: {
       class: computed(() => ({ dark: theme.value === "dark" })),
-      style: computed(() => `color-scheme: ${theme.value}`),
+      style: computed(
+        () =>
+          `color-scheme:${theme.value};background-color:${
+            theme.value === "dark" ? "#070b14" : "#b9c1cf"
+          };--app-bg:${theme.value === "dark" ? "#070b14" : "#b9c1cf"}`
+      ),
     },
   });
+
+  if (import.meta.client) {
+    watch(
+      theme,
+      (resolved) => {
+        paintRoot(resolved);
+      },
+      { immediate: true }
+    );
+  }
 
   function watchSystem() {
     if (!import.meta.client || mediaListener) return;

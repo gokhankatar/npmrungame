@@ -54,6 +54,31 @@ export const panelNavItems: PanelNavItem[] = [
     icon: "mdi-numeric-9-plus-box-multiple-outline",
   },
   {
+    title: "Platformlar",
+    titleKey: "panel.nav.platforms",
+    icon: "mdi-gamepad-variant-outline",
+    children: [
+      {
+        title: "Steam",
+        titleKey: "panel.nav.platforms.steam",
+        to: "/dashboard/platforms/steam",
+        icon: "mdi-steam",
+      },
+      {
+        title: "Epic Games",
+        titleKey: "panel.nav.platforms.epic",
+        to: "/dashboard/platforms/epic",
+        icon: "mdi-storefront-outline",
+      },
+      {
+        title: "PlayStation",
+        titleKey: "panel.nav.platforms.playstation",
+        to: "/dashboard/platforms/playstation",
+        icon: "mdi-sony-playstation",
+      },
+    ],
+  },
+  {
     title: "Admin",
     titleKey: "panel.nav.admin",
     icon: "mdi-shield-account",

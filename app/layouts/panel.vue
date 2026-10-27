@@ -3,6 +3,7 @@ import { panelNavItems } from "~/utils/panelNav";
 import { useAppLocale } from "~/composables/useAppLocale";
 import { useAppTheme } from "~/composables/useAppTheme";
 import { useUserProfile } from "~/composables/useUserProfile";
+import Scroll_To_Top from "~/components/common/Scroll_To_Top.vue";
 import PanelProfileMenu from "~/components/panel/PanelProfileMenu.vue";
 import store from "~/store/store";
 import { isChannelOwner } from "~/utils/channelOwnerGames";
@@ -223,6 +224,8 @@ watch(
     <main class="panel-main">
       <slot />
     </main>
+
+    <Scroll_To_Top />
   </div>
 </template>
 
@@ -254,21 +257,23 @@ watch(
 }
 
 .panel-shell[data-theme="light"] {
-  --panel-bg: #f1f5f9;
-  --panel-side: #ffffff;
-  --panel-border: rgb(15 23 42 / 0.08);
+  /* Keşif’te sorun yok — aynı orta slate palet */
+  --panel-bg: #b9c1cf;
+  --panel-side: #c8d0dc;
+  --panel-border: rgb(15 23 42 / 0.14);
   --panel-text: #0f172a;
-  --panel-muted: #64748b;
-  --panel-accent: #059669;
+  --panel-muted: #334155;
+  --panel-accent: #047857;
   --panel-accent-ink: #ffffff;
-  --panel-card: #ffffff;
-  --panel-card-border: rgb(15 23 42 / 0.1);
-  --panel-card-shadow: 0 8px 24px rgb(15 23 42 / 0.06);
-  --panel-soft: #f8fafc;
-  --panel-title-grad: linear-gradient(120deg, #0f172a 0%, #047857 50%, #10b981 100%);
-  --panel-icon-bg: rgb(16 185 129 / 0.1);
-  --panel-icon-border: rgb(16 185 129 / 0.28);
+  --panel-card: #ced5e0;
+  --panel-card-border: rgb(15 23 42 / 0.16);
+  --panel-card-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+  --panel-soft: #c2cad6;
+  --panel-title-grad: linear-gradient(120deg, #0f172a 0%, #065f46 55%, #047857 100%);
+  --panel-icon-bg: rgb(4 120 87 / 0.14);
+  --panel-icon-border: rgb(4 120 87 / 0.38);
   color-scheme: light;
+  background: var(--panel-bg);
 }
 
 .panel-appbar {
@@ -288,7 +293,9 @@ watch(
 }
 
 .panel-shell[data-theme="light"] .panel-appbar {
-  background: rgb(255 255 255 / 0.92);
+  background: #c8d0dc;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .panel-appbar__spacer {
@@ -581,8 +588,18 @@ watch(
 }
 
 .panel-shell[data-theme="light"] .panel-nav__link--active {
-  color: #047857;
-  background: rgb(16 185 129 / 0.12);
+  color: #065f46;
+  background: rgb(4 120 87 / 0.14);
+  font-weight: 800;
+}
+
+.panel-shell[data-theme="light"] .panel-brand__title {
+  /* clip + light green = kayboluyor; solid koyu başlık */
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #065f46;
+  color: #065f46;
 }
 
 .panel-sidebar__foot {

@@ -19,16 +19,26 @@ export type PlayerListCounts = {
   target_2026_games: number;
 };
 
+export type PlayerSteamLive = {
+  personaname: string | null;
+  avatar: string | null;
+  gameName: string | null;
+  /** public profilden okunamadı / API hatası */
+  privateOrUnavailable: boolean;
+};
+
 export type PlayerOverviewRow = {
   uid: string;
   email: string;
   username: string;
   displayName: string;
   photoURL: string | null;
+  steamId: string | null;
   isOwner: boolean;
   createdAtMs: number | null;
   counts: PlayerListCounts;
   totalGames: number;
+  steamLive?: PlayerSteamLive | null;
 };
 
 export const PLAYER_LIST_KEYS: UserGameListKey[] = [
@@ -66,14 +76,23 @@ type PlayerBaseRow = Omit<PlayerOverviewRow, "counts" | "totalGames"> & {
 
 /** Eski auto-id + uid-doc çiftlerini tek satıra indir */
 function pickPreferredPlayer(a: PlayerBaseRow, b: PlayerBaseRow): PlayerBaseRow {
-  if (a.isOwner !== b.isOwner) return a.isOwner ? a : b;
-  const aCanon = a.firestoreId === a.uid;
-  const bCanon = b.firestoreId === b.uid;
-  if (aCanon !== bCanon) return aCanon ? a : b;
-  const aTs = a.createdAtMs ?? 0;
-  const bTs = b.createdAtMs ?? 0;
-  if (aTs !== bTs) return aTs >= bTs ? a : b;
-  return a;
+  let winner: PlayerBaseRow;
+  if (a.isOwner !== b.isOwner) winner = a.isOwner ? a : b;
+  else {
+    const aCanon = a.firestoreId === a.uid;
+    const bCanon = b.firestoreId === b.uid;
+    if (aCanon !== bCanon) winner = aCanon ? a : b;
+    else {
+      const aTs = a.createdAtMs ?? 0;
+      const bTs = b.createdAtMs ?? 0;
+      winner = aTs >= bTs ? a : b;
+    }
+  }
+  // steamId hangi dokümanda varsa koru
+  if (!winner.steamId && (a.steamId || b.steamId)) {
+    return { ...winner, steamId: a.steamId || b.steamId };
+  }
+  return winner;
 }
 
 function pickPreferredCounted(
@@ -128,13 +147,15 @@ export async function fetchOwnerPlayerOverview(
       (data.displayName as string) ||
       email.split("@")[0] ||
       "Oyuncu";
+    const rawSteam = String(data.steamId || "").trim();
     return {
       firestoreId: d.id,
       uid,
       email,
       username,
       displayName: (data.displayName as string) || username,
-      photoURL: (data.photoURL as string) || null,
+      photoURL: (data.photoURL as string) || (data.avatarUrl as string) || null,
+      steamId: /^\d{17}$/.test(rawSteam) ? rawSteam : null,
       isOwner: isChannelOwner(uid) || uid === CHANNEL_OWNER_UID,
       createdAtMs: createdAtMs(data),
     };
@@ -149,6 +170,7 @@ export async function fetchOwnerPlayerOverview(
       username: "npmrungame",
       displayName: "npmrungame",
       photoURL: null,
+      steamId: null,
       isOwner: true,
       createdAtMs: null,
     });
@@ -210,5 +232,82 @@ export function summarizePlayerRows(rows: PlayerOverviewRow[]) {
     playerCount: rows.length,
     totals,
     libraryTotal: PLAYER_LIST_KEYS.reduce((s, k) => s + totals[k], 0),
+    steamLinkedCount: rows.filter((r) => !!r.steamId).length,
   };
+}
+
+async function mapChunk<T, R>(
+  items: T[],
+  size: number,
+  fn: (item: T) => Promise<R>
+): Promise<R[]> {
+  const out: R[] = [];
+  for (let i = 0; i < items.length; i += size) {
+    const slice = items.slice(i, i + size);
+    const part = await Promise.all(slice.map(fn));
+    out.push(...part);
+  }
+  return out;
+}
+
+/** Steam bağlı oyuncular için GetPlayerSummaries — 5’li paralel */
+export async function enrichPlayersWithSteamLive(
+  rows: PlayerOverviewRow[]
+): Promise<PlayerOverviewRow[]> {
+  const linked = rows.filter((r) => r.steamId);
+  if (!linked.length) {
+    return rows.map((r) => ({ ...r, steamLive: null }));
+  }
+
+  const liveBySteamId = new Map<string, PlayerSteamLive>();
+
+  await mapChunk(linked, 5, async (row) => {
+    const steamId = row.steamId!;
+    try {
+      const res = await $fetch<{
+        success?: boolean;
+        data?: {
+          personaname?: string;
+          avatarfull?: string;
+          avatarmedium?: string;
+          gameextrainfo?: string;
+          communityvisibilitystate?: number;
+        } | null;
+      }>("/api/steam/player-summary", { query: { steamId } });
+
+      const data = res?.data;
+      if (!data) {
+        liveBySteamId.set(steamId, {
+          personaname: null,
+          avatar: null,
+          gameName: null,
+          privateOrUnavailable: true,
+        });
+        return;
+      }
+
+      // 1 = private, 3 = public
+      const visibility = Number(data.communityvisibilitystate ?? 0);
+      const isPrivate = visibility > 0 && visibility < 3;
+
+      liveBySteamId.set(steamId, {
+        personaname: data.personaname || null,
+        avatar: data.avatarfull || data.avatarmedium || null,
+        gameName: data.gameextrainfo || null,
+        privateOrUnavailable: isPrivate && !data.gameextrainfo,
+      });
+    } catch {
+      liveBySteamId.set(steamId, {
+        personaname: null,
+        avatar: null,
+        gameName: null,
+        privateOrUnavailable: true,
+      });
+    }
+  });
+
+  return rows.map((r) => ({
+    ...r,
+    steamLive: r.steamId ? liveBySteamId.get(r.steamId) ?? null : null,
+  }));
 }

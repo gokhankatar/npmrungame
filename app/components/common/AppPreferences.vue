@@ -346,7 +346,7 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
 }
 
 .prefs-inline[data-theme="light"] .prefs-inline__seg {
-  background: #f1f5f9;
+  background: #c2cad6;
 }
 
 .prefs-inline__divider {
@@ -418,7 +418,7 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
 
 .prefs-inline[data-theme="light"] .prefs-inline__btn--on,
 .prefs-inline[data-theme="light"] .prefs-inline__icon--on {
-  background: #fff;
+  background: #ced5e0;
   color: #047857;
   box-shadow: 0 1px 3px rgb(15 23 42 / 0.1);
 }
@@ -502,7 +502,7 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
 
 .prefs-dd[data-theme="light"] .prefs-dd__menu {
   border-color: rgb(15 23 42 / 0.1);
-  background: #ffffff;
+  background: #ced5e0;
   box-shadow: 0 16px 40px rgb(15 23 42 / 0.14);
 }
 
@@ -532,7 +532,7 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
 }
 
 .prefs-dd[data-theme="light"] .prefs-dd__item:hover {
-  background: #f8fafc;
+  background: #c2cad6;
 }
 
 .prefs-dd__item--on {

@@ -19,7 +19,13 @@ const label = computed(() => props.text.toLocaleUpperCase("tr-TR"));
   line-height: 1.15;
   letter-spacing: 0.04em;
   /* No background-clip:text — Chromium paints � for TR glyphs (Ş/İ/ı) with transparent fill */
-  color: #9ff5c0;
-  text-shadow: 0 0 28px rgba(105, 240, 174, 0.28);
+  color: var(--panel-accent, #69f0ae);
+  text-shadow: 0 0 28px color-mix(in srgb, var(--panel-accent, #69f0ae) 28%, transparent);
+}
+
+/* Light: açık neon yeşil beyazda kayboluyor → koyu emerald */
+:global(.panel-shell[data-theme="light"]) .ppt {
+  color: #047857;
+  text-shadow: none;
 }
 </style>

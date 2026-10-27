@@ -17,8 +17,39 @@ definePageMeta({
 
 const { tx } = useAppLocale();
 const _store = store();
-const { displayName } = useUserProfile();
+const { displayName, user } = useUserProfile();
 const { $firestore } = useNuxtApp();
+
+const steamId = computed(() => String(user.value?.steamId || "").trim());
+const steamLive = ref<{
+  game: string | null;
+  persona: string;
+  avatar: string;
+} | null>(null);
+
+async function loadSteamLive() {
+  if (!/^\d{17}$/.test(steamId.value)) {
+    steamLive.value = null;
+    return;
+  }
+  try {
+    const res = await $fetch<{
+      success: boolean;
+      data: {
+        personaname?: string;
+        avatarfull?: string;
+        gameextrainfo?: string;
+      } | null;
+    }>("/api/steam/player-summary", { query: { steamId: steamId.value } });
+    steamLive.value = {
+      game: res?.data?.gameextrainfo || null,
+      persona: res?.data?.personaname || "",
+      avatar: res?.data?.avatarfull || "",
+    };
+  } catch {
+    steamLive.value = null;
+  }
+}
 
 useSeoMeta({
   title: "Panel | npmrungame",
@@ -91,7 +122,11 @@ async function loadCounts() {
   }
 }
 
-onMounted(loadCounts);
+onMounted(() => {
+  loadCounts();
+  loadSteamLive();
+});
+watch(steamId, () => loadSteamLive());
 </script>
 
 <template>
@@ -108,6 +143,32 @@ onMounted(loadCounts);
     <div class="dash-home__spotlight">
       <PanelSpotlight />
     </div>
+
+    <NuxtLink
+      v-if="steamLive"
+      to="/dashboard/platforms/steam"
+      class="dash-steam-live"
+      :class="{ 'dash-steam-live--on': !!steamLive.game }"
+    >
+      <img
+        v-if="steamLive.avatar"
+        :src="steamLive.avatar"
+        alt=""
+        class="dash-steam-live__av"
+      />
+      <div class="dash-steam-live__body">
+        <small>{{ tx("panel.steam.dashLiveTitle") }}</small>
+        <strong v-if="steamLive.game">
+          <span class="dash-steam-live__dot" />
+          {{ steamLive.game }}
+        </strong>
+        <strong v-else>{{ tx("panel.steam.dashLiveIdle") }}</strong>
+      </div>
+      <span class="dash-steam-live__cta">
+        {{ tx("panel.steam.dashLiveCta") }}
+        <v-icon icon="mdi-chevron-right" size="18" />
+      </span>
+    </NuxtLink>
 
     <h2 class="dash-home__section">{{ tx("panel.home.highlights") }}</h2>
     <PanelHomeHighlights />
@@ -179,6 +240,63 @@ onMounted(loadCounts);
 
 .dash-home__spotlight {
   margin-top: 1.25rem;
+}
+
+.dash-steam-live {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--panel-card-border, rgb(15 23 42 / 0.1));
+  background: var(--panel-card, #0c1220);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--panel-card-shadow, none);
+}
+.dash-steam-live--on {
+  border-color: color-mix(in srgb, var(--panel-accent, #69f0ae) 40%, transparent);
+}
+.dash-steam-live__av {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+.dash-steam-live__body {
+  flex: 1;
+  min-width: 0;
+}
+.dash-steam-live__body small {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--panel-muted, #94a3b8);
+}
+.dash-steam-live__body strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 750;
+}
+.dash-steam-live__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgb(34 197 94 / 0.25);
+}
+.dash-steam-live__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--panel-accent, #69f0ae);
 }
 
 .dash-home__section {
