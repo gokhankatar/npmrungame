@@ -32,8 +32,8 @@
           :class="{ [`top10-wallpaper__cell--top${game.rank}`]: game.rank <= 3 }"
         >
           <v-img
-            v-if="game.background_image"
-            :src="game.background_image"
+            v-if="coverSrc(game)"
+            :src="coverSrc(game)!"
             :alt="game.name"
             cover
             position="center center"
@@ -80,8 +80,8 @@
         <span class="top10-share-card__rank">{{ game.rank }}</span>
         <div class="top10-share-card__poster">
           <v-img
-            v-if="game.background_image"
-            :src="game.background_image"
+            v-if="coverSrc(game)"
+            :src="coverSrc(game)!"
             :alt="game.name"
             cover
             position="center center"
@@ -120,8 +120,8 @@
         <span class="top10-share-card__list-rank">{{ game.rank }}</span>
         <div class="top10-share-card__list-poster">
           <v-img
-            v-if="game.background_image"
-            :src="game.background_image"
+            v-if="coverSrc(game)"
+            :src="coverSrc(game)!"
             :alt="game.name"
             cover
             position="center center"
@@ -166,7 +166,7 @@
 
 <script lang="ts" setup>
 import type { Top10DisplayMode, Top10GameEntry } from "~/composables/core/top10";
-import { TOP10_MAX_GAMES } from "~/composables/core/top10";
+import { resolveTop10Cover, TOP10_MAX_GAMES } from "~/composables/core/top10";
 
 const props = withDefaults(
   defineProps<{
@@ -199,6 +199,25 @@ const emptySlots = computed(() => {
   const filled = displayGames.value.length;
   return Array.from({ length: TOP10_MAX_GAMES - filled }, (_, i) => filled + i + 1);
 });
+
+function coverSrc(game: Top10GameEntry) {
+  const url = resolveTop10Cover(game);
+  if (!url) return null;
+  if (url.startsWith("/") || url.startsWith("data:")) return url;
+  try {
+    const host = new URL(url).hostname;
+    if (
+      host === "media.rawg.io" ||
+      host === "images.igdb.com" ||
+      host === "img.igdb.com"
+    ) {
+      return `/api/img-proxy?url=${encodeURIComponent(url)}`;
+    }
+  } catch {
+    /* ignore */
+  }
+  return url;
+}
 
 defineExpose({ cardRef });
 </script>

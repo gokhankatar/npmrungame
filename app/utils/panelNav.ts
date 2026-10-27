@@ -1,9 +1,13 @@
 export type PanelNavItem = {
   title: string;
-  to: string;
-  icon: string;
   /** i18n key for title */
   titleKey: string;
+  icon: string;
+  to?: string;
+  /** Sadece kanal sahibi (owner UUID) görür */
+  ownerOnly?: boolean;
+  /** Parent menü — alt öğeler */
+  children?: PanelNavItem[];
 };
 
 export const panelNavItems: PanelNavItem[] = [
@@ -38,10 +42,10 @@ export const panelNavItems: PanelNavItem[] = [
     icon: "mdi-playlist-play",
   },
   {
-    title: "2026 hedeflerim",
+    title: "Bu yıl bitirdiklerim",
     titleKey: "panel.nav.target2026",
     to: "/dashboard/target-2026",
-    icon: "mdi-flag-checkered",
+    icon: "mdi-calendar-check",
   },
   {
     title: "Top 9 listem",
@@ -49,4 +53,26 @@ export const panelNavItems: PanelNavItem[] = [
     to: "/top-10",
     icon: "mdi-numeric-9-plus-box-multiple-outline",
   },
+  {
+    title: "Admin",
+    titleKey: "panel.nav.admin",
+    icon: "mdi-shield-account",
+    ownerOnly: true,
+    children: [
+      {
+        title: "Oyuncular",
+        titleKey: "panel.nav.players",
+        to: "/dashboard/players",
+        icon: "mdi-account-group-outline",
+        ownerOnly: true,
+      },
+    ],
+  },
 ];
+
+/** Kart / sayım için düz liste (grupları açar) */
+export function flattenPanelNav(items: PanelNavItem[]): PanelNavItem[] {
+  return items.flatMap((item) =>
+    item.children?.length ? item.children : [item]
+  );
+}

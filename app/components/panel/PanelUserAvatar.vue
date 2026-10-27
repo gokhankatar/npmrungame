@@ -48,13 +48,8 @@ const boxStyle = computed(() => ({
   justify-content: center;
   overflow: hidden;
   border-radius: 9999px;
-  border: 1px solid rgb(255 255 255 / 0.14);
-  background: rgb(255 255 255 / 0.06);
-}
-
-:global(html:not(.dark)) .panel-avatar {
-  border-color: rgb(15 23 42 / 0.12);
-  background: rgb(15 23 42 / 0.05);
+  border: 1px solid var(--panel-border, rgb(255 255 255 / 0.14));
+  background: var(--panel-soft, rgb(255 255 255 / 0.06));
 }
 
 .panel-avatar__img {
@@ -69,16 +64,16 @@ const boxStyle = computed(() => ({
   height: 100%;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
-  background: linear-gradient(160deg, rgb(105 240 174 / 0.12), transparent 70%);
+  color: var(--panel-muted, #94a3b8);
+  background: linear-gradient(
+    160deg,
+    var(--panel-icon-bg, rgb(105 240 174 / 0.12)),
+    transparent 70%
+  );
 }
 
 .panel-avatar__empty svg {
   width: 58%;
   height: 58%;
-}
-
-:global(html:not(.dark)) .panel-avatar__empty {
-  color: #64748b;
 }
 </style>

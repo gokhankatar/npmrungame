@@ -13,7 +13,7 @@ withDefaults(
 );
 
 const { locale, setLocale, tx } = useAppLocale();
-const { preference, setTheme } = useAppTheme();
+const { theme, preference, setTheme } = useAppTheme();
 
 const locales: { id: Locale; label: string }[] = [
   { id: "tr", label: "TR" },
@@ -73,6 +73,7 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
     <div
       v-if="variant === 'inline'"
       class="prefs-inline"
+      :data-theme="theme"
       role="group"
       :aria-label="tx('prefs.language')"
     >
@@ -120,7 +121,7 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
     </div>
 
     <!-- Dropdown (app bar) -->
-    <div v-else ref="root" class="prefs-dd">
+    <div v-else ref="root" class="prefs-dd" :data-theme="theme">
       <div class="prefs-dd__wrap">
         <button
           type="button"
@@ -297,11 +298,12 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
   height: 0.94rem;
   flex-shrink: 0;
   border-radius: 3px;
-  box-shadow: 0 0 0 1px rgb(15 23 42 / 0.12);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
 }
 
-:global(html.dark) .prefs-flag {
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
+.prefs-dd[data-theme="light"] .prefs-flag,
+.prefs-inline[data-theme="light"] .prefs-flag {
+  box-shadow: 0 0 0 1px rgb(15 23 42 / 0.12);
 }
 
 .prefs-chevron {
@@ -318,7 +320,7 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
   flex-shrink: 0;
 }
 
-/* —— Inline (sidebar) —— */
+/* —— Inline (sidebar) — dark-first —— */
 .prefs-inline {
   display: flex;
   flex-wrap: wrap;
@@ -326,13 +328,13 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
   gap: 0.5rem;
   padding: 0.35rem;
   border-radius: 0.75rem;
-  border: 1px solid rgb(15 23 42 / 0.1);
-  background: rgb(255 255 255 / 0.85);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(15 23 42 / 0.65);
 }
 
-:global(html.dark) .prefs-inline {
-  border-color: rgb(255 255 255 / 0.1);
-  background: rgb(15 23 42 / 0.65);
+.prefs-inline[data-theme="light"] {
+  border-color: rgb(15 23 42 / 0.1);
+  background: rgb(255 255 255 / 0.85);
 }
 
 .prefs-inline__seg {
@@ -340,18 +342,18 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
   align-items: center;
   padding: 0.15rem;
   border-radius: 0.5rem;
-  background: #f1f5f9;
+  background: #1e293b;
 }
 
-:global(html.dark) .prefs-inline__seg {
-  background: #1e293b;
+.prefs-inline[data-theme="light"] .prefs-inline__seg {
+  background: #f1f5f9;
 }
 
 .prefs-inline__divider {
   display: none;
   width: 1px;
   height: 1.25rem;
-  background: #e2e8f0;
+  background: #334155;
 }
 
 @media (min-width: 640px) {
@@ -360,8 +362,8 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
   }
 }
 
-:global(html.dark) .prefs-inline__divider {
-  background: #334155;
+.prefs-inline[data-theme="light"] .prefs-inline__divider {
+  background: #e2e8f0;
 }
 
 .prefs-inline__btn,
@@ -372,7 +374,7 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
   border: none;
   border-radius: 0.4rem;
   background: transparent;
-  color: #64748b;
+  color: #94a3b8;
   font: inherit;
   font-size: 0.75rem;
   font-weight: 700;
@@ -394,34 +396,34 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
 
 .prefs-inline__btn:hover,
 .prefs-inline__icon:hover {
-  color: #0f172a;
-}
-
-:global(html.dark) .prefs-inline__btn,
-:global(html.dark) .prefs-inline__icon {
-  color: #94a3b8;
-}
-
-:global(html.dark) .prefs-inline__btn:hover,
-:global(html.dark) .prefs-inline__icon:hover {
   color: #e2e8f0;
+}
+
+.prefs-inline[data-theme="light"] .prefs-inline__btn,
+.prefs-inline[data-theme="light"] .prefs-inline__icon {
+  color: #64748b;
+}
+
+.prefs-inline[data-theme="light"] .prefs-inline__btn:hover,
+.prefs-inline[data-theme="light"] .prefs-inline__icon:hover {
+  color: #0f172a;
 }
 
 .prefs-inline__btn--on,
 .prefs-inline__icon--on {
-  background: #fff;
-  color: #047857;
-  box-shadow: 0 1px 3px rgb(15 23 42 / 0.1);
-}
-
-:global(html.dark) .prefs-inline__btn--on,
-:global(html.dark) .prefs-inline__icon--on {
   background: #334155;
   color: #69f0ae;
   box-shadow: none;
 }
 
-/* —— Dropdown (app bar) —— */
+.prefs-inline[data-theme="light"] .prefs-inline__btn--on,
+.prefs-inline[data-theme="light"] .prefs-inline__icon--on {
+  background: #fff;
+  color: #047857;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.1);
+}
+
+/* —— Dropdown (app bar) — dark-first —— */
 .prefs-dd {
   display: flex;
   align-items: center;
@@ -440,9 +442,9 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
   min-height: 2.25rem;
   padding: 0 0.75rem;
   border-radius: 0.55rem;
-  border: 1px solid rgb(15 23 42 / 0.14);
-  background: rgb(255 255 255 / 0.7);
-  color: #0f172a;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  background: rgb(15 23 42 / 0.55);
+  color: #e8eef7;
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -454,20 +456,20 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
 }
 
 .prefs-dd__trigger:hover {
-  border-color: rgb(16 185 129 / 0.45);
-  color: #047857;
-}
-
-:global(html.dark) .prefs-dd__trigger {
-  border-color: rgb(255 255 255 / 0.14);
-  background: rgb(15 23 42 / 0.55);
-  color: #e8eef7;
-}
-
-:global(html.dark) .prefs-dd__trigger:hover {
   border-color: rgb(105 240 174 / 0.4);
   background: rgb(30 41 59 / 0.85);
   color: #69f0ae;
+}
+
+.prefs-dd[data-theme="light"] .prefs-dd__trigger {
+  border-color: rgb(15 23 42 / 0.14);
+  background: rgb(255 255 255 / 0.7);
+  color: #0f172a;
+}
+
+.prefs-dd[data-theme="light"] .prefs-dd__trigger:hover {
+  border-color: rgb(16 185 129 / 0.45);
+  color: #047857;
 }
 
 .prefs-dd__label {
@@ -489,19 +491,19 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
   padding: 0.35rem;
   overflow: hidden;
   border-radius: 0.75rem;
-  border: 1px solid rgb(15 23 42 / 0.1);
-  background: #ffffff;
-  box-shadow: 0 16px 40px rgb(15 23 42 / 0.14);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: #0c1220;
+  box-shadow: 0 18px 48px rgb(0 0 0 / 0.45);
 }
 
 .prefs-dd__menu--theme {
   min-width: 10.5rem;
 }
 
-:global(html.dark) .prefs-dd__menu {
-  border-color: rgb(255 255 255 / 0.1);
-  background: #0c1220;
-  box-shadow: 0 18px 48px rgb(0 0 0 / 0.45);
+.prefs-dd[data-theme="light"] .prefs-dd__menu {
+  border-color: rgb(15 23 42 / 0.1);
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgb(15 23 42 / 0.14);
 }
 
 .prefs-dd__item {
@@ -513,7 +515,7 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
   border: none;
   border-radius: 0.55rem;
   background: transparent;
-  color: #334155;
+  color: #e2e8f0;
   font: inherit;
   font-size: 0.875rem;
   text-align: left;
@@ -522,36 +524,31 @@ onUnmounted(() => document.removeEventListener("click", onDocumentClick));
 }
 
 .prefs-dd__item:hover {
-  background: #f8fafc;
-}
-
-:global(html.dark) .prefs-dd__item {
-  color: #e2e8f0;
-}
-
-:global(html.dark) .prefs-dd__item:hover {
   background: rgb(255 255 255 / 0.06);
+}
+
+.prefs-dd[data-theme="light"] .prefs-dd__item {
+  color: #334155;
+}
+
+.prefs-dd[data-theme="light"] .prefs-dd__item:hover {
+  background: #f8fafc;
 }
 
 .prefs-dd__item--on {
   font-weight: 700;
-  color: #047857;
+  color: #69f0ae;
 }
 
-:global(html.dark) .prefs-dd__item--on {
-  color: #69f0ae;
+.prefs-dd[data-theme="light"] .prefs-dd__item--on {
+  color: #047857;
 }
 
 .prefs-skel--inline {
   height: 2.5rem;
   width: 12rem;
   border-radius: 0.75rem;
-  border: 1px solid rgb(15 23 42 / 0.08);
-  background: #f1f5f9;
-}
-
-:global(html.dark) .prefs-skel--inline {
-  border-color: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.08);
   background: rgb(255 255 255 / 0.05);
 }
 

@@ -2,6 +2,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
   GoogleAuthProvider,
   sendPasswordResetEmail,
   confirmPasswordReset,
@@ -18,6 +19,7 @@ import {
   serverTimestamp,
   where,
 } from "firebase/firestore";
+import { isPlayerBanned } from "~/composables/admin/purgePlayerAccount";
 import store from "~/store/store";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -48,6 +50,10 @@ const firebaseErrorMessage = (code?: string, fallback = "Bir hata oluştu") => {
       return "Giriş penceresi kapatıldı";
     case "auth/popup-blocked":
       return "Popup engellendi. Tarayıcı ayarlarını kontrol edin";
+    case "auth/user-disabled":
+      return fallback !== "Bir hata oluştu"
+        ? fallback
+        : "Bu hesap yönetici tarafından kapatıldı";
     case "auth/operation-not-allowed":
       return "Bu giriş yöntemi etkin değil";
     case "auth/unauthorized-domain":
@@ -109,15 +115,30 @@ export function useFirebaseAuth() {
     }
   }
 
+  async function assertNotBanned(uid: string, email?: string | null) {
+    if (!$firestore) return;
+    const banned = await isPlayerBanned($firestore, uid, email);
+    if (!banned) return;
+    await signOut($auth);
+    const err = new Error(
+      "Bu hesap yönetici tarafından kapatıldı. Giriş yapılamaz."
+    );
+    (err as any).code = "auth/user-disabled";
+    throw err;
+  }
+
   async function login(email: string, password: string) {
     error.value = "";
     pending.value = true;
     try {
+      const normalized = normalizeEmail(email);
       const { user } = await signInWithEmailAndPassword(
         $auth,
-        normalizeEmail(email),
+        normalized,
         password
       );
+      await assertNotBanned(user.uid, user.email || normalized);
+
       const userDocRef = doc($firestore, "registered_users", user.uid);
       const userDoc = await getDoc(userDocRef);
 
@@ -131,23 +152,75 @@ export function useFirebaseAuth() {
       _store.setUser(userData);
       return userData;
     } catch (e: any) {
-      error.value = firebaseErrorMessage(e?.code);
+      error.value = firebaseErrorMessage(
+        e?.code,
+        e?.message || "Giriş başarısız"
+      );
       throw e;
     } finally {
       pending.value = false;
     }
   }
 
-  async function register(email: string, password: string, username: string) {
+  async function register(
+    email: string,
+    password: string,
+    username: string,
+    registerTicket?: string
+  ) {
     error.value = "";
     pending.value = true;
     try {
       const normalized = normalizeEmail(email);
+
+      if (!registerTicket?.trim()) {
+        const err = new Error(
+          "Kayıt için önce email doğrulaması gerekli."
+        );
+        (err as any).code = "auth/missing-verification";
+        throw err;
+      }
+
+      // Sunucu ticket’ı tek kullanımlık tüket — kod doğrulanmadan hesap açılmaz
+      try {
+        await $fetch("/api/auth/consume-register-ticket", {
+          method: "POST",
+          body: { email: normalized, ticket: registerTicket.trim() },
+        });
+      } catch (e: any) {
+        const msg =
+          e?.data?.data?.message ||
+          e?.data?.message ||
+          e?.message ||
+          "Email doğrulaması geçersiz.";
+        error.value = msg;
+        throw e;
+      }
+
+      // Email banlıysa Auth hesabı açmadan önce engelle
+      if ($firestore) {
+        const emailBanned = await isPlayerBanned($firestore, "__none__", normalized);
+        if (emailBanned) {
+          const err = new Error(
+            "Bu email ile kayıt kapatıldı. Farklı bir email kullan."
+          );
+          (err as any).code = "auth/user-disabled";
+          throw err;
+        }
+      }
+
       const { user } = await createUserWithEmailAndPassword(
         $auth,
         normalized,
         password
       );
+
+      try {
+        await assertNotBanned(user.uid, normalized);
+      } catch (banErr) {
+        throw banErr;
+      }
+
       const finalUsername =
         username.trim() || extractNameFromEmail(normalized);
 
@@ -164,7 +237,7 @@ export function useFirebaseAuth() {
       _store.setUser(payload);
       return payload;
     } catch (e: any) {
-      error.value = firebaseErrorMessage(e?.code);
+      error.value = firebaseErrorMessage(e?.code, e?.message);
       throw e;
     } finally {
       pending.value = false;
@@ -185,6 +258,9 @@ export function useFirebaseAuth() {
       provider.addScope("email");
 
       const { user } = await signInWithPopup($auth, provider);
+      const email = normalizeEmail(user.email || "");
+      await assertNotBanned(user.uid, email);
+
       const userDocRef = doc($firestore, "registered_users", user.uid);
       const userDoc = await getDoc(userDocRef);
 
@@ -200,8 +276,8 @@ export function useFirebaseAuth() {
         const newUserData = {
           uid: user.uid,
           username:
-            user.displayName || extractNameFromEmail(user.email || ""),
-          email: user.email,
+            user.displayName || extractNameFromEmail(email || user.email || ""),
+          email,
           displayName: user.displayName,
           photoURL: user.photoURL,
           createdAt: serverTimestamp(),
@@ -210,7 +286,11 @@ export function useFirebaseAuth() {
         await setDoc(userDocRef, newUserData);
         userData = { ...userData, ...newUserData };
       } else {
-        userData = { ...userData, ...userDoc.data() };
+        userData = { ...userData, ...userDoc.data(), email: email || userDoc.data()?.email };
+        // Eski kayıtlarda email normalize edilmemiş olabilir
+        if (email && userDoc.data()?.email !== email) {
+          await setDoc(userDocRef, { email, updatedAt: serverTimestamp() }, { merge: true });
+        }
       }
 
       _store.setUser(userData);

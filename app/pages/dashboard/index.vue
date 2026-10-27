@@ -1,9 +1,13 @@
-﻿<script setup lang="ts">
-import { collection, getCountFromServer } from "firebase/firestore";
+<script setup lang="ts">
+import { getCountFromServer } from "firebase/firestore";
 import store from "~/store/store";
-import { panelNavItems } from "~/utils/panelNav";
+import { flattenPanelNav, panelNavItems } from "~/utils/panelNav";
 import { useAppLocale } from "~/composables/useAppLocale";
 import { useUserProfile } from "~/composables/useUserProfile";
+import {
+  gamesCollection,
+  type UserGameListKey,
+} from "~/utils/channelOwnerGames";
 
 definePageMeta({
   layout: "panel",
@@ -30,7 +34,7 @@ const counts = ref<Record<string, number>>({
 });
 const loadingCounts = ref(true);
 
-const collectionByPath: Record<string, string> = {
+const collectionByPath: Record<string, UserGameListKey> = {
   "/dashboard/playing": "current_games",
   "/dashboard/completed": "completed_games",
   "/dashboard/radar": "upcoming_games",
@@ -47,11 +51,11 @@ const countKeyByPath: Record<string, keyof typeof counts.value> = {
 };
 
 const cards = computed(() =>
-  panelNavItems
-    .filter((i) => i.to in collectionByPath)
+  flattenPanelNav(panelNavItems)
+    .filter((i) => i.to && i.to in collectionByPath)
     .map((item) => ({
       ...item,
-      count: counts.value[countKeyByPath[item.to]] ?? 0,
+      count: counts.value[countKeyByPath[item.to!]] ?? 0,
     }))
 );
 
@@ -68,7 +72,7 @@ async function loadCounts() {
       entries.map(async ([path, colName]) => {
         try {
           const snap = await getCountFromServer(
-            collection($firestore, "user_games", uid, colName)
+            gamesCollection($firestore, uid, colName)
           );
           return [path, snap.data().count] as const;
         } catch {
@@ -96,40 +100,49 @@ onMounted(loadCounts);
       <p class="dash-home__eyebrow">{{ tx("panel.home.eyebrow") }}</p>
       <h1 class="dash-home__title">
         {{ tx("panel.home.title") }}
-        <span v-if="displayName"> — {{ displayName }}</span>
+        <span v-if="displayName"> · {{ displayName }}</span>
       </h1>
       <p class="dash-home__sub">{{ tx("panel.home.subtitle") }}</p>
     </header>
 
-    <!-- Full-bleed spotlight: admin seçer / yoksa en yakın radar -->
     <div class="dash-home__spotlight">
       <PanelSpotlight />
     </div>
 
+    <h2 class="dash-home__section">{{ tx("panel.home.highlights") }}</h2>
+    <PanelHomeHighlights />
+
     <h2 class="dash-home__section">{{ tx("panel.home.collections") }}</h2>
 
-    <div class="dash-home__grid">
-      <NuxtLink
+    <v-row dense class="dash-home__grid">
+      <v-col
         v-for="card in cards"
         :key="card.to"
-        :to="card.to"
-        class="dash-card"
+        cols="12"
+        sm="6"
+        :md="card.to === '/dashboard/completed' || card.to === '/dashboard/playing' ? 6 : 4"
       >
-        <div class="dash-card__icon">
-          <v-icon :icon="card.icon" size="22" />
-        </div>
-        <div class="dash-card__body">
-          <h3>{{ tx(card.titleKey) }}</h3>
-          <p>
-            <template v-if="loadingCounts">…</template>
-            <template v-else
-              >{{ card.count }} {{ tx("panel.home.games") }}</template
-            >
-          </p>
-        </div>
-        <v-icon icon="mdi-chevron-right" size="20" class="dash-card__chevron" />
-      </NuxtLink>
-    </div>
+        <NuxtLink :to="card.to!" class="dash-card">
+          <div class="dash-card__icon">
+            <v-icon :icon="card.icon" size="22" />
+          </div>
+          <div class="dash-card__body">
+            <h3>{{ tx(card.titleKey) }}</h3>
+            <p>
+              <template v-if="loadingCounts">…</template>
+              <template v-else
+                >{{ card.count }} {{ tx("panel.home.games") }}</template
+              >
+            </p>
+          </div>
+          <v-icon
+            icon="mdi-chevron-right"
+            size="20"
+            class="dash-card__chevron"
+          />
+        </NuxtLink>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -161,11 +174,7 @@ onMounted(loadCounts);
   max-width: 38rem;
   font-size: 0.9rem;
   line-height: 1.5;
-  color: #94a3b8;
-}
-
-:global(html:not(.dark)) .dash-home__sub {
-  color: #64748b;
+  color: var(--panel-muted, #94a3b8);
 }
 
 .dash-home__spotlight {
@@ -173,49 +182,33 @@ onMounted(loadCounts);
 }
 
 .dash-home__section {
-  margin: 1.75rem 0 0.85rem;
+  margin: 1.55rem 0 0.85rem;
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 .dash-home__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-}
-
-@media (min-width: 640px) {
-  .dash-home__grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (min-width: 1100px) {
-  .dash-home__grid {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
+  margin: 0;
 }
 
 .dash-card {
   display: flex;
   align-items: center;
   gap: 0.85rem;
+  height: 100%;
+  min-height: 4.6rem;
   padding: 1rem 1.05rem;
   border-radius: 1rem;
-  border: 1px solid rgb(255 255 255 / 0.08);
-  background: rgb(12 18 32 / 0.85);
+  border: 1px solid var(--panel-card-border, rgb(255 255 255 / 0.08));
+  background: var(--panel-card, rgb(12 18 32 / 0.85));
   color: inherit;
   text-decoration: none;
+  box-shadow: var(--panel-card-shadow, none);
   transition:
     border-color 0.15s ease,
     background-color 0.15s ease,
     transform 0.15s ease;
-}
-
-:global(html:not(.dark)) .dash-card {
-  background: #fff;
-  border-color: rgb(15 23 42 / 0.08);
 }
 
 .dash-card:hover {
@@ -231,8 +224,8 @@ onMounted(loadCounts);
   align-items: center;
   justify-content: center;
   border-radius: 0.75rem;
-  background: rgb(105 240 174 / 0.12);
-  color: #69f0ae;
+  background: var(--panel-icon-bg, rgb(105 240 174 / 0.12));
+  color: var(--panel-accent, #69f0ae);
 }
 
 .dash-card__body {

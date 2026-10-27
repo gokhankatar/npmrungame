@@ -11,11 +11,24 @@
         :games="games"
         title="Bir ara oynayacaklarım"
         file-name="bir-ara-oynayacaklarim"
+        :editing="bulkDeleteMode"
+        :edit-disabled="!games.length"
         @add="isAddGame = true"
+        @edit="toggleBulkMode"
       />
     </v-col>
 
     <v-col cols="12" lg="10">
+      <Admin_Bulk_Delete_Bar
+        :active="bulkDeleteMode"
+        :selected-count="selectedCount"
+        :total-count="games.length"
+        @select-all="selectAll(games)"
+        @clear="clearSelection"
+        @delete="bulkConfirmOpen = true"
+        @cancel="exitBulkMode"
+      />
+
       <PanelEmptyState
         v-if="!isLoading && games.length === 0"
         icon="mdi-playlist-play"
@@ -30,173 +43,119 @@
         <Game_Card
           v-if="viewMode === 'card'"
           :loading="isLoading"
-          :arr="games"
+          :arr="paginatedItems"
           :onRowClick="handleRowClick"
+          :bulk-delete-mode="bulkDeleteMode"
+          :is-selected="isSelected"
+          :on-toggle-select="toggleSelect"
         />
 
         <Admin_Game_List
           v-else-if="viewMode === 'list'"
           :loading="isLoading"
-          :arr="games"
-          :onDeleteClick="handleDeleteGame"
+          :arr="paginatedItems"
+          :onDeleteClick="bulkDeleteMode ? undefined : handleDeleteGame"
           :onRowClick="handleRowClick"
+          :bulk-delete-mode="bulkDeleteMode"
+          :is-selected="isSelected"
+          :on-toggle-select="toggleSelect"
         />
 
         <Admin_Game_Table
           v-else
           :loading="isLoading"
-          :arr="games"
-          :onDeleteClick="handleDeleteGame"
+          :arr="paginatedItems"
+          :onDeleteClick="bulkDeleteMode ? undefined : handleDeleteGame"
           :onRowClick="handleRowClick"
+          :bulk-delete-mode="bulkDeleteMode"
+          :is-selected="isSelected"
+          :on-toggle-select="toggleSelect"
+        />
+
+        <PanelListPagination
+          v-model="page"
+          v-model:page-size="pageSize"
+          :page-count="pageCount"
+          :page-size="pageSize"
+          :total-count="totalCount"
         />
       </template>
     </v-col>
   </v-row>
 
-  <!-- Add Game Dialog -->
-  <v-dialog
+  <PanelBulkDeleteConfirm
+    v-model="bulkConfirmOpen"
+    :count="selectedCount"
+    :loading="isBulkDeleting"
+    @confirm="confirmBulkDelete"
+  />
+
+  <Admin_Add_Game_Dialog
     v-model="isAddGame"
-    :max-width="800"
-    style="
-      background-color: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(0.7rem);
-      -webkit-backdrop-filter: blur(0.7rem);
-    "
-  >
-    <div
-      class="add-game-dialog d-flex flex-column align-start ga-2 ga-lg-4 rounded pa-2 pa-lg-5"
-    >
-      <v-btn
-        @click="isAddGame = false"
-        icon="mdi-close"
-        color="grey-darken-1"
-        class="close-btn ma-1"
-        variant="text"
-        size="small"
-        :ripple="false"
-      />
+    v-model:search="searchGameText"
+    theme="green"
+    title="Oyun Ekle"
+    subtitle="Bir ara oynamak istediğin oyunları ara ve backlog’a ekle"
+    submit-text="Backlog’a ekle"
+    :search-results="searchResults"
+    :selected="selectedGamesAfterResearch"
+    :loading="isSearchingGameLoading"
+    :adding="isAddingToDb"
+    @search="onSearchInput(searchGameText)"
+    @toggle-select="selectGameAfterSearch"
+    @submit="addGameToDb"
+    @clear-selection="selectedGamesAfterResearch = []"
+  />
 
-      <div class="d-flex align-center ga-2">
-        <v-icon icon="mdi-plus" color="green-accent-2" size="large" />
-        <p
-          class="text-subtitle-2 text-lg-subtitle-1 text-xl-h5 text-grey-lighten-1 default-title-letter"
-        >
-          Oyun Ekle
-        </p>
-      </div>
-
-      <v-divider color="white" class="w-100" />
-
-      <v-text-field
-        v-model="searchGameText"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        class="w-100 text-grey-lighten-1"
-        color="grey-lighten-1"
-        rounded="xl"
-        label="Oyun Ara"
-        placeholder="Oyun adı girin..."
-        :density="display.lgAndUp.value ? 'comfortable' : 'compact'"
-        clearable
-        :loading="isSearchingGameLoading"
-        @update:model-value="onSearchInput"
-      />
-
-      <div v-if="searchResults.length > 0" class="w-100">
-        <div
-          v-for="game in searchResults"
-          :key="game.id"
-          class="search-result-item d-flex align-center ga-3 pa-3 rounded-lg cursor-pointer mb-2"
-          @click="selectGameAfterSearch(game)"
-          :class="
-            selectedGamesAfterResearch.some((g: any) => g.id === game.id)
-              ? 'selected-game'
-              : ''
-          "
-        >
-          <v-img :src="game.background_image" width="64" height="64" class="rounded-lg" cover />
-          <div class="d-flex flex-column flex-grow-1">
-            <p class="text-subtitle-2 text-grey-lighten-1 default-title-letter">
-              {{ game.name }}
-            </p>
-            <p class="text-caption text-grey-darken-1">
-              {{ new Date(game.released).getFullYear() }}
-            </p>
-          </div>
-          <v-icon
-            :icon="
-              selectedGamesAfterResearch.some((g: any) => g.id === game.id)
-                ? 'mdi-check-circle'
-                : 'mdi-circle-outline'
-            "
-            :color="
-              selectedGamesAfterResearch.some((g: any) => g.id === game.id)
-                ? 'green-accent-2'
-                : 'grey-darken-1'
-            "
-          />
-        </div>
-
-        <v-row class="w-100 mx-auto d-flex align-center mt-3" dense>
-          <v-col cols="12" sm="6">
-            <v-btn
-              @click="addGameToDb"
-              :loading="isAddingToDb"
-              :text="`Ekle (${selectedGamesAfterResearch?.length})`"
-              size="small"
-              :ripple="false"
-              prepend-icon="mdi-plus"
-              class="text-capitalize"
-              block
-            />
-          </v-col>
-
-          <v-col cols="12" sm="6">
-            <v-btn
-              @click="selectedGamesAfterResearch = []"
-              text="Temizle"
-              size="small"
-              :ripple="false"
-              class="text-capitalize"
-              prepend-icon="mdi-broom"
-              block
-            />
-          </v-col>
-        </v-row>
-      </div>
-    </div>
-  </v-dialog>
 </template>
 
 <script lang="ts" setup>
 import axios from "axios";
 import _ from "lodash";
-import {
-  doc,
-  getDocs,
-  collection,
-  deleteDoc,
-  addDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { getDocs, deleteDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import Admin_Game_Table from "../common/Admin_Game_Table.vue";
 import Admin_Game_List from "../common/Admin_Game_List.vue";
 import Game_Card from "../common/Game_Card.vue";
+import Admin_Add_Game_Dialog from "~/components/admin/Admin_Add_Game_Dialog.vue";
+import Admin_Bulk_Delete_Bar from "~/components/common/Admin_Bulk_Delete_Bar.vue";
+import PanelBulkDeleteConfirm from "~/components/panel/PanelBulkDeleteConfirm.vue";
 import PanelEmptyState from "~/components/panel/PanelEmptyState.vue";
+import PanelListPagination from "~/components/panel/PanelListPagination.vue";
 import PanelPageTitle from "~/components/panel/PanelPageTitle.vue";
 import store from "~/store/store";
 import { useAppLocale } from "~/composables/useAppLocale";
+import {
+  batchDeleteUserListGames,
+  usePanelBulkEdit,
+} from "~/composables/usePanelBulkEdit";
+import { usePanelListPagination } from "~/composables/usePanelListPagination";
 import { isAbortError } from "~/utils/isAbortError";
+import { gameDoc, gamesCollection } from "~/utils/channelOwnerGames";
 
 const { $firestore } = useNuxtApp();
 const display = useDisplay();
 const _store = store();
 const { tx } = useAppLocale();
 
+const {
+  bulkDeleteMode,
+  selectedIds,
+  selectedCount,
+  isSelected,
+  toggleBulkMode,
+  exitBulkMode,
+  toggleSelect,
+  selectAll,
+  clearSelection,
+} = usePanelBulkEdit();
+
+const bulkConfirmOpen = ref(false);
+const isBulkDeleting = ref(false);
+
 const smallScreen = computed(() => display.smAndDown.value);
 
 const emptyTips = computed(() => [
-  { icon: "mdi-magnify", text: tx("panel.empty.tipSearch") },
+  { icon: "mdi-lightbulb-on-outline", text: tx("panel.empty.tipSearch") },
 ]);
 
 const isLoading = ref(false);
@@ -210,12 +169,24 @@ const searchGameText = ref<string>("");
 const searchResults = ref<any[]>([]);
 const selectedGamesAfterResearch = ref<any[]>([]);
 
+const {
+  page,
+  pageSize,
+  pageCount,
+  paginatedItems,
+  totalCount,
+} = usePanelListPagination(games);
+
 const getGames = async () => {
   if (!_store.user?.uid || !$firestore) return;
 
   try {
     isLoading.value = true;
-    const gamesCol = collection($firestore, "user_games", _store.user.uid, "to_play_games");
+    const gamesCol = gamesCollection(
+      $firestore,
+      _store.user.uid,
+      "to_play_games"
+    );
     const gamesSnapshot = await getDocs(gamesCol);
 
     const gamesList = gamesSnapshot.docs.map((doc) => ({
@@ -273,7 +244,11 @@ const addGameToDb = async () => {
 
   try {
     isAddingToDb.value = true;
-    const gamesCol = collection($firestore, "user_games", _store.user.uid, "to_play_games");
+    const gamesCol = gamesCollection(
+      $firestore,
+      _store.user.uid,
+      "to_play_games"
+    );
 
     for (const game of selectedGamesAfterResearch.value) {
       await addDoc(gamesCol, {
@@ -302,17 +277,33 @@ const handleDeleteGame = async (game: any) => {
   if (!_store.user?.uid || !$firestore || !game.firestoreId) return;
 
   try {
-    const gameDocRef = doc(
-      $firestore,
-      "user_games",
-      _store.user.uid,
-      "to_play_games",
-      game.firestoreId
+    await deleteDoc(
+      gameDoc($firestore, _store.user.uid, "to_play_games", game.firestoreId)
     );
-    await deleteDoc(gameDocRef);
     await getGames();
   } catch (error) {
     console.error("Error deleting game:", error);
+  }
+};
+
+const confirmBulkDelete = async () => {
+  if (!_store.user?.uid || !$firestore || !selectedIds.value.length) return;
+
+  try {
+    isBulkDeleting.value = true;
+    await batchDeleteUserListGames(
+      $firestore,
+      _store.user.uid,
+      "to_play_games",
+      selectedIds.value
+    );
+    bulkConfirmOpen.value = false;
+    exitBulkMode();
+    await getGames();
+  } catch (error) {
+    console.error("Error bulk deleting games:", error);
+  } finally {
+    isBulkDeleting.value = false;
   }
 };
 
@@ -332,33 +323,4 @@ onMounted(() => {
 <style scoped>
 @import "~/assets/css/main.css";
 
-.search-result-item {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-}
-
-.search-result-item:hover {
-  background: rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.selected-game {
-  background: rgba(76, 175, 80, 0.2) !important;
-  border-color: rgba(76, 175, 80, 0.4) !important;
-}
-
-.add-game-dialog {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(0.5rem);
-  -webkit-backdrop-filter: blur(0.5rem);
-}
-
-.close-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 10;
-}
 </style>

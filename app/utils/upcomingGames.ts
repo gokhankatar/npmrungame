@@ -15,8 +15,28 @@ export interface CountdownChip {
 export const UPCOMING_GAMES_COLLECTION = "upcoming_games";
 
 export const parseReleaseDate = (value: string) => {
-  const [y, m, d] = value.split("-").map(Number);
-  return new Date(y, m - 1, d);
+  const isoDay = value.slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(isoDay)) {
+    const [y, m, d] = isoDay.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? new Date(NaN) : parsed;
+};
+
+/** released veya releaseDate alanından çıkış günü */
+export const resolveGameReleaseIso = (item: {
+  released?: string | null;
+  releaseDate?: string | null;
+} | null | undefined): string | null => {
+  const raw = item?.releaseDate || item?.released || null;
+  if (!raw || raw === "TBA") return null;
+  const d = parseReleaseDate(String(raw));
+  if (Number.isNaN(d.getTime())) return null;
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 };
 
 export const formatReleaseDate = (value: string) =>
@@ -66,6 +86,59 @@ export const getCountdownHeadline = (value: string) => {
   if (diffDays === 0) return { value: "Bugün", unit: "çıkıyor" };
   return { value: String(diffDays), unit: "gün kaldı" };
 };
+
+/** Çıkış günü yerel 00:00 */
+export const getReleaseMidnight = (value: string) => {
+  const release = parseReleaseDate(value);
+  release.setHours(0, 0, 0, 0);
+  return release;
+};
+
+export const getCalendarDaysUntilRelease = (value: string, now = new Date()) => {
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  const release = getReleaseMidnight(value);
+  return Math.round((release.getTime() - today.getTime()) / 86400000);
+};
+
+export const getMsUntilReleaseMidnight = (value: string, now = new Date()) =>
+  getReleaseMidnight(value).getTime() - now.getTime();
+
+/** 2 gün veya daha az + henüz 00:00 gelmemiş → canlı countdown */
+export const shouldShowLiveReleaseCountdown = (
+  value: string,
+  now = new Date()
+) => {
+  const ms = getMsUntilReleaseMidnight(value, now);
+  const days = getCalendarDaysUntilRelease(value, now);
+  return ms > 0 && days <= 2;
+};
+
+export type LiveCountdownParts = {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  totalMs: number;
+};
+
+export const getLiveCountdownParts = (
+  value: string,
+  now = new Date()
+): LiveCountdownParts | null => {
+  const totalMs = getMsUntilReleaseMidnight(value, now);
+  if (totalMs <= 0) return null;
+  const totalSec = Math.floor(totalMs / 1000);
+  return {
+    totalMs,
+    days: Math.floor(totalSec / 86400),
+    hours: Math.floor((totalSec % 86400) / 3600),
+    minutes: Math.floor((totalSec % 3600) / 60),
+    seconds: totalSec % 60,
+  };
+};
+
+export const pad2 = (n: number) => String(n).padStart(2, "0");
 
 export const sortByReleaseDate = (games: UpcomingGame[]) =>
   [...games].sort(

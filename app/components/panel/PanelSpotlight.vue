@@ -5,7 +5,9 @@ import {
   useDashboardSpotlight,
   type SpotlightGame,
 } from "~/composables/useDashboardSpotlight";
+import { useLiveReleaseCountdown } from "~/composables/useLiveReleaseCountdown";
 import { useAppLocale } from "~/composables/useAppLocale";
+import { pad2 } from "~/utils/upcomingGames";
 import store from "~/store/store";
 
 const { tx, locale } = useAppLocale();
@@ -21,6 +23,21 @@ function openGameDetail() {
 const loading = ref(true);
 const game = ref<SpotlightGame | null>(null);
 
+const releaseDate = computed(() => game.value?.releaseDate ?? null);
+const { active: liveActive, parts: liveParts } =
+  useLiveReleaseCountdown(releaseDate);
+
+/** Gün yok — toplam saat : dk : sn */
+const liveHms = computed(() => {
+  const p = liveParts.value;
+  if (!p) return null;
+  return {
+    hours: p.days * 24 + p.hours,
+    minutes: p.minutes,
+    seconds: p.seconds,
+  };
+});
+
 const daysLeft = computed(() =>
   game.value ? getDaysUntilRelease(game.value.releaseDate) : null
 );
@@ -28,7 +45,11 @@ const daysLeft = computed(() =>
 const countdownLabel = computed(() => {
   const d = daysLeft.value;
   if (d === null) return "";
-  if (d < 0) return tx("panel.spotlight.releasedAgo").replace("{n}", String(Math.abs(d)));
+  if (d < 0)
+    return tx("panel.spotlight.releasedAgo").replace(
+      "{n}",
+      String(Math.abs(d))
+    );
   if (d === 0) return tx("panel.spotlight.today");
   return tx("panel.spotlight.daysLeft").replace("{n}", String(d));
 });
@@ -86,35 +107,63 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="spotlight__content">
-        <span class="spotlight__badge">
-          <v-icon icon="mdi-star-shooting" size="14" />
-          {{ tx("panel.spotlight.badge") }}
-        </span>
-
-        <h2 class="spotlight__title">{{ game.name }}</h2>
-        <p class="spotlight__date">{{ dateLabel }}</p>
-
-        <div class="spotlight__countdown">
-          <span class="spotlight__countdown-value">
-            {{ daysLeft === 0 ? "0" : Math.abs(daysLeft ?? 0) }}
+        <div class="spotlight__copy">
+          <span class="spotlight__badge">
+            <v-icon icon="mdi-star-shooting" size="14" />
+            {{ tx("panel.spotlight.badge") }}
           </span>
-          <span class="spotlight__countdown-unit">{{ countdownLabel }}</span>
+
+          <h2 class="spotlight__title">{{ game.name }}</h2>
+          <p class="spotlight__date">{{ dateLabel }}</p>
+
+          <div v-if="!(liveActive && liveHms)" class="spotlight__countdown">
+            <span class="spotlight__countdown-value">
+              {{ daysLeft === 0 ? "0" : Math.abs(daysLeft ?? 0) }}
+            </span>
+            <span class="spotlight__countdown-unit">{{ countdownLabel }}</span>
+          </div>
+
+          <div class="spotlight__actions">
+            <NuxtLink
+              to="/dashboard/radar"
+              class="spotlight__btn spotlight__btn--primary"
+            >
+              <v-icon icon="mdi-radar" size="18" />
+              {{ tx("panel.spotlight.openRadar") }}
+            </NuxtLink>
+            <button
+              v-if="game.rawgId"
+              type="button"
+              class="spotlight__btn spotlight__btn--ghost"
+              @click="openGameDetail"
+            >
+              <v-icon icon="mdi-information-outline" size="18" />
+              {{ tx("panel.spotlight.detail") }}
+            </button>
+          </div>
         </div>
 
-        <div class="spotlight__actions">
-          <NuxtLink to="/dashboard/radar" class="spotlight__btn spotlight__btn--primary">
-            <v-icon icon="mdi-radar" size="18" />
-            {{ tx("panel.spotlight.openRadar") }}
-          </NuxtLink>
-          <button
-            v-if="game.rawgId"
-            type="button"
-            class="spotlight__btn spotlight__btn--ghost"
-            @click="openGameDetail"
-          >
-            <v-icon icon="mdi-information-outline" size="18" />
-            {{ tx("panel.spotlight.detail") }}
-          </button>
+        <div
+          v-if="liveActive && liveHms"
+          class="spotlight__live"
+          aria-label="Geri sayım"
+        >
+          <div class="spotlight__live-digits">
+            <span class="spotlight__live-block">
+              <strong>{{ pad2(liveHms.hours) }}</strong>
+              <small>sa</small>
+            </span>
+            <span class="spotlight__live-sep" aria-hidden="true">:</span>
+            <span class="spotlight__live-block">
+              <strong>{{ pad2(liveHms.minutes) }}</strong>
+              <small>dk</small>
+            </span>
+            <span class="spotlight__live-sep" aria-hidden="true">:</span>
+            <span class="spotlight__live-block">
+              <strong>{{ pad2(liveHms.seconds) }}</strong>
+              <small>sn</small>
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -249,15 +298,26 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  gap: 1rem;
   min-height: inherit;
   padding: 1.5rem 1.25rem 1.4rem;
-  max-width: 40rem;
 }
 
 @media (min-width: 768px) {
   .spotlight__content {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.25rem;
     padding: 2rem 2rem 1.75rem;
   }
+}
+
+.spotlight__copy {
+  display: flex;
+  flex-direction: column;
+  max-width: 40rem;
+  min-width: 0;
 }
 
 .spotlight__badge {
@@ -316,6 +376,73 @@ onBeforeUnmount(() => {
   font-size: 0.85rem;
   font-weight: 600;
   color: rgb(226 232 240 / 0.9);
+}
+
+.spotlight__live {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+  margin-left: auto;
+  padding: 0.9rem 1.15rem 1rem;
+  border-radius: 1.1rem;
+  background: rgb(6 18 14 / 0.72);
+  border: 1px solid rgb(105 240 174 / 0.55);
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.35),
+    0 10px 28px rgb(0 0 0 / 0.45),
+    0 0 24px rgb(105 240 174 / 0.18);
+  backdrop-filter: blur(12px);
+  width: fit-content;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  .spotlight__live {
+    align-items: flex-start;
+    margin-left: 0;
+  }
+}
+
+.spotlight__live-digits {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.25rem 0.4rem;
+}
+
+.spotlight__live-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 2.75rem;
+}
+
+.spotlight__live-block strong {
+  font-size: clamp(1.65rem, 3.6vw, 2.3rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: #69f0ae;
+  text-shadow: 0 0 18px rgb(105 240 174 / 0.45);
+}
+
+.spotlight__live-block small {
+  margin-top: 0.28rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(185 255 214 / 0.95);
+}
+
+.spotlight__live-sep {
+  padding-bottom: 0.95rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: rgb(105 240 174 / 0.7);
 }
 
 .spotlight__actions {

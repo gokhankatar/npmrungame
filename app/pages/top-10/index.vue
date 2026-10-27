@@ -1,352 +1,283 @@
 <template>
-  <div class="top10-page top10-page--panel">
-    <header class="top10-hero top10-hero--panel">
-      <div class="top10-hero-top">
-        <div class="top10-hero-copy">
-          <p class="top10-hero-badge">Top 9</p>
-          <h1 class="top10-hero-title">Kendi 9'unu oluştur</h1>
-          <p class="top10-hero-sub">
-            Dokuz oyunu sırala, ekran görünümünü seç, kaydet ve paylaş.
-          </p>
-        </div>
-
-        <div class="top10-hero-progress" aria-label="Liste ilerlemesi">
-          <v-progress-circular
-            :model-value="progressPercent"
-            :size="smallScreen ? 68 : 80"
-            :width="5"
-            color="#69f0ae"
-            bg-color="rgba(255,255,255,0.08)"
-          >
-            <span class="top10-hero-progress__value">{{ selectedGames.length }}/{{ TOP10_MAX_GAMES }}</span>
-          </v-progress-circular>
-          <p class="top10-hero-progress__label">oyun</p>
-        </div>
-      </div>
+  <div class="top9-studio">
+    <header class="top9-studio__intro">
+      <p class="top9-studio__eyebrow">Top 9</p>
+      <h1 class="top9-studio__title">Kendi 9'unu oluştur</h1>
+      <p class="top9-studio__lead">
+        Bir kareye dokunup oyun seç veya değiştir. Hazır olunca kaydet, görsel üret
+        veya paylaş.
+      </p>
     </header>
 
-    <div class="top10-layout">
-        <!-- Sol: arama + slotlar -->
-        <div class="top10-panel top10-panel--editor">
-          <section class="top10-editor-block">
-            <div class="top10-panel__head">
-              <h2 class="top10-panel__title default-title-letter">
-                <span class="top10-panel__icon-ring">
-                  <v-icon icon="mdi-magnify" size="18" color="#69f0ae" />
-                </span>
-                Oyun ara
-              </h2>
-            </div>
+    <div class="top9-studio__board-wrap">
+      <p class="top9-studio__hint">Bir kareye dokunarak oyun seç ↓</p>
 
-            <v-text-field
-              v-model="searchQuery"
-              rounded="xl"
-              variant="outlined"
-              label="Oyun adı yaz..."
-              prepend-inner-icon="mdi-gamepad-variant-outline"
-              color="green-accent-2"
-              class="top10-search-field default-title-letter"
-              hide-details
-              clearable
-              :loading="isSearching"
-              :density="smallScreen ? 'compact' : 'comfortable'"
+      <div ref="boardExportRef" class="top9-board" role="list">
+        <button
+          v-for="slot in slotRows"
+          :key="slot.rank"
+          type="button"
+          class="top9-cell"
+          :class="{
+            'top9-cell--filled': !!slot.game,
+            'top9-cell--empty': !slot.game,
+          }"
+          role="listitem"
+          :aria-label="
+            slot.game
+              ? `${slot.rank}. ${slot.game.name}`
+              : `${slot.rank}. boş kare — oyun seç`
+          "
+          @click="openPicker(slot.rank)"
+        >
+          <template v-if="slot.game">
+            <img
+              v-if="slotCover(slot.game)"
+              :src="slotCover(slot.game)"
+              :alt="slot.game.name"
+              class="top9-cell__cover"
+              loading="lazy"
+              referrerpolicy="no-referrer"
             />
-
-            <div v-if="isSearching" class="top10-search-state">
-              <v-progress-circular indeterminate color="green-accent-2" size="28" width="2" />
+            <div v-else class="top9-cell__cover top9-cell__cover--fallback">
+              <v-icon icon="mdi-gamepad-variant-outline" size="28" />
             </div>
-
-            <p
-              v-else-if="searchQuery.length >= 2 && !searchResults.length"
-              class="top10-search-hint default-title-letter"
+            <span class="top9-cell__shade" aria-hidden="true" />
+            <span class="top9-cell__rank">{{ slot.rank }}</span>
+            <span class="top9-cell__name">
+              <span class="top9-cell__name-text">{{ slot.game.name }}</span>
+            </span>
+            <span
+              class="top9-cell__clear"
+              title="Kaldır"
+              @click.stop="removeGame(slot.rank - 1)"
             >
-              Sonuç bulunamadı.
-            </p>
-
-            <div v-else-if="searchResults.length" class="top10-search-results">
-              <button
-                v-for="game in searchResults"
-                :key="game.id"
-                type="button"
-                class="top10-search-pick"
-                :class="{ 'top10-search-pick--disabled': isGameInList(game.id) || isListFull }"
-                @click="addGame(game)"
-              >
-                <div class="top10-search-pick__thumb">
-                  <v-img
-                    v-if="game.background_image"
-                    :src="game.background_image"
-                    cover
-                    position="center center"
-                    class="top10-search-pick__img"
-                  />
-                  <v-icon v-else icon="mdi-gamepad-variant-outline" color="grey" />
-                </div>
-                <div class="top10-search-pick__info text-left">
-                  <p class="top10-search-pick__name default-title-letter">{{ game.name }}</p>
-                  <p class="top10-search-pick__meta default-title-letter">
-                    {{ game.released?.slice(0, 4) || "—" }}
-                    <span v-if="game.metacritic" class="top10-search-pick__mc">
-                      Metacritic puanı {{ game.metacritic }}
-                    </span>
-                  </p>
-                </div>
-                <v-icon
-                  :icon="isGameInList(game.id) ? 'mdi-check-circle' : 'mdi-plus-circle'"
-                  :color="isGameInList(game.id) ? '#69f0ae' : 'grey-lighten-1'"
-                  size="24"
-                />
-              </button>
-            </div>
-
-            <p v-else class="top10-search-hint default-title-letter">
-              En az 2 karakter yazarak oyun ara.
-            </p>
-          </section>
-
-          <v-divider class="top10-divider my-4" />
-
-          <section class="top10-editor-block">
-            <div class="top10-panel__head">
-              <h2 class="top10-panel__title default-title-letter">
-                <span class="top10-panel__icon-ring">
-                  <v-icon icon="mdi-format-list-numbered" size="18" color="#69f0ae" />
-                </span>
-                Sıralaman
-              </h2>
-              <v-chip size="x-small" variant="tonal" color="green-accent-2" class="default-title-letter">
-                {{ selectedGames.length }}/{{ TOP10_MAX_GAMES }}
-              </v-chip>
-            </div>
-
-            <div class="top10-slots">
-              <div
-                v-for="slot in slotRows"
-                :key="slot.rank"
-                class="top10-slot"
-                :class="{
-                  'top10-slot--filled': !!slot.game,
-                  [`top10-slot--rank${slot.rank}`]: !!slot.game && slot.rank <= 3,
-                }"
-              >
-                <span class="top10-slot__rank">{{ slot.rank }}</span>
-
-                <div
-                  class="top10-slot__thumb"
-                  :class="{ 'top10-slot__thumb--empty': !slot.game }"
-                >
-                  <v-img
-                    v-if="slot.game?.background_image"
-                    :src="slot.game.background_image"
-                    cover
-                    position="center center"
-                    class="top10-slot__img"
-                  />
-                  <v-icon v-else icon="mdi-plus" size="18" color="rgba(255,255,255,0.2)" />
-                </div>
-
-                <div class="top10-slot__body">
-                  <p
-                    class="top10-slot__name default-title-letter"
-                    :class="{ 'top10-slot__name--empty': !slot.game }"
-                  >
-                    {{ slot.game?.name || "Oyun seç" }}
-                  </p>
-                  <p v-if="slot.game?.released" class="top10-slot__meta default-title-letter">
-                    {{ slot.game.released.slice(0, 4) }}
-                  </p>
-                </div>
-
-                <div v-if="slot.game" class="top10-slot__actions">
-                  <v-btn
-                    icon="mdi-chevron-up"
-                    variant="text"
-                    size="x-small"
-                    color="grey-lighten-1"
-                    :disabled="slot.rank === 1"
-                    :ripple="false"
-                    @click="moveGame(slot.rank - 1, -1)"
-                  />
-                  <v-btn
-                    icon="mdi-chevron-down"
-                    variant="text"
-                    size="x-small"
-                    color="grey-lighten-1"
-                    :disabled="slot.rank === selectedGames.length"
-                    :ripple="false"
-                    @click="moveGame(slot.rank - 1, 1)"
-                  />
-                  <v-btn
-                    icon="mdi-close"
-                    variant="text"
-                    size="x-small"
-                    color="error"
-                    :ripple="false"
-                    @click="removeGame(slot.rank - 1)"
-                  />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <v-divider class="top10-divider my-4" />
-
-          <section class="top10-editor-block">
-            <v-text-field
-              v-model="listTitle"
-              rounded="xl"
-              variant="outlined"
-              label="Liste başlığı"
-              prepend-inner-icon="mdi-format-title"
-              color="green-accent-2"
-              class="default-title-letter"
-              hide-details
-              :density="smallScreen ? 'compact' : 'comfortable'"
-            />
-
-            <div class="top10-actions-bar">
-              <v-btn
-                color="green-accent-2"
-                variant="flat"
-                rounded="pill"
-                class="text-black text-capitalize default-title-letter"
-                prepend-icon="mdi-content-save"
-                :loading="isSaving"
-                :disabled="!canSave"
-                text="Kaydet"
-                :ripple="false"
-                @click="handleSave"
-              />
-              <v-btn
-                v-if="savedSlug"
-                variant="tonal"
-                color="green-accent-2"
-                rounded="pill"
-                class="text-capitalize default-title-letter"
-                prepend-icon="mdi-link-variant"
-                text="Linki kopyala"
-                :ripple="false"
-                @click="copyShareLink"
-              />
-              <v-btn
-                v-if="savedSlug && canShare"
-                variant="outlined"
-                color="grey-lighten-1"
-                rounded="pill"
-                class="text-capitalize default-title-letter"
-                prepend-icon="mdi-open-in-new"
-                text="Paylaş"
-                :ripple="false"
-                :to="`/top-10/${savedSlug}`"
-              />
-            </div>
-
-            <p
-              v-if="saveMessage"
-              class="top10-status default-title-letter"
-              :class="saveMessageOk ? 'top10-status--ok' : 'top10-status--warn'"
-            >
-              {{ saveMessage }}
-            </p>
-            <p
-              v-else-if="!canShare"
-              class="top10-status top10-status--warn default-title-letter"
-            >
-              Paylaşım için {{ TOP10_MAX_GAMES }} oyun seç ({{ selectedGames.length }}/{{ TOP10_MAX_GAMES }}).
-            </p>
-          </section>
-        </div>
-
-        <!-- Sağ: önizleme -->
-        <div class="top10-panel top10-panel--preview top10-preview-panel">
-          <div class="top10-panel__head top10-panel__head--preview">
-            <h2 class="top10-panel__title default-title-letter">
-              <span class="top10-panel__icon-ring">
-                <v-icon icon="mdi-share-variant" size="18" color="#69f0ae" />
-              </span>
-              Paylaşım önizlemesi
-            </h2>
-          </div>
-
-          <div class="top10-view-picker">
-            <p class="top10-view-picker__label default-title-letter">Görünüm tercihi</p>
-            <div class="top10-view-picker__options">
-              <button
-                type="button"
-                class="top10-view-option"
-                :class="{ 'top10-view-option--active': displayMode === 'wallpaper' }"
-                @click="displayMode = 'wallpaper'"
-              >
-                <v-icon
-                  icon="mdi-wallpaper"
-                  size="22"
-                  :color="displayMode === 'wallpaper' ? '#69f0ae' : 'grey'"
-                />
-                <span class="top10-view-option__title default-title-letter">Ekran</span>
-                <span class="top10-view-option__sub default-title-letter"
-                  >3×3 duvar kağıdı — wallpaper</span
-                >
-                <div
-                  class="top10-view-option__mini top10-view-option__mini--wall"
-                  aria-hidden="true"
-                >
-                  <span v-for="n in 9" :key="n" />
-                </div>
-              </button>
-
-              <button
-                type="button"
-                class="top10-view-option"
-                :class="{ 'top10-view-option--active': displayMode === 'grid' }"
-                @click="displayMode = 'grid'"
-              >
-                <v-icon icon="mdi-view-grid" size="22" :color="displayMode === 'grid' ? '#69f0ae' : 'grey'" />
-                <span class="top10-view-option__title default-title-letter">Kart</span>
-                <span class="top10-view-option__sub default-title-letter">Poster grid — Instagram</span>
-                <div class="top10-view-option__mini top10-view-option__mini--grid" aria-hidden="true">
-                  <span v-for="n in 6" :key="n" />
-                </div>
-              </button>
-
-              <button
-                type="button"
-                class="top10-view-option"
-                :class="{ 'top10-view-option--active': displayMode === 'list' }"
-                @click="displayMode = 'list'"
-              >
-                <v-icon icon="mdi-format-list-bulleted" size="22" :color="displayMode === 'list' ? '#69f0ae' : 'grey'" />
-                <span class="top10-view-option__title default-title-letter">Liste</span>
-                <span class="top10-view-option__sub default-title-letter">Sıralı liste — Twitter / story</span>
-                <div class="top10-view-option__mini top10-view-option__mini--list" aria-hidden="true">
-                  <span v-for="n in 4" :key="n" />
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <div class="top10-preview-frame">
-            <Top10_Share_Card
-              :title="previewTitle"
-              :username="displayUsername"
-              :games="previewGames"
-              :display-mode="displayMode"
-              :show-empty-slots="selectedGames.length < TOP10_MAX_GAMES"
-            />
-          </div>
-
-          <p class="top10-preview-tip default-title-letter">
-            <v-icon icon="mdi-camera-outline" size="14" class="mr-1" />
-            Ekran görüntüsü alıp paylaşabilirsin — veya kaydettikten sonra link gönder.
-          </p>
-        </div>
+              <v-icon icon="mdi-close" size="16" />
+            </span>
+          </template>
+          <template v-else>
+            <span class="top9-cell__plus">+</span>
+            <span class="top9-cell__no">No. {{ slot.rank }}</span>
+          </template>
+        </button>
       </div>
+    </div>
+
+    <div class="top9-studio__tools">
+      <section class="top9-tool top9-tool--wide">
+        <h2 class="top9-tool__title">Liste</h2>
+        <v-text-field
+          v-model="listTitle"
+          rounded="lg"
+          variant="outlined"
+          label="Liste başlığı"
+          prepend-inner-icon="mdi-format-title"
+          color="success"
+          class="top9-search"
+          hide-details
+          density="comfortable"
+          placeholder="Örn. Benim Top 9"
+        />
+
+        <div class="top9-actions">
+          <button
+            type="button"
+            class="top9-btn top9-btn--primary"
+            :disabled="!canSave"
+            @click="handleSave"
+          >
+            <v-icon
+              :icon="isSaving ? 'mdi-loading' : 'mdi-content-save'"
+              size="18"
+              :class="{ 'top9-spin': isSaving }"
+            />
+            Kaydet
+          </button>
+          <button
+            type="button"
+            class="top9-btn top9-btn--gold"
+            :disabled="!filledCount || isExporting"
+            @click="exportImage"
+          >
+            <v-icon
+              :icon="isExporting ? 'mdi-loading' : 'mdi-image-outline'"
+              size="18"
+              :class="{ 'top9-spin': isExporting }"
+            />
+            Görsel üret
+          </button>
+          <button
+            type="button"
+            class="top9-btn top9-btn--forest"
+            :disabled="!savedSlug || !canShare"
+            @click="copyShareLink"
+          >
+            <v-icon icon="mdi-share-variant" size="18" />
+            Paylaş
+          </button>
+          <button
+            type="button"
+            class="top9-btn top9-btn--ghost"
+            :disabled="!filledCount"
+            @click="clearList"
+          >
+            <v-icon icon="mdi-broom" size="18" />
+            Listeyi temizle
+          </button>
+        </div>
+
+        <p
+          v-if="saveMessage"
+          class="top9-status"
+          :class="saveMessageOk ? 'top9-status--ok' : 'top9-status--warn'"
+        >
+          {{ saveMessage }}
+        </p>
+        <p v-else-if="!canShare" class="top9-status top9-status--warn">
+          Paylaşım için {{ TOP10_MAX_GAMES }} oyun seç
+          ({{ filledCount }}/{{ TOP10_MAX_GAMES }}).
+        </p>
+
+        <div class="top9-modes">
+          <p class="top9-modes__label">Paylaşım görünümü</p>
+          <div class="top9-modes__row">
+            <button
+              v-for="mode in displayModes"
+              :key="mode.id"
+              type="button"
+              class="top9-mode"
+              :class="{ 'top9-mode--on': displayMode === mode.id }"
+              @click="displayMode = mode.id"
+            >
+              {{ mode.label }}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="top9-preview">
+      <h2 class="top9-tool__title">Önizleme</h2>
+      <div class="top9-preview__frame">
+        <Top10_Share_Card
+          ref="shareCardRef"
+          :title="previewTitle"
+          :username="displayUsername"
+          :games="previewGames"
+          :display-mode="displayMode"
+          :show-empty-slots="filledCount < TOP10_MAX_GAMES"
+        />
+      </div>
+    </section>
+
+    <!-- Oyun seç / değiştir popup -->
+    <div
+      v-if="pickerOpen"
+      class="top9-modal"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="pickerTitle"
+      @click.self="closePicker"
+    >
+      <div class="top9-modal__panel">
+        <header class="top9-modal__head">
+          <div>
+            <p class="top9-modal__eyebrow">Kare {{ activeSlot }}</p>
+            <h2 class="top9-modal__title">{{ pickerTitle }}</h2>
+          </div>
+          <button
+            type="button"
+            class="top9-modal__close"
+            aria-label="Kapat"
+            @click="closePicker"
+          >
+            <v-icon icon="mdi-close" size="20" />
+          </button>
+        </header>
+
+        <v-text-field
+          v-model="searchQuery"
+          rounded="lg"
+          variant="outlined"
+          label="Oyun adı yaz…"
+          prepend-inner-icon="mdi-magnify"
+          color="success"
+          class="top9-search"
+          hide-details
+          clearable
+          autofocus
+          :loading="isSearching"
+          density="comfortable"
+        />
+
+        <div v-if="activeFilled" class="top9-modal__current">
+          <img
+            v-if="slotCover(activeFilled)"
+            :src="slotCover(activeFilled)!"
+            alt=""
+            class="top9-modal__current-thumb"
+          />
+          <div>
+            <strong>{{ activeFilled.name }}</strong>
+            <small>Şu an bu karede</small>
+          </div>
+          <button type="button" class="top9-btn top9-btn--ghost" @click="clearActiveSlot">
+            Kaldır
+          </button>
+        </div>
+
+        <div v-if="isSearching" class="top9-search-state">
+          <v-progress-circular indeterminate color="success" size="26" width="2" />
+        </div>
+        <p
+          v-else-if="searchQuery.length >= 2 && !searchResults.length"
+          class="top9-search-hint"
+        >
+          Sonuç bulunamadı.
+        </p>
+        <div v-else-if="searchResults.length" class="top9-search-results top9-search-results--modal">
+          <button
+            v-for="game in searchResults"
+            :key="game.id"
+            type="button"
+            class="top9-pick"
+            :disabled="
+              isGameInList(game.id) && activeFilled?.id !== game.id
+            "
+            @click="pickGame(game)"
+          >
+            <img
+              v-if="proxiedCover(resolveTop10Cover(game) || game.background_image)"
+              :src="proxiedCover(resolveTop10Cover(game) || game.background_image)!"
+              :alt="game.name"
+              class="top9-pick__thumb"
+              loading="lazy"
+            />
+            <span v-else class="top9-pick__thumb top9-pick__thumb--empty">
+              <v-icon icon="mdi-gamepad-variant-outline" size="18" />
+            </span>
+            <span class="top9-pick__meta">
+              <strong>{{ game.name }}</strong>
+              <small>{{ game.released?.slice(0, 4) || "—" }}</small>
+            </span>
+            <v-icon
+              :icon="activeFilled?.id === game.id ? 'mdi-check' : 'mdi-plus'"
+              size="20"
+            />
+          </button>
+        </div>
+        <p v-else class="top9-search-hint">En az 2 karakter yazarak ara.</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import axios from "axios";
+import { toPng } from "html-to-image";
 import Top10_Share_Card from "~/components/top10/Top10_Share_Card.vue";
 import {
+  resolveTop10Cover,
   snapshotTop10Game,
   TOP10_MAX_GAMES,
   TOP10_MIN_SHARE,
@@ -373,10 +304,6 @@ useHead({
 
 const { $firestore } = useNuxtApp();
 const _store = store();
-const display = useDisplay();
-
-const smallScreen = computed(() => display.smAndDown.value);
-const currentUser = computed(() => _store.user);
 
 const searchQuery = ref("");
 const searchResults = ref<any[]>([]);
@@ -386,10 +313,23 @@ const listTitle = ref("");
 const displayMode = ref<Top10DisplayMode>("wallpaper");
 const savedSlug = ref<string | null>(null);
 const isSaving = ref(false);
+const isExporting = ref(false);
 const saveMessage = ref("");
 const saveMessageOk = ref(true);
+const activeSlot = ref<number | null>(null);
+const pickerOpen = ref(false);
+const boardExportRef = ref<HTMLElement | null>(null);
+const shareCardRef = ref<{ cardRef?: HTMLElement | null } | null>(null);
 
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+const displayModes: { id: Top10DisplayMode; label: string }[] = [
+  { id: "wallpaper", label: "Ekran" },
+  { id: "grid", label: "Kart" },
+  { id: "list", label: "Liste" },
+];
+
+const currentUser = computed(() => _store.user);
 
 const displayUsername = computed(
   () =>
@@ -403,17 +343,20 @@ const previewTitle = computed(
   () => listTitle.value.trim() || `${displayUsername.value} · Top 9`
 );
 
+const filledCount = computed(() =>
+  Math.min(selectedGames.value.length, TOP10_MAX_GAMES)
+);
+
 const previewGames = computed(() =>
-  selectedGames.value.map((g, i) => ({ ...g, rank: i + 1 }))
+  selectedGames.value
+    .slice(0, TOP10_MAX_GAMES)
+    .map((g, i) => ({ ...g, rank: i + 1 }))
 );
 
-const progressPercent = computed(() =>
-  Math.round((selectedGames.value.length / TOP10_MAX_GAMES) * 100)
+const canShare = computed(() => filledCount.value >= TOP10_MIN_SHARE);
+const canSave = computed(
+  () => !!currentUser.value && filledCount.value > 0 && !isSaving.value
 );
-
-const isListFull = computed(() => selectedGames.value.length >= TOP10_MAX_GAMES);
-const canShare = computed(() => selectedGames.value.length >= TOP10_MIN_SHARE);
-const canSave = computed(() => currentUser.value && selectedGames.value.length > 0 && !isSaving.value);
 
 const slotRows = computed(() =>
   Array.from({ length: TOP10_MAX_GAMES }, (_, i) => ({
@@ -422,33 +365,119 @@ const slotRows = computed(() =>
   }))
 );
 
-const isGameInList = (id: number) => selectedGames.value.some((g) => g.id === id);
+const activeFilled = computed(() => {
+  if (!activeSlot.value) return null;
+  return selectedGames.value[activeSlot.value - 1] ?? null;
+});
 
-const addGame = (game: any) => {
-  if (isGameInList(game.id) || isListFull.value) return;
-  selectedGames.value.push(snapshotTop10Game(game, selectedGames.value.length + 1));
-};
+const pickerTitle = computed(() =>
+  activeFilled.value ? "Oyunu değiştir" : "Oyun ekle"
+);
 
-const removeGame = (index: number) => {
+/** Görüntüleme + export: RAWG CORS için same-origin proxy */
+function proxiedCover(url: string | null | undefined): string | null {
+  if (!url) return null;
+  if (url.startsWith("/") || url.startsWith("data:")) return url;
+  try {
+    const host = new URL(url).hostname;
+    if (
+      host === "media.rawg.io" ||
+      host === "images.igdb.com" ||
+      host === "img.igdb.com"
+    ) {
+      return `/api/img-proxy?url=${encodeURIComponent(url)}`;
+    }
+  } catch {
+    /* ignore */
+  }
+  return url;
+}
+
+function slotCover(game: Top10GameEntry | null | undefined) {
+  return proxiedCover(resolveTop10Cover(game));
+}
+
+function normalizeTitle(title: string) {
+  const t = title.trim();
+  if (!t) return "";
+  return t
+    .replace(/my\s*top\s*10/gi, "My Top 9")
+    .replace(/top\s*10/gi, "Top 9");
+}
+
+function capGames(games: Top10GameEntry[]) {
+  return [...games]
+    .sort((a, b) => a.rank - b.rank)
+    .slice(0, TOP10_MAX_GAMES)
+    .map((g, i) => ({ ...g, rank: i + 1 }));
+}
+
+const isGameInList = (id: number) =>
+  selectedGames.value.some((g) => g.id === id);
+
+function openPicker(rank: number) {
+  activeSlot.value = rank;
+  searchQuery.value = "";
+  searchResults.value = [];
+  pickerOpen.value = true;
+}
+
+function closePicker() {
+  pickerOpen.value = false;
+  activeSlot.value = null;
+  searchQuery.value = "";
+  searchResults.value = [];
+}
+
+function pickGame(game: any) {
+  const rank = activeSlot.value;
+  if (!rank) return;
+  if (isGameInList(game.id) && activeFilled.value?.id !== game.id) return;
+
+  const entry = snapshotTop10Game(game, rank);
+  const next = [...selectedGames.value];
+
+  if (next[rank - 1]) {
+    next[rank - 1] = { ...entry, rank };
+  } else if (next.length >= TOP10_MAX_GAMES) {
+    return;
+  } else {
+    next.push(snapshotTop10Game(game, next.length + 1));
+  }
+
+  selectedGames.value = capGames(next);
+  closePicker();
+}
+
+function removeGame(index: number) {
   selectedGames.value.splice(index, 1);
-  selectedGames.value = selectedGames.value.map((g, i) => ({ ...g, rank: i + 1 }));
-};
+  selectedGames.value = capGames(selectedGames.value);
+  if (activeSlot.value === index + 1) closePicker();
+}
 
-const moveGame = (index: number, direction: -1 | 1) => {
-  const next = index + direction;
-  if (next < 0 || next >= selectedGames.value.length) return;
-  const arr = [...selectedGames.value];
-  [arr[index], arr[next]] = [arr[next], arr[index]];
-  selectedGames.value = arr.map((g, i) => ({ ...g, rank: i + 1 }));
-};
+function clearActiveSlot() {
+  if (!activeSlot.value) return;
+  removeGame(activeSlot.value - 1);
+}
+
+function clearList() {
+  if (!filledCount.value) return;
+  if (!confirm("Tüm Top 9 listesi temizlensin mi?")) return;
+  selectedGames.value = [];
+  saveMessageOk.value = true;
+  saveMessage.value = "Liste temizlendi. Kaydetmeyi unutma.";
+}
 
 const loadExistingList = async () => {
   if (!currentUser.value?.uid) return;
   try {
-    const existing = await fetchUserTop10List($firestore, currentUser.value.uid);
+    const existing = await fetchUserTop10List(
+      $firestore,
+      currentUser.value.uid
+    );
     if (!existing) return;
-    selectedGames.value = [...existing.games].sort((a, b) => a.rank - b.rank);
-    listTitle.value = existing.title;
+    selectedGames.value = capGames(existing.games);
+    listTitle.value = normalizeTitle(existing.title || "");
     savedSlug.value = existing.slug;
     displayMode.value = existing.displayMode ?? "wallpaper";
   } catch (e) {
@@ -457,15 +486,16 @@ const loadExistingList = async () => {
 };
 
 const handleSave = async () => {
-  if (!currentUser.value?.uid || !selectedGames.value.length) return;
+  if (!currentUser.value?.uid || !filledCount.value) return;
 
   try {
     isSaving.value = true;
     saveMessage.value = "";
+    selectedGames.value = capGames(selectedGames.value);
 
     const saved = await saveUserTop10List($firestore, currentUser.value.uid, {
       username: displayUsername.value,
-      title: listTitle.value,
+      title: normalizeTitle(listTitle.value) || previewTitle.value,
       games: selectedGames.value,
       displayMode: displayMode.value,
       isPublic: canShare.value,
@@ -473,6 +503,7 @@ const handleSave = async () => {
     });
 
     savedSlug.value = saved.slug;
+    listTitle.value = normalizeTitle(listTitle.value) || listTitle.value;
     saveMessageOk.value = true;
     saveMessage.value = canShare.value
       ? "Liste kaydedildi! Paylaşım linkini kopyalayabilirsin."
@@ -498,6 +529,60 @@ const copyShareLink = async () => {
     saveMessage.value = url;
   }
 };
+
+let cachedFontEmbedCSS: string | null = null;
+
+async function loadFontEmbedCSS() {
+  if (cachedFontEmbedCSS != null) return cachedFontEmbedCSS;
+  try {
+    const res = await fetch("/api/font-embed-css");
+    cachedFontEmbedCSS = res.ok ? await res.text() : "";
+  } catch {
+    cachedFontEmbedCSS = "";
+  }
+  return cachedFontEmbedCSS;
+}
+
+async function exportImage() {
+  const target =
+    (shareCardRef.value as any)?.$el?.querySelector?.(".top10-share-card") ||
+    (shareCardRef.value as any)?.cardRef ||
+    boardExportRef.value;
+
+  if (!target || !(target instanceof HTMLElement)) {
+    saveMessageOk.value = false;
+    saveMessage.value = "Önizleme alanı bulunamadı.";
+    return;
+  }
+
+  try {
+    isExporting.value = true;
+    saveMessage.value = "";
+    // Google Fonts link stylesheet cssRules CORS → SecurityError.
+    // Sunucudan gömülü CSS al; document.styleSheets okunmaz.
+    const fontEmbedCSS = await loadFontEmbedCSS();
+    const dataUrl = await toPng(target, {
+      cacheBust: true,
+      pixelRatio: 2,
+      backgroundColor: "#0f1a14",
+      fontEmbedCSS,
+      skipFonts: false,
+    });
+    const link = document.createElement("a");
+    link.download = `npmrungame-top9-${Date.now()}.png`;
+    link.href = dataUrl;
+    link.click();
+    saveMessageOk.value = true;
+    saveMessage.value = "Görsel indirildi.";
+  } catch (e) {
+    console.error("Top9 export:", e);
+    saveMessageOk.value = false;
+    saveMessage.value =
+      "Görsel üretilemedi. Kapak görselleri engellenmiş olabilir — tekrar dene.";
+  } finally {
+    isExporting.value = false;
+  }
+}
 
 watch(searchQuery, (val) => {
   if (searchTimer) clearTimeout(searchTimer);
@@ -528,9 +613,18 @@ watch(
   },
   { immediate: true }
 );
+
+onMounted(() => {
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === "Escape" && pickerOpen.value) closePicker();
+  };
+  window.addEventListener("keydown", onKey);
+  onUnmounted(() => window.removeEventListener("keydown", onKey));
+});
 </script>
 
 <style scoped>
 @import "~/assets/css/main.css";
 @import "~/assets/css/top10.css";
+@import "~/assets/css/top9-studio.css";
 </style>

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-/** Navbar/Footer yok — Top 9 paylaşım, oyun detayı vb. */
+import { useAppTheme } from "~/composables/useAppTheme";
+
+/** Navbar/Footer yok � Top 9 payla??m, oyun detay? vb. */
+const { theme } = useAppTheme();
 </script>
 
 <template>
-  <div class="bare-layout">
+  <div class="bare-layout" :data-theme="theme">
     <slot />
   </div>
 </template>
@@ -16,7 +19,7 @@
   color: #e8eef7;
 }
 
-:global(html:not(.dark)) .bare-layout {
+.bare-layout[data-theme="light"] {
   background: #f1f5f9;
   color: #0f172a;
 }

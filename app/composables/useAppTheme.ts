@@ -4,35 +4,68 @@ export type ThemePreference = "light" | "dark" | "system";
 export type ThemeMode = "light" | "dark";
 
 const THEME_KEY = "npmrungame-theme";
+const RESOLVED_KEY = "npmrungame-theme-resolved";
 
 let mediaQuery: MediaQueryList | null = null;
 let mediaListener: (() => void) | null = null;
 
+function isPreference(value: unknown): value is ThemePreference {
+  return value === "light" || value === "dark" || value === "system";
+}
+
+function isMode(value: unknown): value is ThemeMode {
+  return value === "light" || value === "dark";
+}
+
 export function useAppTheme() {
-  const preference = useState<ThemePreference>(
-    "theme-preference",
-    () => "system"
+  /** Cookie → SSR ve client aynı temayı görür (hydration mismatch önler) */
+  const preferenceCookie = useCookie<ThemePreference>(THEME_KEY, {
+    default: () => "system",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+  const resolvedCookie = useCookie<ThemeMode>(RESOLVED_KEY, {
+    default: () => "dark",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+
+  const preference = useState<ThemePreference>("theme-preference", () =>
+    isPreference(preferenceCookie.value) ? preferenceCookie.value : "system"
   );
-  const theme = useState<ThemeMode>("theme", () => "dark");
+
+  const theme = useState<ThemeMode>("theme", () => {
+    if (isMode(resolvedCookie.value)) return resolvedCookie.value;
+    if (preference.value === "light" || preference.value === "dark") {
+      return preference.value;
+    }
+    return "dark";
+  });
 
   function resolve(pref: ThemePreference): ThemeMode {
     if (pref !== "system") return pref;
-    if (!import.meta.client) return "dark";
+    if (!import.meta.client) {
+      return isMode(resolvedCookie.value) ? resolvedCookie.value : "dark";
+    }
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
   }
 
   function applyTheme(pref: ThemePreference) {
-    if (!import.meta.client) return;
     const resolved = resolve(pref);
     theme.value = resolved;
-
-    const root = document.documentElement;
-    if (resolved === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-    root.style.colorScheme = resolved;
+    preferenceCookie.value = pref;
+    resolvedCookie.value = resolved;
   }
+
+  // SSR + client: html.dark Nuxt useHead ile senkron (hydration drift önler)
+  useHead({
+    htmlAttrs: {
+      class: computed(() => ({ dark: theme.value === "dark" })),
+      style: computed(() => `color-scheme: ${theme.value}`),
+    },
+  });
 
   function watchSystem() {
     if (!import.meta.client || mediaListener) return;
@@ -58,12 +91,18 @@ export function useAppTheme() {
 
   function initTheme() {
     if (!import.meta.client) return;
-    const stored = localStorage.getItem(THEME_KEY) as ThemePreference | null;
-    setTheme(
-      stored === "light" || stored === "dark" || stored === "system"
-        ? stored
-        : "system"
-    );
+    const stored = localStorage.getItem(THEME_KEY);
+    const pref = isPreference(stored)
+      ? stored
+      : isPreference(preferenceCookie.value)
+        ? preferenceCookie.value
+        : "system";
+    // Zaten aynıysa DOM/state'i yeniden yazma (hydration sonrası gereksiz flash)
+    if (pref === preference.value && resolve(pref) === theme.value) {
+      watchSystem();
+      return;
+    }
+    setTheme(pref);
   }
 
   return { theme, preference, setTheme, toggleTheme, initTheme };

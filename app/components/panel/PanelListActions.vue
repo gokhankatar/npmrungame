@@ -7,14 +7,25 @@ import {
   type GameExportRow,
 } from "~/utils/exportGames";
 
-const props = defineProps<{
-  games: GameExportRow[];
-  title: string;
-  fileName: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    games: GameExportRow[];
+    title: string;
+    fileName: string;
+    /** Çoklu seçim / düzenleme modu açık mı */
+    editing?: boolean;
+    /** Düzenle butonu (liste boşken) */
+    editDisabled?: boolean;
+  }>(),
+  {
+    editing: false,
+    editDisabled: false,
+  }
+);
 
 const emit = defineEmits<{
   add: [];
+  edit: [];
 }>();
 
 const { tx } = useAppLocale();
@@ -52,6 +63,19 @@ async function onPdf() {
       @excel="onExcel"
       @pdf="onPdf"
     />
+    <button
+      type="button"
+      class="pla__edit"
+      :class="{ 'pla__edit--active': editing }"
+      :disabled="editDisabled && !editing"
+      @click="emit('edit')"
+    >
+      <v-icon
+        :icon="editing ? 'mdi-close' : 'mdi-checkbox-multiple-marked-outline'"
+        size="18"
+      />
+      {{ editing ? tx("panel.list.editDone") : tx("panel.list.edit") }}
+    </button>
     <button type="button" class="pla__add" @click="emit('add')">
       <v-icon icon="mdi-plus" size="18" />
       {{ tx("panel.empty.addGame") }}
@@ -66,6 +90,51 @@ async function onPdf() {
   align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+
+.pla__edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.88);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.pla__edit:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(105, 240, 174, 0.45);
+  color: #69f0ae;
+  transform: translateY(-1px);
+}
+
+.pla__edit--active {
+  border-color: rgba(239, 83, 80, 0.55);
+  background: rgba(239, 83, 80, 0.12);
+  color: #ef9a9a;
+}
+
+.pla__edit--active:hover:not(:disabled) {
+  border-color: rgba(239, 83, 80, 0.75);
+  background: rgba(239, 83, 80, 0.18);
+  color: #ffcdd2;
+}
+
+.pla__edit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .pla__add {

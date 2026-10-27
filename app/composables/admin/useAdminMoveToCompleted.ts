@@ -16,8 +16,9 @@ export function buildCompletedGamePayload(game: Record<string, unknown>) {
   };
 }
 
+/** Bu takvim yılında bitirildiyse “bu yıl” koleksiyonuna da yaz */
 export function isCompletedInCurrentYear(): boolean {
-  return new Date().getFullYear() === 2026;
+  return true;
 }
 
 export async function moveGameToCompletedCollections(

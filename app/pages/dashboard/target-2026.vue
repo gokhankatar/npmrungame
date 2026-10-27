@@ -6,7 +6,7 @@ definePageMeta({
 });
 
 useSeoMeta({
-  title: "2026 hedeflerim | npmrungame",
+  title: "Bu yıl bitirdiklerim | npmrungame",
   robots: "noindex, nofollow",
 });
 </script>

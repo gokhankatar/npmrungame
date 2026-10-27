@@ -23,7 +23,7 @@ const {
 } = useUserProfile();
 
 useSeoMeta({
-  title: "HesabÄ±m | npmrungame",
+  title: "Hesabým | npmrungame",
   robots: "noindex, nofollow",
 });
 
@@ -215,26 +215,17 @@ async function onSave() {
 .account-hero__sub {
   margin: 0;
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: var(--panel-muted, #94a3b8);
   line-height: 1.5;
-}
-
-:global(html:not(.dark)) .account-hero__sub {
-  color: #64748b;
 }
 
 .account-card {
   margin-bottom: 1rem;
   padding: 1.25rem 1.3rem;
   border-radius: 1.1rem;
-  border: 1px solid rgb(255 255 255 / 0.08);
-  background: linear-gradient(165deg, rgb(105 240 174 / 0.06), rgb(12 18 32 / 0.9) 55%);
-}
-
-:global(html:not(.dark)) .account-card {
-  background: #fff;
-  border-color: rgb(15 23 42 / 0.08);
-  box-shadow: 0 10px 28px rgb(15 23 42 / 0.05);
+  border: 1px solid var(--panel-card-border, rgb(255 255 255 / 0.08));
+  background: var(--panel-card, #0c1220);
+  box-shadow: var(--panel-card-shadow, none);
 }
 
 .account-card__title {
@@ -307,14 +298,14 @@ async function onSave() {
   gap: 0.35rem;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--panel-muted, #94a3b8);
 }
 
 .account-field input {
-  border: 1px solid rgb(255 255 255 / 0.12);
+  border: 1px solid var(--panel-border, rgb(255 255 255 / 0.12));
   border-radius: 0.75rem;
-  background: rgb(0 0 0 / 0.25);
-  color: #e8eef7;
+  background: var(--panel-soft, rgb(0 0 0 / 0.25));
+  color: var(--panel-text, #e8eef7);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 600;
@@ -323,19 +314,13 @@ async function onSave() {
 }
 
 .account-field input:focus {
-  border-color: rgb(105 240 174 / 0.45);
-  box-shadow: 0 0 0 3px rgb(105 240 174 / 0.12);
+  border-color: color-mix(in srgb, var(--panel-accent, #69f0ae) 45%, transparent);
+  box-shadow: 0 0 0 3px var(--panel-icon-bg, rgb(105 240 174 / 0.12));
 }
 
 .account-field input:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-}
-
-:global(html:not(.dark)) .account-field input {
-  background: #f8fafc;
-  border-color: rgb(15 23 42 / 0.12);
-  color: #0f172a;
 }
 
 .account-form__foot {
@@ -372,19 +357,14 @@ async function onSave() {
 }
 
 .account-btn--primary {
-  background: #69f0ae;
-  color: #07140f;
+  background: var(--panel-accent, #69f0ae);
+  color: var(--panel-accent-ink, #07140f);
 }
 
 .account-btn--ghost {
   background: transparent;
-  border-color: rgb(255 255 255 / 0.14);
-  color: #cbd5e1;
-}
-
-:global(html:not(.dark)) .account-btn--ghost {
-  border-color: rgb(15 23 42 / 0.14);
-  color: #334155;
+  border-color: var(--panel-border, rgb(255 255 255 / 0.14));
+  color: var(--panel-muted, #cbd5e1);
 }
 
 .account-msg {
@@ -394,7 +374,7 @@ async function onSave() {
 }
 
 .account-msg--ok {
-  color: #69f0ae;
+  color: var(--panel-accent, #69f0ae);
 }
 
 .account-msg--err {

@@ -1,5 +1,6 @@
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { isPlayerBanned } from "~/composables/admin/purgePlayerAccount";
 import store from "~/store/store";
 import { isAbortError } from "~/utils/isAbortError";
 
@@ -27,6 +28,18 @@ export default defineNuxtPlugin(() => {
         if (user) {
           try {
             if ($firestore) {
+              const banned = await isPlayerBanned(
+                $firestore,
+                user.uid,
+                user.email
+              );
+              if (banned) {
+                await signOut($auth);
+                _store.clearUser();
+                markReady(null);
+                return;
+              }
+
               const userDocRef = doc($firestore, "registered_users", user.uid);
               const userDoc = await getDoc(userDocRef);
 

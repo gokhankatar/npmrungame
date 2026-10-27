@@ -1,4 +1,4 @@
-/* Auth card form — light default, html.dark overrides (beats Vuetify) */
+/* Auth form ? light base; dark via .auth-screen[data-theme="dark"] (layout) */
 
 .auth-form__brand {
   display: flex;
@@ -26,7 +26,7 @@
   color: #0f172a;
 }
 
-html.dark .auth-form__title {
+.auth-screen[data-theme="dark"] .auth-form__title {
   color: #fff;
 }
 
@@ -36,7 +36,7 @@ html.dark .auth-form__title {
   color: #475569;
 }
 
-html.dark .auth-form__subtitle {
+.auth-screen[data-theme="dark"] .auth-form__subtitle {
   color: rgb(148 163 184);
 }
 
@@ -55,7 +55,7 @@ html.dark .auth-form__subtitle {
   color: #334155;
 }
 
-html.dark .auth-form__field label {
+.auth-screen[data-theme="dark"] .auth-form__field label {
   color: rgb(203 213 225);
 }
 
@@ -75,7 +75,7 @@ html.dark .auth-form__field label {
     box-shadow 0.15s ease;
 }
 
-html.dark .auth-form__field input {
+.auth-screen[data-theme="dark"] .auth-form__field input {
   border: 1px solid rgb(255 255 255 / 0.12);
   background: rgb(30 41 59 / 0.72);
   color: #fff;
@@ -86,7 +86,7 @@ html.dark .auth-form__field input {
   color: #94a3b8;
 }
 
-html.dark .auth-form__field input::placeholder {
+.auth-screen[data-theme="dark"] .auth-form__field input::placeholder {
   color: rgb(100 116 139);
 }
 
@@ -125,11 +125,11 @@ html.dark .auth-form__field input::placeholder {
   color: #475569;
 }
 
-html.dark .auth-form__eye {
+.auth-screen[data-theme="dark"] .auth-form__eye {
   color: rgb(148 163 184);
 }
 
-html.dark .auth-form__eye:hover {
+.auth-screen[data-theme="dark"] .auth-form__eye:hover {
   color: rgb(226 232 240);
 }
 
@@ -152,7 +152,7 @@ html.dark .auth-form__eye:hover {
   color: #991b1b;
 }
 
-html.dark .auth-form__error {
+.auth-screen[data-theme="dark"] .auth-form__error {
   border: 1px solid rgb(127 29 29 / 0.5);
   background: rgb(69 10 10 / 0.4);
   color: rgb(254 202 202);
@@ -170,7 +170,7 @@ html.dark .auth-form__error {
   text-align: center;
 }
 
-html.dark .auth-form__success {
+.auth-screen[data-theme="dark"] .auth-form__success {
   border: 1px solid rgb(5 150 105 / 0.45);
   background: rgb(6 78 59 / 0.4);
   color: rgb(167 243 208);
@@ -186,7 +186,7 @@ html.dark .auth-form__success {
   color: #64748b;
 }
 
-html.dark .auth-form__hint--muted {
+.auth-screen[data-theme="dark"] .auth-form__hint--muted {
   color: rgb(148 163 184);
 }
 
@@ -194,7 +194,7 @@ html.dark .auth-form__hint--muted {
   color: #047857;
 }
 
-html.dark .auth-form__hint--ok {
+.auth-screen[data-theme="dark"] .auth-form__hint--ok {
   color: #69f0ae;
 }
 
@@ -202,7 +202,7 @@ html.dark .auth-form__hint--ok {
   color: #dc2626;
 }
 
-html.dark .auth-form__hint--bad {
+.auth-screen[data-theme="dark"] .auth-form__hint--bad {
   color: rgb(252 165 165);
 }
 
@@ -212,7 +212,7 @@ html.dark .auth-form__hint--bad {
   text-decoration: underline;
 }
 
-html.dark .auth-form__hint a {
+.auth-screen[data-theme="dark"] .auth-form__hint a {
   color: #69f0ae;
 }
 
@@ -237,7 +237,7 @@ html.dark .auth-form__hint a {
   text-decoration: none;
 }
 
-html.dark .auth-form__forgot a {
+.auth-screen[data-theme="dark"] .auth-form__forgot a {
   color: #69f0ae;
 }
 
@@ -257,7 +257,7 @@ html.dark .auth-form__forgot a {
   text-decoration: none;
 }
 
-html.dark .auth-form__back a {
+.auth-screen[data-theme="dark"] .auth-form__back a {
   color: #69f0ae;
 }
 
@@ -317,7 +317,7 @@ html.dark .auth-form__back a {
   font-weight: 500;
 }
 
-html.dark .auth-form__divider {
+.auth-screen[data-theme="dark"] .auth-form__divider {
   color: rgb(148 163 184);
 }
 
@@ -329,8 +329,8 @@ html.dark .auth-form__divider {
   background: rgb(148 163 184 / 0.35);
 }
 
-html.dark .auth-form__divider::before,
-html.dark .auth-form__divider::after {
+.auth-screen[data-theme="dark"] .auth-form__divider::before,
+.auth-screen[data-theme="dark"] .auth-form__divider::after {
   background: rgb(255 255 255 / 0.12);
 }
 
@@ -356,13 +356,13 @@ html.dark .auth-form__divider::after {
   background: #fff;
 }
 
-html.dark .auth-form__google {
+.auth-screen[data-theme="dark"] .auth-form__google {
   border: 1px solid rgb(255 255 255 / 0.12);
   background: rgb(30 41 59 / 0.72);
   color: #fff;
 }
 
-html.dark .auth-form__google:hover:not(:disabled) {
+.auth-screen[data-theme="dark"] .auth-form__google:hover:not(:disabled) {
   background: rgb(30 41 59 / 0.95);
 }
 
@@ -383,7 +383,7 @@ html.dark .auth-form__google:hover:not(:disabled) {
   color: #475569;
 }
 
-html.dark .auth-form__footer {
+.auth-screen[data-theme="dark"] .auth-form__footer {
   color: rgb(148 163 184);
 }
 
@@ -393,7 +393,7 @@ html.dark .auth-form__footer {
   text-decoration: none;
 }
 
-html.dark .auth-form__footer a {
+.auth-screen[data-theme="dark"] .auth-form__footer a {
   color: #69f0ae;
 }
 

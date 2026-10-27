@@ -17,13 +17,16 @@
   width: 100%;
   background: linear-gradient(
     165deg,
-    rgba(18, 26, 40, 0.98) 0%,
-    rgba(10, 14, 22, 0.99) 100%
+    rgba(22, 32, 48, 0.98) 0%,
+    rgba(10, 14, 22, 0.99) 55%,
+    rgba(8, 12, 20, 1) 100%
   ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.35rem !important;
   box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(var(--aad-accent-rgb), 0.08);
+    0 28px 72px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(var(--aad-accent-rgb), 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .admin-add-game-dialog--cyan {

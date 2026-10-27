@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useAppLocale } from "~/composables/useAppLocale";
+import { useAppTheme } from "~/composables/useAppTheme";
 
 const { tx } = useAppLocale();
+const { theme } = useAppTheme();
 </script>
 
 <template>
-  <div class="auth-screen">
+  <div class="auth-screen" :data-theme="theme">
     <div class="auth-bg" aria-hidden="true">
       <img src="/media/misc/auth-bg.jpg" alt="" class="auth-bg__img" />
       <div class="auth-bg__grad auth-bg__grad--t" />
@@ -172,24 +174,24 @@ const { tx } = useAppLocale();
   margin: auto;
   padding: 1.75rem;
   border-radius: 1.5rem;
-  /* Light: buzlu beyaz kart (biscount) */
-  border: 1px solid rgb(255 255 255 / 0.7);
-  background: rgb(255 255 255 / 0.72);
-  box-shadow:
-    0 25px 50px -12px rgb(15 23 42 / 0.28),
-    0 0 0 1px rgb(255 255 255 / 0.45);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  color: #0f172a;
-}
-
-:global(html.dark) .auth-card {
+  /* Dark default — data-theme ile light override */
   border: 1px solid rgb(255 255 255 / 0.12);
-  background: rgb(15 23 42 / 0.58);
+  background: rgb(15 23 42 / 0.72);
   box-shadow:
     0 25px 50px -12px rgb(0 0 0 / 0.45),
     0 0 0 1px rgb(255 255 255 / 0.08);
   color: #fff;
+}
+
+.auth-screen[data-theme="light"] .auth-card {
+  border: 1px solid rgb(255 255 255 / 0.7);
+  background: rgb(255 255 255 / 0.78);
+  box-shadow:
+    0 25px 50px -12px rgb(15 23 42 / 0.28),
+    0 0 0 1px rgb(255 255 255 / 0.45);
+  color: #0f172a;
 }
 
 @media (min-width: 640px) {

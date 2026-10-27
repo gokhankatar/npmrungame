@@ -7,6 +7,8 @@ export type Top10GameEntry = {
   name: string;
   slug: string;
   background_image: string | null;
+  /** IGDB dikey poster — kart/export için tercih */
+  cover_image?: string | null;
   released?: string;
   metacritic?: number | null;
   genres?: { id: number; name: string; slug: string }[];
@@ -36,7 +38,8 @@ export const snapshotTop10Game = (game: any, rank: number): Top10GameEntry => ({
   id: game.id,
   name: game.name,
   slug: game.slug ?? game.name?.toLowerCase().replace(/\s+/g, "-") ?? String(game.id),
-  background_image: game.background_image ?? null,
+  background_image: game.background_image ?? game.cover_image ?? null,
+  cover_image: game.cover_image ?? game.background_image ?? null,
   released: game.released,
   metacritic: game.metacritic ?? null,
   genres: (game.genres ?? []).map((g: any) => ({
@@ -45,3 +48,10 @@ export const snapshotTop10Game = (game: any, rank: number): Top10GameEntry => ({
     slug: g.slug,
   })),
 });
+
+/** Top 9 / paylaşım kartı görseli — poster öncelikli */
+export const resolveTop10Cover = (game: {
+  cover_image?: string | null;
+  background_image?: string | null;
+} | null | undefined): string | null =>
+  game?.cover_image || game?.background_image || null;

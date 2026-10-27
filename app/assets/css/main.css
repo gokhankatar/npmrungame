@@ -166,7 +166,8 @@
 .game-card-img img,
 .game-card-img .v-img__img {
   object-fit: cover !important;
-  object-position: center top !important;
+  /* Poster ortala — kenar/logo kırpılmasını azalt */
+  object-position: center center !important;
 }
 
 .game-card:hover .game-card-img {

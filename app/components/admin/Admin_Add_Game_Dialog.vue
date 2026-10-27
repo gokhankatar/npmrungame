@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     :model-value="modelValue"
-    max-width="560"
+    max-width="640"
     scrollable
     transition="dialog-bottom-transition"
     content-class="admin-add-game-overlay"
@@ -110,13 +110,16 @@
             @click="emit('toggle-select', game)"
           >
             <v-avatar :size="smallScreen ? 40 : 52" rounded="lg" class="admin-add-game-dialog__avatar">
-              <v-img :src="game.background_image" :alt="game.name" cover />
+              <v-img :src="resolveGameCardImage(game)" :alt="game.name" cover />
             </v-avatar>
             <div class="admin-add-game-dialog__item-body">
               <p class="admin-add-game-dialog__item-name">
                 {{ game.name }}
-                <span v-if="game.released" class="admin-add-game-dialog__item-year">
-                  ({{ new Date(game.released).getFullYear() }})
+                <span
+                  v-if="formatGameReleaseYear(game) !== 'TBA'"
+                  class="admin-add-game-dialog__item-year"
+                >
+                  ({{ formatGameReleaseYear(game) }})
                 </span>
               </p>
               <div class="admin-add-game-dialog__item-meta">
@@ -186,7 +189,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useMetacriticStyle } from "~/composables/data/handleData";
+import {
+  formatGameReleaseYear,
+  resolveGameCardImage,
+  useMetacriticStyle,
+} from "~/composables/data/handleData";
 
 const props = withDefaults(
   defineProps<{

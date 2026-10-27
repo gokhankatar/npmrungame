@@ -83,8 +83,8 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          // FOUC önleme: light / dark / system tercihini ilk boyamada uygula
-          innerHTML: `(function(){try{var k='npmrungame-theme';var p=localStorage.getItem(k)||'system';var d=p==='dark'||(p==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('npmrungame-locale');if(l==='tr'||l==='en')document.documentElement.lang=l;}catch(e){}})();`,
+          // FOUC + cookie: SSR ile aynı temayı paylaş (hydration mismatch önler)
+          innerHTML: `(function(){try{var k='npmrungame-theme',rk='npmrungame-theme-resolved';var p=localStorage.getItem(k)||'system';var d=p==='dark'||(p==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var r=d?'dark':'light';document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=r;document.cookie=k+'='+encodeURIComponent(p)+';path=/;max-age=31536000;samesite=lax';document.cookie=rk+'='+r+';path=/;max-age=31536000;samesite=lax';var l=localStorage.getItem('npmrungame-locale');if(l==='tr'||l==='en')document.documentElement.lang=l;}catch(e){}})();`,
           tagPosition: "head",
         },
       ],

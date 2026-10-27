@@ -83,9 +83,9 @@ function pick(kind: "excel" | "pdf") {
   min-height: 2.35rem;
   padding: 0.45rem 0.9rem;
   border-radius: 0.7rem;
-  border: 1px solid rgb(255 255 255 / 0.14);
+  border: 1px solid var(--panel-border, rgb(255 255 255 / 0.14));
   background: transparent;
-  color: #e8eef7;
+  color: var(--panel-text, #e8eef7);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 650;
@@ -97,25 +97,14 @@ function pick(kind: "excel" | "pdf") {
 }
 
 .pem__trigger:hover:not(:disabled) {
-  border-color: rgb(105 240 174 / 0.45);
-  color: #69f0ae;
-  background: rgb(105 240 174 / 0.06);
+  border-color: color-mix(in srgb, var(--panel-accent, #69f0ae) 45%, transparent);
+  color: var(--panel-accent, #69f0ae);
+  background: var(--panel-icon-bg, rgb(105 240 174 / 0.06));
 }
 
 .pem__trigger:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-}
-
-:global(html:not(.dark)) .pem__trigger {
-  border-color: rgb(15 23 42 / 0.14);
-  color: #0f172a;
-}
-
-:global(html:not(.dark)) .pem__trigger:hover:not(:disabled) {
-  border-color: rgb(16 185 129 / 0.45);
-  color: #047857;
-  background: rgb(16 185 129 / 0.06);
 }
 
 .pem__chevron {
@@ -135,15 +124,10 @@ function pick(kind: "excel" | "pdf") {
   width: 15.5rem;
   padding: 0.4rem;
   border-radius: 1rem;
-  border: 1px solid rgb(255 255 255 / 0.1);
-  background: #0c1220;
-  box-shadow: 0 16px 40px rgb(0 0 0 / 0.4);
-}
-
-:global(html:not(.dark)) .pem__menu {
-  background: #fff;
-  border-color: rgb(15 23 42 / 0.1);
-  box-shadow: 0 16px 40px rgb(15 23 42 / 0.12);
+  border: 1px solid var(--panel-card-border, rgb(255 255 255 / 0.1));
+  background: var(--panel-card, #0c1220);
+  box-shadow: var(--panel-card-shadow, 0 16px 40px rgb(0 0 0 / 0.4));
+  color: var(--panel-text, #e8eef7);
 }
 
 .pem__item {
@@ -163,11 +147,7 @@ function pick(kind: "excel" | "pdf") {
 }
 
 .pem__item:hover {
-  background: rgb(255 255 255 / 0.05);
-}
-
-:global(html:not(.dark)) .pem__item:hover {
-  background: #f8fafc;
+  background: var(--panel-soft, rgb(255 255 255 / 0.05));
 }
 
 .pem__icon {
@@ -186,12 +166,8 @@ function pick(kind: "excel" | "pdf") {
 }
 
 .pem__icon--excel {
-  background: rgb(105 240 174 / 0.12);
-  color: #69f0ae;
-}
-
-:global(html:not(.dark)) .pem__icon--excel {
-  color: #059669;
+  background: var(--panel-icon-bg, rgb(105 240 174 / 0.12));
+  color: var(--panel-accent, #69f0ae);
 }
 
 .pem__item-text {

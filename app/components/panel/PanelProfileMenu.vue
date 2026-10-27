@@ -178,14 +178,10 @@ function goAccount() {
   width: min(17.5rem, 86vw);
   padding: 0.55rem;
   border-radius: 1rem;
-  border: 1px solid var(--panel-border, rgb(255 255 255 / 0.1));
-  background: var(--panel-side, #0c1220);
-  box-shadow: 0 18px 48px rgb(0 0 0 / 0.45);
-}
-
-:global(html:not(.dark)) .ppm__menu {
-  background: #fff;
-  box-shadow: 0 16px 40px rgb(15 23 42 / 0.12);
+  border: 1px solid var(--panel-card-border, var(--panel-border, rgb(255 255 255 / 0.1)));
+  background: var(--panel-card, var(--panel-side, #0c1220));
+  box-shadow: var(--panel-card-shadow, 0 18px 48px rgb(0 0 0 / 0.45));
+  color: var(--panel-text, #e8eef7);
 }
 
 .ppm__head {

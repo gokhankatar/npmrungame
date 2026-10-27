@@ -16,7 +16,7 @@ export const userDashboardItems: UserDashboardItem[] = [
     icon: "mdi-radar",
   },
   {
-    title: "2026 Hedef Oyunlar",
+    title: "Bu yıl bitirdiklerim",
     slug: "target_2026_games",
     icon: "mdi-calendar-check",
   },

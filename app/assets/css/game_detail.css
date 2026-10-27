@@ -1,4 +1,4 @@
-/* Oyun detay — IGDB verisine göre cinematic layout */
+/* Oyun detay ? IGDB verisine g?re cinematic layout */
 
 .game-detail-page {
   --gd-accent: #69f0ae;
@@ -17,7 +17,9 @@
   padding-bottom: 3.5rem;
 }
 
-:global(html:not(.dark)) .game-detail-page {
+:global(html:not(.dark)) .game-detail-page,
+:global(.bare-layout[data-theme="light"]) .game-detail-page,
+:global(.panel-shell[data-theme="light"]) .game-detail-page {
   --gd-ink: #0f172a;
   --gd-muted: #64748b;
   --gd-page: #eef2f7;
@@ -25,7 +27,7 @@
   --gd-border: rgb(15 23 42 / 0.1);
 }
 
-/* —— Hero —— */
+/* ?? Hero ?? */
 .gd-hero {
   position: relative;
   isolation: isolate;
@@ -373,7 +375,7 @@ button.gd-meter:hover {
   transform: translateY(-1px);
 }
 
-/* —— Body —— */
+/* ?? Body ?? */
 .gd-body {
   position: relative;
   z-index: 2;
@@ -510,7 +512,9 @@ button.gd-meter:hover {
   box-shadow: 0 16px 40px rgb(0 0 0 / 0.2);
 }
 
-:global(html:not(.dark)) .gd-card {
+:global(html:not(.dark)) .gd-card,
+:global(.bare-layout[data-theme="light"]) .gd-card,
+:global(.panel-shell[data-theme="light"]) .gd-card {
   box-shadow: 0 12px 28px rgb(15 23 42 / 0.06);
 }
 

@@ -52,15 +52,56 @@ export const formatGameGenreLabels = (
     .join(" - ");
 };
 
+/** released (RAWG/IGDB) veya releaseDate (admin radar) */
+export const getGameReleaseRaw = (item: {
+  released?: string | null;
+  releaseDate?: string | null;
+} | null | undefined): string | null => {
+  const raw = item?.released || item?.releaseDate || null;
+  if (!raw || raw === "TBA") return null;
+  return String(raw);
+};
+
+export const getGameReleaseDate = (
+  item: {
+    released?: string | null;
+    releaseDate?: string | null;
+  } | null | undefined
+): Date | null => {
+  const raw = getGameReleaseRaw(item);
+  if (!raw) return null;
+  // YYYY-MM-DD → yerel gün (UTC kayması olmasın)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const [y, m, d] = raw.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+/** Kart meta: yıl veya TBA */
+export const formatGameReleaseYear = (item: any): string => {
+  const d = getGameReleaseDate(item);
+  return d ? String(d.getFullYear()) : "TBA";
+};
+
+/** Dikey kart için poster; yoksa hero görseli */
+export const resolveGameCardImage = (item: any): string => {
+  return (
+    item?.cover_image ||
+    item?.background_image ||
+    "https://f4.bcbits.com/img/0016409163_71.jpg"
+  );
+};
+
 export const formatGameYearAndGenres = (item: {
-  released?: string;
+  released?: string | null;
+  releaseDate?: string | null;
   genres?: GameGenreRef[];
 }): string => {
-  const year = item.released
-    ? new Date(item.released).getFullYear()
-    : new Date().getFullYear();
+  const year = formatGameReleaseYear(item);
   const genres = formatGameGenreLabels(item.genres);
-  return genres ? `${year} · ${genres}` : String(year);
+  return genres ? `${year} · ${genres}` : year;
 };
 
 export const useLimitedTags = (tags: any[] | null | undefined, limit = 3) => {

@@ -84,8 +84,10 @@
 
       <Admin_Collection_Pagination
         v-model="page"
+        v-model:page-size="pageSize"
         :page-count="pageCount"
         :page-size="pageSize"
+        :total-count="totalCount"
       />
     </template>
   </Admin_Game_Collection_Shell>
@@ -462,6 +464,7 @@ const {
   pageCount,
   paginatedItems,
   pageSize,
+  totalCount,
   resetPage,
 } = useAdminCollectionPagination(currentGames);
 

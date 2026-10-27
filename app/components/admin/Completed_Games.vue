@@ -80,8 +80,10 @@
 
         <Admin_Collection_Pagination
           v-model="page"
+          v-model:page-size="pageSize"
           :page-count="pageCount"
           :page-size="pageSize"
+          :total-count="totalCount"
         />
       </template>
   </Admin_Game_Collection_Shell>
@@ -510,6 +512,7 @@ const {
   pageCount,
   paginatedItems,
   pageSize,
+  totalCount,
   resetPage,
 } = useAdminCollectionPagination(completedGames);
 
@@ -665,12 +668,8 @@ const addGameToDb = async () => {
 
     addedGameToDbCount.value = games.length;
 
-    // Helper function to check if game is completed in 2026
-    // Check current year - if we're adding the game in 2026, it means we completed it in 2026
-    const isCompletedIn2026 = () => {
-      const currentYear = new Date().getFullYear();
-      return currentYear === 2026;
-    };
+    // Bu yıl bitenler koleksiyonuna da yaz (panel “Bu yıl bitirdiklerim”)
+    const isCompletedIn2026 = () => true;
 
     // 🔥 Single
     if (games.length === 1) {

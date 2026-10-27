@@ -1,5 +1,27 @@
 <template>
   <v-row :dense="display.smAndDown.value" class="game-card-row">
+    <!-- Skeleton: gerçek kartla aynı grid + 2:3 oran -->
+    <template v-if="loading">
+      <v-col
+        v-for="i in skeletonCount"
+        :key="`game-skel-${i}`"
+        :cols="gridCols"
+        :sm="gridSm"
+        :md="gridMd"
+        :lg="gridLg"
+        :xl="gridXl"
+      >
+        <div class="game-card-skeleton" aria-hidden="true">
+          <span class="game-card-skeleton__shine" />
+          <span class="game-card-skeleton__meta">
+            <i />
+            <i />
+          </span>
+        </div>
+      </v-col>
+    </template>
+
+    <template v-else>
     <v-col
       v-for="(item, index) of arr"
       :key="item.firestoreId ?? index"
@@ -9,14 +31,7 @@
       :lg="gridLg"
       :xl="gridXl"
     >
-      <v-skeleton-loader
-        v-if="loading"
-        type="image"
-        class="rounded-lg game-card-skeleton"
-      />
-
       <v-card
-        v-if="!loading"
         class="game-card game-card--steam bg-transparent rounded-lg transition"
         :class="{
           'cursor-pointer': true,
@@ -28,12 +43,51 @@
       >
         <div class="game-card-image-wrapper">
           <v-img
-            :src="item.background_image ?? 'https://f4.bcbits.com/img/0016409163_71.jpg'"
+            :src="resolveGameCardImage(item)"
             class="game-card-img"
             cover
-            position="center top"
+            position="center center"
           />
           <div class="game-card-overlay" aria-hidden="true" />
+
+          <div
+            v-if="bulkDeleteMode"
+            class="game-card-bulk-check"
+            aria-hidden="true"
+          >
+            <v-icon
+              :icon="
+                isItemSelected(item)
+                  ? 'mdi-checkbox-marked'
+                  : 'mdi-checkbox-blank-outline'
+              "
+              :color="isItemSelected(item) ? 'success' : 'grey-lighten-1'"
+              size="22"
+            />
+          </div>
+
+          <div
+            v-if="showPlayingActions && !bulkDeleteMode"
+            class="game-card-actions"
+            @click.stop
+          >
+            <button
+              type="button"
+              class="game-card-actions__btn game-card-actions__btn--done"
+              @click.stop="emitComplete(item)"
+            >
+              <v-icon icon="mdi-check-circle" size="18" />
+              Tamamladım
+            </button>
+            <button
+              type="button"
+              class="game-card-actions__btn game-card-actions__btn--remove"
+              @click.stop="emitRemove(item)"
+            >
+              <v-icon icon="mdi-trash-can-outline" size="18" />
+              Kaldır
+            </button>
+          </div>
 
           <template v-if="!display.xs.value">
             <v-tooltip text="Toplam oynama süresi (Ana Hikaye)" location="top">
@@ -120,9 +174,7 @@
                 {{
                   props.metaFormat === "year-genres"
                     ? formatGameYearAndGenres(item)
-                    : item.released
-                      ? new Date(item.released).getFullYear()
-                      : "—"
+                    : formatGameReleaseYear(item)
                 }}
               </p>
             </div>
@@ -146,6 +198,7 @@
         </div>
       </v-card>
     </v-col>
+    </template>
   </v-row>
 </template>
 
@@ -153,9 +206,11 @@
 import fireAnimationSrc from "~/assets/img/fire_anim.gif";
 import { truncateText } from "~/composables/core/basicFunc";
 import {
+  formatGameReleaseYear,
   formatGameYearAndGenres,
   getMetacriticBadge,
   getUniquePlatformIcons,
+  resolveGameCardImage,
 } from "~/composables/data/handleData";
 
 const props = withDefaults(
@@ -170,9 +225,16 @@ const props = withDefaults(
     density?: "default" | "comfortable" | "admin-grid";
     /** year: sadece yıl | year-genres: "2026 · aksiyon - nişancı - indie" */
     metaFormat?: "year" | "year-genres";
+    /** Hover’da Tamamladım / Kaldır overlay (şu an oynadıklarım) */
+    showPlayingActions?: boolean;
+    onCompleteClick?: (item: any) => void;
+    onRemoveClick?: (item: any) => void;
   }>(),
-  { density: "default", metaFormat: "year" }
+  { density: "default", metaFormat: "year", showPlayingActions: false }
 );
+
+const emitComplete = (item: any) => props.onCompleteClick?.(item);
+const emitRemove = (item: any) => props.onRemoveClick?.(item);
 
 /** Steam library tarzı: büyük ekranda daha çok sütun → kartlar şişmez */
 const gridCols = computed(() => 6);
@@ -193,6 +255,15 @@ const gridXl = computed(() => 2);
 
 const display = useDisplay();
 const fireAnimation = fireAnimationSrc;
+
+/** Gerçek grid ile aynı satır doluluğu (xl’de 6 sütun → 12 placeholder) */
+const skeletonCount = computed(() => {
+  if (display.xlAndUp.value) return 12;
+  if (display.lgAndUp.value) return props.density === "default" ? 8 : 12;
+  if (display.mdAndUp.value) return 8;
+  if (display.smAndUp.value) return 6;
+  return 4;
+});
 
 const metacriticBadge = (item: any) => getMetacriticBadge(item?.metacritic);
 
@@ -252,10 +323,95 @@ const handleCardClick = (item: any) => {
   height: 100%;
 }
 
+.game-card .game-card-img :deep(img),
+.game-card .game-card-img :deep(.v-img__img) {
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
 .game-card-skeleton {
-  aspect-ratio: 2 / 3;
+  position: relative;
   width: 100%;
+  aspect-ratio: 2 / 3;
   border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #1a222c 0%, #12171e 55%, #0e1319 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.game-card-skeleton__shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.07) 45%,
+    transparent 65%
+  );
+  background-size: 200% 100%;
+  animation: gameCardSkeletonShine 1.35s ease-in-out infinite;
+}
+
+.game-card-skeleton__meta {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 12px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.game-card-skeleton__meta i {
+  display: block;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.game-card-skeleton__meta i:first-child {
+  width: 72%;
+}
+
+.game-card-skeleton__meta i:last-child {
+  width: 38%;
+  height: 0.55rem;
+  opacity: 0.75;
+}
+
+@keyframes gameCardSkeletonShine {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -80% 0;
+  }
+}
+
+html.dark .game-card-skeleton,
+.v-theme--dark .game-card-skeleton {
+  background: linear-gradient(145deg, #1a222c 0%, #12171e 55%, #0e1319 100%);
+}
+
+:global(html:not(.dark)) .game-card-skeleton {
+  background: linear-gradient(145deg, #e8eef2 0%, #d8e0e6 55%, #cfd8df 100%);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+:global(html:not(.dark)) .game-card-skeleton__shine {
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.55) 45%,
+    transparent 65%
+  );
+  background-size: 200% 100%;
+}
+
+:global(html:not(.dark)) .game-card-skeleton__meta i {
+  background: rgba(15, 23, 42, 0.12);
 }
 
 .game-card-info {
@@ -305,6 +461,87 @@ const handleCardClick = (item: any) => {
 .game-card:hover .game-card-hover-details {
   opacity: 1;
   max-height: 56px;
+}
+
+/* Oynama aksiyonları varken alt genre şeridini gizle */
+.game-card:has(.game-card-actions):hover .game-card-hover-details {
+  opacity: 0;
+  max-height: 0;
+}
+
+.game-card-actions {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.85rem;
+  border-radius: inherit;
+  background: rgb(7 11 20 / 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.game-card:hover .game-card-actions,
+.game-card:focus-within .game-card-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.game-card-actions__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: min(100%, 10.5rem);
+  min-height: 2.35rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transform: translateY(6px);
+  transition:
+    transform 0.2s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    filter 0.15s ease;
+}
+
+.game-card:hover .game-card-actions__btn,
+.game-card:focus-within .game-card-actions__btn {
+  transform: translateY(0);
+}
+
+.game-card-actions__btn--done {
+  background: #69f0ae;
+  color: #07140f;
+  box-shadow: 0 8px 20px rgb(105 240 174 / 0.28);
+}
+
+.game-card-actions__btn--done:hover {
+  filter: brightness(1.06);
+}
+
+.game-card-actions__btn--remove {
+  background: rgb(15 23 42 / 0.72);
+  color: #f8fafc;
+  border-color: rgb(255 255 255 / 0.18);
+}
+
+.game-card-actions__btn--remove:hover {
+  background: rgb(239 68 68 / 0.22);
+  border-color: rgb(248 113 113 / 0.55);
+  color: #fecaca;
 }
 
 /* Metacritic — resmi kutu, hover’da kare border yok */
@@ -368,6 +605,22 @@ const handleCardClick = (item: any) => {
   box-shadow: 0 0 20px rgba(105, 240, 174, 0.15);
 }
 
+.game-card-bulk-check {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 0.45rem;
+  background: rgba(8, 12, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+}
+
 @media (max-width: 599px) {
   .game-card:hover .game-card-hover-details {
     opacity: 0;
@@ -390,6 +643,28 @@ const handleCardClick = (item: any) => {
   .game-card:hover .metacritic-point,
   .game-card:hover .playtime-icon {
     transform: none !important;
+  }
+
+  /* Mobilde hover yok — aksiyonlar hafif görünür kalsın */
+  .game-card-actions {
+    opacity: 1;
+    pointer-events: auto;
+    background: linear-gradient(
+      to top,
+      rgb(7 11 20 / 0.88) 0%,
+      rgb(7 11 20 / 0.35) 55%,
+      transparent 100%
+    );
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    justify-content: flex-end;
+    padding-bottom: 0.75rem;
+  }
+
+  .game-card-actions__btn {
+    transform: none;
+    min-height: 2.1rem;
+    font-size: 0.72rem;
   }
 }
 </style>
