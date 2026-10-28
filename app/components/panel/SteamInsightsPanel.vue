@@ -2,7 +2,27 @@
 import { useAppLocale } from "~/composables/useAppLocale";
 import { steamHours, type SteamGame } from "~/composables/useSteamHub";
 import { useSteamInsights } from "~/composables/useSteamInsights";
+import { syncPortraitCoverFit } from "~/utils/portraitCoverFit";
 import { formatSteamMoney } from "~/utils/steamMatch";
+
+const radarCoverFit = {
+  mediaSelector: ".si-match__cover",
+  imgBaseClass: "si-match__img",
+  bleedClass: "si-match__img--bleed",
+  fgClass: "si-match__img--fg",
+  mediaWideClass: "si-match__cover--wide",
+} as const;
+
+function onRadarCoverLoad(e: Event) {
+  syncPortraitCoverFit(e.target as HTMLImageElement, radarCoverFit);
+}
+
+function bindRadarCover(el: Element | null) {
+  if (!(el instanceof HTMLImageElement)) return;
+  if (el.complete && el.naturalWidth) {
+    syncPortraitCoverFit(el, radarCoverFit);
+  }
+}
 
 const props = defineProps<{
   games: SteamGame[];
@@ -21,6 +41,7 @@ const { tx } = useAppLocale();
 const {
   libraryValue,
   libraryValueDisplay,
+  libraryValueStats,
   setDisplayCurrency,
   yearRecap,
   radarMatch,
@@ -31,6 +52,8 @@ const {
 const loading = ref(true);
 const errorMsg = ref("");
 const booted = ref(false);
+/** Kimler listelendi — boş oyunda bile açılabilir */
+const showAllFriends = ref(false);
 
 const yearShareText = computed(() => {
   const y = yearRecap.value;
@@ -45,6 +68,59 @@ const yearShareText = computed(() => {
 /** Radar’da var, Steam kütüphanesinde yok */
 const radarMissingRows = computed(() =>
   radarMatch.value.rows.filter((r) => !r.owned)
+);
+
+function friendRank(f: {
+  gameId: string | null;
+  personastate?: number;
+}) {
+  if (f.gameId) return 0;
+  const st = f.personastate || 0;
+  if (st >= 1) return 1;
+  return 2;
+}
+
+const friendsSorted = computed(() =>
+  [...(friendsLive.value.friends || [])].sort((a, b) => {
+    const d = friendRank(a) - friendRank(b);
+    if (d) return d;
+    return a.personaname.localeCompare(b.personaname, "tr");
+  })
+);
+
+function friendStatusLabel(f: {
+  gameId: string | null;
+  gameExtraInfo: string | null;
+  personastate?: number;
+}) {
+  if (f.gameId) {
+    return f.gameExtraInfo || tx("panel.steam.friendsInGame");
+  }
+  if ((f.personastate || 0) >= 1) return tx("panel.steam.friendsOnline");
+  return tx("panel.steam.friendsOffline");
+}
+
+function friendProfileUrl(f: {
+  steamId: string;
+  profileurl: string | null;
+}) {
+  return (
+    f.profileurl || `https://steamcommunity.com/profiles/${f.steamId}`
+  );
+}
+
+watch(
+  () =>
+    [
+      friendsLive.value.loading,
+      friendsLive.value.playing.length,
+      friendsLive.value.total,
+    ] as const,
+  ([loading, playingN, total]) => {
+    if (!loading && total > 0 && playingN === 0) {
+      showAllFriends.value = true;
+    }
+  }
 );
 
 async function copyYearCard() {
@@ -196,33 +272,92 @@ watch(
           </div>
           <p v-if="libraryValue.loading" class="si-card__muted">…</p>
           <template v-else>
-            <p class="si-card__big si-card__big--value">
-              {{
-                formatSteamMoney(
-                  libraryValueDisplay.cents,
-                  libraryValueDisplay.currency
-                )
-              }}
-            </p>
-            <div class="si-card__foot">
-              <p class="si-card__meta">
+            <div class="si-value-body">
+              <p class="si-card__big si-card__big--value">
+                {{
+                  formatSteamMoney(
+                    libraryValueDisplay.cents,
+                    libraryValueDisplay.currency
+                  )
+                }}
+              </p>
+              <ul class="si-value-stats" aria-label="value stats">
+                <li v-if="libraryValueStats.avgCents != null" class="si-value-stat">
+                  <span class="si-value-stat__l">{{ tx("panel.steam.valueAvg") }}</span>
+                  <strong class="si-value-stat__n">
+                    {{
+                      formatSteamMoney(
+                        libraryValueStats.avgCents,
+                        libraryValueStats.currency
+                      )
+                    }}
+                  </strong>
+                </li>
+                <li v-if="libraryValueStats.listCents != null" class="si-value-stat">
+                  <span class="si-value-stat__l">{{ tx("panel.steam.valueList") }}</span>
+                  <strong class="si-value-stat__n">
+                    {{
+                      formatSteamMoney(
+                        libraryValueStats.listCents,
+                        libraryValueStats.currency
+                      )
+                    }}
+                  </strong>
+                </li>
+                <li
+                  v-if="libraryValueStats.saveCents != null"
+                  class="si-value-stat si-value-stat--save"
+                >
+                  <span class="si-value-stat__l">{{ tx("panel.steam.valueSave") }}</span>
+                  <strong class="si-value-stat__n">
+                    −{{
+                      formatSteamMoney(
+                        libraryValueStats.saveCents,
+                        libraryValueStats.currency
+                      )
+                    }}
+                  </strong>
+                </li>
+              </ul>
+            </div>
+            <div class="si-card__foot si-value-chips">
+              <span class="si-value-chip">
                 {{
                   tx("panel.steam.valueMeta")
                     .replace("{n}", String(libraryValue.pricedCount))
                     .replace("{t}", String(libraryValue.scannedCount))
                 }}
-              </p>
-              <p v-if="libraryValue.usdTryRate" class="si-card__note">
+              </span>
+              <span
+                v-if="libraryValueStats.unpriced > 0"
+                class="si-value-chip"
+              >
+                {{
+                  tx("panel.steam.valueUnpriced").replace(
+                    "{n}",
+                    String(libraryValueStats.unpriced)
+                  )
+                }}
+              </span>
+              <span
+                v-if="libraryValueStats.sampleNote"
+                class="si-value-chip si-value-chip--accent"
+              >
+                {{
+                  tx("panel.steam.valueSample").replace(
+                    "{n}",
+                    String(libraryValue.scannedCount)
+                  )
+                }}
+              </span>
+              <span v-if="libraryValue.usdTryRate" class="si-value-chip">
                 {{
                   tx("panel.steam.valueRate").replace(
                     "{rate}",
                     libraryValue.usdTryRate.toFixed(2)
                   )
                 }}
-              </p>
-              <p v-if="libraryValue.sampleNote" class="si-card__note">
-                {{ tx("panel.steam.valueSample") }}
-              </p>
+              </span>
             </div>
           </template>
         </section>
@@ -267,16 +402,16 @@ watch(
             {{ tx("panel.steam.yearCopy") }}
           </button>
         </div>
-        <div class="si-year__stats">
-          <div>
+        <div class="si-year__stats" role="list">
+          <div class="si-year__stat" role="listitem">
             <strong>{{ yearRecap.gamesTouched }}</strong>
             <span>{{ tx("panel.steam.yearGames") }}</span>
           </div>
-          <div>
+          <div class="si-year__stat" role="listitem">
             <strong>{{ yearRecap.hoursApprox }}</strong>
             <span>{{ tx("panel.steam.hours") }}</span>
           </div>
-          <div>
+          <div class="si-year__stat si-year__stat--plat" role="listitem">
             <strong>{{ yearRecap.platinumInLibrary }}</strong>
             <span>{{ tx("panel.steam.platinum") }}</span>
           </div>
@@ -296,7 +431,6 @@ watch(
             </div>
           </li>
         </ul>
-        <p class="si-card__note">{{ tx("panel.steam.yearNote") }}</p>
       </section>
 
       <section class="si-card si-card--wide si-friends-card">
@@ -308,9 +442,17 @@ watch(
               <p class="si-card__hint">{{ tx("panel.steam.friendsHint") }}</p>
             </div>
           </div>
-          <span
-            v-if="!friendsLive.loading && !friendsLive.privateOrFail"
+          <button
+            v-if="
+              !friendsLive.loading &&
+              !friendsLive.privateOrFail &&
+              friendsLive.total > 0
+            "
+            type="button"
             class="si-friends-card__count"
+            :class="{ 'si-friends-card__count--on': showAllFriends }"
+            :aria-expanded="showAllFriends"
+            @click="showAllFriends = !showAllFriends"
           >
             {{
               tx("panel.steam.friendsMeta").replace(
@@ -318,44 +460,120 @@ watch(
                 String(friendsLive.total)
               )
             }}
-          </span>
+            <v-icon
+              :icon="showAllFriends ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              size="16"
+            />
+          </button>
         </div>
 
         <p v-if="friendsLive.loading" class="si-card__muted">…</p>
         <p v-else-if="friendsLive.privateOrFail" class="si-card__meta">
           {{ tx("panel.steam.friendsPrivate") }}
         </p>
-        <div v-else-if="!friendsLive.playing.length" class="si-friends-empty">
-          <div class="si-friends-empty__ico" aria-hidden="true">
-            <v-icon icon="mdi-gamepad-variant-outline" size="28" />
-          </div>
-          <div>
-            <strong>{{ tx("panel.steam.friendsEmpty") }}</strong>
-            <p>
-              {{
-                tx("panel.steam.friendsEmptyHint").replace(
-                  "{n}",
-                  String(friendsLive.total)
-                )
-              }}
-            </p>
-          </div>
-        </div>
-        <ul v-else class="si-friends">
-          <li v-for="f in friendsLive.playing.slice(0, 12)" :key="f.steamId">
-            <img v-if="f.avatarfull" :src="f.avatarfull" alt="" />
-            <span v-else class="si-friends__av" aria-hidden="true">
-              {{ (f.personaname || "?").slice(0, 1) }}
-            </span>
-            <div>
-              <strong>{{ f.personaname }}</strong>
-              <em>
-                <span class="si-live" aria-hidden="true" />
-                {{ f.gameExtraInfo || tx("panel.steam.friendsPlayingNow") }}
-              </em>
+        <template v-else>
+          <div v-if="!friendsLive.playing.length" class="si-friends-empty">
+            <div class="si-friends-empty__ico" aria-hidden="true">
+              <v-icon icon="mdi-gamepad-variant-outline" size="28" />
             </div>
-          </li>
-        </ul>
+            <div>
+              <strong>{{ tx("panel.steam.friendsEmpty") }}</strong>
+              <p>
+                {{
+                  tx("panel.steam.friendsEmptyHint").replace(
+                    "{n}",
+                    String(friendsLive.total)
+                  )
+                }}
+              </p>
+              <button
+                v-if="friendsSorted.length && !showAllFriends"
+                type="button"
+                class="si-friends-empty__cta"
+                @click="showAllFriends = true"
+              >
+                {{ tx("panel.steam.friendsShowAll") }}
+                <v-icon icon="mdi-account-multiple-outline" size="16" />
+              </button>
+            </div>
+          </div>
+          <ul v-else class="si-friends">
+            <li v-for="f in friendsLive.playing.slice(0, 12)" :key="f.steamId">
+              <a
+                class="si-friends__link"
+                :href="friendProfileUrl(f)"
+                target="_blank"
+                rel="noopener noreferrer"
+                :title="tx('panel.steam.friendsOpenProfile')"
+              >
+                <img v-if="f.avatarfull" :src="f.avatarfull" alt="" />
+                <span v-else class="si-friends__av" aria-hidden="true">
+                  {{ (f.personaname || "?").slice(0, 1) }}
+                </span>
+                <div>
+                  <strong>{{ f.personaname }}</strong>
+                  <em>
+                    <span class="si-live" aria-hidden="true" />
+                    {{ f.gameExtraInfo || tx("panel.steam.friendsPlayingNow") }}
+                  </em>
+                </div>
+              </a>
+            </li>
+          </ul>
+
+          <div v-if="showAllFriends && friendsSorted.length" class="si-friends-all">
+            <div class="si-friends-all__head">
+              <h3>{{ tx("panel.steam.friendsAll") }}</h3>
+              <button
+                type="button"
+                class="si-friends-all__hide"
+                @click="showAllFriends = false"
+              >
+                {{ tx("panel.steam.friendsHideAll") }}
+              </button>
+            </div>
+            <ul class="si-friends si-friends--all">
+              <li
+                v-for="f in friendsSorted"
+                :key="`all-${f.steamId}`"
+                :class="{
+                  'si-friends__item--live': !!f.gameId,
+                  'si-friends__item--on': !f.gameId && (f.personastate || 0) >= 1,
+                }"
+              >
+                <a
+                  class="si-friends__link"
+                  :href="friendProfileUrl(f)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :title="tx('panel.steam.friendsOpenProfile')"
+                >
+                  <img v-if="f.avatarfull" :src="f.avatarfull" alt="" />
+                  <span v-else class="si-friends__av" aria-hidden="true">
+                    {{ (f.personaname || "?").slice(0, 1) }}
+                  </span>
+                  <div>
+                    <strong>{{ f.personaname }}</strong>
+                    <em>
+                      <span
+                        v-if="f.gameId"
+                        class="si-live"
+                        aria-hidden="true"
+                      />
+                      <span
+                        v-else-if="(f.personastate || 0) >= 1"
+                        class="si-dot si-dot--on"
+                        aria-hidden="true"
+                      />
+                      <span v-else class="si-dot" aria-hidden="true" />
+                      {{ friendStatusLabel(f) }}
+                    </em>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </template>
       </section>
 
       <section class="si-card si-card--wide">
@@ -367,7 +585,14 @@ watch(
           <ul v-if="radarMissingRows.length" class="si-match">
             <li v-for="r in radarMissingRows" :key="r.id">
               <div class="si-match__cover">
-                <img :src="r.imageUrl" :alt="r.name" loading="lazy" />
+                <img
+                  :ref="bindRadarCover"
+                  class="si-match__img"
+                  :src="r.imageUrl"
+                  :alt="r.name"
+                  loading="lazy"
+                  @load="onRadarCoverLoad"
+                />
               </div>
               <div class="si-match__meta">
                 <strong :title="r.name">{{ r.name }}</strong>
@@ -460,7 +685,7 @@ watch(
   grid-column: 1 / -1;
 }
 .si-card--value {
-  min-height: 14.5rem;
+  min-height: 16rem;
   justify-content: space-between;
   background:
     radial-gradient(
@@ -472,8 +697,9 @@ watch(
   border-color: color-mix(in srgb, var(--panel-accent, #69f0ae) 28%, transparent);
 }
 .si-card--plat {
-  min-height: 11.5rem;
+  min-height: 16rem;
   align-items: flex-start;
+  justify-content: flex-start;
   background:
     radial-gradient(
       100% 80% at 100% 0%,
@@ -691,20 +917,101 @@ watch(
   flex-direction: column;
   gap: 0.2rem;
 }
+.si-value-chips {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+.si-value-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--panel-border, rgb(15 23 42 / 0.14));
+  background: var(--panel-soft, #c2cad6);
+  color: var(--panel-muted, #334155);
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.si-value-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.85rem;
+  margin: 0.45rem 0 0.65rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
 .si-card__big--value {
+  display: block;
+  width: 100%;
+  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(3.6rem, 9vw, 6.25rem);
+  margin: 0;
+  letter-spacing: -0.07em;
+  line-height: 0.88;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.si-value-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.5rem;
+  max-width: 36rem;
+}
+.si-value-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--panel-border, rgb(15 23 42 / 0.12));
+  background: color-mix(in srgb, var(--panel-soft, #c2cad6) 55%, transparent);
+}
+.si-value-stat__l {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--panel-muted, #64748b);
+}
+.si-value-stat__n {
+  font-size: 0.84rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--panel-text, #0f172a);
+  line-height: 1.1;
+}
+.si-value-stat--save .si-value-stat__n {
+  color: var(--panel-accent, #69f0ae);
+}
+.si-value-chip--accent {
+  border-color: color-mix(in srgb, var(--panel-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--panel-accent) 12%, var(--panel-soft));
+  color: var(--panel-accent, #15803d);
+}
+.si-card__big--plat {
   flex: 1 1 auto;
   display: flex;
   align-items: center;
-  font-size: clamp(3.6rem, 8.5vw, 5.25rem);
-  margin: 0.35rem 0;
-  letter-spacing: -0.05em;
-  line-height: 0.95;
+  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(4rem, 8vw, 5.75rem);
   font-weight: 900;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+  color: #ca8a04;
+  margin: 0.35rem 0 0.2rem;
+  font-variant-numeric: tabular-nums;
 }
-.si-card__big--plat {
-  font-size: clamp(2.4rem, 4vw, 3rem);
+:global(.panel-shell[data-theme="dark"]) .si-card__big--plat {
   color: #f5d76e;
-  margin: 0.15rem 0;
 }
 .si-card__hint--plat {
   display: -webkit-box;
@@ -776,7 +1083,7 @@ watch(
   letter-spacing: -0.02em;
 }
 .si-card__link {
-  margin-top: 0.35rem;
+  margin-top: auto;
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
@@ -784,6 +1091,9 @@ watch(
   font-weight: 700;
   font-size: 0.88rem;
   text-decoration: none;
+}
+.si-card--plat .si-card__meta {
+  margin-top: 0;
 }
 .si-year__top {
   display: flex;
@@ -795,29 +1105,48 @@ watch(
 .si-year__stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin: 0.5rem 0;
+  align-items: stretch;
+  gap: 0;
+  margin: 0.75rem 0 0.35rem;
+  padding: 0.85rem 0.35rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--panel-accent, #047857) 6%, var(--panel-soft, #c2cad6));
+  border: 1px solid color-mix(in srgb, var(--panel-accent, #047857) 16%, transparent);
 }
-.si-year__stats div {
-  flex: 1 1 6rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 12px;
-  background: var(--panel-soft, rgb(0 0 0 / 0.22));
-  border: 1px solid var(--panel-border, rgb(15 23 42 / 0.08));
+.si-year__stat {
+  flex: 1 1 5.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0.35rem 0.75rem;
+  text-align: center;
+  border-right: 1px solid color-mix(in srgb, var(--panel-border, rgb(15 23 42 / 0.14)) 80%, transparent);
 }
-.si-year__stats strong {
-  font-size: 1.35rem;
-  font-weight: 800;
+.si-year__stat:last-child {
+  border-right: 0;
 }
-.si-year__stats span {
-  font-size: 0.75rem;
+.si-year__stat strong {
+  font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--panel-accent, #047857);
+  font-variant-numeric: tabular-nums;
+}
+.si-year__stat--plat strong {
+  color: #ca8a04;
+}
+:global(.panel-shell[data-theme="dark"]) .si-year__stat--plat strong {
+  color: #f5d76e;
+}
+.si-year__stat span {
+  font-size: 0.72rem;
   color: var(--panel-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 .si-year__top-list {
   list-style: none;
@@ -899,6 +1228,10 @@ watch(
   gap: 0.75rem;
 }
 .si-friends-card__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font: inherit;
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--panel-muted);
@@ -906,6 +1239,17 @@ watch(
   border-radius: 999px;
   background: var(--panel-soft);
   border: 1px solid var(--panel-border);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+.si-friends-card__count:hover,
+.si-friends-card__count--on {
+  color: var(--panel-accent);
+  border-color: color-mix(in srgb, var(--panel-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--panel-accent) 10%, var(--panel-soft));
 }
 .si-friends-empty {
   display: flex;
@@ -940,6 +1284,24 @@ watch(
   color: var(--panel-muted);
   line-height: 1.4;
 }
+.si-friends-empty__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--panel-accent) 35%, transparent);
+  background: color-mix(in srgb, var(--panel-accent) 12%, transparent);
+  color: var(--panel-accent);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.si-friends-empty__cta:hover {
+  background: color-mix(in srgb, var(--panel-accent) 20%, transparent);
+}
 .si-friends,
 .si-match,
 .si-sales {
@@ -959,11 +1321,25 @@ watch(
   align-items: center;
 }
 .si-friends li {
-  padding: 0.7rem 0.8rem;
+  padding: 0;
   border-radius: 14px;
   background: var(--panel-soft);
   border: 1px solid var(--panel-border);
   min-width: 0;
+  overflow: hidden;
+}
+.si-friends__link {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  color: inherit;
+  text-decoration: none;
+}
+.si-friends__link:hover strong {
+  color: var(--panel-accent);
 }
 .si-friends img,
 .si-friends__av,
@@ -1005,8 +1381,51 @@ watch(
   max-width: 100%;
 }
 .si-friends li > div,
+.si-friends__link > div,
 .si-owner > div {
   min-width: 0;
+}
+.si-friends-all {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--panel-border);
+}
+.si-friends-all__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+.si-friends-all__head h3 {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.si-friends-all__hide {
+  border: 0;
+  background: transparent;
+  color: var(--panel-muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+}
+.si-friends-all__hide:hover {
+  color: var(--panel-accent);
+}
+.si-friends--all {
+  margin-top: 0;
+  max-height: 22rem;
+  overflow: auto;
+  padding-right: 0.15rem;
+}
+.si-friends__item--live {
+  border-color: color-mix(in srgb, #22c55e 45%, var(--panel-border));
+}
+.si-friends__item--on {
+  border-color: color-mix(in srgb, var(--panel-accent) 35%, var(--panel-border));
 }
 .si-live {
   width: 7px;
@@ -1014,6 +1433,18 @@ watch(
   border-radius: 999px;
   background: #22c55e;
   box-shadow: 0 0 0 3px rgb(34 197 94 / 0.25);
+  flex-shrink: 0;
+}
+.si-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel-muted) 55%, transparent);
+  flex-shrink: 0;
+}
+.si-dot--on {
+  background: var(--panel-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--panel-accent) 22%, transparent);
 }
 .si-match {
   display: grid;
@@ -1038,15 +1469,55 @@ watch(
   transform: translateY(-1px);
 }
 .si-match__cover {
+  position: relative;
+  isolation: isolate;
   aspect-ratio: 3 / 4;
   background: color-mix(in srgb, var(--panel-soft) 70%, #000);
   overflow: hidden;
+  line-height: 0;
 }
-.si-match__cover img {
+.si-match__img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 18%;
   display: block;
+}
+.si-match__cover--wide {
+  background: #05080c;
+}
+.si-match__img--bleed {
+  inset: -18%;
+  width: auto;
+  height: auto;
+  min-width: 136%;
+  min-height: 136%;
+  object-fit: cover;
+  object-position: center;
+  filter: blur(16px) brightness(0.38) saturate(1.05);
+  z-index: 0;
+}
+.si-match__img--fg {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: 92%;
+  height: auto;
+  max-height: 46%;
+  object-fit: contain;
+  object-position: center;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  filter: brightness(0.95) contrast(1.04) saturate(1.02);
+  z-index: 1;
+}
+.si-match li:hover .si-match__img--fg {
+  transform: translate(-50%, -50%) scale(1.03);
 }
 .si-match__meta {
   display: flex;

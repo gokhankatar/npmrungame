@@ -6,7 +6,7 @@ Steam hesabını panele bağlayıp kütüphane, başarımlar, son oynananlar ve 
 
 ## Nerede kaldık (2026-10-27)
 
-Steam hub MVP büyük ölçüde **tamam**. Keşif varsayılan sekme; Başarımlar ayrı sayfa değil hub tab’ı. Light mode’da Kütüphane / Başarımlar sekmelerinde hâlâ “aşırı parlak” hissi var — Keşif’te sorun yok; global temayı bozmadan sadece bu iki sekmeye özel çözüm **sonraya bırakıldı**.
+Steam hub MVP büyük ölçüde **tamam**. Keşif varsayılan sekme; Başarımlar hub tab. Light mode Kütüphane/Başarımlar parlaklığı: pane-scoped mid-slate kartlar (`.steam-pane--light` / `.sa--light`) — Keşif ve global `--app-bg` dokunulmaz.
 
 ### Bu turda yapılanlar
 
@@ -24,7 +24,7 @@ Steam hub MVP büyük ölçüde **tamam**. Keşif varsayılan sekme; Başarımla
 
 | Konu | Not |
 |---|---|
-| Light mode Kütüphane + Başarımlar parlaklık | Koyu Steam kartları + açık zemin kontrastı. Kartları light’a çevirme / global bg koyulaştırma Keşif’i bozdu → **geri alındı**. Sonraki turda sadece bu sekmeler için (global tema dokunmadan) çöz. |
+| Light mode Kütüphane + Başarımlar parlaklık | Kök: koyu kart + açık zemin. Fix: yalnız `.steam-pane--light` / `.sa--light` (Keşif + global tema dokunulmaz); aktif tab soft yeşil + koyu yazı. |
 | Wishlist tab | Hub’dan çıkarıldı; tekrar istenirse kolay |
 | İndirim / nadir / owner-playing Keşif kartları | Paketten sadeleştirildi / oyun detayına taşındı |
 
@@ -64,7 +64,7 @@ Steam hub MVP büyük ölçüde **tamam**. Keşif varsayılan sekme; Başarımla
 
 | Fikir | Durum | Not |
 |---|---|---|
-| Kütüphane değeri | ✅ | Steam `cc=TR` · Frankfurter USD/TRY · sample |
+| Kütüphane değeri | ✅ | `IStoreBrowseService/GetItems` (store appdetails Akamai 403) · USD→TRY Frankfurter · sample |
 | Platin / %100 skorboard | ✅ | Hub Başarımlar tab + link |
 | Nadir başarımlar | ✅ | Oyun detayında «Nadir» sıralama |
 | Arkadaşlar canlı | ✅ | Keşif col-12 · boş: “Şu an oyunda olan arkadaşın yok.” |
@@ -83,15 +83,14 @@ Steam hub MVP büyük ölçüde **tamam**. Keşif varsayılan sekme; Başarımla
 - [x] Keşif paketi (değer, yıl, radar, arkadaş)
 - [x] Başarımlar hub tab (ayrı sayfa değil)
 - [x] env.example notu
-- [ ] Light mode: Kütüphane + Başarımlar parlaklık (ertelendi)
+- [x] Light mode: Kütüphane + Başarımlar — pane-scoped mid-slate kartlar (Keşif ayrı)
 
 ## Sonraki adımlar
 
-1. **Light mode fix (öncelik):** Sadece Kütüphane / Başarımlar sekmeleri — Keşif ve global `--app-bg`’ye dokunmadan.
-2. Koleksiyon dokümanlarına kalıcı `steamAppId` (IGDB) — radar eşleşmesi.
-3. Tam kütüphane fiyatı için sunucu cache / cron.
-4. İndirim için e-posta / push (opsiyonel).
-5. Cross-user platin liderlik tablosu.
+1. Koleksiyon dokümanlarına kalıcı `steamAppId` (IGDB) — radar eşleşmesi.
+2. Tam kütüphane fiyatı için sunucu cache / cron.
+3. İndirim için e-posta / push (opsiyonel).
+4. Cross-user platin liderlik tablosu.
 
 ## Out of scope
 

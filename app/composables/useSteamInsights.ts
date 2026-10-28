@@ -114,21 +114,26 @@ export function useSteamInsights() {
     items: [],
   }));
 
+  type FriendRow = {
+    steamId: string;
+    personaname: string;
+    avatarfull: string | null;
+    personastate?: number;
+    gameId: string | null;
+    gameExtraInfo: string | null;
+    profileurl: string | null;
+  };
+
   const friendsLive = useState<{
     loading: boolean;
     total: number;
-    playing: Array<{
-      steamId: string;
-      personaname: string;
-      avatarfull: string | null;
-      gameId: string | null;
-      gameExtraInfo: string | null;
-      profileurl: string | null;
-    }>;
+    friends: FriendRow[];
+    playing: FriendRow[];
     privateOrFail: boolean;
   }>("steam-ins-friends", () => ({
     loading: false,
     total: 0,
+    friends: [],
     playing: [],
     privateOrFail: false,
   }));
@@ -185,9 +190,10 @@ export function useSteamInsights() {
     if (!games.length) return;
     libraryValue.value.loading = true;
     try {
+      /** Steam store rate-limit: API max 48 — tam katalog yerine en çok oynananlar */
       const sample = [...games]
         .sort((a, b) => b.playtimeForeverMin - a.playtimeForeverMin)
-        .slice(0, 36);
+        .slice(0, 48);
       const appIds = sample.map((g) => g.appId).join(",");
 
       const [res, fx] = await Promise.all([
@@ -236,10 +242,8 @@ export function useSteamInsights() {
     }
   }
 
-  /** Gösterilecek tutar (kuruş, seçili para biriminde) */
-  const libraryValueDisplay = computed(() => {
+  function tryCentsToDisplay(tryCents: number | null) {
     const v = libraryValue.value;
-    const tryCents = v.totalFinalTry;
     if (tryCents == null) {
       return { cents: null as number | null, currency: v.displayCurrency };
     }
@@ -253,6 +257,40 @@ export function useSteamInsights() {
       };
     }
     return { cents: tryCents, currency: "TRY" as const };
+  }
+
+  /** Gösterilecek tutar (kuruş, seçili para biriminde) */
+  const libraryValueDisplay = computed(() =>
+    tryCentsToDisplay(libraryValue.value.totalFinalTry)
+  );
+
+  /** Kart içi ikincil metrikler */
+  const libraryValueStats = computed(() => {
+    const v = libraryValue.value;
+    const final = libraryValueDisplay.value;
+    const initial = tryCentsToDisplay(v.totalInitialTry);
+    const priced = v.pricedCount;
+    const avgCents =
+      final.cents != null && priced > 0
+        ? Math.round(final.cents / priced)
+        : null;
+    const saveCents =
+      initial.cents != null &&
+      final.cents != null &&
+      initial.cents > final.cents
+        ? initial.cents - final.cents
+        : null;
+    const unpriced = Math.max(0, v.scannedCount - priced);
+    return {
+      currency: final.currency,
+      avgCents,
+      listCents: initial.cents,
+      saveCents,
+      unpriced,
+      sampleNote: v.sampleNote,
+      scannedCount: v.scannedCount,
+      pricedCount: priced,
+    };
   });
 
   async function loadRadarMatch(
@@ -392,12 +430,14 @@ export function useSteamInsights() {
         success: boolean;
         data: {
           total: number;
+          friends?: typeof friendsLive.value.friends;
           playing: typeof friendsLive.value.playing;
         };
       }>("/api/steam/friends", { query: { steamId: steamId.value } });
       friendsLive.value = {
         loading: false,
         total: res?.data?.total || 0,
+        friends: res?.data?.friends || [],
         playing: res?.data?.playing || [],
         privateOrFail: !res?.success,
       };
@@ -405,6 +445,7 @@ export function useSteamInsights() {
       friendsLive.value = {
         loading: false,
         total: 0,
+        friends: [],
         playing: [],
         privateOrFail: true,
       };
@@ -439,6 +480,7 @@ export function useSteamInsights() {
     hub,
     libraryValue,
     libraryValueDisplay,
+    libraryValueStats,
     setDisplayCurrency,
     yearRecap,
     radarMatch,

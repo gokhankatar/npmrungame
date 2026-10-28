@@ -15,11 +15,10 @@ withDefaults(
           <span class="sgs__shine" />
           <span class="sgs__pill sgs__pill--l" />
           <span class="sgs__pill sgs__pill--r" />
-        </div>
-        <div class="sgs__body">
-          <i class="sgs__line sgs__line--title" />
-          <i class="sgs__line sgs__line--bar" />
-          <i class="sgs__line sgs__line--meta" />
+          <div class="sgs__foot">
+            <i class="sgs__line sgs__line--title" />
+            <i class="sgs__line sgs__line--bar" />
+          </div>
         </div>
       </div>
     </li>
@@ -32,20 +31,31 @@ withDefaults(
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.05rem;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.95rem;
+}
+@media (max-width: 1100px) {
+  .sgs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .sgs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
 }
 .sgs__card {
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(105, 240, 174, 0.12);
-  background: linear-gradient(180deg, #0f1c17, #0a1210);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0a0e14;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
 }
 .sgs__media {
   position: relative;
-  aspect-ratio: 460 / 215;
-  background: linear-gradient(145deg, #15241e 0%, #0d1612 100%);
+  aspect-ratio: 2 / 3;
+  background: linear-gradient(145deg, #1a222c 0%, #0e1319 100%);
   overflow: hidden;
 }
 .sgs__shine {
@@ -76,31 +86,32 @@ withDefaults(
   right: 0.55rem;
   width: 2.6rem;
 }
-.sgs__body {
+.sgs__foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.75rem 0.85rem 0.9rem;
+  gap: 0.4rem;
+  padding: 0.65rem 0.7rem 0.75rem;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.75));
 }
 .sgs__line {
   display: block;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   height: 0.72rem;
 }
 .sgs__line--title {
   width: 78%;
-  height: 0.85rem;
+  height: 0.75rem;
 }
 .sgs__line--bar {
   width: 100%;
   height: 0.28rem;
   opacity: 0.7;
-}
-.sgs__line--meta {
-  width: 42%;
-  height: 0.55rem;
-  opacity: 0.65;
 }
 
 @keyframes sgs-shine {
@@ -110,27 +121,5 @@ withDefaults(
   100% {
     background-position: -80% 0;
   }
-}
-
-:global(.panel-shell[data-theme="light"]) .sgs__card {
-  background: var(--panel-card, #ced5e0);
-  border-color: var(--panel-card-border, rgb(15 23 42 / 0.16));
-  box-shadow: var(--panel-card-shadow, 0 1px 2px rgb(15 23 42 / 0.06));
-}
-:global(.panel-shell[data-theme="light"]) .sgs__media {
-  background: linear-gradient(145deg, #b4bcc9 0%, #a8b1c0 100%);
-}
-:global(.panel-shell[data-theme="light"]) .sgs__shine {
-  background: linear-gradient(
-    110deg,
-    transparent 22%,
-    rgb(255 255 255 / 0.2) 45%,
-    transparent 68%
-  );
-  background-size: 220% 100%;
-}
-:global(.panel-shell[data-theme="light"]) .sgs__pill,
-:global(.panel-shell[data-theme="light"]) .sgs__line {
-  background: rgb(15 23 42 / 0.12);
 }
 </style>

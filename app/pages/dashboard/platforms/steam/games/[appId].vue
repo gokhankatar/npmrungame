@@ -380,7 +380,7 @@ watch(
   isolation: isolate;
   overflow: hidden;
   border-radius: 20px;
-  min-height: 220px;
+  min-height: 300px;
   background: #0d1f18 center / cover no-repeat;
   border: 1px solid rgba(20, 40, 32, 0.12);
   box-shadow: 0 18px 40px rgba(8, 24, 18, 0.16);
@@ -402,9 +402,11 @@ watch(
 .sg-hero__inner {
   position: relative;
   z-index: 1;
-  padding: 1.25rem 1.35rem 1.4rem;
+  min-height: 300px;
+  padding: 1.45rem 1.5rem 1.6rem;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   gap: 0.55rem;
 }
 .sg-back {
@@ -523,11 +525,12 @@ watch(
   background: color-mix(in srgb, var(--panel-accent, #69f0ae) 22%, transparent);
   color: inherit;
 }
-:global(.panel-shell[data-theme="light"]) .sg-chip {
+/* :global(.x[attr]) .y  → Vue scoped .y’yi düşürüp stilleri panel-shell’e basıyordu */
+:global(.panel-shell[data-theme="light"] .sg-chip) {
   background: #c2cad6;
   color: #334155;
 }
-:global(.panel-shell[data-theme="light"]) .sg-chip--on {
+:global(.panel-shell[data-theme="light"] .sg-chip--on) {
   color: #047857;
   background: rgb(4 120 87 / 0.1);
   border-color: #047857;
@@ -654,18 +657,18 @@ watch(
 .sg-row > div {
   min-width: 0;
 }
-:global(.panel-shell[data-theme="light"]) .sg-row {
+:global(.panel-shell[data-theme="light"] .sg-row) {
   background: #ced5e0;
   border-color: rgb(15 23 42 / 0.14);
   box-shadow: none;
 }
-:global(.panel-shell[data-theme="light"]) .sg-row strong {
+:global(.panel-shell[data-theme="light"] .sg-row strong) {
   color: #0f172a;
 }
-:global(.panel-shell[data-theme="light"]) .sg-row p {
+:global(.panel-shell[data-theme="light"] .sg-row p) {
   color: #475569;
 }
-:global(.panel-shell[data-theme="light"]) .sg-row--off {
+:global(.panel-shell[data-theme="light"] .sg-row--off) {
   background: #c2cad6;
   opacity: 0.78;
 }

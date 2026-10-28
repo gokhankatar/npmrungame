@@ -73,7 +73,14 @@ export function steamCoverCandidates(
 }
 
 const STEAM_STORE_UA =
-  "Mozilla/5.0 (compatible; npmrungame-panel/1.0)";
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+
+const STEAM_STORE_HEADERS = {
+  "User-Agent": STEAM_STORE_UA,
+  Accept: "application/json,text/plain,*/*",
+  "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
+  Referer: "https://store.steampowered.com/",
+};
 
 /** Store appdetails — hash’li gerçek kapak URL’si */
 export async function fetchSteamStoreHeader(
@@ -85,7 +92,7 @@ export async function fetchSteamStoreHeader(
       {
         params: { appids: String(appId), filters: "basic" },
         timeout: 8_000,
-        headers: { "User-Agent": STEAM_STORE_UA },
+        headers: STEAM_STORE_HEADERS,
       }
     );
     const row = data?.[String(appId)]?.data;
@@ -112,8 +119,117 @@ export type SteamStorePrice = {
   headerUrl: string | null;
 };
 
-/** Store appdetails — fiyat + indirim (+ opsiyonel kapak) */
-export async function fetchSteamStorePrice(
+function currencyFromFormattedPrice(formatted: unknown): string | null {
+  const s = String(formatted || "");
+  if (!s) return null;
+  if (s.includes("₺") || /TL|TRY/i.test(s)) return "TRY";
+  if (s.includes("$") || /USD/i.test(s)) return "USD";
+  if (s.includes("€") || /EUR/i.test(s)) return "EUR";
+  if (s.includes("£") || /GBP/i.test(s)) return "GBP";
+  return null;
+}
+
+function centsFromSteamField(raw: unknown): number | null {
+  if (typeof raw === "number" && Number.isFinite(raw)) return Math.round(raw);
+  if (typeof raw === "string" && /^\d+$/.test(raw.trim())) {
+    return Number(raw.trim());
+  }
+  return null;
+}
+
+/**
+ * Web API IStoreBrowseService/GetItems — store.steampowered.com Akamai 403
+ * engelinde de çalışır (api.steampowered.com + STEAM_WEB_API_KEY).
+ */
+export async function fetchSteamStorePrices(
+  appIds: Array<number | string>,
+  opts?: { cc?: string; lang?: string; concurrency?: number }
+): Promise<SteamStorePrice[]> {
+  const ids = [...new Set(appIds.map(Number).filter((n) => n > 0))];
+  if (!ids.length) return [];
+
+  const key = requireSteamApiKey();
+  const cc = (opts?.cc || "TR").toUpperCase().slice(0, 2);
+  const lang = opts?.lang || "turkish";
+  const out: SteamStorePrice[] = [];
+  const chunk = 25;
+
+  for (let i = 0; i < ids.length; i += chunk) {
+    const batch = ids.slice(i, i + chunk);
+    const input = {
+      ids: batch.map((appid) => ({ appid })),
+      context: { language: lang, country_code: cc },
+      data_request: { include_all_purchase_options: true },
+    };
+    try {
+      const data = await $fetch<{
+        response?: { store_items?: Array<Record<string, any>> };
+      }>("https://api.steampowered.com/IStoreBrowseService/GetItems/v1/", {
+        params: {
+          key,
+          input_json: JSON.stringify(input),
+        },
+        timeout: 20_000,
+      });
+
+      for (const it of data?.response?.store_items || []) {
+        const appId = Number(it.appid || 0);
+        if (!appId) continue;
+        const isFree = !!it.is_free;
+        const best = it.best_purchase_option || null;
+        const final = centsFromSteamField(best?.final_price_in_cents);
+        const initial =
+          centsFromSteamField(
+            best?.original_price_in_cents ?? best?.initial_price_in_cents
+          ) ?? final;
+        const discountPct =
+          typeof best?.discount_pct === "number"
+            ? best.discount_pct
+            : typeof best?.discount_percent === "number"
+              ? best.discount_percent
+              : 0;
+        const currency =
+          currencyFromFormattedPrice(best?.formatted_final_price) ||
+          (cc === "TR" ? "TRY" : cc) ||
+          "USD";
+
+        out.push({
+          appId,
+          name: typeof it.name === "string" ? it.name : null,
+          currency: final != null ? currency : isFree ? currency : null,
+          final: final != null ? final : isFree ? 0 : null,
+          initial: initial != null ? initial : isFree ? 0 : null,
+          discountPct,
+          isFree,
+          headerUrl: null,
+        });
+      }
+    } catch {
+      // batch fail → sonraki chunk
+    }
+  }
+
+  // Eksik kalanlar için eski store appdetails (çoğu IP’de 403)
+  const have = new Set(out.map((r) => r.appId));
+  const missing = ids.filter((id) => !have.has(id));
+  if (missing.length) {
+    const concurrency = Math.max(1, Math.min(opts?.concurrency || 3, 5));
+    for (let i = 0; i < missing.length; i += concurrency) {
+      const batch = missing.slice(i, i + concurrency);
+      const rows = await Promise.all(
+        batch.map((id) => fetchSteamStorePriceAppdetails(id, opts))
+      );
+      for (const row of rows) {
+        if (row) out.push(row);
+      }
+    }
+  }
+
+  return out;
+}
+
+/** Store appdetails — fiyat + indirim (+ opsiyonel kapak); Akamai sık 403 verir */
+async function fetchSteamStorePriceAppdetails(
   appId: number | string,
   opts?: { cc?: string; lang?: string }
 ): Promise<SteamStorePrice | null> {
@@ -125,12 +241,11 @@ export async function fetchSteamStorePrice(
       {
         params: {
           appids: String(id),
-          filters: "price_overview,basic",
           cc: opts?.cc || "TR",
           l: opts?.lang || "turkish",
         },
         timeout: 8_000,
-        headers: { "User-Agent": STEAM_STORE_UA },
+        headers: STEAM_STORE_HEADERS,
       }
     );
     const pack = data?.[String(id)];
@@ -144,33 +259,22 @@ export async function fetchSteamStorePrice(
       currency: po?.currency || null,
       final: typeof po?.final === "number" ? po.final : isFree ? 0 : null,
       initial: typeof po?.initial === "number" ? po.initial : isFree ? 0 : null,
-      discountPct: typeof po?.discount_percent === "number" ? po.discount_percent : 0,
+      discountPct:
+        typeof po?.discount_percent === "number" ? po.discount_percent : 0,
       isFree,
       headerUrl:
-        (typeof row.header_image === "string" && row.header_image) ||
-        null,
+        (typeof row.header_image === "string" && row.header_image) || null,
     };
   } catch {
     return null;
   }
 }
 
-/** Rate-limit dostu batch fiyat */
-export async function fetchSteamStorePrices(
-  appIds: Array<number | string>,
-  opts?: { cc?: string; lang?: string; concurrency?: number }
-): Promise<SteamStorePrice[]> {
-  const ids = [...new Set(appIds.map(Number).filter((n) => n > 0))];
-  const out: SteamStorePrice[] = [];
-  const concurrency = Math.max(1, Math.min(opts?.concurrency || 5, 8));
-  for (let i = 0; i < ids.length; i += concurrency) {
-    const batch = ids.slice(i, i + concurrency);
-    const rows = await Promise.all(
-      batch.map((id) => fetchSteamStorePrice(id, opts))
-    );
-    for (const row of rows) {
-      if (row) out.push(row);
-    }
-  }
-  return out;
+/** Tekil fiyat (browse batch üzerinden) */
+export async function fetchSteamStorePrice(
+  appId: number | string,
+  opts?: { cc?: string; lang?: string }
+): Promise<SteamStorePrice | null> {
+  const rows = await fetchSteamStorePrices([appId], opts);
+  return rows[0] || null;
 }

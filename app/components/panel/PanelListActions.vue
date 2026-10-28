@@ -137,6 +137,28 @@ async function onPdf() {
   cursor: not-allowed;
 }
 
+/* Light: beyaz yazı kayboluyordu — dışa aktar ile aynı kontrast */
+:global(.panel-shell[data-theme="light"]) .pla__edit {
+  border-color: rgb(15 23 42 / 0.18);
+  background: color-mix(in srgb, var(--panel-card, #ced5e0) 88%, #fff);
+  color: var(--panel-text, #0f172a);
+}
+:global(.panel-shell[data-theme="light"]) .pla__edit:hover:not(:disabled) {
+  background: #fff;
+  border-color: color-mix(in srgb, var(--panel-accent, #047857) 45%, transparent);
+  color: var(--panel-accent, #047857);
+}
+:global(.panel-shell[data-theme="light"]) .pla__edit--active {
+  border-color: rgb(185 28 28 / 0.45);
+  background: rgb(254 226 226 / 0.85);
+  color: #b91c1c;
+}
+:global(.panel-shell[data-theme="light"]) .pla__edit--active:hover:not(:disabled) {
+  border-color: rgb(185 28 28 / 0.65);
+  background: rgb(254 202 202 / 0.95);
+  color: #991b1b;
+}
+
 .pla__add {
   display: inline-flex;
   align-items: center;

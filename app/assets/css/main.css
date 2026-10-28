@@ -39,6 +39,15 @@ html.dark .v-application {
   --v-theme-surface: 12, 18, 32 !important;
 }
 
+/*
+  Guard: bozuk scoped :global(.panel-shell[data-theme]) .child kuralları
+  opacity/background’i panel-shell’e sızdırıp light’ta “aşırı parlak” yapıyordu.
+*/
+.panel-shell[data-theme="light"],
+.panel-shell[data-theme="dark"] {
+  opacity: 1 !important;
+}
+
 .transition {
   transition: all 0.3s ease;
 }

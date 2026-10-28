@@ -13,7 +13,17 @@ const RAIL_STORAGE_KEY = "npmrungame.panel.rail";
 const { tx } = useAppLocale();
 const { theme } = useAppTheme();
 const route = useRoute();
-const { displayName } = useUserProfile();
+const { displayName, avatarSrc, user } = useUserProfile();
+const userEmail = computed(() => String(user.value?.email || "").trim());
+const userInitials = computed(() => {
+  const n = displayName.value.trim();
+  if (!n) return "?";
+  const parts = n.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0]![0] || ""}${parts[1]![0] || ""}`.toUpperCase();
+  }
+  return n.slice(0, 2).toUpperCase();
+});
 const _store = store();
 const mobileOpen = ref(false);
 const rail = ref(false);
@@ -130,14 +140,24 @@ watch(
     >
       <div class="panel-sidebar__head">
         <NuxtLink
-          to="/dashboard"
-          class="panel-brand panel-brand--sidebar"
+          to="/dashboard/account"
+          class="panel-user"
           :title="displayName"
         >
-          <img src="/media/brand/channel-avatar.jpg" alt="" class="panel-brand__logo" />
-          <div class="panel-brand__meta">
-            <strong class="panel-brand__title">{{ tx("panel.brand") }}</strong>
-            <small>{{ displayName }}</small>
+          <img
+            v-if="avatarSrc"
+            :src="avatarSrc"
+            alt=""
+            class="panel-user__avatar"
+          />
+          <span
+            v-else
+            class="panel-user__avatar panel-user__avatar--fallback"
+            aria-hidden="true"
+          >{{ userInitials }}</span>
+          <div class="panel-user__meta">
+            <strong>{{ displayName }}</strong>
+            <small v-if="userEmail">{{ userEmail }}</small>
           </div>
         </NuxtLink>
 
@@ -402,26 +422,53 @@ watch(
   }
 }
 
-.panel-brand--sidebar {
-  align-items: flex-start;
+.panel-user {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
   flex: 1;
+  min-width: 0;
   margin-right: 0;
+  padding: 0.15rem 0;
+  color: inherit;
+  text-decoration: none;
+}
+.panel-user__avatar {
+  width: 2.45rem;
+  height: 2.45rem;
+  border-radius: 9999px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1.5px solid var(--panel-border);
+  background: var(--panel-soft, rgb(0 0 0 / 0.22));
+}
+.panel-user__avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--panel-accent, #69f0ae);
+  background: var(--panel-icon-bg, rgb(105 240 174 / 0.12));
+  border-color: var(--panel-icon-border, rgb(105 240 174 / 0.28));
+}
+.panel-user__meta {
   min-width: 0;
 }
-
-.panel-brand__meta {
-  min-width: 0;
-}
-
-.panel-brand--sidebar strong {
+.panel-user__meta strong {
   display: block;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--panel-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
-.panel-brand--sidebar small {
+.panel-user__meta small {
   display: block;
-  margin-top: 0.15rem;
-  font-size: 0.75rem;
+  margin-top: 0.18rem;
+  font-size: 0.72rem;
   font-weight: 500;
   color: var(--panel-muted);
   overflow: hidden;
@@ -645,12 +692,12 @@ watch(
     padding: 0.85rem 0.4rem;
   }
 
-  .panel-sidebar--rail .panel-brand--sidebar {
+  .panel-sidebar--rail .panel-user {
     justify-content: center;
     align-items: center;
   }
 
-  .panel-sidebar--rail .panel-brand__meta,
+  .panel-sidebar--rail .panel-user__meta,
   .panel-sidebar--rail .panel-nav__label {
     display: none;
   }

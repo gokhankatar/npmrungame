@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PanelEmptyState from "~/components/panel/PanelEmptyState.vue";
 import PanelPageTitle from "~/components/panel/PanelPageTitle.vue";
 import SteamAchievementsPanel from "~/components/panel/SteamAchievementsPanel.vue";
 import SteamGameSkeleton from "~/components/panel/SteamGameSkeleton.vue";
@@ -7,9 +8,13 @@ import { useAppLocale } from "~/composables/useAppLocale";
 import { useUserProfile } from "~/composables/useUserProfile";
 import { useSteamHub } from "~/composables/useSteamHub";
 import {
-  advanceSteamCover,
+  clearPortraitCoverFit,
+  syncPortraitCoverFit,
+} from "~/utils/portraitCoverFit";
+import {
+  advanceSteamPortraitCover,
   enrichSteamCoversFromStore,
-  steamCoverSrc,
+  steamPortraitSrc,
 } from "~/utils/steamCover";
 
 definePageMeta({
@@ -18,9 +23,8 @@ definePageMeta({
   middleware: "auth",
 });
 
-const { tx } = useAppLocale();
+const { tx, locale } = useAppLocale();
 const { user } = useUserProfile();
-
 useSeoMeta({
   title: () => `${tx("panel.steam.title")} | npmrungame`,
   robots: "noindex, nofollow",
@@ -63,13 +67,55 @@ const sortMenuOpen = ref(false);
 const sortRoot = ref<HTMLElement | null>(null);
 const filterPlatinum = ref(false);
 const filterUnderOneHour = ref(false);
+const LIBRARY_VIEW_KEY = "npmrungame.steam.libraryView";
+const libraryView = ref<"grid" | "list">("grid");
+
+function clearAllListCoverFits() {
+  document
+    .querySelectorAll<HTMLImageElement>(
+      ".steam-card--list .steam-card__img:not(.steam-card__img--bleed)"
+    )
+    .forEach((img) => clearPortraitCoverFit(img, steamCardCoverFit));
+}
+
+function resyncGridCoverFits() {
+  document
+    .querySelectorAll<HTMLImageElement>(
+      ".steam-card:not(.steam-card--list) .steam-card__img:not(.steam-card__img--bleed)"
+    )
+    .forEach((img) => {
+      if (img.complete && img.naturalWidth) {
+        syncPortraitCoverFit(img, steamCardCoverFit);
+      }
+    });
+}
+
+watch(libraryView, (v) => {
+  try {
+    localStorage.setItem(LIBRARY_VIEW_KEY, v);
+  } catch {
+    /* ignore */
+  }
+  nextTick(() => {
+    if (v === "list") clearAllListCoverFits();
+    else resyncGridCoverFits();
+  });
+});
 
 function onDocClick(e: MouseEvent) {
   if (!sortMenuOpen.value || !sortRoot.value) return;
   if (!sortRoot.value.contains(e.target as Node)) sortMenuOpen.value = false;
 }
 
-onMounted(() => document.addEventListener("click", onDocClick));
+onMounted(() => {
+  document.addEventListener("click", onDocClick);
+  try {
+    const v = localStorage.getItem(LIBRARY_VIEW_KEY);
+    if (v === "grid" || v === "list") libraryView.value = v;
+  } catch {
+    /* ignore */
+  }
+});
 onBeforeUnmount(() => document.removeEventListener("click", onDocClick));
 
 const sortOptions = computed(() => [
@@ -149,8 +195,39 @@ function formatHoursLabel(min: number) {
   return `${hours(min)} ${tx("panel.steam.hours")}`;
 }
 
+function formatLastPlayed(ts?: number) {
+  if (!ts) return tx("panel.steam.lastPlayedNever");
+  return new Date(ts * 1000).toLocaleDateString(
+    locale.value === "en" ? "en-GB" : "tr-TR",
+    { day: "numeric", month: "short", year: "numeric" }
+  );
+}
+
+function listCoverSrc(g: SteamGame) {
+  return g.headerUrl || steamPortraitSrc(g);
+}
+
+const steamCardCoverFit = {
+  mediaSelector: ".steam-card__media",
+  imgBaseClass: "steam-card__img",
+  bleedClass: "steam-card__img--bleed",
+  fgClass: "steam-card__img--fg",
+  mediaWideClass: "steam-card__media--wide",
+} as const;
+
+function onCoverLoad(e: Event) {
+  const el = e.target as HTMLImageElement;
+  /* Liste: tek kapak — bleed/fg yok */
+  if (el.closest(".steam-card--list")) {
+    clearPortraitCoverFit(el, steamCardCoverFit);
+    return;
+  }
+  syncPortraitCoverFit(el, steamCardCoverFit);
+}
+
 function onCoverError(e: Event, g: SteamGame) {
-  advanceSteamCover(e, g);
+  clearPortraitCoverFit(e.target as HTMLImageElement, steamCardCoverFit);
+  advanceSteamPortraitCover(e, g);
 }
 
 /** 1 saatten az oynananlar listede yok — chip’te sayılır */
@@ -479,7 +556,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="steam-hub">
+  <div
+    class="steam-hub"
+    :class="{
+      'steam-hub--shelf':
+        tab === 'library' || tab === 'achievements' || tab === 'recent',
+    }"
+  >
     <header class="steam-hub__head">
       <div>
         <PanelPageTitle :text="tx('panel.steam.title')" />
@@ -572,8 +655,6 @@ onMounted(() => {
       </section>
 
       <p v-if="errorMsg" class="steam-msg steam-msg--err">{{ errorMsg }}</p>
-      <p class="steam-note">{{ tx("panel.steam.notePlatinum") }}</p>
-
       <div class="steam-tabs" role="tablist">
         <button
           type="button"
@@ -620,7 +701,10 @@ onMounted(() => {
         </button>
       </div>
 
-      <div v-if="loading && tab !== 'insights'" class="steam-skel">
+      <div
+        v-if="loading && tab !== 'insights'"
+        class="steam-pane steam-skel"
+      >
         <div class="steam-skel__toolbar" aria-hidden="true">
           <span class="steam-skel__search" />
           <span class="steam-skel__sort" />
@@ -637,21 +721,28 @@ onMounted(() => {
         :ready="!loading"
       />
 
-      <SteamAchievementsPanel
+      <div
         v-else-if="tab === 'achievements'"
-        :games="playedLibrary"
-        :platinum-count="platinumCount"
-        :progress-scanning="progressScanning"
-        :loading="loading"
-        :get-progress="getProgress"
-      />
+        class="steam-pane steam-pane--ach"
+      >
+        <SteamAchievementsPanel
+          :games="playedLibrary"
+          :platinum-count="platinumCount"
+          :progress-scanning="progressScanning"
+          :loading="loading"
+          :get-progress="getProgress"
+        />
+      </div>
 
-      <template v-else-if="tab === 'library'">
+      <div
+        v-else-if="tab === 'library'"
+        class="steam-pane"
+      >
         <div class="steam-toolbar">
           <input
             v-model="search"
             type="search"
-            class="steam-search"
+            class="steam-search steam-search--compact"
             :placeholder="tx('panel.steam.search')"
           />
 
@@ -664,10 +755,7 @@ onMounted(() => {
               @click="sortMenuOpen = !sortMenuOpen"
             >
               <v-icon icon="mdi-sort-variant" size="18" />
-              <span class="steam-sort__meta">
-                <small>{{ tx("panel.steam.sortLabel") }}</small>
-                <strong>{{ sortLabel }}</strong>
-              </span>
+              <span class="steam-sort__label">{{ sortLabel }}</span>
               <v-icon
                 :icon="sortMenuOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
                 size="18"
@@ -700,6 +788,34 @@ onMounted(() => {
             </ul>
           </div>
 
+          <div class="steam-view" role="group" :aria-label="tx('panel.steam.library')">
+            <button
+              type="button"
+              class="steam-view__btn"
+              :class="{ 'steam-view__btn--on': libraryView === 'grid' }"
+              :aria-pressed="libraryView === 'grid'"
+              :title="tx('panel.steam.viewGrid')"
+              @click="libraryView = 'grid'"
+            >
+              <v-icon icon="mdi-view-grid-outline" size="20" />
+            </button>
+            <button
+              type="button"
+              class="steam-view__btn"
+              :class="{ 'steam-view__btn--on': libraryView === 'list' }"
+              :aria-pressed="libraryView === 'list'"
+              :title="tx('panel.steam.viewList')"
+              @click="libraryView = 'list'"
+            >
+              <v-icon icon="mdi-view-list-outline" size="20" />
+            </button>
+          </div>
+        </div>
+
+        <div
+          v-if="platinumCount > 0 || progressScanning || underOneHourCount > 0"
+          class="steam-filters"
+        >
           <button
             v-if="platinumCount > 0 || progressScanning"
             type="button"
@@ -738,45 +854,121 @@ onMounted(() => {
             {{ underOneHourChip }}
           </button>
         </div>
-        <ul class="steam-grid">
+
+        <ul
+          :class="libraryView === 'list' ? 'steam-list' : 'steam-grid'"
+        >
           <li v-for="g in filteredLibrary" :key="g.appId">
             <NuxtLink
               :to="`/dashboard/platforms/steam/games/${g.appId}`"
               class="steam-card"
               :class="{
                 'steam-card--plat': getProgress(g.appId)?.isComplete,
+                'steam-card--list': libraryView === 'list',
               }"
               :aria-label="g.name"
             >
               <div class="steam-card__media">
                 <img
-                  :src="steamCoverSrc(g)"
+                  :src="
+                    libraryView === 'list'
+                      ? listCoverSrc(g)
+                      : steamPortraitSrc(g)
+                  "
                   :alt="g.name"
                   class="steam-card__img"
                   loading="lazy"
+                  @load="onCoverLoad"
                   @error="onCoverError($event, g)"
                 />
                 <div class="steam-card__shade" aria-hidden="true" />
-                <span class="steam-card__hours">
-                  <v-icon icon="mdi-clock-outline" size="14" />
-                  {{ formatHoursLabel(g.playtimeForeverMin) }}
-                </span>
-                <span
-                  v-if="getProgress(g.appId)?.isComplete"
-                  class="steam-card__plat"
-                >
-                  <v-icon icon="mdi-trophy" size="14" />
-                  {{ tx("panel.steam.platinum") }} · %100
-                </span>
-                <span
-                  v-else-if="progressLabel(g.appId)"
-                  class="steam-card__pct"
-                >
-                  {{ progressLabel(g.appId) }}
-                </span>
+                <template v-if="libraryView !== 'list'">
+                  <span class="steam-card__hours">
+                    <v-icon icon="mdi-clock-outline" size="14" />
+                    {{ formatHoursLabel(g.playtimeForeverMin) }}
+                  </span>
+                  <span
+                    v-if="getProgress(g.appId)?.isComplete"
+                    class="steam-card__plat"
+                  >
+                    <v-icon icon="mdi-trophy" size="14" />
+                    {{ tx("panel.steam.platinum") }} · %100
+                  </span>
+                  <span
+                    v-else-if="progressLabel(g.appId)"
+                    class="steam-card__pct"
+                  >
+                    {{ progressLabel(g.appId) }}
+                  </span>
+                </template>
               </div>
               <div class="steam-card__body">
-                <strong class="steam-card__name" :title="g.name">{{ g.name }}</strong>
+                <strong class="steam-card__name" :title="g.name">{{
+                  g.name
+                }}</strong>
+                <div v-if="libraryView === 'list'" class="steam-card__facts">
+                  <div class="steam-card__fact">
+                    <span class="steam-card__fact-l">{{
+                      tx("panel.steam.totalPlay")
+                    }}</span>
+                    <strong class="steam-card__fact-v">
+                      <v-icon icon="mdi-clock-outline" size="15" />
+                      {{ formatHoursLabel(g.playtimeForeverMin) }}
+                    </strong>
+                  </div>
+                  <div class="steam-card__fact">
+                    <span class="steam-card__fact-l">{{
+                      tx("panel.steam.completionLabel")
+                    }}</span>
+                    <strong
+                      class="steam-card__fact-v"
+                      :class="{
+                        'steam-card__fact-v--plat': getProgress(g.appId)
+                          ?.isComplete,
+                      }"
+                    >
+                      <v-icon
+                        :icon="
+                          getProgress(g.appId)?.isComplete
+                            ? 'mdi-trophy'
+                            : 'mdi-chart-arc'
+                        "
+                        size="15"
+                      />
+                      <template v-if="getProgress(g.appId)?.isComplete">
+                        {{ tx("panel.steam.platinum") }} · %100
+                      </template>
+                      <template v-else-if="progressLabel(g.appId)">
+                        {{ progressLabel(g.appId) }}
+                      </template>
+                      <template v-else>
+                        {{ cardAchMeta(g.appId).label }}
+                      </template>
+                    </strong>
+                  </div>
+                  <div class="steam-card__fact">
+                    <span class="steam-card__fact-l">{{
+                      tx("panel.steam.lastPlayedLabel")
+                    }}</span>
+                    <strong class="steam-card__fact-v">
+                      <v-icon icon="mdi-calendar-outline" size="15" />
+                      {{ formatLastPlayed(g.lastPlayed) }}
+                    </strong>
+                  </div>
+                  <div
+                    v-if="g.playtime2WeeksMin > 0"
+                    class="steam-card__fact"
+                  >
+                    <span class="steam-card__fact-l">{{
+                      tx("panel.steam.weeksPlay")
+                    }}</span>
+                    <strong class="steam-card__fact-v">
+                      <v-icon icon="mdi-history" size="15" />
+                      {{ hours(g.playtime2WeeksMin) }}
+                      {{ tx("panel.steam.hours") }}
+                    </strong>
+                  </div>
+                </div>
                 <span
                   class="steam-card__bar-wrap"
                   :class="{
@@ -794,40 +986,68 @@ onMounted(() => {
                   </span>
                   <em>{{ cardAchMeta(g.appId).label }}</em>
                 </span>
+                <v-icon
+                  v-if="libraryView === 'list'"
+                  icon="mdi-chevron-right"
+                  size="22"
+                  class="steam-card__chev"
+                />
               </div>
             </NuxtLink>
           </li>
         </ul>
-      </template>
+      </div>
 
-      <ul v-else-if="tab === 'recent'" class="steam-grid">
-        <li v-for="g in recentVisible" :key="g.appId">
-          <NuxtLink
-            :to="`/dashboard/platforms/steam/games/${g.appId}`"
-            class="steam-card"
-            :aria-label="g.name"
-          >
-            <div class="steam-card__media">
-              <img
-                :src="steamCoverSrc(g)"
-                :alt="g.name"
-                class="steam-card__img"
-                loading="lazy"
-                @error="onCoverError($event, g)"
-              />
-              <div class="steam-card__shade" aria-hidden="true" />
-              <span class="steam-card__hours">
-                <v-icon icon="mdi-clock-outline" size="14" />
-                {{ hours(g.playtime2WeeksMin) }} {{ tx("panel.steam.hours") }}
-                · 2w
-              </span>
-            </div>
-            <div class="steam-card__body">
-              <strong class="steam-card__name">{{ g.name }}</strong>
-            </div>
-          </NuxtLink>
-        </li>
-      </ul>
+      <div
+        v-else-if="tab === 'recent'"
+        class="steam-pane"
+      >
+        <div v-if="!recentVisible.length" class="steam-recent-empty">
+          <PanelEmptyState
+            icon="mdi-calendar-clock-outline"
+            :title="tx('panel.steam.recentEmptyTitle')"
+            :description="tx('panel.steam.recentEmptyBody')"
+            :tips="[
+              {
+                icon: 'mdi-information-outline',
+                text: tx('panel.steam.recentEmptyTip'),
+              },
+            ]"
+            :primary-action-text="tx('panel.steam.recentEmptyCta')"
+            primary-action-icon="mdi-bookshelf"
+            @primary-action="tab = 'library'"
+          />
+        </div>
+        <ul v-else class="steam-grid">
+          <li v-for="g in recentVisible" :key="g.appId">
+            <NuxtLink
+              :to="`/dashboard/platforms/steam/games/${g.appId}`"
+              class="steam-card"
+              :aria-label="g.name"
+            >
+              <div class="steam-card__media">
+                <img
+                  :src="steamPortraitSrc(g)"
+                  :alt="g.name"
+                  class="steam-card__img"
+                  loading="lazy"
+                  @load="onCoverLoad"
+                  @error="onCoverError($event, g)"
+                />
+                <div class="steam-card__shade" aria-hidden="true" />
+                <span class="steam-card__hours">
+                  <v-icon icon="mdi-clock-outline" size="14" />
+                  {{ hours(g.playtime2WeeksMin) }} {{ tx("panel.steam.hours") }}
+                  · 2w
+                </span>
+                <div class="steam-card__body">
+                  <strong class="steam-card__name">{{ g.name }}</strong>
+                </div>
+              </div>
+            </NuxtLink>
+          </li>
+        </ul>
+      </div>
 
     </template>
   </div>
@@ -909,7 +1129,7 @@ onMounted(() => {
   isolation: isolate;
   overflow: hidden;
   border-radius: 24px;
-  min-height: 240px;
+  min-height: 300px;
   border: 1px solid rgba(105, 240, 174, 0.18);
   background: linear-gradient(135deg, #0a1813 0%, #143028 55%, #07140f 100%);
   box-shadow:
@@ -918,11 +1138,12 @@ onMounted(() => {
 }
 .steam-banner__bg {
   position: absolute;
-  inset: -6%;
+  inset: -2%;
   background-size: cover;
-  background-position: center 28%;
+  /* Steam header’larda logo/üst kompozisyon genelde üstte; cover kırpınca top’a yasla */
+  background-position: center top;
   filter: saturate(1.15) brightness(0.62) contrast(1.05);
-  transform: scale(1.04);
+  transform: scale(1.01);
   z-index: 0;
 }
 .steam-banner__veil {
@@ -952,19 +1173,19 @@ onMounted(() => {
   align-items: flex-end;
   justify-content: space-between;
   gap: 1.5rem;
-  padding: 1.85rem 1.75rem 1.65rem;
-  min-height: 240px;
+  padding: 2.15rem 1.9rem 1.85rem;
+  min-height: 300px;
 }
 .steam-banner__profile {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1.25rem;
   min-width: 0;
 }
 .steam-banner__av {
-  width: 112px;
-  height: 112px;
-  border-radius: 26px;
+  width: 120px;
+  height: 120px;
+  border-radius: 28px;
   object-fit: cover;
   border: 3px solid rgba(105, 240, 174, 0.65);
   box-shadow:
@@ -1103,11 +1324,6 @@ onMounted(() => {
 .steam-banner__stat--plat .steam-banner__stat-n {
   color: #f5d76e;
 }
-.steam-note {
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--panel-muted, #64748b);
-}
 .steam-msg {
   margin: 0;
   padding: 0.65rem 0.85rem;
@@ -1148,31 +1364,59 @@ onMounted(() => {
   background: transparent;
 }
 .steam-tab--on {
-  background: transparent;
-  border-color: var(--panel-accent, #059669);
-  color: var(--panel-accent, #059669);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--panel-accent, #059669) 35%, transparent);
+  background: color-mix(in srgb, var(--panel-accent, #047857) 18%, var(--panel-soft, #c2cad6));
+  border-color: var(--panel-accent, #047857);
+  color: var(--panel-accent, #047857);
+  box-shadow: none;
 }
 .steam-tab__count {
   font-size: 0.75rem;
   opacity: 0.75;
 }
+/*
+ * Banner/başlık tüm sekmelerde aynı — Keşif’te sorun yok.
+ * Kütüphane/Başarım: soft kart dolgusu yok → boş #b9c1cf deniz + toolbar
+ * (panel-card #ced5e0 zeminden DAHA AÇIK) = “sayfa parladı”.
+ */
+.steam-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 .steam-toolbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem;
+  align-items: stretch;
+  gap: 0.55rem;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
 }
 .steam-search {
   flex: 1 1 200px;
   min-width: 0;
-  padding: 0.7rem 0.95rem;
+  height: 2.75rem;
+  box-sizing: border-box;
+  padding: 0 0.95rem;
   border-radius: 12px;
   border: 1px solid var(--panel-card-border, rgb(15 23 42 / 0.12));
-  background: var(--panel-soft, #dde3ec);
+  background: var(--panel-card, #0c1220);
   color: var(--panel-text, #0f172a);
   font-size: 0.9rem;
   box-shadow: none;
+}
+.steam-search--compact {
+  flex: 0 1 240px;
+  max-width: 260px;
+  min-width: 160px;
+}
+/* Light: Keşif ile aynı token’lar — ekstra gri kabuk yok */
+:global(.panel-shell[data-theme="light"] .steam-hub--shelf .steam-pane) {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 .steam-search::placeholder {
   color: var(--panel-muted, #64748b);
@@ -1185,35 +1429,57 @@ onMounted(() => {
 .steam-sort__btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  min-width: 11.5rem;
-  padding: 0.5rem 0.8rem;
+  gap: 0.45rem;
+  height: 2.75rem;
+  box-sizing: border-box;
+  min-width: 10.5rem;
+  padding: 0 0.85rem;
   border-radius: 12px;
   border: 1px solid var(--panel-card-border, rgb(15 23 42 / 0.12));
-  background: var(--panel-soft, #dde3ec);
+  background: var(--panel-card, #0c1220);
   color: var(--panel-text, #0f172a);
   cursor: pointer;
   box-shadow: none;
 }
-.steam-sort__meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.05rem;
+.steam-sort__label {
   flex: 1;
-  text-align: left;
-}
-.steam-sort__meta small {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--panel-muted, #64748b);
-}
-.steam-sort__meta strong {
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--panel-text, #0f172a);
+  text-align: left;
+  white-space: nowrap;
+}
+.steam-view {
+  display: inline-flex;
+  align-items: stretch;
+  height: 2.75rem;
+  margin-left: auto;
+  padding: 0.2rem;
+  border-radius: 12px;
+  border: 1px solid var(--panel-card-border, rgb(15 23 42 / 0.12));
+  background: var(--panel-card, #0c1220);
+  box-sizing: border-box;
+}
+.steam-view__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--panel-muted, #64748b);
+  cursor: pointer;
+}
+.steam-view__btn--on {
+  background: var(--panel-icon-bg, rgb(105 240 174 / 0.14));
+  color: var(--panel-accent, #047857);
+}
+.steam-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
 }
 .steam-sort__menu {
   position: absolute;
@@ -1226,8 +1492,8 @@ onMounted(() => {
   list-style: none;
   border-radius: 14px;
   border: 1px solid var(--panel-card-border, rgb(15 23 42 / 0.12));
-  background: var(--panel-card, #e8edf4);
-  box-shadow: 0 12px 28px rgb(15 23 42 / 0.12);
+  background: var(--panel-card, #0c1220);
+  box-shadow: var(--panel-card-shadow, 0 12px 28px rgb(0 0 0 / 0.22));
 }
 .steam-sort__opt {
   display: flex;
@@ -1245,15 +1511,15 @@ onMounted(() => {
   text-align: left;
 }
 .steam-sort__opt:hover {
-  background: var(--panel-soft, #c2cad6);
+  background: var(--panel-soft, rgb(0 0 0 / 0.22));
 }
 .steam-sort__opt--on {
-  background: var(--panel-icon-bg, rgb(16 185 129 / 0.12));
-  color: var(--panel-accent, #059669);
+  background: var(--panel-icon-bg, rgb(105 240 174 / 0.12));
+  color: var(--panel-accent, #69f0ae);
 }
 .steam-sort__check {
   margin-left: auto;
-  color: var(--panel-accent, #059669);
+  color: var(--panel-accent, #69f0ae);
 }
 .steam-chip {
   display: inline-flex;
@@ -1261,7 +1527,7 @@ onMounted(() => {
   gap: 0.35rem;
   padding: 0.55rem 0.9rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, #d97706 55%, var(--panel-card-border));
+  border: 1px solid color-mix(in srgb, #d97706 50%, var(--panel-card-border));
   background: color-mix(in srgb, #d97706 14%, var(--panel-card, #ced5e0));
   color: #9a3412;
   font-size: 0.78rem;
@@ -1283,49 +1549,47 @@ onMounted(() => {
   opacity: 0.75;
 }
 .steam-chip--plat {
-  border-color: color-mix(in srgb, #ca8a04 55%, var(--panel-card-border));
+  border-color: color-mix(in srgb, #ca8a04 50%, var(--panel-card-border));
   background: color-mix(in srgb, #ca8a04 16%, var(--panel-card, #ced5e0));
   color: #854d0e;
 }
 .steam-chip--low {
-  border-color: var(--panel-card-border, rgb(15 23 42 / 0.16));
+  border-color: var(--panel-card-border);
   background: var(--panel-soft, #c2cad6);
-  color: #334155;
+  color: var(--panel-muted, #334155);
 }
 .steam-chip--on {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--panel-accent, #059669) 45%, transparent);
-  background: color-mix(in srgb, var(--panel-accent, #059669) 16%, var(--panel-card, #ced5e0));
-  border-color: var(--panel-accent, #059669);
-  color: var(--panel-accent, #059669);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--panel-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--panel-accent) 16%, var(--panel-card));
+  border-color: var(--panel-accent);
+  color: var(--panel-accent);
 }
 .steam-chip--scan {
-  border-color: var(--panel-icon-border, rgb(16 185 129 / 0.28));
-  background: var(--panel-icon-bg, rgb(16 185 129 / 0.1));
-  color: var(--panel-accent, #059669);
+  border-color: var(--panel-icon-border);
+  background: var(--panel-icon-bg);
+  color: var(--panel-accent);
 }
-
-/* Dark theme: chip / toolbar tonları panel kartına uyumlu */
-:global(.panel-shell[data-theme="dark"]) .steam-chip {
+:global(.panel-shell[data-theme="dark"] .steam-chip) {
   background: color-mix(in srgb, #f59e0b 18%, var(--panel-card));
   border-color: color-mix(in srgb, #f59e0b 45%, transparent);
   color: #fde68a;
 }
-:global(.panel-shell[data-theme="dark"]) .steam-chip--plat {
+:global(.panel-shell[data-theme="dark"] .steam-chip--plat) {
   background: color-mix(in srgb, #f5d76e 22%, var(--panel-card));
   border-color: color-mix(in srgb, #f5d76e 50%, transparent);
   color: #f5d76e;
 }
-:global(.panel-shell[data-theme="dark"]) .steam-chip--low {
+:global(.panel-shell[data-theme="dark"] .steam-chip--low) {
   background: color-mix(in srgb, #94a3b8 14%, var(--panel-card));
   border-color: color-mix(in srgb, #94a3b8 35%, transparent);
   color: #cbd5e1;
 }
-:global(.panel-shell[data-theme="dark"]) .steam-chip--on {
+:global(.panel-shell[data-theme="dark"] .steam-chip--on) {
   background: color-mix(in srgb, var(--panel-accent) 18%, var(--panel-card));
   border-color: var(--panel-accent);
   color: var(--panel-accent);
 }
-:global(.panel-shell[data-theme="dark"]) .steam-msg--err {
+:global(.panel-shell[data-theme="dark"] .steam-msg--err) {
   background: rgba(180, 40, 60, 0.18);
   color: #ffb4c0;
   border-color: rgba(255, 120, 140, 0.28);
@@ -1453,29 +1717,54 @@ onMounted(() => {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.05rem;
+  /* masaüstünde satırda 6 — 8 kolonda kartlar çok küçülüyordu */
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.95rem;
   align-items: stretch;
+}
+@media (max-width: 1100px) {
+  .steam-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .steam-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+.steam-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.steam-list > li {
+  display: block;
+  width: 100%;
 }
 .steam-grid > li {
   display: flex;
   min-height: 0;
 }
 .steam-card {
-  display: flex;
-  flex-direction: column;
+  /* Diğer panel sayfalarındaki Game_Card ile aynı dil: dikey koyu kapak */
+  position: relative;
+  display: block;
   width: 100%;
   height: 100%;
   padding: 0;
-  border: 1px solid rgba(105, 240, 174, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(10, 24, 18, 0.95), rgba(4, 12, 10, 0.98));
-  color: inherit;
+  background: #0a0e14;
+  color: #e8eef7;
   text-align: left;
   text-decoration: none !important;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
   transition:
     border-color 0.18s ease,
     transform 0.18s ease,
@@ -1496,8 +1785,8 @@ onMounted(() => {
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.38);
 }
 .steam-card:hover .steam-card__img {
-  transform: scale(1.05);
-  filter: brightness(1.06);
+  transform: scale(1.04);
+  filter: brightness(0.88) contrast(1.03) saturate(0.96);
 }
 .steam-card:hover .steam-card__cta {
   opacity: 1;
@@ -1506,12 +1795,24 @@ onMounted(() => {
 .steam-card--plat {
   border-color: rgba(245, 215, 110, 0.55);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.28),
+    0 6px 18px rgba(0, 0, 0, 0.28),
     0 0 0 1px rgba(245, 215, 110, 0.25);
 }
 .steam-card--plat:hover {
   border-color: rgba(245, 215, 110, 0.8);
 }
+
+.steam-recent-empty {
+  width: 100%;
+  margin: 0.15rem 0 0.5rem;
+}
+.steam-recent-empty :deep(.panel-empty) {
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
 .steam-card--link {
   text-decoration: none !important;
   color: inherit;
@@ -1520,24 +1821,80 @@ onMounted(() => {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  aspect-ratio: 460 / 215;
-  background: #07140f;
-  /* scale boşluğu / alt çizgi artefaktını kes */
+  aspect-ratio: 2 / 3;
+  width: 100%;
+  background: #0a0e14;
   line-height: 0;
-  flex-shrink: 0;
+  flex: 1 1 auto;
 }
 .steam-card__img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 18%;
   display: block;
-  vertical-align: top;
   border: 0;
   outline: none;
-  /* alt kenarda 1px boşluk kalmasın */
   transform: scale(1.001);
   transform-origin: center center;
+  filter: brightness(0.78) contrast(1.04) saturate(0.94);
   transition: transform 0.35s ease, filter 0.35s ease;
+}
+/* Yatay kapak: blur zemin + ortada tam görünen poster */
+.steam-card__media--wide {
+  background: #05080c;
+}
+.steam-card__img--bleed {
+  inset: -18%;
+  width: auto;
+  height: auto;
+  min-width: 136%;
+  min-height: 136%;
+  object-fit: cover;
+  object-position: center;
+  filter: blur(16px) brightness(0.38) saturate(1.05);
+  transform: none;
+  z-index: 0;
+}
+.steam-card__img--fg {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: 92%;
+  height: auto;
+  max-height: 46%;
+  object-fit: contain;
+  object-position: center;
+  transform: translate(-50%, -58%);
+  border-radius: 8px;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  filter: brightness(0.92) contrast(1.04) saturate(1.02);
+  z-index: 1;
+}
+.steam-card:hover .steam-card__img--fg {
+  transform: translate(-50%, -58%) scale(1.03);
+}
+.steam-card__media--wide .steam-card__shade {
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.25) 0%,
+    transparent 35%,
+    rgba(0, 0, 0, 0.55) 70%,
+    rgba(0, 0, 0, 0.92) 100%
+  );
+}
+.steam-card--list .steam-card__img--fg {
+  width: 88%;
+  max-height: 58%;
+  transform: translate(-50%, -50%);
+}
+.steam-card--list:hover .steam-card__img--fg {
+  transform: translate(-50%, -50%) scale(1.03);
 }
 .steam-card__body,
 .steam-card__name,
@@ -1548,19 +1905,22 @@ onMounted(() => {
 .steam-card__shade {
   position: absolute;
   inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background: linear-gradient(
     180deg,
-    transparent 35%,
-    rgba(2, 10, 8, 0.55) 72%,
-    rgba(2, 10, 8, 0.88) 100%
+    rgba(0, 0, 0, 0.18) 0%,
+    transparent 28%,
+    transparent 42%,
+    rgba(0, 0, 0, 0.55) 68%,
+    rgba(0, 0, 0, 0.92) 100%
   );
-  pointer-events: none;
 }
 .steam-card__hours {
   position: absolute;
   top: 0.55rem;
   left: 0.55rem;
-  z-index: 1;
+  z-index: 3;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -1578,7 +1938,7 @@ onMounted(() => {
   position: absolute;
   top: 0.55rem;
   right: 0.55rem;
-  z-index: 1;
+  z-index: 3;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -1634,23 +1994,192 @@ onMounted(() => {
   font-weight: 800;
 }
 .steam-card__body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.7rem 0.85rem 0.85rem;
-  flex: 1 1 auto;
-  min-height: 5.1rem; /* 2 satır isim + bar alanı — yükseklik sabit */
+  gap: 0.35rem;
+  padding: 0.65rem 0.7rem 0.75rem;
+  pointer-events: none;
 }
 .steam-card__name {
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: #eafff2;
-  line-height: 1.3;
-  height: calc(1.3em * 2); /* tam 2 satır — uzun/kısa isim fark etmez */
+  color: #f3f7fb;
+  line-height: 1.25;
+  max-height: calc(1.25em * 2);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+}
+.steam-card__chev {
+  display: none;
+}
+/* Liste: geniş header + gövde — renkler panel token (aydınlık/koyu) */
+.steam-card--list {
+  display: grid;
+  grid-template-columns: minmax(220px, 32%) minmax(0, 1fr);
+  align-items: stretch;
+  height: auto;
+  min-height: 148px;
+  background: var(--panel-card, #0c1220);
+  border-color: var(--panel-card-border, rgb(255 255 255 / 0.1));
+  box-shadow: var(--panel-card-shadow, 0 6px 18px rgba(0, 0, 0, 0.28));
+  color: var(--panel-text, #e8eef7);
+}
+.steam-card--list:hover,
+.steam-card--list:focus,
+.steam-card--list:focus-visible,
+.steam-card--list:active,
+.steam-card--list:visited {
+  color: var(--panel-text, #e8eef7);
+}
+.steam-card--list .steam-card__media {
+  aspect-ratio: auto;
+  width: 100%;
+  height: 100%;
+  min-height: 148px;
+  flex: none;
+}
+.steam-card--list .steam-card__img {
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  object-fit: cover;
+  object-position: center 20%;
+  filter: brightness(0.9) contrast(1.04) saturate(1);
+  transform: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  z-index: 0;
+}
+.steam-card--list .steam-card__img--bleed {
+  display: none !important;
+}
+.steam-card--list .steam-card__media--wide {
+  background: #0a0e14;
+}
+.steam-card--list:hover .steam-card__img:not(.steam-card__img--bleed) {
+  transform: scale(1.03) !important;
+  filter: brightness(0.96) contrast(1.05) saturate(1.05);
+}
+.steam-card--list .steam-card__shade {
+  background: linear-gradient(
+    90deg,
+    transparent 55%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+}
+.steam-card--list .steam-card__body {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  z-index: 1;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 1rem 2.75rem 1rem 1.25rem;
+  pointer-events: none;
+}
+.steam-card--list .steam-card__name {
+  font-size: 1.15rem;
+  max-height: none;
+  -webkit-line-clamp: 2;
+  text-shadow: none;
+  color: var(--panel-text, #eafff2);
+}
+.steam-card__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.45rem 0.65rem;
+  width: 100%;
+  max-width: 44rem;
+}
+.steam-card__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid var(--panel-border, rgb(255 255 255 / 0.08));
+  background: var(--panel-soft, rgb(0 0 0 / 0.22));
+}
+.steam-card__fact-l {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--panel-muted, #94a3b8);
+}
+.steam-card__fact-v {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  font-size: 0.88rem;
+  font-weight: 750;
+  color: var(--panel-text, #eafff2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.steam-card__fact-v--plat {
+  color: #ca8a04;
+}
+.steam-card--list .steam-card__bar-wrap {
+  max-width: 22rem;
+  margin-top: 0.15rem;
+}
+.steam-card--list .steam-card__bar-wrap em {
+  color: var(--panel-muted, #94a3b8);
+}
+.steam-card--list .steam-card__bar-track {
+  background: color-mix(in srgb, var(--panel-muted, #94a3b8) 22%, transparent);
+}
+.steam-card--list .steam-card__chev {
+  display: block;
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--panel-muted, #94a3b8);
+}
+@media (max-width: 900px) {
+  .steam-card--list {
+    grid-template-columns: minmax(160px, 38%) minmax(0, 1fr);
+  }
+}
+@media (max-width: 720px) {
+  .steam-search--compact {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+  .steam-view {
+    margin-left: 0;
+  }
+  .steam-card--list {
+    grid-template-columns: 1fr;
+  }
+  .steam-card--list .steam-card__media {
+    width: 100%;
+    min-height: 120px;
+    aspect-ratio: 460 / 215;
+  }
+  .steam-card--list .steam-card__body {
+    padding-right: 1.15rem;
+  }
+  .steam-card--list .steam-card__chev {
+    display: none;
+  }
 }
 .steam-card__bar-wrap {
   display: flex;

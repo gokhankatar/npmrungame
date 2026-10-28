@@ -2,10 +2,12 @@
 import SteamGameSkeleton from "~/components/panel/SteamGameSkeleton.vue";
 import { useAppLocale } from "~/composables/useAppLocale";
 import { steamHours, type SteamGame } from "~/composables/useSteamHub";
-import {
-  advanceSteamCover,
-  steamCoverSrc,
-} from "~/utils/steamCover";
+import { advanceSteamCover, steamCoverSrc } from "~/utils/steamCover";
+
+/** Header (yüksek çözünürlük) — 32px community icon satırda bulanık kalıyordu */
+function rowThumb(g: SteamGame) {
+  return steamCoverSrc(g);
+}
 
 type AchProgress = {
   unlocked: number;
@@ -69,25 +71,15 @@ function onCoverError(e: Event, g: SteamGame) {
       <span v-if="platinumCount" class="sa-chip">
         <v-icon icon="mdi-trophy" size="16" />
         {{
-          tx("panel.steam.platinumChip").replace(
-            "{n}",
-            String(platinumCount)
-          )
+          tx("panel.steam.platinumChip").replace("{n}", String(platinumCount))
         }}
       </span>
       <span v-else-if="progressScanning" class="sa-chip sa-chip--scan">
-        <v-progress-circular
-          indeterminate
-          size="14"
-          width="2"
-          color="#69f0ae"
-        />
         {{ tx("panel.steam.platinumScanning") }}
       </span>
     </div>
 
-    <SteamGameSkeleton v-if="loading" :count="8" />
-
+    <SteamGameSkeleton v-if="loading" :count="6" />
     <ul v-else class="sa-list">
       <li v-for="(g, idx) in rows" :key="g.appId">
         <NuxtLink
@@ -97,46 +89,41 @@ function onCoverError(e: Event, g: SteamGame) {
         >
           <span class="sa-rank" aria-hidden="true">#{{ idx + 1 }}</span>
           <img
-            :src="steamCoverSrc(g)"
+            :src="rowThumb(g)"
             :alt="g.name"
             class="sa-row__img"
             loading="lazy"
             @error="onCoverError($event, g)"
           />
           <div class="sa-row__body">
-            <strong>{{ g.name }}</strong>
-            <span>
-              {{ steamHours(g.playtimeForeverMin) }}
-              {{ tx("panel.steam.hours") }}
-            </span>
+            <strong :title="g.name">{{ g.name }}</strong>
+            <span
+              >{{ steamHours(g.playtimeForeverMin) }}
+              {{ tx("panel.steam.hours") }}</span
+            >
           </div>
           <div class="sa-row__prog">
-            <template
-              v-if="
-                getProgress(g.appId)?.status === 'ready' &&
-                getProgress(g.appId)!.total
-              "
-            >
+            <template v-if="getProgress(g.appId)?.status === 'ready'">
               <span
-                v-if="getProgress(g.appId)!.isComplete"
+                v-if="getProgress(g.appId)?.isComplete"
                 class="sa-badge sa-badge--plat"
               >
                 <v-icon icon="mdi-trophy" size="14" />
                 {{ tx("panel.steam.platinum") }}
               </span>
               <span v-else class="sa-badge">
-                %{{ getProgress(g.appId)!.completionPct }}
+                %{{ getProgress(g.appId)?.completionPct }}
               </span>
               <div class="sa-bar">
                 <i
                   :style="{
-                    width: `${getProgress(g.appId)!.completionPct}%`,
+                    width: `${getProgress(g.appId)?.completionPct || 0}%`,
                   }"
                 />
               </div>
               <em>
-                {{ getProgress(g.appId)!.unlocked }}/{{
-                  getProgress(g.appId)!.total
+                {{ getProgress(g.appId)?.unlocked }}/{{
+                  getProgress(g.appId)?.total
                 }}
               </em>
             </template>
@@ -151,6 +138,7 @@ function onCoverError(e: Event, g: SteamGame) {
 </template>
 
 <style scoped>
+/* Keşif / panel token — light’ta koyu ada yok */
 .sa {
   width: 100%;
   display: flex;
@@ -162,6 +150,10 @@ function onCoverError(e: Event, g: SteamGame) {
   flex-wrap: wrap;
   gap: 0.65rem;
   align-items: center;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
 }
 .sa-search {
   flex: 1 1 220px;
@@ -169,9 +161,13 @@ function onCoverError(e: Event, g: SteamGame) {
   padding: 0.65rem 0.9rem;
   border-radius: 12px;
   border: 1px solid var(--panel-card-border, rgb(15 23 42 / 0.12));
-  background: var(--panel-soft, #c2cad6);
+  background: var(--panel-card, #0c1220);
   color: var(--panel-text, #0f172a);
   box-shadow: none;
+}
+:global(.panel-shell[data-theme="light"] .sa-search) {
+  background: var(--panel-soft, #c2cad6);
+  border-color: var(--panel-card-border);
 }
 .sa-search::placeholder {
   color: var(--panel-muted, #64748b);
@@ -198,11 +194,11 @@ function onCoverError(e: Event, g: SteamGame) {
   font-weight: 800;
 }
 .sa-chip--scan {
-  background: var(--panel-icon-bg, rgb(16 185 129 / 0.1));
-  border-color: var(--panel-icon-border, rgb(16 185 129 / 0.28));
-  color: var(--panel-accent, #059669);
+  background: var(--panel-icon-bg);
+  border-color: var(--panel-icon-border);
+  color: var(--panel-accent);
 }
-:global(.panel-shell[data-theme="dark"]) .sa-chip {
+:global(.panel-shell[data-theme="dark"] .sa-chip) {
   background: color-mix(in srgb, #f5d76e 22%, var(--panel-card));
   border-color: color-mix(in srgb, #f5d76e 50%, transparent);
   color: #f5d76e;
@@ -213,7 +209,7 @@ function onCoverError(e: Event, g: SteamGame) {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.55rem;
 }
 .sa-rank {
   display: inline-flex;
@@ -221,40 +217,63 @@ function onCoverError(e: Event, g: SteamGame) {
   justify-content: center;
   font-size: 0.78rem;
   font-weight: 800;
-  color: var(--panel-muted, #94a3b8);
+  color: var(--panel-muted, #64748b);
   letter-spacing: 0.02em;
 }
 .sa-row {
   display: grid;
-  grid-template-columns: 2.2rem 160px 1fr auto auto;
+  grid-template-columns: 2.2rem 120px 1fr auto auto;
   gap: 0.85rem;
   align-items: center;
   padding: 0.55rem 0.75rem 0.55rem 0.55rem;
   border-radius: 14px;
-  border: 1px solid rgba(105, 240, 174, 0.12);
-  background: linear-gradient(
-    180deg,
-    rgba(10, 24, 18, 0.95),
-    rgba(4, 12, 10, 0.98)
-  );
+  border: 1px solid var(--panel-card-border, rgb(15 23 42 / 0.12));
+  background: var(--panel-card, #0c1220);
+  box-shadow: var(--panel-card-shadow, none);
   text-decoration: none;
-  color: inherit;
-  transition: border-color 0.15s ease, transform 0.15s ease;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  color: var(--panel-text, #e8eef7);
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+/* Light: Keşif kartları gibi panel token — tek :global(...) (scoped sızıntı yok) */
+:global(.panel-shell[data-theme="light"] .sa-row) {
+  background: var(--panel-card, #ced5e0);
+  border-color: var(--panel-card-border);
+  box-shadow: none;
+  color: var(--panel-text, #0f172a);
+}
+:global(.panel-shell[data-theme="light"] .sa-row__body strong) {
+  color: var(--panel-text, #0f172a);
+}
+:global(.panel-shell[data-theme="light"] .sa-row__body span),
+:global(.panel-shell[data-theme="light"] .sa-row__prog em),
+:global(.panel-shell[data-theme="light"] .sa-muted),
+:global(.panel-shell[data-theme="light"] .sa-rank),
+:global(.panel-shell[data-theme="light"] .sa-row__chev) {
+  color: var(--panel-muted, #475569);
+}
+:global(.panel-shell[data-theme="light"] .sa-badge:not(.sa-badge--plat)) {
+  background: var(--panel-icon-bg);
+  color: var(--panel-accent, #047857);
+}
+:global(.panel-shell[data-theme="light"] .sa-bar) {
+  background: rgb(15 23 42 / 0.12);
 }
 .sa-row:hover {
-  border-color: rgba(105, 240, 174, 0.4);
+  border-color: color-mix(in srgb, var(--panel-accent, #047857) 45%, transparent);
   transform: translateY(-1px);
 }
 .sa-row--plat {
-  border-color: rgba(245, 215, 110, 0.45);
+  border-color: color-mix(in srgb, #ca8a04 45%, var(--panel-card-border));
 }
 .sa-row__img {
-  width: 160px;
-  height: 75px;
+  width: 120px;
+  height: 56px;
   object-fit: cover;
+  object-position: center;
   border-radius: 10px;
-  background: #07140f;
+  background: var(--panel-soft, #07140f);
 }
 .sa-row__body {
   min-width: 0;
@@ -263,11 +282,11 @@ function onCoverError(e: Event, g: SteamGame) {
   gap: 0.2rem;
 }
 .sa-row__body strong {
-  color: #eafff2;
+  color: var(--panel-text, #e8eef7);
   font-size: 0.98rem;
 }
 .sa-row__body span {
-  color: rgba(200, 255, 224, 0.55);
+  color: var(--panel-muted, #94a3b8);
   font-size: 0.8rem;
 }
 .sa-row__prog {
@@ -284,8 +303,8 @@ function onCoverError(e: Event, g: SteamGame) {
   gap: 0.25rem;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
-  background: rgba(105, 240, 174, 0.15);
-  color: #9ff5c0;
+  background: var(--panel-icon-bg, rgb(105 240 174 / 0.15));
+  color: var(--panel-accent, #047857);
   font-size: 0.72rem;
   font-weight: 800;
 }
@@ -297,42 +316,41 @@ function onCoverError(e: Event, g: SteamGame) {
   width: 110px;
   height: 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
+  background: color-mix(in srgb, var(--panel-muted, #64748b) 22%, transparent);
   overflow: hidden;
 }
 .sa-bar i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #69f0ae, #f5d76e);
+  background: linear-gradient(90deg, var(--panel-accent, #69f0ae), #f5d76e);
 }
 .sa-row__prog em {
   font-style: normal;
   font-size: 0.72rem;
-  color: rgba(200, 255, 224, 0.5);
+  color: var(--panel-muted, #94a3b8);
 }
 .sa-muted {
-  color: rgba(200, 255, 224, 0.4);
+  color: var(--panel-muted, #94a3b8);
   font-size: 0.85rem;
 }
 .sa-row__chev {
-  color: rgba(200, 255, 224, 0.45);
+  color: var(--panel-muted, #94a3b8);
 }
 @media (max-width: 720px) {
   .sa-row {
-    grid-template-columns: 2rem 1fr;
-  }
-  .sa-rank {
-    grid-row: 1;
+    grid-template-columns: 2rem 96px 1fr;
   }
   .sa-row__img {
-    grid-column: 1 / -1;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 460 / 215;
+    width: 96px;
+    height: 45px;
   }
   .sa-row__prog {
+    grid-column: 1 / -1;
     align-items: flex-start;
     text-align: left;
+  }
+  .sa-row__chev {
+    display: none;
   }
 }
 </style>

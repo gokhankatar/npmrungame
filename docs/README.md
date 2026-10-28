@@ -13,7 +13,7 @@ npmrungame panelinde oyuncu platform hesaplarını bağlama ve canlı durum gös
 
 | Dosya | Durum |
 |-------|--------|
-| [steam.md](./steam.md) | Hub MVP ✅ · açık: light mode Kütüphane/Başarımlar parlaklık |
+| [steam.md](./steam.md) | Hub MVP ✅ · light pane fix (Kütüphane/Başarımlar) |
 | [epic-games.md](./epic-games.md) | Hedef / araştırma |
 | [playstation.md](./playstation.md) | Hedef / araştırma |
 | [nintendo.md](./nintendo.md) | Hedef / araştırma |
