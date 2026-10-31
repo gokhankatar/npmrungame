@@ -48,6 +48,7 @@
           :show-playing-actions="!bulkDeleteMode"
           :on-complete-click="openCompleteDialog"
           :on-remove-click="openRemoveDialog"
+          :on-notes-click="openNotesDialog"
           :bulk-delete-mode="bulkDeleteMode"
           :is-selected="isSelected"
           :on-toggle-select="toggleSelect"
@@ -485,6 +486,11 @@ const openCompleteDialog = (game: any) => {
 const openRemoveDialog = (game: any) => {
   activeGame.value = game;
   removeDialog.value = true;
+};
+
+const openNotesDialog = (game: any) => {
+  if (!game?.firestoreId) return;
+  router.push(`/dashboard/playing/${game.firestoreId}/notes`);
 };
 
 const confirmRemoveGame = async () => {

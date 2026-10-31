@@ -67,10 +67,30 @@
           </div>
 
           <div
+            v-if="notesCount(item) > 0 && !bulkDeleteMode"
+            class="game-card-notes-badge"
+            :title="`Platin Defter · ${notesCount(item)} not`"
+          >
+            <v-icon icon="mdi-notebook-outline" size="12" />
+            {{ notesCount(item) }}
+          </div>
+
+          <div
             v-if="showPlayingActions && !bulkDeleteMode"
             class="game-card-actions"
             @click.stop
           >
+            <button
+              type="button"
+              class="game-card-actions__btn game-card-actions__btn--notes"
+              @click.stop="emitNotes(item)"
+            >
+              <v-icon icon="mdi-book-open-page-variant-outline" size="16" />
+              <span class="game-card-actions__label">Platin Defter</span>
+              <span v-if="notesCount(item)" class="game-card-actions__count">
+                {{ notesCount(item) }}
+              </span>
+            </button>
             <button
               type="button"
               class="game-card-actions__btn game-card-actions__btn--done"
@@ -212,6 +232,7 @@ import {
   getUniquePlatformIcons,
   resolveGameCardImage,
 } from "~/composables/data/handleData";
+import { playNotesCount } from "~/composables/core/playNotes";
 
 const props = withDefaults(
   defineProps<{
@@ -229,12 +250,15 @@ const props = withDefaults(
     showPlayingActions?: boolean;
     onCompleteClick?: (item: any) => void;
     onRemoveClick?: (item: any) => void;
+    onNotesClick?: (item: any) => void;
   }>(),
   { density: "default", metaFormat: "year", showPlayingActions: false }
 );
 
 const emitComplete = (item: any) => props.onCompleteClick?.(item);
 const emitRemove = (item: any) => props.onRemoveClick?.(item);
+const emitNotes = (item: any) => props.onNotesClick?.(item);
+const notesCount = (item: any) => playNotesCount(item);
 
 /** Steam library tarzı: büyük ekranda daha çok sütun → kartlar şişmez */
 const gridCols = computed(() => 6);
@@ -522,6 +546,52 @@ html.dark .game-card-skeleton,
   transform: translateY(0);
 }
 
+.game-card-actions__btn--notes {
+  width: min(100%, 11.25rem);
+  gap: 0.3rem;
+  padding-inline: 0.65rem;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  background: transparent;
+  color: #40c4ff;
+  border-color: #40c4ff;
+  box-shadow: none;
+}
+
+.game-card-actions__label {
+  white-space: nowrap;
+}
+
+.game-card-actions__btn--notes:hover {
+  background: rgba(64, 196, 255, 0.14);
+  color: #7adfff;
+  border-color: #7adfff;
+  box-shadow:
+    0 10px 24px rgb(64 196 255 / 0.35),
+    0 2px 0 rgb(64 196 255 / 0.25);
+  transform: translateY(-2px);
+  filter: none;
+}
+
+.game-card:hover .game-card-actions__btn--notes:hover,
+.game-card:focus-within .game-card-actions__btn--notes:hover {
+  transform: translateY(-2px);
+}
+
+.game-card-actions__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: rgba(64, 196, 255, 0.18);
+  color: #40c4ff;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
 .game-card-actions__btn--done {
   background: #69f0ae;
   color: #07140f;
@@ -542,6 +612,30 @@ html.dark .game-card-skeleton,
   background: rgb(239 68 68 / 0.22);
   border-color: rgb(248 113 113 / 0.55);
   color: #fecaca;
+}
+
+.game-card-notes-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 8px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  min-height: 1.35rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  background: rgb(4 16 24 / 0.88);
+  border: 1px solid rgb(64 196 255 / 0.5);
+  color: #40c4ff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.game-card:hover .game-card-notes-badge {
+  opacity: 0;
 }
 
 /* Metacritic — resmi kutu, hover’da kare border yok */
