@@ -105,12 +105,111 @@ async function deleteRegisteredUserDocs(
 /**
  * Kanal sahibi: oyuncuyu platformdan kaldırır.
  * - Oyun listeleri + Top9 + registered_users
- * - banned_users / banned_emails ile tekrar giriş engeli
+ * - alsoBan !== false ise banned_users / banned_emails (tekrar giriş engeli)
  * Not: Firebase Auth hesabı Admin SDK olmadan silinemez; ban ile giriş kapatılır.
  */
+export type BannedPlayerRow = {
+  id: string;
+  uid: string;
+  email: string | null;
+  username: string | null;
+  displayName: string | null;
+  reason: string | null;
+  bannedAtMs: number | null;
+  source: "banned_users" | "banned_emails";
+};
+
+function bannedAtMs(data: Record<string, any>): number | null {
+  const ts =
+    data.bannedAt?.toMillis?.() ??
+    (data.bannedAt?.seconds != null ? data.bannedAt.seconds * 1000 : null) ??
+    (typeof data.bannedAt === "number" ? data.bannedAt : null);
+  return typeof ts === "number" && !Number.isNaN(ts) ? ts : null;
+}
+
+/** Banlı / silinen oyuncu kayıtları (banned_users + banned_emails) */
+export async function fetchBannedPlayers(
+  firestore: Firestore
+): Promise<BannedPlayerRow[]> {
+  const byKey = new Map<string, BannedPlayerRow>();
+
+  const upsert = (row: BannedPlayerRow) => {
+    const key = row.uid || row.email || row.id;
+    const prev = byKey.get(key);
+    if (!prev) {
+      byKey.set(key, row);
+      return;
+    }
+    // Daha dolu / daha yeni kaydı tut
+    byKey.set(key, {
+      ...prev,
+      ...row,
+      email: row.email || prev.email,
+      username: row.username || prev.username,
+      displayName: row.displayName || prev.displayName,
+      reason: row.reason || prev.reason,
+      bannedAtMs:
+        (row.bannedAtMs ?? 0) >= (prev.bannedAtMs ?? 0)
+          ? row.bannedAtMs
+          : prev.bannedAtMs,
+      source: prev.source === "banned_users" ? "banned_users" : row.source,
+    });
+  };
+
+  try {
+    const usersSnap = await getDocs(collection(firestore, "banned_users"));
+    for (const d of usersSnap.docs) {
+      const data = d.data() as Record<string, any>;
+      upsert({
+        id: d.id,
+        uid: String(data.uid || d.id),
+        email: data.email ? normalizeEmail(String(data.email)) : null,
+        username: (data.username as string) || null,
+        displayName: (data.displayName as string) || null,
+        reason: (data.reason as string) || null,
+        bannedAtMs: bannedAtMs(data),
+        source: "banned_users",
+      });
+    }
+  } catch (e) {
+    console.error("fetchBannedPlayers banned_users:", e);
+  }
+
+  try {
+    const emailsSnap = await getDocs(collection(firestore, "banned_emails"));
+    for (const d of emailsSnap.docs) {
+      const data = d.data() as Record<string, any>;
+      const email = normalizeEmail(String(data.email || d.id));
+      upsert({
+        id: d.id,
+        uid: String(data.uid || ""),
+        email: email || null,
+        username: (data.username as string) || null,
+        displayName: (data.displayName as string) || null,
+        reason: (data.reason as string) || null,
+        bannedAtMs: bannedAtMs(data),
+        source: "banned_emails",
+      });
+    }
+  } catch (e) {
+    console.error("fetchBannedPlayers banned_emails:", e);
+  }
+
+  return [...byKey.values()].sort(
+    (a, b) => (b.bannedAtMs ?? 0) - (a.bannedAtMs ?? 0)
+  );
+}
+
 export async function purgePlayerAccount(
   firestore: Firestore,
-  opts: { uid: string; email?: string }
+  opts: {
+    uid: string;
+    email?: string;
+    username?: string;
+    displayName?: string;
+    /** true: ban + sil (tekrar giriş engeli). false: sadece veri sil, ban yok. */
+    alsoBan?: boolean;
+  }
 ) {
   const uid = opts.uid?.trim();
   if (!uid) throw new Error("uid gerekli");
@@ -119,6 +218,9 @@ export async function purgePlayerAccount(
   }
 
   const email = opts.email ? normalizeEmail(opts.email) : "";
+  const username = opts.username?.trim() || null;
+  const displayName = opts.displayName?.trim() || null;
+  const alsoBan = opts.alsoBan !== false;
 
   await deleteUserGameLists(firestore, uid);
 
@@ -130,29 +232,42 @@ export async function purgePlayerAccount(
 
   await deleteRegisteredUserDocs(firestore, uid, email || undefined);
 
-  await setDoc(
-    doc(firestore, "banned_users", uid),
-    {
-      uid,
-      email: email || null,
-      reason: "admin_delete",
-      bannedAt: serverTimestamp(),
-    },
-    { merge: true }
-  );
+  if (!alsoBan) return;
+
+  const banPayload = {
+    uid,
+    email: email || null,
+    username,
+    displayName,
+    reason: "admin_delete",
+    bannedAt: serverTimestamp(),
+  };
+
+  await setDoc(doc(firestore, "banned_users", uid), banPayload, { merge: true });
 
   if (email) {
     await setDoc(
       doc(firestore, "banned_emails", email),
-      {
-        email,
-        uid,
-        reason: "admin_delete",
-        bannedAt: serverTimestamp(),
-      },
+      banPayload,
       { merge: true }
     );
   }
+}
+
+/** Ban kaydını kaldır (yeniden girişe izin verir) */
+export async function removeBannedPlayer(
+  firestore: Firestore,
+  row: Pick<BannedPlayerRow, "uid" | "email">
+) {
+  const uid = row.uid?.trim();
+  const email = row.email ? normalizeEmail(row.email) : "";
+
+  const refs: ReturnType<typeof doc>[] = [];
+  if (uid) refs.push(doc(firestore, "banned_users", uid));
+  if (email) refs.push(doc(firestore, "banned_emails", email));
+
+  if (!refs.length) throw new Error("Silinecek ban kaydı yok.");
+  await batchDeleteRefs(firestore, refs);
 }
 
 export async function isPlayerBanned(

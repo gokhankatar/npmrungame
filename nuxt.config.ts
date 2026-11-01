@@ -18,7 +18,8 @@ export default defineNuxtConfig({
     adminPassw: process.env.ADMIN_PASSWORD_KEY,
     mail: process.env.MAIL,
     mail_password: process.env.MAIL_PASSWORD,
-    steam_web_api_key: process.env.STEAM_WEB_API_KEY,
+    steam_web_api_key:
+      process.env.STEAM_WEB_API_KEY || process.env.STEAM_API_KEY,
     public: {
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       supabaseUrl: process.env.SUPABASE_URL,

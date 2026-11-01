@@ -523,9 +523,11 @@ html.dark .game-card-skeleton,
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  width: min(100%, 10.5rem);
+  box-sizing: border-box;
+  width: 10.5rem;
+  max-width: 100%;
   min-height: 2.35rem;
-  padding: 0.45rem 0.85rem;
+  padding: 0.45rem 0.75rem;
   border-radius: 0.75rem;
   border: 1px solid transparent;
   font: inherit;
@@ -538,7 +540,8 @@ html.dark .game-card-skeleton,
     transform 0.2s ease,
     background 0.15s ease,
     border-color 0.15s ease,
-    filter 0.15s ease;
+    filter 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .game-card:hover .game-card-actions__btn,
@@ -547,10 +550,9 @@ html.dark .game-card-skeleton,
 }
 
 .game-card-actions__btn--notes {
-  width: min(100%, 11.25rem);
   gap: 0.3rem;
-  padding-inline: 0.65rem;
-  font-size: 0.72rem;
+  padding-inline: 0.55rem;
+  font-size: 0.7rem;
   white-space: nowrap;
   background: transparent;
   color: #40c4ff;
@@ -560,6 +562,8 @@ html.dark .game-card-skeleton,
 
 .game-card-actions__label {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .game-card-actions__btn--notes:hover {

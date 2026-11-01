@@ -28,10 +28,25 @@ export async function steamGet<T>(
   params: Record<string, string | number | boolean>
 ): Promise<T> {
   const key = requireSteamApiKey();
-  return await $fetch<T>(`https://api.steampowered.com${path}`, {
-    params: { key, format: "json", ...params },
-    timeout: 12_000,
-  });
+  try {
+    return await $fetch<T>(`https://api.steampowered.com${path}`, {
+      params: { key, format: "json", ...params },
+      timeout: 12_000,
+    });
+  } catch (error: any) {
+    const status = Number(error?.statusCode || error?.response?.status || 0);
+    if (status === 401 || status === 403) {
+      throw createError({
+        statusCode: status || 401,
+        statusMessage: "Steam API anahtarı reddedildi",
+        data: {
+          message:
+            "STEAM_WEB_API_KEY geçersiz veya iptal edilmiş. https://steamcommunity.com/dev/apikey adresinden yeni anahtar alıp .env’e yazın ve sunucuyu yeniden başlatın.",
+        },
+      });
+    }
+    throw error;
+  }
 }
 
 /** Klasik CDN — eski oyunlarda çalışır; yenilerde hash’li store asset gerekir */

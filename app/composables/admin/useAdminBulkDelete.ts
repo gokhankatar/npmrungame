@@ -36,8 +36,14 @@ export function useAdminBulkDelete(
     }
   };
 
+  /** Hepsi seçiliyse temizle, değilse hepsini seç (toggle) */
   const selectAll = (items: any[]) => {
-    selectedIds.value = items.map(getItemId).filter(Boolean);
+    const ids = items.map(getItemId).filter(Boolean) as string[];
+    const allSelected =
+      ids.length > 0 &&
+      selectedIds.value.length === ids.length &&
+      ids.every((id) => selectedIds.value.includes(id));
+    selectedIds.value = allSelected ? [] : ids;
   };
 
   const clearSelection = () => {

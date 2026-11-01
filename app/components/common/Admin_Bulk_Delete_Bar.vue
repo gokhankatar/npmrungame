@@ -13,55 +13,74 @@
         </p>
       </div>
 
-      <div class="admin-bulk-bar-actions d-flex ga-2">
+      <div class="admin-bulk-bar-actions">
         <v-btn
           class="admin-bulk-bar-btn text-capitalize"
           size="small"
           variant="tonal"
           color="#69f0ae"
           :ripple="false"
-          prepend-icon="mdi-select-all"
-          text="Tümünü seç"
+          :prepend-icon="allSelected ? 'mdi-select-off' : 'mdi-select-all'"
+          :text="allSelected ? 'Seçimi kaldır' : 'Tümünü seç'"
           @click="$emit('select-all')"
         />
-        <v-btn
-          class="admin-bulk-bar-btn text-capitalize"
-          size="small"
-          variant="text"
-          color="grey-lighten-1"
-          :ripple="false"
-          prepend-icon="mdi-backspace-outline"
-          text="Temizle"
-          @click="$emit('clear')"
-        />
-        <v-btn
-          class="admin-bulk-bar-btn text-capitalize"
-          size="small"
-          color="error"
-          variant="flat"
-          :ripple="false"
-          prepend-icon="mdi-delete-outline"
-          :disabled="selectedCount === 0"
-          :text="selectedCount > 0 ? `Seçilenleri sil (${selectedCount})` : 'Seçilenleri sil'"
-          @click="$emit('delete')"
-        />
-        <v-btn
-          class="admin-bulk-bar-btn text-capitalize"
-          size="small"
-          variant="outlined"
-          color="grey-lighten-1"
-          :ripple="false"
-          prepend-icon="mdi-close-circle-outline"
-          text="Vazgeç"
-          @click="$emit('cancel')"
-        />
+
+        <v-tooltip text="Temizle" location="top">
+          <template #activator="{ props: tip }">
+            <button
+              v-bind="tip"
+              type="button"
+              class="admin-bulk-icon-btn admin-bulk-icon-btn--clear"
+              aria-label="Temizle"
+              @click="$emit('clear')"
+            >
+              <v-icon icon="mdi-selection-off" size="16" />
+            </button>
+          </template>
+        </v-tooltip>
+
+        <v-tooltip
+          :text="
+            selectedCount > 0
+              ? `Seçilenleri sil (${selectedCount})`
+              : 'Seçilenleri sil'
+          "
+          location="top"
+        >
+          <template #activator="{ props: tip }">
+            <button
+              v-bind="tip"
+              type="button"
+              class="admin-bulk-icon-btn admin-bulk-icon-btn--delete"
+              aria-label="Seçilenleri sil"
+              :disabled="selectedCount === 0"
+              @click="$emit('delete')"
+            >
+              <v-icon icon="mdi-trash-can-outline" size="16" />
+            </button>
+          </template>
+        </v-tooltip>
+
+        <v-tooltip text="Vazgeç" location="top">
+          <template #activator="{ props: tip }">
+            <button
+              v-bind="tip"
+              type="button"
+              class="admin-bulk-icon-btn admin-bulk-icon-btn--cancel"
+              aria-label="Vazgeç"
+              @click="$emit('cancel')"
+            >
+              <v-icon icon="mdi-close" size="16" />
+            </button>
+          </template>
+        </v-tooltip>
       </div>
     </div>
   </transition>
 </template>
 
 <script lang="ts" setup>
-withDefaults(
+const props = withDefaults(
   defineProps<{
     active: boolean;
     selectedCount: number;
@@ -69,6 +88,10 @@ withDefaults(
     entityLabel?: string;
   }>(),
   { entityLabel: "oyun" }
+);
+
+const allSelected = computed(
+  () => props.totalCount > 0 && props.selectedCount === props.totalCount
 );
 
 defineEmits<{
@@ -158,12 +181,68 @@ defineEmits<{
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   margin-left: auto;
 }
 
 .admin-bulk-bar-btn {
   letter-spacing: 0.02em !important;
+}
+
+.admin-bulk-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.admin-bulk-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.admin-bulk-icon-btn--clear {
+  color: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.admin-bulk-icon-btn--clear:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-bulk-icon-btn--delete {
+  color: #ef9a9a;
+  border-color: rgba(239, 83, 80, 0.55);
+}
+
+.admin-bulk-icon-btn--delete:hover:not(:disabled) {
+  color: #ffcdd2;
+  border-color: #ef5350;
+  background: rgba(239, 83, 80, 0.14);
+}
+
+.admin-bulk-icon-btn--cancel {
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.admin-bulk-icon-btn--cancel:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 @media (max-width: 599px) {
@@ -173,7 +252,7 @@ defineEmits<{
   }
 
   .admin-bulk-bar-actions .admin-bulk-bar-btn {
-    flex: 1 1 calc(50% - 0.2rem);
+    flex: 1 1 auto;
     min-width: 0;
   }
 }

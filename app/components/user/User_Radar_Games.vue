@@ -109,6 +109,7 @@ import { gameDoc, gamesCollection } from "~/utils/channelOwnerGames";
 import {
   parseReleaseDate,
   resolveGameReleaseIso,
+  shouldPruneFromRadar,
 } from "~/utils/upcomingGames";
 
 const { $firestore } = useNuxtApp();
@@ -163,6 +164,26 @@ function sortRadarGames(list: any[]) {
   });
 }
 
+const pruneExpiredRadarGames = async (list: any[]) => {
+  if (!_store.user?.uid || !$firestore) return list;
+
+  const expired = list.filter((g) => shouldPruneFromRadar(g));
+  if (!expired.length) return list;
+
+  await Promise.all(
+    expired.map((g) =>
+      deleteDoc(
+        gameDoc($firestore, _store.user!.uid, "upcoming_games", g.firestoreId)
+      ).catch((err) => {
+        console.error("Radar prune delete failed:", g?.name, err);
+      })
+    )
+  );
+
+  const expiredIds = new Set(expired.map((g) => g.firestoreId));
+  return list.filter((g) => !expiredIds.has(g.firestoreId));
+};
+
 const getGames = async () => {
   if (!_store.user?.uid || !$firestore) return;
 
@@ -180,8 +201,9 @@ const getGames = async () => {
       ...doc.data(),
     }));
 
+    const kept = await pruneExpiredRadarGames(gamesList);
     // En yakın çıkış üstte
-    games.value = sortRadarGames(gamesList);
+    games.value = sortRadarGames(kept);
   } catch (error) {
     if (!isAbortError(error)) console.error("Error getting games:", error);
   } finally {

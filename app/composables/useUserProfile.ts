@@ -1,5 +1,9 @@
 import { deleteField, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import store from "~/store/store";
+import {
+  clampYearlyGameGoal,
+  resolveYearlyGameGoal,
+} from "~/utils/yearlyGoal";
 
 export type UserProfilePatch = {
   firstName?: string;
@@ -7,6 +11,7 @@ export type UserProfilePatch = {
   phone?: string;
   avatarUrl?: string | null;
   username?: string;
+  yearlyGameGoal?: number;
 };
 
 const AVATAR_BUCKET = "npmrungame_avatars";
@@ -35,6 +40,10 @@ export function useUserProfile() {
     return (u?.avatarUrl || u?.photoURL || "") as string;
   });
 
+  const yearlyGameGoal = computed(() =>
+    resolveYearlyGameGoal(user.value?.yearlyGameGoal)
+  );
+
   async function patchProfile(patch: UserProfilePatch) {
     const uid = user.value?.uid;
     if (!uid || !$firestore) throw new Error("Oturum bulunamadı");
@@ -50,6 +59,9 @@ export function useUserProfile() {
       if (patch.lastName !== undefined) payload.lastName = patch.lastName.trim();
       if (patch.phone !== undefined) payload.phone = patch.phone.trim();
       if (patch.username !== undefined) payload.username = patch.username.trim();
+      if (patch.yearlyGameGoal !== undefined) {
+        payload.yearlyGameGoal = clampYearlyGameGoal(patch.yearlyGameGoal);
+      }
       if (patch.avatarUrl === null) payload.avatarUrl = deleteField();
       else if (patch.avatarUrl !== undefined) payload.avatarUrl = patch.avatarUrl;
 
@@ -63,6 +75,9 @@ export function useUserProfile() {
       if (patch.lastName !== undefined) nextUser.lastName = payload.lastName;
       if (patch.phone !== undefined) nextUser.phone = payload.phone;
       if (patch.username !== undefined) nextUser.username = payload.username;
+      if (patch.yearlyGameGoal !== undefined) {
+        nextUser.yearlyGameGoal = payload.yearlyGameGoal;
+      }
       if (patch.avatarUrl === null) delete nextUser.avatarUrl;
       else if (patch.avatarUrl !== undefined) nextUser.avatarUrl = patch.avatarUrl;
 
@@ -124,6 +139,7 @@ export function useUserProfile() {
     user,
     displayName,
     avatarSrc,
+    yearlyGameGoal,
     saving,
     uploading,
     error,

@@ -10,6 +10,7 @@ import {
   isChannelOwner,
   type UserGameListKey,
 } from "~/utils/channelOwnerGames";
+import { resolveYearlyGameGoal } from "~/utils/yearlyGoal";
 
 export type PlayerListCounts = {
   current_games: number;
@@ -36,6 +37,8 @@ export type PlayerOverviewRow = {
   steamId: string | null;
   isOwner: boolean;
   createdAtMs: number | null;
+  /** Yıllık bitirme hedefi (registered_users.yearlyGameGoal) */
+  yearlyGameGoal: number;
   counts: PlayerListCounts;
   totalGames: number;
   steamLive?: PlayerSteamLive | null;
@@ -88,11 +91,19 @@ function pickPreferredPlayer(a: PlayerBaseRow, b: PlayerBaseRow): PlayerBaseRow 
       winner = aTs >= bTs ? a : b;
     }
   }
-  // steamId hangi dokümanda varsa koru
-  if (!winner.steamId && (a.steamId || b.steamId)) {
-    return { ...winner, steamId: a.steamId || b.steamId };
+  // steamId / hedef hangi dokümanda varsa koru
+  let next = winner;
+  if (!next.steamId && (a.steamId || b.steamId)) {
+    next = { ...next, steamId: a.steamId || b.steamId };
   }
-  return winner;
+  // Daha spesifik (non-default) hedef tercih et
+  if (a.yearlyGameGoal !== b.yearlyGameGoal) {
+    const aCustom = a.yearlyGameGoal !== resolveYearlyGameGoal(undefined);
+    const bCustom = b.yearlyGameGoal !== resolveYearlyGameGoal(undefined);
+    if (bCustom && !aCustom) next = { ...next, yearlyGameGoal: b.yearlyGameGoal };
+    else if (aCustom && !bCustom) next = { ...next, yearlyGameGoal: a.yearlyGameGoal };
+  }
+  return next;
 }
 
 function pickPreferredCounted(
@@ -158,6 +169,7 @@ export async function fetchOwnerPlayerOverview(
       steamId: /^\d{17}$/.test(rawSteam) ? rawSteam : null,
       isOwner: isChannelOwner(uid) || uid === CHANNEL_OWNER_UID,
       createdAtMs: createdAtMs(data),
+      yearlyGameGoal: resolveYearlyGameGoal(data.yearlyGameGoal),
     };
   });
 
@@ -173,6 +185,7 @@ export async function fetchOwnerPlayerOverview(
       steamId: null,
       isOwner: true,
       createdAtMs: null,
+      yearlyGameGoal: resolveYearlyGameGoal(undefined),
     });
   }
 

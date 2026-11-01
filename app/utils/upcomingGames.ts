@@ -104,6 +104,27 @@ export const getCalendarDaysUntilRelease = (value: string, now = new Date()) => 
 export const getMsUntilReleaseMidnight = (value: string, now = new Date()) =>
   getReleaseMidnight(value).getTime() - now.getTime();
 
+/** Çıkış gece yarısından itibaren `hours` saatten fazla geçmiş mi */
+export const isReleaseOlderThanHours = (
+  value: string,
+  hours = 24,
+  now = new Date()
+) => {
+  const release = getReleaseMidnight(value);
+  if (Number.isNaN(release.getTime())) return false;
+  return now.getTime() - release.getTime() > hours * 3_600_000;
+};
+
+/** Radardan düşecek: çıkış tarihi bilinen ve 24+ saat geçmiş */
+export const shouldPruneFromRadar = (
+  item: { released?: string | null; releaseDate?: string | null },
+  now = new Date()
+) => {
+  const iso = resolveGameReleaseIso(item);
+  if (!iso) return false;
+  return isReleaseOlderThanHours(iso, 24, now);
+};
+
 /** 2 gün veya daha az + henüz 00:00 gelmemiş → canlı countdown */
 export const shouldShowLiveReleaseCountdown = (
   value: string,

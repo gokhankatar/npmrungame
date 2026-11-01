@@ -85,10 +85,10 @@ export const panelNavItems: PanelNavItem[] = [
     ownerOnly: true,
     children: [
       {
-        title: "Oyuncular",
+        title: "Dashboard",
         titleKey: "panel.nav.players",
         to: "/dashboard/players",
-        icon: "mdi-account-group-outline",
+        icon: "mdi-view-dashboard-variant-outline",
         ownerOnly: true,
       },
     ],
